@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/0-project-setup/</loc>
+      <lastmod>2017-08-15T20:02:30+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/categories/</loc>
       <priority>0</priority>
     </url>
@@ -16,6 +25,16 @@
     
       <loc>http://www.demystifyfp.com/</loc>
       <lastmod>2016-04-20T00:00:00+00:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/fsharp/</loc>
+      <lastmod>2017-08-15T20:02:30+05:30</lastmod>
       <priority>0</priority>
     </url>
     
