@@ -5,7 +5,16 @@
     
     <url>
     
-      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/0-project-setup/</loc>
+      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</loc>
       <lastmod>2017-08-15T20:02:30+05:30</lastmod>
     </url>
     
@@ -33,7 +42,57 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/tags/dotliquid/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/tags/fake/</loc>
+      <lastmod>2017-08-15T20:02:30+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/tags/forge/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/tags/fsharp/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/fsharp/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/tags/paket/</loc>
       <lastmod>2017-08-15T20:02:30+05:30</lastmod>
       <priority>0</priority>
     </url>
@@ -52,7 +111,18 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/tags/suave/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/tags/</loc>
+      <lastmod>2017-08-16T20:34:02+05:30</lastmod>
       <priority>0</priority>
     </url>
     

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Paket on Demystify FP</title>
+    <link>http://www.demystifyfp.com/tags/paket/</link>
+    <description>Recent content in Paket on Demystify FP</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Demystify FP</copyright>
+    <lastBuildDate>Tue, 15 Aug 2017 20:02:30 +0530</lastBuildDate>
+    <atom:link href="/tags/paket/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Setting Up FsTweet Project</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</link>
+      <pubDate>Tue, 15 Aug 2017 20:02:30 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;In this first part of the series on &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;, we will be starting the project from scratch using and configuring it to use &lt;a href=&#34;https://fake.build/&#34; target=&#34;_blank&#34;&gt;FAKE&lt;/a&gt; and &lt;a href=&#34;https://fsprojects.github.io/Paket/&#34; target=&#34;_blank&#34;&gt;Paket&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by creating an empty directory with the name &lt;em&gt;FsTweet&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir FsTweet
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are going to use &lt;a href=&#34;http://forge.run/&#34; target=&#34;_blank&#34;&gt;Forge&lt;/a&gt;, a command line tool that provides tasks for creating and managing F# projects.&lt;/p&gt;
+
+&lt;p&gt;This series uses Forge &lt;a href=&#34;https://github.com/fsharp-editing/Forge/releases/tag/1.4.2&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;version 1.4.2&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Post this version, Forge has been updated to work with dotnet core, and it&amp;rsquo;s not backward compatible.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;You can install Forge, by following the &lt;a href=&#34;https://github.com/fsharp-editing/Forge/wiki/Getting-started&#34; target=&#34;_blank&#34;&gt;installation instructions&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;After installation, initialize paket using the &lt;code&gt;forge paket init&lt;/code&gt; command&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; cd FsTweet
+&amp;gt; forge paket init
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This will download the &lt;em&gt;paket.exe&lt;/em&gt; in the &lt;em&gt;.paket&lt;/em&gt; directory along with &lt;em&gt;paket.dependencies&lt;/em&gt; file in the project root directory.&lt;/p&gt;
+
+&lt;p&gt;To &lt;a href=&#34;https://fsprojects.github.io/Paket/dependencies-file.html#Framework-restrictions&#34; target=&#34;_blank&#34;&gt;restrict paket&lt;/a&gt; to use the .NET Framework 4.6.1 version, we need to add, &lt;code&gt;framework: net461&lt;/code&gt; in a new line in the &lt;em&gt;paket.dependencies&lt;/em&gt; file.&lt;/p&gt;
+
+&lt;p&gt;If you prefer to do this from your bash, you can achieve it using the following command&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;gt; echo &#39;framework: net461&#39; &amp;gt;&amp;gt; paket.dependencies
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is creating a &lt;a href=&#34;https://github.com/fsharp-editing/Forge/wiki/new-project&#34; target=&#34;_blank&#34;&gt;new project&lt;/a&gt; and adding the &lt;a href=&#34;https://fake.build/legacy-gettingstarted.html&#34; target=&#34;_blank&#34;&gt;FAKE&lt;/a&gt; using Forge.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge new project -n FsTweet.Web --dir src -t suave
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This command creates a new console project in &lt;em&gt;./src/FsTweet.Web&lt;/em&gt; directory pre-configured with a Suave template.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;You may encounter the following error while running this command&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;  Unhandled error:
+  Could not find file &amp;quot;.../FsTweet/src/build.sh&amp;quot;.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This was a &lt;a href=&#34;https://github.com/fsharp-editing/Forge/issues/54#issuecomment-284559266&#34; target=&#34;_blank&#34;&gt;known issue&lt;/a&gt; in Forge which has been fixed in the later version. You can ignore it in our case.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;That&amp;rsquo;s all!&lt;/p&gt;
+
+&lt;p&gt;We can verify the setup by building the project using Forge&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge build
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This command internally calls the &lt;code&gt;fake&lt;/code&gt; command to build the project.&lt;/p&gt;
+
+&lt;p&gt;Upon successful completion of this command, we can find the &lt;em&gt;FsTweet.Web.exe&lt;/em&gt; file in the &lt;em&gt;FsTweet/build&lt;/em&gt; directory.&lt;/p&gt;
+
+&lt;p&gt;When you run it,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; build/FsTweet.Web.exe
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;if you are on non-windows platform&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;  &amp;gt; mono build/FsTweet.Web.exe
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;It will start the Suave standalone web server on port &lt;code&gt;8080&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;[21:42:45 INF] Smooth! Suave listener started in 138.226 with binding 127.0.0.1:8080
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You will be seeing &lt;code&gt;Hello World!&lt;/code&gt;, when you curl the application&amp;rsquo;s root endpoint&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; curl http://127.0.0.1:8080/
+Hello World!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As we will be building and running the application often during our development, let&amp;rsquo;s leverage Fake and Forge to simplify this mundane task.&lt;/p&gt;
+
+&lt;p&gt;In the FAKE build script, &lt;em&gt;build.fsx&lt;/em&gt;, remove the &lt;code&gt;Deploy&lt;/code&gt; Target&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// build.fsx
+Target &amp;quot;Deploy&amp;quot; (fun _ -&amp;gt;
+    !! (buildDir + &amp;quot;/**/*.*&amp;quot;)
+    -- &amp;quot;*.zip&amp;quot;
+    |&amp;gt; Zip buildDir (deployDir + &amp;quot;ApplicationName.&amp;quot; + version + &amp;quot;.zip&amp;quot;)
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and add the &lt;code&gt;Run&lt;/code&gt; Target&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// build.fsx
+Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt; 
+    ExecProcess 
+        (fun info -&amp;gt; info.FileName &amp;lt;- &amp;quot;./build/FsTweet.Web.exe&amp;quot;)
+        (System.TimeSpan.FromDays 1.)
+    |&amp;gt; ignore
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As the name indicates, the &lt;code&gt;Run&lt;/code&gt; Target runs our application from the build directory using the &lt;a href=&#34;https://fake.build/apidocs/fake-core-process.html&#34; target=&#34;_blank&#34;&gt;ExecProcess&lt;/a&gt; function in FAKE.&lt;/p&gt;
+
+&lt;p&gt;Then change the build order to use &lt;code&gt;Run&lt;/code&gt; instead of &lt;code&gt;Deploy&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Build order
+&amp;quot;Clean&amp;quot;
+  ==&amp;gt; &amp;quot;Build&amp;quot;
+  ==&amp;gt; &amp;quot;Run&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final step is creating &lt;em&gt;Forge.toml&lt;/em&gt; file in the root directory, &lt;em&gt;FsTweet&lt;/em&gt; and add an &lt;code&gt;run&lt;/code&gt; &lt;a href=&#34;https://github.com/fsharp-editing/Forge/wiki/Aliases&#34; target=&#34;_blank&#34;&gt;alias&lt;/a&gt; to run Fake&amp;rsquo;s &lt;code&gt;Run&lt;/code&gt; target&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-toml&#34;&gt;# Forge.toml
+[alias]
+  run=&#39;fake Run&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this alias in place, we can build and run our application using a single command&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge run
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h1 id=&#34;summary&#34;&gt;Summary&lt;/h1&gt;
+
+&lt;p&gt;In this part, we have learned how to bootstrap a project from scratch and configure it to use Paket and FAKE.&lt;/p&gt;
+
+&lt;p&gt;Using Forge, we orchestrated the project setup, and the cherry on the cake is the alias to build and run our project with a single command!&lt;/p&gt;
+
+&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.0&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

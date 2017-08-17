@@ -11,16 +11,230 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Part 0: Project Setup</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/0-project-setup/</link>
-      <pubDate>Tue, 15 Aug 2017 20:02:30 +0530</pubDate>
+      <title>Setting Up Server Side Rendering using DotLiquid</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</link>
+      <pubDate>Wed, 16 Aug 2017 20:34:02 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/0-project-setup/</guid>
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;In this zeroth part of the series on &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;, we will be starting the project from scratch using and configuring it to use &lt;a href=&#34;https://fake.build/&#34; target=&#34;_blank&#34;&gt;FAKE&lt;/a&gt; and &lt;a href=&#34;https://fsprojects.github.io/Paket/&#34; target=&#34;_blank&#34;&gt;Paket&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Welcome to the second part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; series.&lt;/p&gt;
+
+&lt;p&gt;In this post, we are going to extend our &lt;code&gt;FsTweet&lt;/code&gt; app to render &lt;code&gt;Hello, World!&lt;/code&gt; as HTML document from the server side using &lt;a href=&#34;http://dotliquidmarkup.org/&#34; target=&#34;_blank&#34;&gt;DotLiquid&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;adding-packages-references&#34;&gt;Adding Packages References&lt;/h2&gt;
+
+&lt;p&gt;Suave has a &lt;a href=&#34;https://suave.io/dotliquid.html&#34; target=&#34;_blank&#34;&gt;good support&lt;/a&gt; for doing server side rendering using DotLiquid. To make use of this in our project, we need to refer the associated NuGet pacakges in &lt;em&gt;FsTweet.Web.fsproj&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s use Forge to add the required packages using Paket&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add DotLiquid -V 2.0.64
+&amp;gt; forge paket add Suave.DotLiquid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;At the time of this writing there were some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version &lt;code&gt;2.0.64&lt;/code&gt;, we are sticking to the same here.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The next step is referring these packages in the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;To do this, add the package names in the &lt;em&gt;paket.references&lt;/em&gt; file of &lt;em&gt;FsTweet.Web&lt;/em&gt; project&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;...
+DotLiquid
+Suave.DotLiquid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;If you prefer to do the same from your bash, you can use the following commands&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;  &amp;gt; echo &amp;gt;&amp;gt; src/FsTweet.Web/paket.references #adds an empty new line
+  &amp;gt; echo &#39;DotLiquid&#39; &amp;gt;&amp;gt; src/FsTweet.Web/paket.references
+  &amp;gt; echo &#39;Suave.DotLiquid&#39; &amp;gt;&amp;gt; src/FsTweet.Web/paket.references
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last step is running the &lt;code&gt;forge install&lt;/code&gt; command, an alias for the &lt;code&gt;paket install&lt;/code&gt; command.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This command adds the references of the Nuget packages provided in the &lt;em&gt;paket.references&lt;/em&gt; file to the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;h2 id=&#34;initializing-dotliquid&#34;&gt;Initializing DotLiquid&lt;/h2&gt;
+
+&lt;p&gt;Now we have the required NuGet packages onboard&lt;/p&gt;
+
+&lt;p&gt;DotLiquid requires the following global initilization settings to enable us to render the &lt;a href=&#34;https://shopify.github.io/liquid/&#34; target=&#34;_blank&#34;&gt;liquid templates&lt;/a&gt;.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A directory path which contains all our views&lt;/li&gt;
+&lt;li&gt;Naming Convention to be used which referring view models in the views.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://www.nuget.org/packages/Suave.DotLiquid/&#34; target=&#34;_blank&#34;&gt;Suave.DotLiquid&lt;/a&gt; has helper functions to do this for us.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s have a directory called &lt;code&gt;views&lt;/code&gt; in the &lt;code&gt;FsTweet.Web&lt;/code&gt; project to put the liquid template files&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/FsTweet.Web/views
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The add a new function called &lt;code&gt;initDotLiquid&lt;/code&gt;, which invokes the required helper functions to initialize DotLiquid to use this &lt;code&gt;views&lt;/code&gt; directory for templates and &lt;code&gt;CSharpNamingConvention&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
+// ...
+open Suave.DotLiquid
+open System.IO
+open System.Reflection
+
+let currentPath =
+  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+
+let initDotLiquid () =
+  setCSharpNamingConvention ()
+  let templatesDir = Path.Combine(currentPath, &amp;quot;views&amp;quot;)
+  setTemplatesDir templatesDir
+
+[&amp;lt;EntryPoint&amp;gt;]
+let main argv =
+  initDotLiquid ()
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;updating-build-script-to-copy-views-directory&#34;&gt;Updating Build Script To Copy Views Directory&lt;/h2&gt;
+
+&lt;p&gt;With the above DotLiquid configuration in place, while running the &lt;code&gt;FsTweet.Web&lt;/code&gt; application, we need to have the &lt;code&gt;views&lt;/code&gt; directory in the current directory&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;├── build
+│   ├── ...
+│   ├── FsTweet.Web.exe
+│   └── views/
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can achieve it in two ways.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Adding the liquid templates files in the views directory to &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt; file with the &lt;code&gt;Build Action&lt;/code&gt; property as &lt;code&gt;Content&lt;/code&gt; and &lt;code&gt;Copy to Output&lt;/code&gt; property to either &lt;code&gt;Copy always&lt;/code&gt; or &lt;code&gt;Copy if newer&lt;/code&gt; as mentioned in the &lt;a href=&#34;https://msdn.microsoft.com/en-us/library/0c6xyb66(v=vs.100).aspx&#34; target=&#34;_blank&#34;&gt;project file properties&lt;/a&gt; documentation.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;The second option is leveraging our build script to copy the entire &lt;code&gt;views&lt;/code&gt; directory to the &lt;code&gt;build&lt;/code&gt; directory.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;We are going to use the later one as it is an one time work rather than fiddling with the properties every time when we add a new content file&lt;/p&gt;
+
+&lt;p&gt;To do this let&amp;rsquo;s add a new Target in the FAKE build script called &lt;code&gt;Views&lt;/code&gt; and copy the directory the FAKE&amp;rsquo;s &lt;code&gt;CopyDir&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let noFilter = fun _ -&amp;gt; true
+
+Target &amp;quot;Views&amp;quot; (fun _ -&amp;gt;
+    let srcDir = &amp;quot;./src/FsTweet.Web/views&amp;quot;
+    let targetDir = combinePaths buildDir &amp;quot;views&amp;quot;
+    CopyDir targetDir srcDir noFilter
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then modify the build order to invoke &lt;code&gt;Views&lt;/code&gt; Target before &lt;code&gt;Run&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Build order
+&amp;quot;Clean&amp;quot;
+  ==&amp;gt; &amp;quot;Build&amp;quot;
+  ==&amp;gt; &amp;quot;Views&amp;quot;
+  ==&amp;gt; &amp;quot;Run&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
+
+&lt;p&gt;Now it&amp;rsquo;s time to add some liquid templates and see it in action&lt;/p&gt;
+
+&lt;h2 id=&#34;defining-and-rending-dotliquid-templates&#34;&gt;Defining And Rending DotLiquid Templates&lt;/h2&gt;
+
+&lt;p&gt;The first step is defining a master page template with some placeholders.&lt;/p&gt;
+
+&lt;p&gt;Add a new file &lt;em&gt;master_page.liquid&lt;/em&gt; in the &lt;code&gt;views&lt;/code&gt; directory and update it as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- src/FsTweet.Web/views/master_page.liquid --&amp;gt;
+&amp;lt;!DOCTYPE HTML&amp;gt;
+&amp;lt;html&amp;gt;
+  &amp;lt;head&amp;gt;
+    {% block head %}
+    {% endblock %}
+  &amp;lt;/head&amp;gt;
+  &amp;lt;body&amp;gt;
+    &amp;lt;div id=&amp;quot;content&amp;quot;&amp;gt;
+      {% block content %}
+      {% endblock %}
+    &amp;lt;/div&amp;gt;
+    &amp;lt;div id=&amp;quot;scripts&amp;quot;&amp;gt;
+      {% block scripts %}
+      {% endblock %}
+    &amp;lt;/div&amp;gt;		
+  &amp;lt;/body&amp;gt;
+&amp;lt;/html&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This &lt;code&gt;master_page&lt;/code&gt; template defines three placeholders &lt;code&gt;head&lt;/code&gt;, &lt;code&gt;content&lt;/code&gt; and &lt;code&gt;scripts&lt;/code&gt; which will be filled by its child pages.&lt;/p&gt;
+
+&lt;p&gt;The next step is adding a child page liquid template &lt;em&gt;guest/home.liquid&lt;/em&gt; with some title and content&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; FsTweet - Powered by F# &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+&amp;lt;p&amp;gt;Hello, World!&amp;lt;/p&amp;gt;
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This guest home page template &lt;code&gt;extends&lt;/code&gt; the &lt;code&gt;master_page&lt;/code&gt; template and provide values for the &lt;code&gt;head&lt;/code&gt; and &lt;code&gt;content&lt;/code&gt; placeholders.&lt;/p&gt;
+
+&lt;h2 id=&#34;rendering-using-suave-dotliquid&#34;&gt;Rendering Using Suave.DotLiquid&lt;/h2&gt;
+
+&lt;p&gt;The final step is rendering the liquid templates from Suave.&lt;/p&gt;
+
+&lt;p&gt;The &lt;em&gt;Suave.DotLiquid&lt;/em&gt; package has a function called &lt;code&gt;page&lt;/code&gt; which takes a relative file path (from the templates root directory) and a view model and returns a WebPart&lt;/p&gt;
+
+&lt;p&gt;We just need to define the app using this &lt;code&gt;page&lt;/code&gt; function. As the page is not using an view model we can use an empty string for the second parameter.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s also add a &lt;code&gt;path&lt;/code&gt; filter in Suave to render the page only if the path is a root (&lt;code&gt;/&lt;/code&gt;)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
+// ...
+open Suave.Operators
+open Suave.Filters
+// ...
+[&amp;lt;EntryPoint&amp;gt;]
+let main argv =
+  initDotLiquid ()  
+  let app = 
+    path &amp;quot;/&amp;quot; &amp;gt;=&amp;gt; page &amp;quot;guest/home.liquid&amp;quot; &amp;quot;&amp;quot;
+  startWebServer defaultConfig app
+  0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now if you build and run the application using the &lt;code&gt;forge run&lt;/code&gt; command, you can see a HTML document with the &lt;code&gt;Hello, World!&lt;/code&gt; content in the browser on &lt;em&gt;&lt;a href=&#34;http://localhost:8080/&#34; target=&#34;_blank&#34;&gt;http://localhost:8080/&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we have seen how to set up a Suave application to render server side views using DotLiquid and also how to make use of FAKE build script to manage static files.&lt;/p&gt;
+
+&lt;p&gt;The source code is available in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.1&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Setting Up FsTweet Project</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</link>
+      <pubDate>Tue, 15 Aug 2017 20:02:30 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;In this first part of the series on &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;, we will be starting the project from scratch using and configuring it to use &lt;a href=&#34;https://fake.build/&#34; target=&#34;_blank&#34;&gt;FAKE&lt;/a&gt; and &lt;a href=&#34;https://fsprojects.github.io/Paket/&#34; target=&#34;_blank&#34;&gt;Paket&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s get started by creating an empty directory with the name &lt;em&gt;FsTweet&lt;/em&gt;&lt;/p&gt;
 
@@ -154,7 +368,7 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 
 &lt;p&gt;Using Forge, we orchestrated the project setup, and the cherry on the cake is the alias to build and run our project with a single command!&lt;/p&gt;
 
-&lt;p&gt;The source cod is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.0&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.0&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
