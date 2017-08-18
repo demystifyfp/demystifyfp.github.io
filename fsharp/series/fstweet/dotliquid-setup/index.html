@@ -190,7 +190,7 @@
 
 <h2 id="adding-packages-references">Adding Packages References</h2>
 
-<p>Suave has a <a href="https://suave.io/dotliquid.html" target="_blank">good support</a> for doing server side rendering using DotLiquid. To make use of this in our project, we need to refer the associated NuGet pacakges in <em>FsTweet.Web.fsproj</em>.</p>
+<p>Suave has <a href="https://suave.io/dotliquid.html" target="_blank">good support</a> for doing server side rendering using DotLiquid. To make use of this in our project, we need to refer the associated NuGet packages in <em>FsTweet.Web.fsproj</em>.</p>
 
 <p>Let&rsquo;s use Forge to add the required packages using Paket</p>
 
@@ -199,7 +199,7 @@
 </code></pre>
 
 <blockquote>
-<p>At the time of this writing there were some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version <code>2.0.64</code>, we are sticking to the same here.</p>
+<p>At the time of this writing, there were some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version <code>2.0.64</code>, we are sticking to the same here.</p>
 </blockquote>
 
 <p>The next step is referring these packages in the <code>FsTweet.Web.fsproj</code>.</p>
@@ -218,14 +218,14 @@ Suave.DotLiquid
   &gt; echo 'DotLiquid' &gt;&gt; src/FsTweet.Web/paket.references
   &gt; echo 'Suave.DotLiquid' &gt;&gt; src/FsTweet.Web/paket.references
 </code></pre>
+</blockquote>
 
 <p>The last step is running the <code>forge install</code> command, an alias for the <code>paket install</code> command.</p>
-</blockquote>
 
 <pre><code class="language-bash">&gt; forge install
 </code></pre>
 
-<p>This command adds the references of the Nuget packages provided in the <em>paket.references</em> file to the <code>FsTweet.Web.fsproj</code> file.</p>
+<p>This command adds the references of the NuGet packages provided in the <em>paket.references</em> file to the <code>FsTweet.Web.fsproj</code> file.</p>
 
 <h2 id="initializing-dotliquid">Initializing DotLiquid</h2>
 
@@ -235,7 +235,7 @@ Suave.DotLiquid
 
 <ul>
 <li>A directory path which contains all our views</li>
-<li>Naming Convention to be used which referring view models in the views.</li>
+<li>Naming Convention to be used when referring view models in the views.</li>
 </ul>
 
 <p>The <a href="https://www.nuget.org/packages/Suave.DotLiquid/" target="_blank">Suave.DotLiquid</a> has helper functions to do this for us.</p>
@@ -269,7 +269,7 @@ let main argv =
 
 <h2 id="updating-build-script-to-copy-views-directory">Updating Build Script To Copy Views Directory</h2>
 
-<p>With the above DotLiquid configuration in place, while running the <code>FsTweet.Web</code> application, we need to have the <code>views</code> directory in the current directory</p>
+<p>With the above DotLiquid configuration in place, while running the <code>FsTweet.Web</code> application, we need to have the <code>views</code> directory in the current directory.</p>
 
 <pre><code>├── build
 │   ├── ...
@@ -285,7 +285,7 @@ let main argv =
 <li><p>The second option is leveraging our build script to copy the entire <code>views</code> directory to the <code>build</code> directory.</p></li>
 </ol>
 
-<p>We are going to use the later one as it is an one time work rather than fiddling with the properties every time when we add a new content file</p>
+<p>We are going to use the latter one as it is a one time work rather than fiddling with the properties whenever we add a new liquid template file.</p>
 
 <p>To do this let&rsquo;s add a new Target in the FAKE build script called <code>Views</code> and copy the directory the FAKE&rsquo;s <code>CopyDir</code> function</p>
 
@@ -352,7 +352,7 @@ Target &quot;Views&quot; (fun _ -&gt;
 {% endblock %}
 </code></pre>
 
-<p>This guest home page template <code>extends</code> the <code>master_page</code> template and provide values for the <code>head</code> and <code>content</code> placeholders.</p>
+<p>This guest home page template <code>extends</code> the <code>master_page</code> template and provides values for the <code>head</code> and <code>content</code> placeholders.</p>
 
 <h2 id="rendering-using-suave-dotliquid">Rendering Using Suave.DotLiquid</h2>
 
@@ -360,7 +360,7 @@ Target &quot;Views&quot; (fun _ -&gt;
 
 <p>The <em>Suave.DotLiquid</em> package has a function called <code>page</code> which takes a relative file path (from the templates root directory) and a view model and returns a WebPart</p>
 
-<p>We just need to define the app using this <code>page</code> function. As the page is not using an view model we can use an empty string for the second parameter.</p>
+<p>We just need to define the app using this <code>page</code> function. As the page is not using a view model we can use an empty string for the second parameter.</p>
 
 <p>Let&rsquo;s also add a <code>path</code> filter in Suave to render the page only if the path is a root (<code>/</code>)</p>
 
@@ -378,7 +378,7 @@ let main argv =
   0
 </code></pre>
 
-<p>Now if you build and run the application using the <code>forge run</code> command, you can see a HTML document with the <code>Hello, World!</code> content in the browser on <em><a href="http://localhost:8080/" target="_blank">http://localhost:8080/</a></em></p>
+<p>Now if you build and run the application using the <code>forge run</code> command, you can see an HTML document with the <code>Hello, World!</code> content in the browser on <em><a href="http://localhost:8080/" target="_blank">http://localhost:8080/</a></em></p>
 
 <h2 id="summary">Summary</h2>
 

@@ -26,7 +26,7 @@
 
 &lt;h2 id=&#34;adding-packages-references&#34;&gt;Adding Packages References&lt;/h2&gt;
 
-&lt;p&gt;Suave has a &lt;a href=&#34;https://suave.io/dotliquid.html&#34; target=&#34;_blank&#34;&gt;good support&lt;/a&gt; for doing server side rendering using DotLiquid. To make use of this in our project, we need to refer the associated NuGet pacakges in &lt;em&gt;FsTweet.Web.fsproj&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;Suave has &lt;a href=&#34;https://suave.io/dotliquid.html&#34; target=&#34;_blank&#34;&gt;good support&lt;/a&gt; for doing server side rendering using DotLiquid. To make use of this in our project, we need to refer the associated NuGet packages in &lt;em&gt;FsTweet.Web.fsproj&lt;/em&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s use Forge to add the required packages using Paket&lt;/p&gt;
 
@@ -35,7 +35,7 @@
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;At the time of this writing there were some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version &lt;code&gt;2.0.64&lt;/code&gt;, we are sticking to the same here.&lt;/p&gt;
+&lt;p&gt;At the time of this writing, there were some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version &lt;code&gt;2.0.64&lt;/code&gt;, we are sticking to the same here.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;The next step is referring these packages in the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt;.&lt;/p&gt;
@@ -54,14 +54,14 @@ Suave.DotLiquid
   &amp;gt; echo &#39;DotLiquid&#39; &amp;gt;&amp;gt; src/FsTweet.Web/paket.references
   &amp;gt; echo &#39;Suave.DotLiquid&#39; &amp;gt;&amp;gt; src/FsTweet.Web/paket.references
 &lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;The last step is running the &lt;code&gt;forge install&lt;/code&gt; command, an alias for the &lt;code&gt;paket install&lt;/code&gt; command.&lt;/p&gt;
-&lt;/blockquote&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge install
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This command adds the references of the Nuget packages provided in the &lt;em&gt;paket.references&lt;/em&gt; file to the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;This command adds the references of the NuGet packages provided in the &lt;em&gt;paket.references&lt;/em&gt; file to the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt; file.&lt;/p&gt;
 
 &lt;h2 id=&#34;initializing-dotliquid&#34;&gt;Initializing DotLiquid&lt;/h2&gt;
 
@@ -71,7 +71,7 @@ Suave.DotLiquid
 
 &lt;ul&gt;
 &lt;li&gt;A directory path which contains all our views&lt;/li&gt;
-&lt;li&gt;Naming Convention to be used which referring view models in the views.&lt;/li&gt;
+&lt;li&gt;Naming Convention to be used when referring view models in the views.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;The &lt;a href=&#34;https://www.nuget.org/packages/Suave.DotLiquid/&#34; target=&#34;_blank&#34;&gt;Suave.DotLiquid&lt;/a&gt; has helper functions to do this for us.&lt;/p&gt;
@@ -105,7 +105,7 @@ let main argv =
 
 &lt;h2 id=&#34;updating-build-script-to-copy-views-directory&#34;&gt;Updating Build Script To Copy Views Directory&lt;/h2&gt;
 
-&lt;p&gt;With the above DotLiquid configuration in place, while running the &lt;code&gt;FsTweet.Web&lt;/code&gt; application, we need to have the &lt;code&gt;views&lt;/code&gt; directory in the current directory&lt;/p&gt;
+&lt;p&gt;With the above DotLiquid configuration in place, while running the &lt;code&gt;FsTweet.Web&lt;/code&gt; application, we need to have the &lt;code&gt;views&lt;/code&gt; directory in the current directory.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;├── build
 │   ├── ...
@@ -121,7 +121,7 @@ let main argv =
 &lt;li&gt;&lt;p&gt;The second option is leveraging our build script to copy the entire &lt;code&gt;views&lt;/code&gt; directory to the &lt;code&gt;build&lt;/code&gt; directory.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;We are going to use the later one as it is an one time work rather than fiddling with the properties every time when we add a new content file&lt;/p&gt;
+&lt;p&gt;We are going to use the latter one as it is a one time work rather than fiddling with the properties whenever we add a new liquid template file.&lt;/p&gt;
 
 &lt;p&gt;To do this let&amp;rsquo;s add a new Target in the FAKE build script called &lt;code&gt;Views&lt;/code&gt; and copy the directory the FAKE&amp;rsquo;s &lt;code&gt;CopyDir&lt;/code&gt; function&lt;/p&gt;
 
@@ -188,7 +188,7 @@ Target &amp;quot;Views&amp;quot; (fun _ -&amp;gt;
 {% endblock %}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This guest home page template &lt;code&gt;extends&lt;/code&gt; the &lt;code&gt;master_page&lt;/code&gt; template and provide values for the &lt;code&gt;head&lt;/code&gt; and &lt;code&gt;content&lt;/code&gt; placeholders.&lt;/p&gt;
+&lt;p&gt;This guest home page template &lt;code&gt;extends&lt;/code&gt; the &lt;code&gt;master_page&lt;/code&gt; template and provides values for the &lt;code&gt;head&lt;/code&gt; and &lt;code&gt;content&lt;/code&gt; placeholders.&lt;/p&gt;
 
 &lt;h2 id=&#34;rendering-using-suave-dotliquid&#34;&gt;Rendering Using Suave.DotLiquid&lt;/h2&gt;
 
@@ -196,7 +196,7 @@ Target &amp;quot;Views&amp;quot; (fun _ -&amp;gt;
 
 &lt;p&gt;The &lt;em&gt;Suave.DotLiquid&lt;/em&gt; package has a function called &lt;code&gt;page&lt;/code&gt; which takes a relative file path (from the templates root directory) and a view model and returns a WebPart&lt;/p&gt;
 
-&lt;p&gt;We just need to define the app using this &lt;code&gt;page&lt;/code&gt; function. As the page is not using an view model we can use an empty string for the second parameter.&lt;/p&gt;
+&lt;p&gt;We just need to define the app using this &lt;code&gt;page&lt;/code&gt; function. As the page is not using a view model we can use an empty string for the second parameter.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s also add a &lt;code&gt;path&lt;/code&gt; filter in Suave to render the page only if the path is a root (&lt;code&gt;/&lt;/code&gt;)&lt;/p&gt;
 
@@ -214,7 +214,7 @@ let main argv =
   0
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now if you build and run the application using the &lt;code&gt;forge run&lt;/code&gt; command, you can see a HTML document with the &lt;code&gt;Hello, World!&lt;/code&gt; content in the browser on &lt;em&gt;&lt;a href=&#34;http://localhost:8080/&#34; target=&#34;_blank&#34;&gt;http://localhost:8080/&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Now if you build and run the application using the &lt;code&gt;forge run&lt;/code&gt; command, you can see an HTML document with the &lt;code&gt;Hello, World!&lt;/code&gt; content in the browser on &lt;em&gt;&lt;a href=&#34;http://localhost:8080/&#34; target=&#34;_blank&#34;&gt;http://localhost:8080/&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
