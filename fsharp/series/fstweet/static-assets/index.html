@@ -181,9 +181,9 @@
 
 <p>Hi,</p>
 
-<p>Welcome to third part of the <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
+<p>Welcome to the third part of the <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
 
-<p>In this post, we will be changing the guest home page from displaying <code>Hello, World!</code> to a production ready landing page!</p>
+<p>In this post, we will be changing the guest homepage from displaying <code>Hello, World!</code> to a production ready landing page!</p>
 
 <p><img src="/img/fsharp/series/fstweet/guest-home-page.png" alt="img" /></p>
 
@@ -226,11 +226,11 @@
 {% endblock}
 </code></pre>
 
-<p>For simplicity I am leaving the other static content that are modified in the templates and you can find all the changes in <a href="https://github.com/demystifyfp/FsTweet/commit/ae233c5407900b32af682407d902621e0a17bd38#diff-62ccd7caf19fda6d153b1958919d1f9d" target="_blank">this diff</a></p>
+<p>For simplicity, I am leaving the other static content that is modified in the templates, and you can find all the changes in <a href="https://github.com/demystifyfp/FsTweet/commit/ae233c5407900b32af682407d902621e0a17bd38#diff-62ccd7caf19fda6d153b1958919d1f9d" target="_blank">this diff</a></p>
 
 <h2 id="updating-build-script-to-copy-assets-directory">Updating Build Script To Copy Assets Directory</h2>
 
-<p>As we seen during the <a href="/fsharp/series/fstweet/dotliquid-setup/#updating-build-script-to-copy-views-directory" target="_blank">dotliquid setup</a>, we need to add an another Target <code>Assets</code> to copy the <em>assets</em> directory to the <em>build</em> directory</p>
+<p>As we seen during the <a href="/fsharp/series/fstweet/dotliquid-setup/#updating-build-script-to-copy-views-directory" target="_blank">dot liquid setup</a>, we need to add an another Target <code>Assets</code> to copy the <em>assets</em> directory to the <em>build</em> directory</p>
 
 <pre><code class="language-fsharp">let copyToBuildDir srcDir targetDirName =
   let targetDir = combinePaths buildDir targetDirName
@@ -253,9 +253,9 @@ Target &quot;Assets&quot; (fun _ -&gt;
 
 <h2 id="serving-asset-files">Serving Asset Files</h2>
 
-<p>Now we have the assets available in the build directory. The next step is serving them Suave in respose to the request from the browser.</p>
+<p>Now we have the assets available in the build directory. The next step is serving them Suave in response to the request from the browser.</p>
 
-<p>Suave has a lot of <a href="https://suave.io/Suave.html#def:module Suave.Files" target="_blank">useful functions</a> to handle files and in our case we are going to make use of the <a href="https://suave.io/Suave.html#def:val Suave.Files.browseHome" target="_blank">browseHome</a> function to serve the assets</p>
+<p>Suave has a lot of <a href="https://suave.io/Suave.html#def:module Suave.Files" target="_blank">useful functions</a> to handle files, and in our case, we are going to make use of the <a href="https://suave.io/Suave.html#def:val Suave.Files.browseHome" target="_blank">browseHome</a> function to serve the assets</p>
 
 <blockquote>
 <p>&lsquo;browse&rsquo; the file in the sense that the contents of the file are sent based on the request&rsquo;s Url property. Will serve from the current as configured in directory. Suave&rsquo;s runtime. - Suave Documentation</p>
@@ -286,16 +286,16 @@ let main argv =
 <p>We have made two changes here.</p>
 
 <ul>
-<li><p>The <code>serveAssets</code> defines a new <a href="https://theimowski.gitbooks.io/suave-music-store/content/en/webpart.html" target="_blank">WebPart</a> using the <a href="https://suave.io/Suave.html#def:val Suave.Filters.pathRegex" target="_blank">pathRegex</a>. It matches all the requests for the assets and serve the corresponding files using the <code>browseHome</code> function.</p></li>
+<li><p>The <code>serveAssets</code> defines a new <a href="https://theimowski.gitbooks.io/suave-music-store/content/en/webpart.html" target="_blank">WebPart</a> using the <a href="https://suave.io/Suave.html#def:val Suave.Filters.pathRegex" target="_blank">pathRegex</a>. It matches all the requests for the assets and serves the corresponding files using the <code>browseHome</code> function.</p></li>
 
-<li><p>As we are handling more than one requests now, we need to change our <code>app</code> to handle all of them. Using the <a href="https://suave.io/composing.html" target="_blank">choose</a> function, we are defining the <code>app</code> to combine both <code>serveAssets</code> webpart and the one that we already had for serving guest home page.</p></li>
+<li><p>As we are handling more than one requests now, we need to change our <code>app</code> to handle all of them. Using the <a href="https://suave.io/composing.html" target="_blank">choose</a> function, we are defining the <code>app</code> to combine both <code>serveAssets</code> webpart and the one that we already had for serving the guest home page.</p></li>
 </ul>
 
 <h2 id="serving-favicon-ico">Serving favicon.ico</h2>
 
 <p>While serving our <em>FsTweet</em> application, the browser automatically makes a request for <a href="https://en.wikipedia.org/wiki/Favicon" target="_blank">favicon</a>. As the URL path for this request is <code>/favicon.ico</code> our <code>serveAssets</code> webpart cannot match this.</p>
 
-<p>To serve it we need to use a another specific path filter and use the <a href="https://suave.io/Suave.html#def:val Suave.Files.file" target="_blank">file</a> function to get the job done.</p>
+<p>To serve it we need to use an another specific path filter and use the <a href="https://suave.io/Suave.html#def:val Suave.Files.file" target="_blank">file</a> function to get the job done.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web.fs
 // ...
@@ -311,7 +311,7 @@ let serveAssets =
 
 <h2 id="summary">Summary</h2>
 
-<p>In this blog post we learned how to serve static asset files in Suave. The source code can be found in the <a href="https://github.com/demystifyfp/FsTweet/tree/v0.2" target="_blank">GitHub repository</a></p>
+<p>In this blog post, we learned how to serve static asset files in Suave. The source code can be found in the <a href="https://github.com/demystifyfp/FsTweet/tree/v0.2" target="_blank">GitHub repository</a></p>
 
     </div>
   </div>
