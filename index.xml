@@ -11,6 +11,150 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Serving Static Asset Files</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/static-assets/</link>
+      <pubDate>Sat, 19 Aug 2017 07:36:20 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/static-assets/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;Welcome to third part of the &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;In this post, we will be changing the guest home page from displaying &lt;code&gt;Hello, World!&lt;/code&gt; to a production ready landing page!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/guest-home-page.png&#34; alt=&#34;img&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;preparing-static-asset-files&#34;&gt;Preparing Static Asset Files&lt;/h2&gt;
+
+&lt;p&gt;As a first step let&amp;rsquo;s create an assets directory in &lt;em&gt;FsTweet.Web&lt;/em&gt; and place our static asset files. The asset files can be downloaded from the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.2/src/FsTweet.Web/assets&#34; target=&#34;_blank&#34;&gt;repository&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;└── FsTweet.Web
+    ├── FsTweet.Web.fs
+    ├── FsTweet.Web.fsproj
+    ├── assets
+    │   ├── css
+    │   │   └── styles.css
+    │   └── images
+    │       ├── FsTweetLogo.png
+    │       └── favicon.ico
+    ├── ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;modifying-master-page-and-guest-home-templates&#34;&gt;Modifying Master Page and Guest Home Templates&lt;/h2&gt;
+
+&lt;p&gt;Then we need to change our liquid templates to use these assets&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- view/master_page.liquid --&amp;gt;
+&amp;lt;head&amp;gt;
+  &amp;lt;!-- ... --&amp;gt;
+  &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;assets/css/styles.css&amp;quot;&amp;gt;
+&amp;lt;/head&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- view/guest/home.liquid --&amp;gt;
+&amp;lt;!-- ... --&amp;gt;
+{% block content %}
+&amp;lt;!-- ... --&amp;gt;
+&amp;lt;div class=&amp;quot;jumbotron&amp;quot;&amp;gt;
+   &amp;lt;img src=&amp;quot;assets/images/FsTweetLogo.png&amp;quot; width=&amp;quot;400px&amp;quot;/&amp;gt;
+   &amp;lt;p class=&amp;quot;lead&amp;quot;&amp;gt;Communicate with the world in a different way!&amp;lt;/p&amp;gt;
+   &amp;lt;!-- ... --&amp;gt;
+&amp;lt;/div&amp;gt;
+{% endblock}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For simplicity I am leaving the other static content that are modified in the templates and you can find all the changes in &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/commit/ae233c5407900b32af682407d902621e0a17bd38#diff-62ccd7caf19fda6d153b1958919d1f9d&#34; target=&#34;_blank&#34;&gt;this diff&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;updating-build-script-to-copy-assets-directory&#34;&gt;Updating Build Script To Copy Assets Directory&lt;/h2&gt;
+
+&lt;p&gt;As we seen during the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/#updating-build-script-to-copy-views-directory&#34; target=&#34;_blank&#34;&gt;dotliquid setup&lt;/a&gt;, we need to add an another Target &lt;code&gt;Assets&lt;/code&gt; to copy the &lt;em&gt;assets&lt;/em&gt; directory to the &lt;em&gt;build&lt;/em&gt; directory&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let copyToBuildDir srcDir targetDirName =
+  let targetDir = combinePaths buildDir targetDirName
+  CopyDir targetDir srcDir noFilter
+
+Target &amp;quot;Assets&amp;quot; (fun _ -&amp;gt;
+  copyToBuildDir &amp;quot;./src/FsTweet.Web/assets&amp;quot; &amp;quot;assets&amp;quot;
+)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then modify the build order to run this Target before the &lt;code&gt;Run&lt;/code&gt; Target.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Build order
+&amp;quot;Clean&amp;quot;
+==&amp;gt; &amp;quot;Build&amp;quot;
+==&amp;gt; &amp;quot;Views&amp;quot;
+==&amp;gt; &amp;quot;Assets&amp;quot;
+==&amp;gt; &amp;quot;Run&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;serving-asset-files&#34;&gt;Serving Asset Files&lt;/h2&gt;
+
+&lt;p&gt;Now we have the assets available in the build directory. The next step is serving them Suave in respose to the request from the browser.&lt;/p&gt;
+
+&lt;p&gt;Suave has a lot of &lt;a href=&#34;https://suave.io/Suave.html#def:module Suave.Files&#34; target=&#34;_blank&#34;&gt;useful functions&lt;/a&gt; to handle files and in our case we are going to make use of the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Files.browseHome&#34; target=&#34;_blank&#34;&gt;browseHome&lt;/a&gt; function to serve the assets&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;lsquo;browse&amp;rsquo; the file in the sense that the contents of the file are sent based on the request&amp;rsquo;s Url property. Will serve from the current as configured in directory. Suave&amp;rsquo;s runtime. - Suave Documentation&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The current directory in our case is the directory in which the &lt;em&gt;FsTweet.Web.exe&lt;/em&gt; exists. i.e &lt;em&gt;build&lt;/em&gt; directory.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
+// ...
+open Suave.Files
+
+// ...
+let serveAssets =
+  pathRegex &amp;quot;/assets/*&amp;quot; &amp;gt;=&amp;gt; browseHome
+
+[&amp;lt;EntryPoint&amp;gt;]
+let main argv =
+  // ...
+  let app = 
+    choose [
+      serveAssets
+      path &amp;quot;/&amp;quot; &amp;gt;=&amp;gt; page &amp;quot;guest/home.liquid&amp;quot; &amp;quot;&amp;quot;
+    ]
+    
+  startWebServer defaultConfig app
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We have made two changes here.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;The &lt;code&gt;serveAssets&lt;/code&gt; defines a new &lt;a href=&#34;https://theimowski.gitbooks.io/suave-music-store/content/en/webpart.html&#34; target=&#34;_blank&#34;&gt;WebPart&lt;/a&gt; using the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Filters.pathRegex&#34; target=&#34;_blank&#34;&gt;pathRegex&lt;/a&gt;. It matches all the requests for the assets and serve the corresponding files using the &lt;code&gt;browseHome&lt;/code&gt; function.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;As we are handling more than one requests now, we need to change our &lt;code&gt;app&lt;/code&gt; to handle all of them. Using the &lt;a href=&#34;https://suave.io/composing.html&#34; target=&#34;_blank&#34;&gt;choose&lt;/a&gt; function, we are defining the &lt;code&gt;app&lt;/code&gt; to combine both &lt;code&gt;serveAssets&lt;/code&gt; webpart and the one that we already had for serving guest home page.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;serving-favicon-ico&#34;&gt;Serving favicon.ico&lt;/h2&gt;
+
+&lt;p&gt;While serving our &lt;em&gt;FsTweet&lt;/em&gt; application, the browser automatically makes a request for &lt;a href=&#34;https://en.wikipedia.org/wiki/Favicon&#34; target=&#34;_blank&#34;&gt;favicon&lt;/a&gt;. As the URL path for this request is &lt;code&gt;/favicon.ico&lt;/code&gt; our &lt;code&gt;serveAssets&lt;/code&gt; webpart cannot match this.&lt;/p&gt;
+
+&lt;p&gt;To serve it we need to use a another specific path filter and use the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Files.file&#34; target=&#34;_blank&#34;&gt;file&lt;/a&gt; function to get the job done.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
+// ...
+let serveAssets =
+  let faviconPath = 
+    Path.Combine(currentPath, &amp;quot;assets&amp;quot;, &amp;quot;images&amp;quot;, &amp;quot;favicon.ico&amp;quot;)
+  choose [
+    pathRegex &amp;quot;/assets/*&amp;quot; &amp;gt;=&amp;gt; browseHome
+    path &amp;quot;/favicon.ico&amp;quot; &amp;gt;=&amp;gt; file faviconPath
+  ]
+//...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post we learned how to serve static asset files in Suave. The source code can be found in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.2&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Setting Up Server Side Rendering using DotLiquid</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</link>
       <pubDate>Wed, 16 Aug 2017 20:34:02 +0530</pubDate>
