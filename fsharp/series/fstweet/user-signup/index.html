@@ -45,7 +45,7 @@
 
   
 
-  <title>Handling User Singup Form and Validation | Demystify FP</title>
+  <title>Handling User signup Form and Validation | Demystify FP</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
@@ -98,7 +98,7 @@
 
 
   <div class="article-container">
-    <h1 itemprop="name">Handling User Singup Form and Validation</h1>
+    <h1 itemprop="name">Handling User signup Form and Validation</h1>
     
 
 <div class="article-metadata">
@@ -143,28 +143,28 @@
     </li>
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=Handling%20User%20Singup%20Form%20and%20Validation&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f"
+         href="https://twitter.com/intent/tweet?text=Handling%20User%20signup%20Form%20and%20Validation&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f"
          target="_blank">
         <i class="fa fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f&amp;title=Handling%20User%20Singup%20Form%20and%20Validation"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f&amp;title=Handling%20User%20signup%20Form%20and%20Validation"
          target="_blank">
         <i class="fa fa-linkedin"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f&amp;title=Handling%20User%20Singup%20Form%20and%20Validation"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f&amp;title=Handling%20User%20signup%20Form%20and%20Validation"
          target="_blank">
         <i class="fa fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=Handling%20User%20Singup%20Form%20and%20Validation&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f">
+         href="mailto:?subject=Handling%20User%20signup%20Form%20and%20Validation&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fuser-signup%2f">
         <i class="fa fa-envelope"></i>
       </a>
     </li>
@@ -181,7 +181,7 @@
 
 <p>In the <a href="/fsharp/series/fstweet/static-assets/" target="_blank">last blog post</a>, we added a cool landing page for <em>FsTweet</em> to increase the user signups. But the signup form and its backend are not ready yet!</p>
 
-<p>In this fourth part, we will be extending <em>FsTweet</em> to serve the singup page and implement its backend HTTP backend without persistence</p>
+<p>In this fourth part, we will be extending <em>FsTweet</em> to serve the signup page and implement its backend HTTP backend without persistence</p>
 
 <h2 id="a-new-file-for-user-signup">A New File For User Signup</h2>
 
@@ -200,9 +200,9 @@
     -n src/FsTweet.Web/UserSignup.fs -u
 </code></pre>
 
-<p>Though working with the command line is productive then its visual counterpart, the commands that we typed for creating and moving a file is verbose.</p>
+<p>Though working with the command line is productive than its visual counterpart, the commands that we typed for creating and moving a file is verbose.</p>
 
-<p>Forge has <a href="https://github.com/fsharp-editing/Forge/wiki/aliases#alias-definition" target="_blank">an advanced feature called alias</a> using which we can get rid of the boilerplate to a good extent.</p>
+<p>Forge has <a href="https://github.com/fsharp-editing/Forge/wiki/aliases#alias-definition" target="_blank">an advanced feature called alias</a> using which we can get rid of the boilerplate to a large extent.</p>
 
 <p>As we did for the forge <a href="/fsharp/series/fstweet/project-setup/" target="_blank">Run alias</a> during the project setup, let&rsquo;s add few three more alias</p>
 
@@ -221,7 +221,7 @@
 </code></pre>
 
 <blockquote>
-<p>We can generalise the alias as</p>
+<p>We can generalize the alias as</p>
 
 <pre><code class="language-bash">forge {operation-alias} {project-alias} {other-arguments}
 </code></pre>
@@ -250,11 +250,13 @@ module Suave =
       &gt;=&gt; page &quot;user/signup.liquid&quot; ??? 
 </code></pre>
 
-<p>The namespace represents the usecase or the feature that we are about to implement. The modules inside the namespace represent the different layers of the usecase implementation. The <code>Suave</code> module represents the <code>Web</code> layer of the User Signup feature. You can learn about organizing modules from <a href="https://fsharpforfunandprofit.com/posts/recipe-part3/" target="_blank">this blog post</a>.</p>
+<p>The namespace represents the use case or the feature that we are about to implement. The modules inside the namespace represent the different layers of the use case implementation.</p>
+
+<p>The <code>Suave</code> module defines the <code>Web</code> layer of the User Signup feature. You can learn about organizing modules from <a href="https://fsharpforfunandprofit.com/posts/recipe-part3/" target="_blank">this blog post</a>.</p>
 
 <p>The <code>???</code> symbol is a placeholder that we need to fill in with a view model.</p>
 
-<p>The view model has to capture user&rsquo;s email address, password and username.</p>
+<p>The view model has to capture user&rsquo;s email address, password, and username.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
 module Suave = 
@@ -275,11 +277,11 @@ module Suave =
       &gt;=&gt; page &quot;user/signup.liquid&quot; emptyUserSignupViewModel
 </code></pre>
 
-<p>As the name indicates <code>emptyUserSignupViewModel</code> provide the default values for the view model.</p>
+<p>As the name indicates, <code>emptyUserSignupViewModel</code> provide the default values for the view model.</p>
 
 <p>The <code>Error</code> property in the <code>UserSignupViewModel</code> record type is to communicate an error with the view.</p>
 
-<p>The next step is creating a dotliquid template for the singup page.</p>
+<p>The next step is creating a dotliquid template for the signup page.</p>
 
 <pre><code class="language-html">&lt;!-- FsTweet.Web/views/user/signup.liquid --&gt;
 {% extends &quot;master_page.liquid&quot; %}
@@ -307,7 +309,7 @@ module Suave =
 
 <p>In the template, the <code>name</code> attribute with its corresponding view model&rsquo;s property name as value is required to do the model binding on the server side.</p>
 
-<p>An another thing to notice here is the <code>if</code> condition to display the error only if it is available.</p>
+<p>And another thing to notice here is the <code>if</code> condition to display the error only if it is available.</p>
 
 <p>The last step in serving the user signup page is adding this new webpart in the application.</p>
 
@@ -332,7 +334,7 @@ let main argv =
 
 <h2 id="handling-signup-form-post-request">Handling Signup Form POST request</h2>
 
-<p>To handle the POST request duing the signup form submission, we need to have a WebPart configured.</p>
+<p>To handle the POST request during the signup form submission, we need to have a WebPart configured.</p>
 
 <p>On the same path <code>/signup</code> we need to have one WebPart for serving the signup page in response to GET request and an another for the POST request.</p>
 
@@ -388,7 +390,7 @@ module Suave =
 
 <p>In other words, we need to bind the request form data to the <code>UserSignupViewModel</code>.</p>
 
-<p>There is an in-built support for doing this Suave using <code>Suave.Experimental</code> package.</p>
+<p>There is an inbuilt support for doing this Suave using <code>Suave.Experimental</code> package.</p>
 
 <p>Let&rsquo;s add this to our <code>FsTweet.Web</code> project using paket and forge.</p>
 
@@ -429,7 +431,7 @@ module Suave =
   // ...
 </code></pre>
 
-<p>As the <code>bindEmptyForm</code> function returns a <code>generic</code> type as its first option, we need to explicitly specify the type to enable the model binding.</p>
+<p>As the <code>bindEmptyForm</code> function returns a <code>generic</code> type as its first option, we need to specify the type to enable the model binding explicitly.</p>
 
 <p>If the model binding succeeds, we just print the view model and redirects the user to the signup page as we did in the previous section.</p>
 
@@ -445,31 +447,31 @@ module Suave =
 
 <h2 id="transforming-view-model-to-domain-model">Transforming View Model To Domain Model</h2>
 
-<p>Now we have the server side representation of the submitted details in the form of <code>UserSignupViewModel</code>. The next step is validating this view model against a set of constraints before persisting them in a datastore.</p>
+<p>Now we have the server side representation of the submitted details in the form of <code>UserSignupViewModel</code>. The next step is validating this view model against a set of constraints before persisting them in a data store.</p>
 
 <p>In F#, a widely used approach is defining a domain model with illegal states unrepresentable and transform the view model to the domain model before proceeding with the next set of actions.</p>
 
-<p>Let&rsquo;s take the <code>Username</code> property of the <code>UserSignupViewModel</code>. It is of type <code>string</code>. The reason why we have it as <code>string</code> is to enable model binding with ease.</p>
+<p>Let&rsquo;s take the <code>Username</code> property of the <code>UserSignupViewModel</code>. It is of type <code>string</code>. The reason why we have it as a <code>string</code> is to enable model binding with ease.</p>
 
 <p>That means, <code>Username</code> can have <code>null</code>, <code>&quot;&quot;</code> or even a very long string!</p>
 
-<p>Let&rsquo;s assume that we have a business requirement stating the username should not be empty and it can&rsquo;t have more than <code>12</code> characters. An ideal way to represent this requirement in our code is to type called <code>Username</code> and when we say a value of type <code>Username</code> it is gurenteed that all the specified requirements.</p>
+<p>Let&rsquo;s assume that we have a business requirement stating the username should not be empty, and it can&rsquo;t have more than <code>12</code> characters. An ideal way to represent this requirement in our code is to type called <code>Username</code> and when we say a value of type <code>Username</code> it is guaranteed that all the specified requirements.</p>
 
 <p>It is applicable for the other properties as well.</p>
 
-<p><code>Email</code> should have an valid email address and <code>Password</code> has to meet the application&rsquo;s password policy.</p>
+<p><code>Email</code> should have a valid email address, and <code>Password</code> has to meet the application&rsquo;s password policy.</p>
 
-<p>Let&rsquo;s assume that we have a function <code>tryCreate</code> that takes <code>UserSignupViewModel</code> as its input, performs the validations based on the requirements and returns either a domain model <code>UserSignupRequest</code> or an validation error of type <code>string</code>.</p>
+<p>Let&rsquo;s assume that we have a function <code>tryCreate</code> that takes <code>UserSignupViewModel</code> as its input, performs the validations based on the requirements and returns either a domain model <code>UserSignupRequest</code> or a validation error of type <code>string</code>.</p>
 
 <p><img src="/img/fsharp/series/fstweet/vm_to_dm.png" alt="View Model to Domain Model" /></p>
 
 <p>The subsequent domain actions will take <code>UserSignupRequest</code> as its input without bothering about the validness of the input!</p>
 
-<p>If we zoom into the <code>tryCreate</code> function, it will have three <code>tryCreate</code> function being called sequentially. Each of these functions take care of validating the individual properties and transforming them into their corresponding domain type.</p>
+<p>If we zoom into the <code>tryCreate</code> function, it will have three <code>tryCreate</code> function being called sequentially. Each of these functions takes care of validating the individual properties and transforming them into their corresponding domain type.</p>
 
 <p><img src="/img/fsharp/series/fstweet/happy_path.png" alt="Happy Path" /></p>
 
-<p>If we encounter an validation error in any of these internal functions, we can short circuit and return the error that we found.</p>
+<p>If we encounter a validation error in any of these internal functions, we can short circuit and return the error that we found.</p>
 
 <p><img src="/img/fsharp/series/fstweet/error_path.png" alt="Error Path" /></p>
 
@@ -497,7 +499,7 @@ Chessie
 <pre><code class="language-bash">&gt; forge install
 </code></pre>
 
-<h2 id="making-illegal-states-unrepresentable">Making Illegal States Unrepresentable</h2>
+<h2 id="making-the-illegal-states-unrepresentable">Making The Illegal States Unrepresentable</h2>
 
 <p>As a first step, create a new module <code>Domain</code> in the <em>UserSignup.fs</em> and make sure it is above the <code>Suave</code> module.</p>
 
@@ -512,7 +514,7 @@ module Domain =
   type Username = private Username of string
 </code></pre>
 
-<p>The <code>private</code> constructor ensure that we can create a value of type <code>Username</code> only inside the <code>Domain</code> module.</p>
+<p>The <code>private</code> constructor ensures that we can create a value of type <code>Username</code> only inside the <code>Domain</code> module.</p>
 
 <p>Then add the <code>tryCreate</code> function as a static member function of <code>Username</code></p>
 
@@ -536,12 +538,12 @@ module Domain =
 <p>The <code>Result</code>, a type from the <code>Chessie</code> library, <a href="http://fsprojects.github.io/Chessie/reference/chessie-errorhandling-result-2.html" target="_blank">represents</a> the result of our validation. It will have either the <code>Username</code> (if the input is valid) or a <code>string list</code> (for invalid input)</p>
 
 <blockquote>
-<p>The presense <code>string list</code> instead of just <code>string</code> is to support an use case where we are interested in capturing all the errors. As we are going to capture only the first error, we can treat this as a <code>list</code> with only one <code>string</code>.</p>
+<p>The presence <code>string list</code> instead of just <code>string</code> is to support an use case where we are interested in capturing all the errors. As we are going to capture only the first error, we can treat this as a <code>list</code> with only one <code>string</code>.</p>
 </blockquote>
 
 <p>The <code>ok</code> and <code>fail</code> are helper functions from <code>Chessie</code> to wrap our custom values with the <code>Success</code> and <code>Failure</code> part of the <code>Result</code> type respectively.</p>
 
-<p>As we will need the the <code>string</code> representation of the <code>Username</code> to persist it in the datastore, let&rsquo;s add a <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/members/properties" target="_blank">property</a> <code>Value</code> which returns the underlying actual <code>string</code> value.</p>
+<p>As we will need the <code>string</code> representation of the <code>Username</code> to persist it in the data store, let&rsquo;s add a <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/members/properties" target="_blank">property</a> <code>Value</code> which returns the underlying actual <code>string</code> value.</p>
 
 <pre><code class="language-fsharp">module Domain =
   // ...
@@ -582,7 +584,7 @@ module Domain =
       | x -&gt; Password x |&gt; ok
 </code></pre>
 
-<p>Now we have all indiviudal validation and transformation in place. The next step is composing them together and create a new type <code>SignupUserRequest</code> that represents the valid domain model version of the <code>SignupUserViewModel</code></p>
+<p>Now we have all individual validation and transformation in place. The next step is composing them together and create a new type <code>SignupUserRequest</code> that represents the valid domain model version of the <code>SignupUserViewModel</code></p>
 
 <pre><code class="language-fsharp">module Domain =
   // ...
@@ -595,7 +597,7 @@ module Domain =
 
 <p>How do we create <code>SignupUserRequest</code> from <code>SignupUserViewModel</code>?</p>
 
-<p>With the help of <a href="http://fsprojects.github.io/Chessie/reference/chessie-errorhandling-trial-trialbuilder.html" target="_blank">trial</a>, an <a href="https://fsharpforfunandprofit.com/series/computation-expressions.html" target="_blank">computation expression</a>(CE) builder from <code>Chessie</code> and the <code>TryCreate</code> functions that we created earlier we can achieve it with ease.</p>
+<p>With the help of <a href="http://fsprojects.github.io/Chessie/reference/chessie-errorhandling-trial-trialbuilder.html" target="_blank">trial</a>, a <a href="https://fsharpforfunandprofit.com/series/computation-expressions.html" target="_blank">computation expression</a>(CE) builder from <code>Chessie</code> and the <code>TryCreate</code> functions that we created earlier we can achieve it with ease.</p>
 
 <pre><code class="language-fsharp">module Domain =
   // ...
@@ -617,7 +619,7 @@ module Domain =
 
 <p>The <code>TryCreate</code> function in the <code>SignupUserRequest</code> takes a tuple with three elements and returns a <code>Result&lt;SignupUserRequest, string list&gt;</code></p>
 
-<p>The <code>trail</code> CE takes care of short circuting if it encounter an validation error.</p>
+<p>The <code>trail</code> CE takes care of short circuiting if it encounters a validation error.</p>
 
 <h2 id="showing-validation-error">Showing Validation Error</h2>
 
@@ -658,7 +660,7 @@ module Domain =
 
 <p>In our case, in case of success, as a dummy implementation, we just print the <code>SignupUserRequest</code> and redirect to the <em>signup</em> page again.</p>
 
-<p>During failure, we populate the <code>Error</code> property of the view model with the first item in the error messags list and rerender the <em>signup</em> page again.</p>
+<p>During failure, we populate the <code>Error</code> property of the view model with the first item in the error messages list and re-render the <em>signup</em> page again.</p>
 
 <p>As we are referring the liquid template path of the signup page in three places now, let&rsquo;s create a label for this value and use the label in all the places.</p>
 
@@ -687,7 +689,7 @@ module Domain =
       ]
 </code></pre>
 
-<p>Now if we build and run the application, we will be getting following console output for valid singup details.</p>
+<p>Now if we build and run the application, we will be getting following console output for valid signup details.</p>
 
 <pre><code class="language-bash">{Username = Username &quot;demystifyfp&quot;;
  Password = Password &quot;secret&quot;;
@@ -696,7 +698,7 @@ module Domain =
 
 <h2 id="summary">Summary</h2>
 
-<p>We came a long way in this blog post. We started with rendering the signup form and then we did the model binding using the <code>Suave.Experimental</code> library.</p>
+<p>We came a long way in this blog post. We started with rendering the signup form, and then we did the model binding using the <code>Suave.Experimental</code> library.</p>
 
 <p>Finally, we learned how to do validation and transform view model to a domain model using the Railway Programming technique with the help of the <code>Chessie</code> library.</p>
 
