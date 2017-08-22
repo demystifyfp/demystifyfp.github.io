@@ -24,7 +24,7 @@
 
 &lt;p&gt;In this post, we will be changing the guest homepage from displaying &lt;code&gt;Hello, World!&lt;/code&gt; to a production ready landing page!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/guest-home-page.png&#34; alt=&#34;img&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/guest-home-page.png&#34; alt=&#34;Guest Home Page&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;preparing-static-asset-files&#34;&gt;Preparing Static Asset Files&lt;/h2&gt;
 
@@ -62,7 +62,7 @@
    &amp;lt;p class=&amp;quot;lead&amp;quot;&amp;gt;Communicate with the world in a different way!&amp;lt;/p&amp;gt;
    &amp;lt;!-- ... --&amp;gt;
 &amp;lt;/div&amp;gt;
-{% endblock}
+{% endblock %}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;For simplicity, I am leaving the other static content that is modified in the templates, and you can find all the changes in &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/commit/ae233c5407900b32af682407d902621e0a17bd38#diff-62ccd7caf19fda6d153b1958919d1f9d&#34; target=&#34;_blank&#34;&gt;this diff&lt;/a&gt;&lt;/p&gt;

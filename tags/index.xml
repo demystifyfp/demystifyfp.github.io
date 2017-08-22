@@ -7,8 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Wed, 16 Aug 2017 20:34:02 +0530</lastBuildDate>
+    <lastBuildDate>Sat, 19 Aug 2017 16:37:26 +0530</lastBuildDate>
     <atom:link href="/tags/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Chessie</title>
+      <link>http://www.demystifyfp.com/tags/chessie/</link>
+      <pubDate>Sat, 19 Aug 2017 16:37:26 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/tags/chessie/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Dotliquid</title>
@@ -31,7 +40,7 @@
     <item>
       <title>Forge</title>
       <link>http://www.demystifyfp.com/tags/forge/</link>
-      <pubDate>Wed, 16 Aug 2017 20:34:02 +0530</pubDate>
+      <pubDate>Sat, 19 Aug 2017 16:37:26 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/forge/</guid>
       <description></description>
@@ -58,7 +67,7 @@
     <item>
       <title>Suave</title>
       <link>http://www.demystifyfp.com/tags/suave/</link>
-      <pubDate>Sat, 19 Aug 2017 07:36:20 +0530</pubDate>
+      <pubDate>Sat, 19 Aug 2017 16:37:26 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/suave/</guid>
       <description></description>
