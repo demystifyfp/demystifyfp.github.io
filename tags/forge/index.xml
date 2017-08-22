@@ -53,7 +53,7 @@
 
 &lt;p&gt;The &lt;code&gt;web&lt;/code&gt; is an alias for the project argument in the Forge commands. The &lt;code&gt;newFs&lt;/code&gt; and &lt;code&gt;moveUp&lt;/code&gt; alias are for the &lt;code&gt;new file&lt;/code&gt; and &lt;code&gt;move file&lt;/code&gt; operations respectively.&lt;/p&gt;
 
-&lt;p&gt;If we had this alias beforehand, we could have used the following commands instead to do what we just did&lt;/p&gt;
+&lt;p&gt;If we had this alias beforehand, we could have used the following commands to do what we just did&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/UserSignup
 &amp;gt; forge moveUp web -n src/FsTweet.Web/UserSignup.fs
@@ -208,7 +208,7 @@ module Suave =
       ]
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The placeholder implementation of the &lt;code&gt;handleUserSignup&lt;/code&gt; WebPart prints the form values posted (from the &lt;a href=&#34;https://suave.io/Suave.html#def:member Suave.Http.HttpRequest.form&#34; target=&#34;_blank&#34;&gt;request&lt;/a&gt;) in the console and redirects the user again the signup page.&lt;/p&gt;
+&lt;p&gt;The placeholder implementation of the &lt;code&gt;handleUserSignup&lt;/code&gt; WebPart prints the form values posted (from the &lt;a href=&#34;https://suave.io/Suave.html#def:member Suave.Http.HttpRequest.form&#34; target=&#34;_blank&#34;&gt;request&lt;/a&gt;) in the console and redirects the user again to the signup page.&lt;/p&gt;
 
 &lt;p&gt;When we rerun the program with this new changes, we can find the values being posted in the console upon submitting the signup form.&lt;/p&gt;
 
@@ -288,13 +288,13 @@ module Suave =
 
 &lt;p&gt;Now we have the server side representation of the submitted details in the form of &lt;code&gt;UserSignupViewModel&lt;/code&gt;. The next step is validating this view model against a set of constraints before persisting them in a data store.&lt;/p&gt;
 
-&lt;p&gt;In F#, a widely used approach is defining a domain model with illegal states unrepresentable and transform the view model to the domain model before proceeding with the next set of actions.&lt;/p&gt;
+&lt;p&gt;In F#, a widely used approach is defining a domain model with the illegal states unrepresentable and transform the view model to the domain model before proceeding with the next set of actions.&lt;/p&gt;
 
-&lt;p&gt;Let&amp;rsquo;s take the &lt;code&gt;Username&lt;/code&gt; property of the &lt;code&gt;UserSignupViewModel&lt;/code&gt;. It is of type &lt;code&gt;string&lt;/code&gt;. The reason why we have it as a &lt;code&gt;string&lt;/code&gt; is to enable model binding with ease.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s take the &lt;code&gt;Username&lt;/code&gt; property of the &lt;code&gt;UserSignupViewModel&lt;/code&gt; for example.&lt;/p&gt;
 
-&lt;p&gt;That means, &lt;code&gt;Username&lt;/code&gt; can have &lt;code&gt;null&lt;/code&gt;, &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; or even a very long string!&lt;/p&gt;
+&lt;p&gt;It is of type &lt;code&gt;string&lt;/code&gt;. The reason why we have it as a &lt;code&gt;string&lt;/code&gt; is to enable model binding with ease. That means, &lt;code&gt;Username&lt;/code&gt; can have &lt;code&gt;null&lt;/code&gt;, &lt;code&gt;&amp;quot;&amp;quot;&lt;/code&gt; or even a very long string!&lt;/p&gt;
 
-&lt;p&gt;Let&amp;rsquo;s assume that we have a business requirement stating the username should not be empty, and it can&amp;rsquo;t have more than &lt;code&gt;12&lt;/code&gt; characters. An ideal way to represent this requirement in our code is to type called &lt;code&gt;Username&lt;/code&gt; and when we say a value of type &lt;code&gt;Username&lt;/code&gt; it is guaranteed that all the specified requirements.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s assume that we have a business requirement stating the username should not be empty, and it can&amp;rsquo;t have more than &lt;code&gt;12&lt;/code&gt; characters. An ideal way to represent this requirement in our code is to type called &lt;code&gt;Username&lt;/code&gt; and when we say a value is of type &lt;code&gt;Username&lt;/code&gt; it is guaranteed that all the specified requirements for &lt;code&gt;Username&lt;/code&gt; has been checked and it is a valid one.&lt;/p&gt;
 
 &lt;p&gt;It is applicable for the other properties as well.&lt;/p&gt;
 
