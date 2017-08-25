@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Chessie on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/chessie/</link>
-    <description>Recent content in Chessie on Demystify FP</description>
+    <title>Rop on Demystify FP</title>
+    <link>http://www.demystifyfp.com/tags/rop/</link>
+    <description>Recent content in Rop on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
     <lastBuildDate>Fri, 25 Aug 2017 08:34:25 +0530</lastBuildDate>
-    <atom:link href="/tags/chessie/" rel="self" type="application/rss+xml" />
+    <atom:link href="/tags/rop/" rel="self" type="application/rss+xml" />
     
     <item>
       <title>User Signup Form Validation</title>
