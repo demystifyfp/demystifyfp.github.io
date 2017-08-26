@@ -220,7 +220,7 @@ let main argv =
 
 &lt;p&gt;In this blog post, we have seen how to set up a Suave application to render server side views using DotLiquid and also how to make use of FAKE build script to manage static files.&lt;/p&gt;
 
-&lt;p&gt;The source code is available in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.1&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.1&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     

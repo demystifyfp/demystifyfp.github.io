@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/">
+
+  
+
+  <title>Setting Up Database Migration | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Setting Up Database Migration</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-08-25 09:38:55 &#43;0530 IST" itemprop="datePublished">
+      Fri, Aug 25, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/fake">FAKE</a
+    >, 
+    
+    <a href="/tags/fluentmigrator">FluentMigrator</a
+    >, 
+    
+    <a href="/tags/ooinfsharp">OOInFsharp</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fdb-migration-setup%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Setting%20Up%20Database%20Migration&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fdb-migration-setup%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fdb-migration-setup%2f&amp;title=Setting%20Up%20Database%20Migration"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fdb-migration-setup%2f&amp;title=Setting%20Up%20Database%20Migration"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Setting%20Up%20Database%20Migration&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fdb-migration-setup%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi,</p>
+
+<p>In the <a href="/fsharp/series/fstweet/user-signup-validation/" target="_blank">last blog post</a>, we validated the signup details submitted by the user and transformed it into a domain model.</p>
+
+<p>The next step is persisting it in a database. We are going to use <a href="https://www.postgresql.org" target="_blank">PostgreSQL</a> to achieve it.</p>
+
+<p>In this sixth part of the <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series, we are going to learn how to setup PostgreSQL database migrations in fsharp using <a href="https://github.com/fluentmigrator/fluentmigrator" target="_blank">Fluent Migrator</a>.</p>
+
+<p>In the <a href="" target="_blank">following blog post</a>, we will be persisting the signup details.</p>
+
+<h2 id="creating-a-database-migrations-project">Creating a Database Migrations Project</h2>
+
+<p><a href="https://github.com/fluentmigrator/fluentmigrator" target="_blank">Fluent Migrator</a>s is one of the widely used Migration frameworks in .NET outside <a href="https://msdn.microsoft.com/en-us/library/jj591621(v=vs.113).aspx" target="_blank">EF code first migrations</a>.</p>
+
+<p>As we are not going to use EF in favor of <a href="fsprojects.github.io/SQLProvider/" target="_blank">SQLProvider</a>, we are picking the fluent migrator to help us in managing the database schema.</p>
+
+<p>Let&rsquo;s get started by creating a new class library project, <em>FsTweet.Db.Migrations</em>, in the <em>src</em> directory, using forge.</p>
+
+<pre><code class="language-bash">&gt; forge new project -n FsTweet.Db.Migrations \
+    --folder src -t classlib --no-fake
+</code></pre>
+
+<p>The next step is adding the <em>FluentMigrator</em> NuGet package and referring it in the newly created <em>FsTweet.Db.Migrations</em> project.</p>
+
+<pre><code class="language-bash">&gt; forge paket add FluentMigrator -g Database \
+    -p src/FsTweet.Db.Migrations/FsTweet.Db.Migrations.fsproj
+</code></pre>
+
+<p>We are using the paket&rsquo;s <a href="https://fsprojects.github.io/Paket/groups.html" target="_blank">dependency grouping</a> feature using the <code>-g</code> argument with the value <code>Database</code>. It allows us to organize the dependencies better</p>
+
+<p><em>paket.dependencies</em></p>
+
+<pre><code>...
+
+group Database
+source https://www.nuget.org/api/v2
+
+nuget FluentMigrator
+</code></pre>
+
+<p>To create <a href="https://github.com/fluentmigrator/fluentmigrator/wiki/Migration" target="_blank">a migration</a> in Fluent Migrator, we need to create a new class inheriting Fluent Migrator&rsquo;s <code>Migration</code> abstract class.</p>
+
+<p>This class also has to have an attribute <code>Migration</code> to specify the order of the migration and also it should override the <code>Up</code> and <code>Down</code> methods.</p>
+
+<p>Fsharp provides nicer support <a href="https://fsharpforfunandprofit.com/series/object-oriented-programming-in-fsharp.html" target="_blank">to write OO code</a>. So writing the migration is straight forward and we don&rsquo;t need to go back to <em>C#!</em></p>
+
+<p>As a first step, clean up the default code in the <code>FsTweet.Db.Migrations.fs</code> file and update it as below.</p>
+
+<pre><code class="language-fsharp">namespace FsTweet.Db.Migrations
+
+open FluentMigrator
+
+[&lt;Migration(201709250622L, &quot;Creating User Table&quot;)&gt;]
+type CreateUserTable()=
+  inherit Migration()
+
+  override this.Up() = ()
+  override this.Down() = ()
+</code></pre>
+
+<p>As <a href="https://lostechies.com/seanchambers/2011/04/02/fluentmigrator-getting-started/" target="_blank">suggested</a> by <a href="https://lostechies.com/seanchambers/author/seanchambers/" target="_blank">Sean Chambers</a>, one of core contributor of fluent migrator, we are using a time stamp in <code>YYYYMMDDHHMM</code> format in UTC to specify the migration order.</p>
+
+<p>The next step is using the fluent methods offered by the fluent migrator we need to define the <code>Users</code> table and its columns.</p>
+
+<pre><code class="language-fsharp">// ...
+type CreateUserTable()=
+  // ...
+  override this.Up() = 
+    base.Create.Table(&quot;Users&quot;)
+      .WithColumn(&quot;Id&quot;).AsInt32().PrimaryKey().Identity()
+      .WithColumn(&quot;Username&quot;).AsString(12).NotNullable()
+      .WithColumn(&quot;Email&quot;).AsString(254).NotNullable()
+      .WithColumn(&quot;PasswordHash&quot;).AsString().NotNullable()
+      .WithColumn(&quot;EmailVerificationCode&quot;).AsString().NotNullable()
+      .WithColumn(&quot;IsEmailVerified&quot;).AsBoolean()
+    |&gt; ignore
+  // ...
+</code></pre>
+
+<p>The last step is overriding the <code>Down</code> method. In the <code>Down</code> method, we just need to delete the <code>Users</code> table.</p>
+
+<pre><code class="language-fsharp">type CreateUserTable()=
+  // ...
+  override this.Down() = 
+    base.Delete.Table(&quot;Users&quot;) |&gt; ignore
+  // ...
+</code></pre>
+
+<h2 id="building-the-migrations-project">Building the Migrations Project</h2>
+
+<p>Now we have the migrations project in place, and it is all set to build and run.</p>
+
+<p>Let&rsquo;s add a new FAKE Target <code>BuildMigrations</code> in the build script to build the migrations.</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+Target &quot;BuildMigrations&quot; (fun _ -&gt;
+  !! &quot;src/FsTweet.Db.Migrations/*.fsproj&quot;
+  |&gt; MSBuildDebug buildDir &quot;Build&quot; 
+  |&gt; Log &quot;MigrationBuild-Output: &quot;
+)
+// ...
+</code></pre>
+
+<p>Then we need to change the existing <code>Build</code> target to build only the <code>FsTweet.Web</code> project instead of all the <code>.fsproj</code> projects in the application.</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+Target &quot;Build&quot; (fun _ -&gt;
+  !! &quot;src/FsTweet.Web/*.fsproj&quot;
+  |&gt; MSBuildDebug buildDir &quot;Build&quot;
+  |&gt; Log &quot;AppBuild-Output: &quot;
+)
+// ...
+</code></pre>
+
+<p>To run the migration against Postgres, we need to install the <a href="http://www.npgsql.org/" target="_blank">Npgsql</a> package from NuGet.</p>
+
+<pre><code class="language-bash">&gt; forge paket add Npgsql -g Database
+</code></pre>
+
+<p>FAKE has inbuilt support for <a href="https://fake.build/todo-fluentmigrator.html" target="_blank">running fluent migration</a> from the build script.</p>
+
+<p>To do it add the references of the <code>FluentMigrator</code> and <code>Npgsql</code> DLLs in the build script.</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+#r &quot;./packages/FAKE/tools/Fake.FluentMigrator.dll&quot;
+#r &quot;./packages/database/Npgsql/lib/net45/Npgsql.dll&quot;
+// ...
+open Fake.FluentMigratorHelper
+// ...
+</code></pre>
+
+<p>Then define <code>RunMigrations</code> Target with a <code>connString</code> and a <code>dbConnection</code> pointing to a local database.</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+let connString = 
+  @&quot;Server=127.0.0.1;Port=5432;Database=FsTweet;User Id=postgres;Password=test;&quot;
+let dbConnection = ConnectionString (connString, DatabaseProvider.PostgreSQL)
+
+Target &quot;RunMigrations&quot; (fun _ -&gt; 
+  MigrateToLatest dbConnection [migrationsAssembly] DefaultMigrationOptions
+)
+// ...
+</code></pre>
+
+<p>This migration script <strong>doesn&rsquo;t create the database</strong>.</p>
+
+<p>So, we need to create it manually before we run the script.</p>
+
+<p>The last step in running the migration script is adding it to the build script build order.</p>
+
+<p>We need to run the migrations before the <code>Build</code> target, as we need to have the database schema in place to use <a href="fsprojects.github.io/SQLProvider/" target="_blank">SQLProvider</a> to interact with the PostgreSQL.</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+&quot;Clean&quot;
+==&gt; &quot;BuildMigrations&quot;
+==&gt; &quot;RunMigrations&quot;
+==&gt; &quot;Build&quot;
+// ...
+</code></pre>
+
+<p>Then run the build.</p>
+
+<pre><code class="language-fsharp">&gt; forge build
+</code></pre>
+
+<blockquote>
+<p>This command is an inbuilt alias in forge representing the <code>forge fake Build</code> command.</p>
+</blockquote>
+
+<p>While the build script is running, we can see the console log of the <code>RunMigrations</code> target like the one below</p>
+
+<pre><code class="language-bash">...
+Starting Target: RunMigrations (==&gt; BuildMigrations)
+...
+----------------------------------------------------
+201709250622: CreateUserTable migrating
+----------------------------------------------------
+[+] Beginning Transaction
+[+] CreateTable Users
+[+] Committing Transaction
+[+] 201709250622: CreateUserTable migrated
+[+] Task completed.
+Finished Target: RunMigrations
+...
+</code></pre>
+
+<p>Upon successful execution of the build script, we can verify the schema using <a href="https://www.postgresql.org/docs/9.6/static/app-psql.html" target="_blank">psql</a></p>
+
+<pre><code class="language-bash">&gt; psql -d FsTweet
+psql (9.6.2, server 9.5.1)
+Type &quot;help&quot; for help.
+
+FsTweet=# \d &quot;Users&quot;
+                            Table &quot;public.Users&quot;
+
+        Column         |          Type          |                      Modifiers
+-----------------------+------------------------+------------------------------------------------------
+ Id                    | integer                | not null default nextval('&quot;Users_Id_seq&quot;'::regclass)
+ Username              | character varying(12)  | not null
+ Email                 | character varying(254) | not null
+ PasswordHash          | text                   | not null
+ EmailVerificationCode | text                   | not null
+ IsEmailVerified       | boolean                | not null
+Indexes:
+    &quot;PK_Users&quot; PRIMARY KEY, btree (&quot;Id&quot;)
+</code></pre>
+
+<p>Cool! The migrations went well :)</p>
+
+<h2 id="extending-the-connection-string">Extending the Connection String</h2>
+
+<p>In the script that we ran, the connection string is hard coded. To make it reusable across different build environments, we need to get it from the environment variable.</p>
+
+<p>FAKE has function <code>environVarOrDefault</code>, which takes the value from the given environment name and if the environment variable is not available, it returns the provided default value.</p>
+
+<p>Let&rsquo;s use this function in our build script to make it reusable</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+let connString = 
+  environVarOrDefault 
+    &quot;FSTWEET_DB_CONN_STRING&quot;
+    @&quot;Server=127.0.0.1;Port=5432;Database=FsTweet;User Id=postgres;Password=test;&quot;
+// ...
+</code></pre>
+
+<p>That&rsquo;s it!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learned how to set up database migration using Fluent Migrator in fsharp and leverage FAKE to run the migrations while running the build script.</p>
+
+<p>The source code for this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.5" target="_blank">GitHub</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/"><span
+      aria-hidden="true">&larr;</span> Validating New User Signup Form</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

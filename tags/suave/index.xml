@@ -11,7 +11,7 @@
     <atom:link href="/tags/suave/" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>User Signup Form Validation</title>
+      <title>Validating New User Signup Form</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/</link>
       <pubDate>Fri, 25 Aug 2017 08:34:25 +0530</pubDate>
       
@@ -272,7 +272,7 @@ module Domain =
 
 &lt;p&gt;In this part, we learned how to do validation and transform view model to a domain model using the Railway Programming technique with the help of the &lt;code&gt;Chessie&lt;/code&gt; library.&lt;/p&gt;
 
-&lt;p&gt;The source code for this part is available in &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.4&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The source code for this part is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.4&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -545,7 +545,7 @@ module Suave =
 
 &lt;p&gt;In this blog post, We started with rendering the signup form, and then we learned how to do view model binding using the &lt;code&gt;Suave.Experimental&lt;/code&gt; library.&lt;/p&gt;
 
-&lt;p&gt;The source code is available in &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.3&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.3&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -903,7 +903,7 @@ let main argv =
 
 &lt;p&gt;In this blog post, we have seen how to set up a Suave application to render server side views using DotLiquid and also how to make use of FAKE build script to manage static files.&lt;/p&gt;
 
-&lt;p&gt;The source code is available in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.1&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.1&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
