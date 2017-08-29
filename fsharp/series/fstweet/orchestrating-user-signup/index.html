@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/">
+
+  
+
+  <title>Orchestrating User Signup | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Orchestrating User Signup</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-08-28 09:38:55 &#43;0530 IST" itemprop="datePublished">
+      Mon, Aug 28, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/chessie">Chessie</a
+    >, 
+    
+    <a href="/tags/rop">rop</a
+    >, 
+    
+    <a href="/tags/suave">suave</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2forchestrating-user-signup%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Orchestrating%20User%20Signup&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2forchestrating-user-signup%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2forchestrating-user-signup%2f&amp;title=Orchestrating%20User%20Signup"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2forchestrating-user-signup%2f&amp;title=Orchestrating%20User%20Signup"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Orchestrating%20User%20Signup&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2forchestrating-user-signup%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi,</p>
+
+<p>Welcome back to the seventh part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
+
+<p>In this part we will be orchestrating the user signup usecase.</p>
+
+<h2 id="requirments">Requirments</h2>
+
+<p>Before dive into the implementation, let&rsquo;s spend some to jot down the requirement of the user sign up process.</p>
+
+<ol>
+<li><p>If the user submitted invalid details, we should let him/her to know about the error (which we already implemented in the <a href="/fsharp/series/fstweet/user-signup-validation/" target="_blank">fifth</a> part)</p></li>
+
+<li><p>We also need to check the whether the username or the email provided by the user has been already used by someone else and report it, if we found it is not available.</p></li>
+
+<li><p>If all the details are fine, then we need to persist the user details with his password hashed and also a randomly generated verification code.</p></li>
+
+<li><p>Then we need to send an email to the provided email address with the verification code.</p></li>
+
+<li><p>Upon receiving an URL with the verification code, the user will be nagvigating to the provided URL to complete his singup process.</p></li>
+</ol>
+
+<p>In this blog post we are going to implement the <a href="https://lostechies.com/jimmybogard/2008/08/21/services-in-domain-driven-design/" target="_blank">the service layer</a> part of the user signup which co-ordinates the steps 2 to 4.</p>
+
+<h2 id="generating-password-hash">Generating Password Hash</h2>
+
+<p>As a first step, let&rsquo;s generate the hash for the password provided by the user.</p>
+
+<p>To generate the hash we are going to use <a href="https://en.wikipedia.org/wiki/Bcrypt" target="_blank">the Bcrypt</a> algorithm. In .NET we can leverage this algorithm to generate hash using the <a href="https://github.com/BcryptNet/bcrypt.net" target="_blank">Bcrypt.Net</a> library.</p>
+
+<p>Let&rsquo;s add its NuGet package to our Web project</p>
+
+<pre><code class="language-bash">&gt; forge paket add BCrypt.Net-Next \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+</code></pre>
+
+<p>Then in the <code>Domain</code> module add a new type, <code>PasswordHash</code></p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  open BCrypt.Net
+  // ...
+  type PasswordHash = private PasswordHash of string with
+    member this.Value =
+      let (PasswordHash passwordHash) = this
+      passwordHash
+
+    static member Create (password : Password) =
+      BCrypt.HashPassword(password.Value)
+      |&gt; PasswordHash
+</code></pre>
+
+<p>As <a href="/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable" target="_blank">we did</a> for the other Domain types <code>PasswordHash</code> has a private constructor function to prevent it from creating from outside.</p>
+
+<p>The static function <code>Create</code> takes care of creating the password hash from the provided password using the <code>Bcrypt</code> library.</p>
+
+<p>The <code>Value</code> property provides the underlying string representation of the <code>PasswordHash</code> type. We will be using while persisting the user details.</p>
+
+<blockquote>
+<p>We are placing all the <code>Domain</code> types in <code>UserSignup</code> namespace now. Some of the types that we declared here may be needed for the other usecases. We will be doing the module reorganization when we require it.</p>
+</blockquote>
+
+<h2 id="generating-random-verification-code">Generating Random Verification Code</h2>
+
+<p>Like <code>PasswordHash</code>, let&rsquo;s create a domain type for the verification code with a <code>Value</code> property and a static function to <code>Create</code> it.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  open System.Security.Cryptography
+  // ...
+  type VerificationCode = private VerificationCode of string with
+    member this.Value =
+      let (VerificationCode verificationCode) = this
+      verificationCode
+    static member Create () =
+      use rngCsp = new RNGCryptoServiceProvider()
+      let verificationCodeLength = 15
+      let b : byte [] = 
+        Array.zeroCreate verificationCodeLength
+      rngCsp.GetBytes(b)
+      System.Convert.ToBase64String b
+      |&gt; VerificationCode 
+</code></pre>
+
+<p>We are making use of <a href="https://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider(v=vs.110).aspx" target="_blank">RNGCryptoServiceProvider</a> from the .NET standard library to generate the random bytes and convert them to a string using <a href="https://msdn.microsoft.com/en-us/library/dhx0d524(v=vs.110).aspx" target="_blank">Base64Encoding</a></p>
+
+<h2 id="canonicalizing-username-and-email-address">Canonicalizing Username And Email Address</h2>
+
+<p>To enable the uniqueness check on the <code>Username</code> and the <code>EmailAddress</code> fields, we need to canonicalize both of them.</p>
+
+<p>In our case, trimming the white-space characters and convtering to the string to lower case should suffice.</p>
+
+<p>To do it, we can use the existing <code>TryCreate</code> function in the <code>Username</code> and <code>EmailAddress</code> type.</p>
+
+<pre><code class="language-fsharp">type Username = private Username of string with
+    static member TryCreate (username : string) =
+      match username with
+      // ...
+      | x -&gt; x.Trim().ToLowerInvariant() |&gt; Username |&gt; ok
+    // ...
+
+// ...
+
+type EmailAddress = private EmailAddress of string with
+  // ...
+  static member TryCreate (emailAddress : string) =
+    try 
+      // ...
+      emailAddress.Trim().ToLowerInvariant() |&gt;  EmailAddress  |&gt; ok
+    // ...
+</code></pre>
+
+<h2 id="a-type-for-the-create-user-function">A Type For The Create User Function</h2>
+
+<p>We now have both the <code>PasswordHash</code> and the random <code>VerifcationCode</code> in place to persist them along with the canonicalized <code>Username</code> and <code>EmailAddress</code>.</p>
+
+<p>As a first step towards persisting a new user details, let&rsquo;s define a type signature for the Create User function that we will be implementing in the next blog post.</p>
+
+<p>First we need a type to represent the create user request</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  type CreateUserRequest = {
+    Username : Username
+    PasswordHash : PasswordHash
+    Email : EmailAddress
+    VerificationCode : VerificationCode
+  }
+  // ...
+</code></pre>
+
+<p>Then we need to have a type for the response. We will be returning the primary key that has been generated from the PostgreSQL database.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  type UserId = UserId of int
+  // ...
+</code></pre>
+
+<p>As creating a new user is a database operation, things might go wrong. We also need to account the uniqueness check of the <code>Username</code> and the <code>Email</code> properties.</p>
+
+<p>Let&rsquo;s define types for accomodating these scenarios as well.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  type CreateUserError =
+  | EmailAlreadyExists
+  | UsernameAlreadyExists
+  | Error of System.Exception
+  // ...
+</code></pre>
+
+<p>With the help of the types that we declared so far we can now write the type for the create user function</p>
+
+<pre><code class="language-fsharp">type CreateUser = 
+    CreateUserRequest -&gt; AsyncResult&lt;UserId, CreateUserError&gt;
+</code></pre>
+
+<p>The <a href="https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-asyncresult-2.html" target="_blank">AsyncResult</a> type is from the <a href="https://fsprojects.github.io/Chessie/" target="_blank">Chessie</a> library. It represents the <a href="https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-result-2.html" target="_blank">Result</a> of an <a href="https://fsharpforfunandprofit.com/posts/concurrency-async-and-parallel/" target="_blank">asynchronous</a> computation.</p>
+
+<h2 id="a-type-for-the-send-signup-email-function">A Type For The Send Signup Email Function</h2>
+
+<p>Upon creating a new user we need to send a new signup email to the user. Let&rsquo;s create type for this as we did for <code>CreateUser</code>.</p>
+
+<p>The input for this function are <code>Username</code>, <code>EmailAddress</code> and the <code>VerificationCode</code>.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  type SignupEmailRequest = {
+    Username : Username
+    EmailAddress : EmailAddress
+    VerificationCode : VerificationCode
+  }
+  // ...
+</code></pre>
+
+<p>As sending an email may fail, we need to have a type for representing it as well</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...
+  type SendEmailError = SendEmailError of System.Exception
+  // ...
+</code></pre>
+
+<p>If email sent successfully, we will be returning <code>unit</code> .</p>
+
+<p>With the help of these two types, we can declare the <code>SendSignupEmail</code> type as</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...  
+  type SendSignupEmail = 
+    SignupEmailRequest -&gt; AsyncResult&lt;unit, SendEmailError&gt;
+  // ...
+</code></pre>
+
+<h2 id="defining-the-signupuser-function-signature">Defining The SignupUser Function Signature</h2>
+
+<p>The <code>SignupUser</code> function makes use of <code>CreateUser</code> and <code>SendSignupEmail</code> functions to complete the user sign up process.</p>
+
+<p>In addition to these two functions, the <code>SignupUser</code> function takes a record of type <code>UserSignupRequest</code> as its input but what about the output?</p>
+
+<pre><code class="language-fsharp">type SignupUser = 
+    CreateUser -&gt; SendSignupEmail -&gt; UserSignupRequest 
+      -&gt; ???
+</code></pre>
+
+<p>There are possible outcomes</p>
+
+<ol>
+<li><code>CreateUser</code> may fail</li>
+<li><code>SendSignupEmail</code> may fail</li>
+<li>User successfully signed up.</li>
+</ol>
+
+<p>We can group the two failure conditions into a single type</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...  
+  type UserSignupError =
+  | CreateUserError of CreateUserError
+  | SendEmailError of SendEmailError
+  // ...
+</code></pre>
+
+<p>For successful sign up, we will be returning a value of type <code>UserId</code>, which we declared earlier.</p>
+
+<pre><code class="language-fsharp">type SignupUser = 
+    CreateUser -&gt; SendSignupEmail -&gt; UserSignupRequest 
+      -&gt; AsyncResult&lt;UserId, UserSignupError&gt;
+</code></pre>
+
+<blockquote>
+<p>We are not going to use this <code>SignupUser</code> type anywhere else and it is just for illustration.</p>
+</blockquote>
+
+<h2 id="implementing-the-signupuser-function">Implementing The SignupUser Function</h2>
+
+<p>Now we know the inputs and the outputs of the <code>SignupUser</code> function and it is time to get our hands dirty!</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...  
+  let signupUser (createUser : CreateUser) 
+                 (sendEmail : SendSignupEmail) 
+                 (req : UserSignupRequest) = asyncTrial {
+    // TODO
+  }
+</code></pre>
+
+<p>Like the <a href="/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable" target="_blank">trial</a> computation that we used to do the user signup form validation, the <a href="https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-asynctrial-asynctrialbuilder.html" target="_blank">asyncTrail</a> computation expression is going to help us here to do error handling in asynchronous operations.</p>
+
+<p>The first step is creating a value of type <code>CreateUserRequest</code> from <code>UserSignupRequest</code></p>
+
+<pre><code class="language-fsharp">let signupUser ... (req : UserSignupRequest) = asyncTrail {
+  let createUserReq = {
+    PasswordHash = PasswordHash.Create req.Password
+    Username = req.Username
+    Email = req.EmailAddress
+    VerificationCode = VerificationCode.Create()
+  }
+  // TODO
+}
+</code></pre>
+
+<blockquote>
+<p>The <code>...</code> notation is just a convention that we are using here to avoid repeating the parameters and it is not part of the fsharp language syntax</p>
+</blockquote>
+
+<p>The next step is calling the <code>createUser</code> function with the <code>createUserReq</code></p>
+
+<pre><code class="language-fsharp">let signupUser (createUser : CreateUser) ... = asyncTrail {
+  let createUserReq = // ...
+  let! userId = createUser createUserReq
+  // TODO
+}
+</code></pre>
+
+<p>Great! We need to send an email now. Let&rsquo;s <code>do</code> it!</p>
+
+<p>Steps involved are creating a value of type <code>SignupEmailRequest</code> and calling the <code>sendEmail</code> function with this value.</p>
+
+<p>As the <code>sendEmail</code> function returning <code>unit</code> on success, we can use the <code>do!</code> notation instead of <code>let!</code></p>
+
+<pre><code class="language-fsharp">let signupUser ... (sendEmail : SendSignupEmail) ... = asyncTrail {
+  let createUserReq = // ...
+  let! userId = // ...
+  let sendEmailReq = {
+    Username = req.Username
+    VerificationCode = createUserReq.VerificationCode
+    EmailAddress = createUserReq.Email
+  }
+  do! sendEmail sendEmailReq
+  // TODO
+}
+</code></pre>
+
+<p>Now you would be getting an compiler error</p>
+
+<p><img src="/img/fsharp/series/fstweet/bind-error.png" alt="Bind Error" /></p>
+
+<p>Would you be able to find why are we getting this compiler error?</p>
+
+<p>To figure out the solution, let&rsquo;s go back <a href="https://github.com/demystifyfp/FsTweet/blob/v0.4/src/FsTweet.Web/UserSignup.fs#L42-L52" target="_blank">to the TryCreate function</a> in <code>UserSignupRequest</code> type.</p>
+
+<pre><code class="language-fsharp">// ...
+with static member TryCreate (username, password, email) =
+  trial {
+    let! username = Username.TryCreate username
+    let! password = Password.TryCreate password
+    let! emailAddress = EmailAddress.TryCreate email
+    return {
+      Username = username
+      Password = password
+      EmailAddress = emailAddress
+    }
+  }
+</code></pre>
+
+<p>The signature of the <code>TryCreate</code> function is</p>
+
+<pre><code class="language-fsharp">(string, string, string) -&gt; Result&lt;UserSignupRequest, string&gt;
+</code></pre>
+
+<p>The signature of the <code>TryCreate</code> function of the Domain types are</p>
+
+<pre><code class="language-fsharp">Username.TryCreate :: string -&gt; Result&lt;Username, string&gt;
+Password.TryCreate :: string -&gt; Result&lt;Password, string&gt;
+EmailAddress.TryCreate :: string -&gt; Result&lt;EmailAddress, string&gt;
+</code></pre>
+
+<p>Let&rsquo;s focus our attention to the type that represents the result of a failed computation</p>
+
+<pre><code class="language-fsharp">UserSignupRequest.TryCreate :: ... -&gt; Result&lt;..., string&gt;
+Username.TryCreate :: ... -&gt; Result&lt;..., string&gt;
+Password.TryCreate :: ... -&gt; Result&lt;..., string&gt;
+EmailAddress.TryCreate :: ... -&gt; Result&lt;..., string&gt;
+</code></pre>
+
+<p>All are of <code>string</code> type!</p>
+
+<p>Coming back to the <code>signupUser</code> function what we are implementing, here is a type signature of the functions</p>
+
+<pre><code class="language-fsharp">signupUser :: ... -&gt; AsyncResult&lt;..., UserSignupError&gt;
+createUser :: ... -&gt; AsyncResult&lt;..., CreateUserError&gt;
+sendEmail :: ... -&gt; AsyncResult&lt;..., SendEmailError&gt;
+</code></pre>
+
+<p>In this case the types that are reprensenting the failure are of different type. That&rsquo;s thing that we need to fix!</p>
+
+<p><img src="/img/fsharp/series/fstweet/asynctrail-bind-shape.png" alt="Async Trail Output Mismatch" /></p>
+
+<p>If we transform (or map) the failure type to <code>UserSignupError</code>, then things would be fine!</p>
+
+<p><img src="/img/fsharp/series/fstweet/user_signup_map_failure.png" alt="Map Failure" /></p>
+
+<h2 id="mapping-asyncresult-failure-type">Mapping AsyncResult Failure Type</h2>
+
+<blockquote>
+<p>Disclaimer: You may find this section hard or confusing to get it in the first shot. A recommendended approach would be working out the following implementation on your own and use the implementation provided here as a reference. And also if you are thinking of taking a break, this is a right time!</p>
+</blockquote>
+
+<p>We already have a union cases which maps <code>CreateUserError</code> and <code>SendEmailError</code> types to <code>UserSignupError</code></p>
+
+<pre><code class="language-fsharp">type UserSignupError =
+| CreateUserError of CreateUserError
+| SendEmailError of SendEmailError
+</code></pre>
+
+<p>These union case identifiers are actually functions which has the following signature</p>
+
+<pre><code class="language-fsharp">CreateUserError :: CreateUserError -&gt; UserSignupError
+SendEmailError :: SendEmailError -&gt; UserSignupError
+</code></pre>
+
+<p>But we can&rsquo;t use it directly, as the <code>CreateUserError</code> and the <code>SendEmailError</code> are part of the <code>AsyncResult</code> type!</p>
+
+<p>What we want to achieve is mapping</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;UserId, CreateUserError&gt; -&gt; AsyncResult&lt;UserId, UserSignupError&gt;
+</code></pre>
+
+<p>and</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;unit, SendEmailError&gt; -&gt; AsyncResult&lt;unit, UserSignupError&gt;
+</code></pre>
+
+<p>Accomplishing this mapping is little tricky.</p>
+
+<p>Let&rsquo;s start our mapping by defining a new function called <code>mapAsyncFailure</code></p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  let mapAsyncFailure f aResult =
+    // TODO
+</code></pre>
+
+<p>The <code>mapAsyncFailure</code> function is a generic function with the following type signature.</p>
+
+<pre><code class="language-fsharp">mapAsyncFailure :: 'a -&gt; 'b -&gt; AsyncResult&lt;'c, 'a&gt; -&gt; AsyncResult&lt;'c, 'b&gt;
+</code></pre>
+
+<p>It takes a function <code>f</code> which maps a type <code>a</code> to <code>b</code> and an <code>AsyncResult</code> as its input. It&rsquo;s output is an <code>AsyncResult</code> with its failure type mapped using the given function <code>f</code>.</p>
+
+<p>The first step to do this mapping is to transform</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;'c, 'a&gt; -&gt; Async&lt;Result&lt;'c, 'a&gt;&gt;
+</code></pre>
+
+<p>The <code>AsyncResult</code> type is defined in Chessie as a single case discriminated union case <code>AR</code></p>
+
+<pre><code class="language-fsharp">type AsyncResult&lt;'a, 'b&gt; = 
+  | AR of Async&lt;Result&lt;'a, 'b&gt;&gt;
+</code></pre>
+
+<p>The Chessie library already has a function, <code>ofAsyncResult</code>, to carry out this transformation (or unboxing!)</p>
+
+<pre><code class="language-fsharp">let mapAsyncFailure f aResult =
+  aResult
+  |&gt; Async.ofAsyncResult 
+</code></pre>
+
+<p>The next step is mapping the value that is part of the <code>Async</code> type.</p>
+
+<pre><code class="language-fsharp">Async&lt;'a&gt; -&gt; Async&lt;'b&gt;
+</code></pre>
+
+<p>We can again make use of the Chessie library again by using its <code>map</code> function. This map function like other <code>map</code> functions in the fsharp standard module, takes a function as its input to do the mapping.</p>
+
+<pre><code class="language-fsharp">'a -&gt; 'b -&gt; Async&lt;'a&gt; -&gt; Async&lt;'b&gt;
+</code></pre>
+
+<p>The easier way to understand is to think <code>Async</code> as a box. All mapping function does is takes the value out of the <code>Async</code> box, perform the mapping, then put it to back to a new <code>Async</code> box and return it.</p>
+
+<p><img src="/img/fsharp/series/fstweet/async-map.png" alt="Async Map" /></p>
+
+<p>But what is the function that we need to give to the <code>map</code> function to do the mapping</p>
+
+<pre><code class="language-fsharp">let mapAsyncFailure f aResult =
+  aResult
+  |&gt; Async.ofAsyncResult 
+  |&gt; Async.map ???
+</code></pre>
+
+<p>We can&rsquo;t give the <code>CreateUserError</code> union case function directly as the <code>f</code> parameter here, it only maps <code>CreateUserError</code> to <code>UserSignupError</code>.</p>
+
+<p>The reason is, the value inside the <code>Async</code> is not <code>CreateUserError</code>, it&rsquo;s <code>Result&lt;UserId, CreateUserError&gt;</code>.</p>
+
+<p>We need to have an another map function which maps the failure part of the <code>Result</code> type</p>
+
+<p><img src="/img/fsharp/series/fstweet/result-map-failure.png" alt="Result Map Failure" /></p>
+
+<p>Let&rsquo;s assume that we have <code>mapFailure</code> function which takes a function <code>f</code> to do this failure type mapping on the <code>Result</code> type.</p>
+
+<p>We can continue with the definition of the <code>mapAsyncFailure</code> function using this <code>mapFailure</code> function.</p>
+
+<pre><code class="language-fsharp">let mapAsyncFailure f aResult =
+  aResult
+  |&gt; Async.ofAsyncResult 
+  |&gt; Async.map (mapFailure f)
+</code></pre>
+
+<p>The final step is putting the <code>Async</code> of <code>Result</code> type back to <code>AsyncResult</code> type. As <code>AsyncResult</code> is defined as single case discrimated union, we can use the <code>AR</code> union case to complete the mapping.</p>
+
+<pre><code class="language-fsharp">let mapAsyncFailure f aResult =
+  aResult
+  |&gt; Async.ofAsyncResult 
+  |&gt; Async.map (mapFailure f)
+  |&gt; AR
+</code></pre>
+
+<p>The <code>mapFailure</code> is not part of the codebase yet. So, Let&rsquo;s add it before going back to the <code>signupUser</code> function.</p>
+
+<p>The Chessie library already has a <code>mapFailure</code> function. But the mapping function parameter maps a list of errors instead of a single error</p>
+
+<pre><code class="language-fsharp">'a list -&gt; 'b list -&gt; Result&lt;'c, 'a list&gt; -&gt; Result&lt;'c, 'b list&gt; 
+</code></pre>
+
+<p>The reason for this signature is because the library treats failures as a list in the <code>Result</code> type.</p>
+
+<p>As we are treating the failure in the <code>Result</code> type as a single item, we can&rsquo;t directly make use of it.</p>
+
+<p>However, we can leverage it to fit our requirement by having our own implementation, which takes the first item from the failure list, call the mapping function and then create a list from the output of the map function.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+module Domain =
+  // ...
+  let mapFailure f aResult = 
+    let mapFirstItem xs = 
+      List.head xs |&gt; f |&gt; List.singleton 
+    mapFailure mapFirstItem aResult
+  // ...
+</code></pre>
+
+<p>This <code>mapFailure</code> function has the signature</p>
+
+<pre><code class="language-fsharp">'a -&gt; 'b -&gt; Result&lt;'c, 'a&gt; -&gt; Result&lt;'c, 'b&gt; 
+</code></pre>
+
+<p>With this, we are done with the mapping of Async Result failure type.</p>
+
+<h2 id="going-back-to-the-signupuser-function">Going Back To The signupUser Function</h2>
+
+<p>In previous section, we implemented a solution to fix the compiler error that we encountered while defining the <code>signupUser</code> function.</p>
+
+<p>With the <code>mapAsyncFailure</code> function, we can rewrite the <code>signupUser</code> function to transform the error type and return the <code>UserId</code> if everything goes well.</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...
+  let signupUser ...= asyncTrial {
+    
+    let createUserReq = // ...
+    let! userId = 
+      createUser createUserReq
+      |&gt; mapAsyncFailure CreateUserError
+    let sendEmailReq = // ...
+    do! sendEmail sendEmailReq 
+        |&gt; mapAsyncFailure SendEmailError
+
+    return userId
+  }
+</code></pre>
+
+<p>That&rsquo;s it!!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>One of the key take away of this blog post is how we can solve a complex problem in fsharp by just focusing on the function signature.</p>
+
+<p>We also learned how to compose functions together, transforming the values using the map function to come up with a robust implementation.</p>
+
+<p>The source code is available on the <a href="https://github.com/demystifyfp/FsTweet/tree/v0.6" target="_blank">GitHub Repository</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/"><span
+      aria-hidden="true">&larr;</span> Setting Up Database Migration</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

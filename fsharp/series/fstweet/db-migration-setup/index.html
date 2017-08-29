@@ -104,8 +104,8 @@
 <div class="article-metadata">
 
   <span class="article-date">
-    <time datetime="2017-08-25 09:38:55 &#43;0530 IST" itemprop="datePublished">
-      Fri, Aug 25, 2017
+    <time datetime="2017-08-26 18:47:29 &#43;0530 IST" itemprop="datePublished">
+      Sat, Aug 26, 2017
     </time>
   </span>
 
@@ -190,7 +190,7 @@
 
 <p>In this sixth part of the <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series, we are going to learn how to setup PostgreSQL database migrations in fsharp using <a href="https://github.com/fluentmigrator/fluentmigrator" target="_blank">Fluent Migrator</a>.</p>
 
-<p>In the <a href="" target="_blank">following blog post</a>, we will be persisting the signup details.</p>
+<p>In the <a href="/fsharp/series/fstweet/orchestrating-user-signup/" target="_blank">following blog post</a>, we will be orchastrating the user signup.</p>
 
 <h2 id="creating-a-database-migrations-project">Creating a Database Migrations Project</h2>
 
@@ -300,8 +300,12 @@ Target &quot;Build&quot; (fun _ -&gt;
 
 <p>To run the migration against Postgres, we need to install the <a href="http://www.npgsql.org/" target="_blank">Npgsql</a> package from NuGet.</p>
 
-<pre><code class="language-bash">&gt; forge paket add Npgsql -g Database
+<pre><code class="language-bash">&gt; forge paket add Npgsql -g Database --version 3.1.10
 </code></pre>
+
+<blockquote>
+<p>At the time of this writing there is <a href="https://github.com/npgsql/npgsql/issues/1603" target="_blank">an issue</a> with the latest version of Npgsql. So, we are using the version <code>3.1.10</code> here.</p>
+</blockquote>
 
 <p>FAKE has inbuilt support for <a href="https://fake.build/todo-fluentmigrator.html" target="_blank">running fluent migration</a> from the build script.</p>
 
@@ -434,6 +438,9 @@ let connString =
       aria-hidden="true">&larr;</span> Validating New User Signup Form</a></li>
     
 
+    
+    <li class="next"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/">Orchestrating User Signup <span
+      aria-hidden="true">&rarr;</span></a></li>
     
   </ul>
 </nav>

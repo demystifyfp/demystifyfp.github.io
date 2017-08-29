@@ -7,8 +7,556 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 25 Aug 2017 08:34:25 +0530</lastBuildDate>
+    <lastBuildDate>Mon, 28 Aug 2017 09:38:55 +0530</lastBuildDate>
     <atom:link href="/tags/chessie/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Orchestrating User Signup</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/</link>
+      <pubDate>Mon, 28 Aug 2017 09:38:55 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;Welcome back to the seventh part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;In this part we will be orchestrating the user signup usecase.&lt;/p&gt;
+
+&lt;h2 id=&#34;requirments&#34;&gt;Requirments&lt;/h2&gt;
+
+&lt;p&gt;Before dive into the implementation, let&amp;rsquo;s spend some to jot down the requirement of the user sign up process.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;If the user submitted invalid details, we should let him/her to know about the error (which we already implemented in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/&#34; target=&#34;_blank&#34;&gt;fifth&lt;/a&gt; part)&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;We also need to check the whether the username or the email provided by the user has been already used by someone else and report it, if we found it is not available.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If all the details are fine, then we need to persist the user details with his password hashed and also a randomly generated verification code.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Then we need to send an email to the provided email address with the verification code.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Upon receiving an URL with the verification code, the user will be nagvigating to the provided URL to complete his singup process.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;In this blog post we are going to implement the &lt;a href=&#34;https://lostechies.com/jimmybogard/2008/08/21/services-in-domain-driven-design/&#34; target=&#34;_blank&#34;&gt;the service layer&lt;/a&gt; part of the user signup which co-ordinates the steps 2 to 4.&lt;/p&gt;
+
+&lt;h2 id=&#34;generating-password-hash&#34;&gt;Generating Password Hash&lt;/h2&gt;
+
+&lt;p&gt;As a first step, let&amp;rsquo;s generate the hash for the password provided by the user.&lt;/p&gt;
+
+&lt;p&gt;To generate the hash we are going to use &lt;a href=&#34;https://en.wikipedia.org/wiki/Bcrypt&#34; target=&#34;_blank&#34;&gt;the Bcrypt&lt;/a&gt; algorithm. In .NET we can leverage this algorithm to generate hash using the &lt;a href=&#34;https://github.com/BcryptNet/bcrypt.net&#34; target=&#34;_blank&#34;&gt;Bcrypt.Net&lt;/a&gt; library.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add its NuGet package to our Web project&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add BCrypt.Net-Next \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in the &lt;code&gt;Domain&lt;/code&gt; module add a new type, &lt;code&gt;PasswordHash&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  open BCrypt.Net
+  // ...
+  type PasswordHash = private PasswordHash of string with
+    member this.Value =
+      let (PasswordHash passwordHash) = this
+      passwordHash
+
+    static member Create (password : Password) =
+      BCrypt.HashPassword(password.Value)
+      |&amp;gt; PasswordHash
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;we did&lt;/a&gt; for the other Domain types &lt;code&gt;PasswordHash&lt;/code&gt; has a private constructor function to prevent it from creating from outside.&lt;/p&gt;
+
+&lt;p&gt;The static function &lt;code&gt;Create&lt;/code&gt; takes care of creating the password hash from the provided password using the &lt;code&gt;Bcrypt&lt;/code&gt; library.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Value&lt;/code&gt; property provides the underlying string representation of the &lt;code&gt;PasswordHash&lt;/code&gt; type. We will be using while persisting the user details.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are placing all the &lt;code&gt;Domain&lt;/code&gt; types in &lt;code&gt;UserSignup&lt;/code&gt; namespace now. Some of the types that we declared here may be needed for the other usecases. We will be doing the module reorganization when we require it.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;generating-random-verification-code&#34;&gt;Generating Random Verification Code&lt;/h2&gt;
+
+&lt;p&gt;Like &lt;code&gt;PasswordHash&lt;/code&gt;, let&amp;rsquo;s create a domain type for the verification code with a &lt;code&gt;Value&lt;/code&gt; property and a static function to &lt;code&gt;Create&lt;/code&gt; it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  open System.Security.Cryptography
+  // ...
+  type VerificationCode = private VerificationCode of string with
+    member this.Value =
+      let (VerificationCode verificationCode) = this
+      verificationCode
+    static member Create () =
+      use rngCsp = new RNGCryptoServiceProvider()
+      let verificationCodeLength = 15
+      let b : byte [] = 
+        Array.zeroCreate verificationCodeLength
+      rngCsp.GetBytes(b)
+      System.Convert.ToBase64String b
+      |&amp;gt; VerificationCode 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are making use of &lt;a href=&#34;https://msdn.microsoft.com/en-us/library/system.security.cryptography.rngcryptoserviceprovider(v=vs.110).aspx&#34; target=&#34;_blank&#34;&gt;RNGCryptoServiceProvider&lt;/a&gt; from the .NET standard library to generate the random bytes and convert them to a string using &lt;a href=&#34;https://msdn.microsoft.com/en-us/library/dhx0d524(v=vs.110).aspx&#34; target=&#34;_blank&#34;&gt;Base64Encoding&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;canonicalizing-username-and-email-address&#34;&gt;Canonicalizing Username And Email Address&lt;/h2&gt;
+
+&lt;p&gt;To enable the uniqueness check on the &lt;code&gt;Username&lt;/code&gt; and the &lt;code&gt;EmailAddress&lt;/code&gt; fields, we need to canonicalize both of them.&lt;/p&gt;
+
+&lt;p&gt;In our case, trimming the white-space characters and convtering to the string to lower case should suffice.&lt;/p&gt;
+
+&lt;p&gt;To do it, we can use the existing &lt;code&gt;TryCreate&lt;/code&gt; function in the &lt;code&gt;Username&lt;/code&gt; and &lt;code&gt;EmailAddress&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Username = private Username of string with
+    static member TryCreate (username : string) =
+      match username with
+      // ...
+      | x -&amp;gt; x.Trim().ToLowerInvariant() |&amp;gt; Username |&amp;gt; ok
+    // ...
+
+// ...
+
+type EmailAddress = private EmailAddress of string with
+  // ...
+  static member TryCreate (emailAddress : string) =
+    try 
+      // ...
+      emailAddress.Trim().ToLowerInvariant() |&amp;gt;  EmailAddress  |&amp;gt; ok
+    // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;a-type-for-the-create-user-function&#34;&gt;A Type For The Create User Function&lt;/h2&gt;
+
+&lt;p&gt;We now have both the &lt;code&gt;PasswordHash&lt;/code&gt; and the random &lt;code&gt;VerifcationCode&lt;/code&gt; in place to persist them along with the canonicalized &lt;code&gt;Username&lt;/code&gt; and &lt;code&gt;EmailAddress&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;As a first step towards persisting a new user details, let&amp;rsquo;s define a type signature for the Create User function that we will be implementing in the next blog post.&lt;/p&gt;
+
+&lt;p&gt;First we need a type to represent the create user request&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  type CreateUserRequest = {
+    Username : Username
+    PasswordHash : PasswordHash
+    Email : EmailAddress
+    VerificationCode : VerificationCode
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we need to have a type for the response. We will be returning the primary key that has been generated from the PostgreSQL database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  type UserId = UserId of int
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As creating a new user is a database operation, things might go wrong. We also need to account the uniqueness check of the &lt;code&gt;Username&lt;/code&gt; and the &lt;code&gt;Email&lt;/code&gt; properties.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s define types for accomodating these scenarios as well.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  type CreateUserError =
+  | EmailAlreadyExists
+  | UsernameAlreadyExists
+  | Error of System.Exception
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With the help of the types that we declared so far we can now write the type for the create user function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type CreateUser = 
+    CreateUserRequest -&amp;gt; AsyncResult&amp;lt;UserId, CreateUserError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-asyncresult-2.html&#34; target=&#34;_blank&#34;&gt;AsyncResult&lt;/a&gt; type is from the &lt;a href=&#34;https://fsprojects.github.io/Chessie/&#34; target=&#34;_blank&#34;&gt;Chessie&lt;/a&gt; library. It represents the &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-result-2.html&#34; target=&#34;_blank&#34;&gt;Result&lt;/a&gt; of an &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/concurrency-async-and-parallel/&#34; target=&#34;_blank&#34;&gt;asynchronous&lt;/a&gt; computation.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-type-for-the-send-signup-email-function&#34;&gt;A Type For The Send Signup Email Function&lt;/h2&gt;
+
+&lt;p&gt;Upon creating a new user we need to send a new signup email to the user. Let&amp;rsquo;s create type for this as we did for &lt;code&gt;CreateUser&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The input for this function are &lt;code&gt;Username&lt;/code&gt;, &lt;code&gt;EmailAddress&lt;/code&gt; and the &lt;code&gt;VerificationCode&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  type SignupEmailRequest = {
+    Username : Username
+    EmailAddress : EmailAddress
+    VerificationCode : VerificationCode
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As sending an email may fail, we need to have a type for representing it as well&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...
+  type SendEmailError = SendEmailError of System.Exception
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If email sent successfully, we will be returning &lt;code&gt;unit&lt;/code&gt; .&lt;/p&gt;
+
+&lt;p&gt;With the help of these two types, we can declare the &lt;code&gt;SendSignupEmail&lt;/code&gt; type as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...  
+  type SendSignupEmail = 
+    SignupEmailRequest -&amp;gt; AsyncResult&amp;lt;unit, SendEmailError&amp;gt;
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;defining-the-signupuser-function-signature&#34;&gt;Defining The SignupUser Function Signature&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code&gt;SignupUser&lt;/code&gt; function makes use of &lt;code&gt;CreateUser&lt;/code&gt; and &lt;code&gt;SendSignupEmail&lt;/code&gt; functions to complete the user sign up process.&lt;/p&gt;
+
+&lt;p&gt;In addition to these two functions, the &lt;code&gt;SignupUser&lt;/code&gt; function takes a record of type &lt;code&gt;UserSignupRequest&lt;/code&gt; as its input but what about the output?&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type SignupUser = 
+    CreateUser -&amp;gt; SendSignupEmail -&amp;gt; UserSignupRequest 
+      -&amp;gt; ???
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;There are possible outcomes&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;CreateUser&lt;/code&gt; may fail&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;SendSignupEmail&lt;/code&gt; may fail&lt;/li&gt;
+&lt;li&gt;User successfully signed up.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;We can group the two failure conditions into a single type&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...  
+  type UserSignupError =
+  | CreateUserError of CreateUserError
+  | SendEmailError of SendEmailError
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For successful sign up, we will be returning a value of type &lt;code&gt;UserId&lt;/code&gt;, which we declared earlier.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type SignupUser = 
+    CreateUser -&amp;gt; SendSignupEmail -&amp;gt; UserSignupRequest 
+      -&amp;gt; AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are not going to use this &lt;code&gt;SignupUser&lt;/code&gt; type anywhere else and it is just for illustration.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;implementing-the-signupuser-function&#34;&gt;Implementing The SignupUser Function&lt;/h2&gt;
+
+&lt;p&gt;Now we know the inputs and the outputs of the &lt;code&gt;SignupUser&lt;/code&gt; function and it is time to get our hands dirty!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...  
+  let signupUser (createUser : CreateUser) 
+                 (sendEmail : SendSignupEmail) 
+                 (req : UserSignupRequest) = asyncTrial {
+    // TODO
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Like the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;trial&lt;/a&gt; computation that we used to do the user signup form validation, the &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-asynctrial-asynctrialbuilder.html&#34; target=&#34;_blank&#34;&gt;asyncTrail&lt;/a&gt; computation expression is going to help us here to do error handling in asynchronous operations.&lt;/p&gt;
+
+&lt;p&gt;The first step is creating a value of type &lt;code&gt;CreateUserRequest&lt;/code&gt; from &lt;code&gt;UserSignupRequest&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let signupUser ... (req : UserSignupRequest) = asyncTrail {
+  let createUserReq = {
+    PasswordHash = PasswordHash.Create req.Password
+    Username = req.Username
+    Email = req.EmailAddress
+    VerificationCode = VerificationCode.Create()
+  }
+  // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;code&gt;...&lt;/code&gt; notation is just a convention that we are using here to avoid repeating the parameters and it is not part of the fsharp language syntax&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The next step is calling the &lt;code&gt;createUser&lt;/code&gt; function with the &lt;code&gt;createUserReq&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let signupUser (createUser : CreateUser) ... = asyncTrail {
+  let createUserReq = // ...
+  let! userId = createUser createUserReq
+  // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Great! We need to send an email now. Let&amp;rsquo;s &lt;code&gt;do&lt;/code&gt; it!&lt;/p&gt;
+
+&lt;p&gt;Steps involved are creating a value of type &lt;code&gt;SignupEmailRequest&lt;/code&gt; and calling the &lt;code&gt;sendEmail&lt;/code&gt; function with this value.&lt;/p&gt;
+
+&lt;p&gt;As the &lt;code&gt;sendEmail&lt;/code&gt; function returning &lt;code&gt;unit&lt;/code&gt; on success, we can use the &lt;code&gt;do!&lt;/code&gt; notation instead of &lt;code&gt;let!&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let signupUser ... (sendEmail : SendSignupEmail) ... = asyncTrail {
+  let createUserReq = // ...
+  let! userId = // ...
+  let sendEmailReq = {
+    Username = req.Username
+    VerificationCode = createUserReq.VerificationCode
+    EmailAddress = createUserReq.Email
+  }
+  do! sendEmail sendEmailReq
+  // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now you would be getting an compiler error&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/bind-error.png&#34; alt=&#34;Bind Error&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Would you be able to find why are we getting this compiler error?&lt;/p&gt;
+
+&lt;p&gt;To figure out the solution, let&amp;rsquo;s go back &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/blob/v0.4/src/FsTweet.Web/UserSignup.fs#L42-L52&#34; target=&#34;_blank&#34;&gt;to the TryCreate function&lt;/a&gt; in &lt;code&gt;UserSignupRequest&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// ...
+with static member TryCreate (username, password, email) =
+  trial {
+    let! username = Username.TryCreate username
+    let! password = Password.TryCreate password
+    let! emailAddress = EmailAddress.TryCreate email
+    return {
+      Username = username
+      Password = password
+      EmailAddress = emailAddress
+    }
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The signature of the &lt;code&gt;TryCreate&lt;/code&gt; function is&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;(string, string, string) -&amp;gt; Result&amp;lt;UserSignupRequest, string&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The signature of the &lt;code&gt;TryCreate&lt;/code&gt; function of the Domain types are&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;Username.TryCreate :: string -&amp;gt; Result&amp;lt;Username, string&amp;gt;
+Password.TryCreate :: string -&amp;gt; Result&amp;lt;Password, string&amp;gt;
+EmailAddress.TryCreate :: string -&amp;gt; Result&amp;lt;EmailAddress, string&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s focus our attention to the type that represents the result of a failed computation&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;UserSignupRequest.TryCreate :: ... -&amp;gt; Result&amp;lt;..., string&amp;gt;
+Username.TryCreate :: ... -&amp;gt; Result&amp;lt;..., string&amp;gt;
+Password.TryCreate :: ... -&amp;gt; Result&amp;lt;..., string&amp;gt;
+EmailAddress.TryCreate :: ... -&amp;gt; Result&amp;lt;..., string&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;All are of &lt;code&gt;string&lt;/code&gt; type!&lt;/p&gt;
+
+&lt;p&gt;Coming back to the &lt;code&gt;signupUser&lt;/code&gt; function what we are implementing, here is a type signature of the functions&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;signupUser :: ... -&amp;gt; AsyncResult&amp;lt;..., UserSignupError&amp;gt;
+createUser :: ... -&amp;gt; AsyncResult&amp;lt;..., CreateUserError&amp;gt;
+sendEmail :: ... -&amp;gt; AsyncResult&amp;lt;..., SendEmailError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In this case the types that are reprensenting the failure are of different type. That&amp;rsquo;s thing that we need to fix!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/asynctrail-bind-shape.png&#34; alt=&#34;Async Trail Output Mismatch&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If we transform (or map) the failure type to &lt;code&gt;UserSignupError&lt;/code&gt;, then things would be fine!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_signup_map_failure.png&#34; alt=&#34;Map Failure&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;mapping-asyncresult-failure-type&#34;&gt;Mapping AsyncResult Failure Type&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Disclaimer: You may find this section hard or confusing to get it in the first shot. A recommendended approach would be working out the following implementation on your own and use the implementation provided here as a reference. And also if you are thinking of taking a break, this is a right time!&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We already have a union cases which maps &lt;code&gt;CreateUserError&lt;/code&gt; and &lt;code&gt;SendEmailError&lt;/code&gt; types to &lt;code&gt;UserSignupError&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type UserSignupError =
+| CreateUserError of CreateUserError
+| SendEmailError of SendEmailError
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;These union case identifiers are actually functions which has the following signature&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;CreateUserError :: CreateUserError -&amp;gt; UserSignupError
+SendEmailError :: SendEmailError -&amp;gt; UserSignupError
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But we can&amp;rsquo;t use it directly, as the &lt;code&gt;CreateUserError&lt;/code&gt; and the &lt;code&gt;SendEmailError&lt;/code&gt; are part of the &lt;code&gt;AsyncResult&lt;/code&gt; type!&lt;/p&gt;
+
+&lt;p&gt;What we want to achieve is mapping&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;AsyncResult&amp;lt;UserId, CreateUserError&amp;gt; -&amp;gt; AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;AsyncResult&amp;lt;unit, SendEmailError&amp;gt; -&amp;gt; AsyncResult&amp;lt;unit, UserSignupError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Accomplishing this mapping is little tricky.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start our mapping by defining a new function called &lt;code&gt;mapAsyncFailure&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  let mapAsyncFailure f aResult =
+    // TODO
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;mapAsyncFailure&lt;/code&gt; function is a generic function with the following type signature.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;mapAsyncFailure :: &#39;a -&amp;gt; &#39;b -&amp;gt; AsyncResult&amp;lt;&#39;c, &#39;a&amp;gt; -&amp;gt; AsyncResult&amp;lt;&#39;c, &#39;b&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It takes a function &lt;code&gt;f&lt;/code&gt; which maps a type &lt;code&gt;a&lt;/code&gt; to &lt;code&gt;b&lt;/code&gt; and an &lt;code&gt;AsyncResult&lt;/code&gt; as its input. It&amp;rsquo;s output is an &lt;code&gt;AsyncResult&lt;/code&gt; with its failure type mapped using the given function &lt;code&gt;f&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The first step to do this mapping is to transform&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;AsyncResult&amp;lt;&#39;c, &#39;a&amp;gt; -&amp;gt; Async&amp;lt;Result&amp;lt;&#39;c, &#39;a&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;AsyncResult&lt;/code&gt; type is defined in Chessie as a single case discriminated union case &lt;code&gt;AR&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type AsyncResult&amp;lt;&#39;a, &#39;b&amp;gt; = 
+  | AR of Async&amp;lt;Result&amp;lt;&#39;a, &#39;b&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The Chessie library already has a function, &lt;code&gt;ofAsyncResult&lt;/code&gt;, to carry out this transformation (or unboxing!)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapAsyncFailure f aResult =
+  aResult
+  |&amp;gt; Async.ofAsyncResult 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is mapping the value that is part of the &lt;code&gt;Async&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;Async&amp;lt;&#39;a&amp;gt; -&amp;gt; Async&amp;lt;&#39;b&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can again make use of the Chessie library again by using its &lt;code&gt;map&lt;/code&gt; function. This map function like other &lt;code&gt;map&lt;/code&gt; functions in the fsharp standard module, takes a function as its input to do the mapping.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;&#39;a -&amp;gt; &#39;b -&amp;gt; Async&amp;lt;&#39;a&amp;gt; -&amp;gt; Async&amp;lt;&#39;b&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The easier way to understand is to think &lt;code&gt;Async&lt;/code&gt; as a box. All mapping function does is takes the value out of the &lt;code&gt;Async&lt;/code&gt; box, perform the mapping, then put it to back to a new &lt;code&gt;Async&lt;/code&gt; box and return it.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/async-map.png&#34; alt=&#34;Async Map&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;But what is the function that we need to give to the &lt;code&gt;map&lt;/code&gt; function to do the mapping&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapAsyncFailure f aResult =
+  aResult
+  |&amp;gt; Async.ofAsyncResult 
+  |&amp;gt; Async.map ???
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can&amp;rsquo;t give the &lt;code&gt;CreateUserError&lt;/code&gt; union case function directly as the &lt;code&gt;f&lt;/code&gt; parameter here, it only maps &lt;code&gt;CreateUserError&lt;/code&gt; to &lt;code&gt;UserSignupError&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The reason is, the value inside the &lt;code&gt;Async&lt;/code&gt; is not &lt;code&gt;CreateUserError&lt;/code&gt;, it&amp;rsquo;s &lt;code&gt;Result&amp;lt;UserId, CreateUserError&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We need to have an another map function which maps the failure part of the &lt;code&gt;Result&lt;/code&gt; type&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/result-map-failure.png&#34; alt=&#34;Result Map Failure&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s assume that we have &lt;code&gt;mapFailure&lt;/code&gt; function which takes a function &lt;code&gt;f&lt;/code&gt; to do this failure type mapping on the &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;p&gt;We can continue with the definition of the &lt;code&gt;mapAsyncFailure&lt;/code&gt; function using this &lt;code&gt;mapFailure&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapAsyncFailure f aResult =
+  aResult
+  |&amp;gt; Async.ofAsyncResult 
+  |&amp;gt; Async.map (mapFailure f)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final step is putting the &lt;code&gt;Async&lt;/code&gt; of &lt;code&gt;Result&lt;/code&gt; type back to &lt;code&gt;AsyncResult&lt;/code&gt; type. As &lt;code&gt;AsyncResult&lt;/code&gt; is defined as single case discrimated union, we can use the &lt;code&gt;AR&lt;/code&gt; union case to complete the mapping.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapAsyncFailure f aResult =
+  aResult
+  |&amp;gt; Async.ofAsyncResult 
+  |&amp;gt; Async.map (mapFailure f)
+  |&amp;gt; AR
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;mapFailure&lt;/code&gt; is not part of the codebase yet. So, Let&amp;rsquo;s add it before going back to the &lt;code&gt;signupUser&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;p&gt;The Chessie library already has a &lt;code&gt;mapFailure&lt;/code&gt; function. But the mapping function parameter maps a list of errors instead of a single error&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;&#39;a list -&amp;gt; &#39;b list -&amp;gt; Result&amp;lt;&#39;c, &#39;a list&amp;gt; -&amp;gt; Result&amp;lt;&#39;c, &#39;b list&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The reason for this signature is because the library treats failures as a list in the &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;p&gt;As we are treating the failure in the &lt;code&gt;Result&lt;/code&gt; type as a single item, we can&amp;rsquo;t directly make use of it.&lt;/p&gt;
+
+&lt;p&gt;However, we can leverage it to fit our requirement by having our own implementation, which takes the first item from the failure list, call the mapping function and then create a list from the output of the map function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
+module Domain =
+  // ...
+  let mapFailure f aResult = 
+    let mapFirstItem xs = 
+      List.head xs |&amp;gt; f |&amp;gt; List.singleton 
+    mapFailure mapFirstItem aResult
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This &lt;code&gt;mapFailure&lt;/code&gt; function has the signature&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;&#39;a -&amp;gt; &#39;b -&amp;gt; Result&amp;lt;&#39;c, &#39;a&amp;gt; -&amp;gt; Result&amp;lt;&#39;c, &#39;b&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this, we are done with the mapping of Async Result failure type.&lt;/p&gt;
+
+&lt;h2 id=&#34;going-back-to-the-signupuser-function&#34;&gt;Going Back To The signupUser Function&lt;/h2&gt;
+
+&lt;p&gt;In previous section, we implemented a solution to fix the compiler error that we encountered while defining the &lt;code&gt;signupUser&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;p&gt;With the &lt;code&gt;mapAsyncFailure&lt;/code&gt; function, we can rewrite the &lt;code&gt;signupUser&lt;/code&gt; function to transform the error type and return the &lt;code&gt;UserId&lt;/code&gt; if everything goes well.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...
+  let signupUser ...= asyncTrial {
+    
+    let createUserReq = // ...
+    let! userId = 
+      createUser createUserReq
+      |&amp;gt; mapAsyncFailure CreateUserError
+    let sendEmailReq = // ...
+    do! sendEmail sendEmailReq 
+        |&amp;gt; mapAsyncFailure SendEmailError
+
+    return userId
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s it!!&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;One of the key take away of this blog post is how we can solve a complex problem in fsharp by just focusing on the function signature.&lt;/p&gt;
+
+&lt;p&gt;We also learned how to compose functions together, transforming the values using the map function to come up with a robust implementation.&lt;/p&gt;
+
+&lt;p&gt;The source code is available on the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.6&#34; target=&#34;_blank&#34;&gt;GitHub Repository&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Validating New User Signup Form</title>

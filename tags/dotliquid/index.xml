@@ -35,7 +35,7 @@
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;At the time of this writing, there were some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version &lt;code&gt;2.0.64&lt;/code&gt;, we are sticking to the same here.&lt;/p&gt;
+&lt;p&gt;At the time of this writing, there are some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version &lt;code&gt;2.0.64&lt;/code&gt;, we are sticking to the same here.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;The next step is referring these packages in the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt;.&lt;/p&gt;

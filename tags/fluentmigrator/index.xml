@@ -7,13 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 25 Aug 2017 09:38:55 +0530</lastBuildDate>
+    <lastBuildDate>Sat, 26 Aug 2017 18:47:29 +0530</lastBuildDate>
     <atom:link href="/tags/fluentmigrator/" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Setting Up Database Migration</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/</link>
-      <pubDate>Fri, 25 Aug 2017 09:38:55 +0530</pubDate>
+      <pubDate>Sat, 26 Aug 2017 18:47:29 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/</guid>
       <description>
@@ -26,7 +26,7 @@
 
 &lt;p&gt;In this sixth part of the &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to learn how to setup PostgreSQL database migrations in fsharp using &lt;a href=&#34;https://github.com/fluentmigrator/fluentmigrator&#34; target=&#34;_blank&#34;&gt;Fluent Migrator&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;following blog post&lt;/a&gt;, we will be persisting the signup details.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;following blog post&lt;/a&gt;, we will be orchastrating the user signup.&lt;/p&gt;
 
 &lt;h2 id=&#34;creating-a-database-migrations-project&#34;&gt;Creating a Database Migrations Project&lt;/h2&gt;
 
@@ -136,8 +136,12 @@ Target &amp;quot;Build&amp;quot; (fun _ -&amp;gt;
 
 &lt;p&gt;To run the migration against Postgres, we need to install the &lt;a href=&#34;http://www.npgsql.org/&#34; target=&#34;_blank&#34;&gt;Npgsql&lt;/a&gt; package from NuGet.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add Npgsql -g Database
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add Npgsql -g Database --version 3.1.10
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;At the time of this writing there is &lt;a href=&#34;https://github.com/npgsql/npgsql/issues/1603&#34; target=&#34;_blank&#34;&gt;an issue&lt;/a&gt; with the latest version of Npgsql. So, we are using the version &lt;code&gt;3.1.10&lt;/code&gt; here.&lt;/p&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;FAKE has inbuilt support for &lt;a href=&#34;https://fake.build/todo-fluentmigrator.html&#34; target=&#34;_blank&#34;&gt;running fluent migration&lt;/a&gt; from the build script.&lt;/p&gt;
 
