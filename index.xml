@@ -20,7 +20,7 @@
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;last post&lt;/a&gt;, using the Chessie library we orchestrated the user signup process.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;last post&lt;/a&gt;, using the Chessie library, we orchestrated the user signup process.&lt;/p&gt;
 
 &lt;p&gt;There are three more things that we need to do wrap up the user signup workflow.&lt;/p&gt;
 
@@ -32,7 +32,7 @@
 &lt;li&gt;&lt;p&gt;Adding the presentation layer to inform the user about his/her progress in the signup process.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;In this blog post, we are going to pick the third item. We are going to fake the implementation of user creation and sending email.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to pick the third item. We will be faking the implementation of user creation and sending an email.&lt;/p&gt;
 
 &lt;h2 id=&#34;domain-to-presentation-layer&#34;&gt;Domain To Presentation Layer&lt;/h2&gt;
 
@@ -44,16 +44,13 @@
 
 &lt;p&gt;The domain layer returns &lt;code&gt;AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;&lt;/code&gt; and the presentation layer needs &lt;code&gt;WebPart&lt;/code&gt; as we are using Suave.&lt;/p&gt;
 
-&lt;p&gt;It is one of best practice to keep your implemenation agonistic of the library/framework!&lt;/p&gt;
-
 &lt;p&gt;So, all we need is a function with the following signature.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;UserSignupViewModel -&amp;gt; 
-  AsyncResult&amp;lt;UserId, UserSignupError&amp;gt; -&amp;gt;
-    Async&amp;lt;WebPart&amp;gt;
+  AsyncResult&amp;lt;UserId, UserSignupError&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;We need &lt;code&gt;UserSignupViewModel&lt;/code&gt; to communicate the error details with the user. If you are wondering why are we returning &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt; instead of &lt;code&gt;WebPart&lt;/code&gt;, just hold your curiosity for few more minutes!&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;UserSignupViewModel&lt;/code&gt; is required communicate the error details with the user along with the information that he/she submitted.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s start our implementation by creating a new function &lt;code&gt;handleUserSignupAsyncResult&lt;/code&gt; in the &lt;code&gt;Suave&lt;/code&gt; module.&lt;/p&gt;
 
@@ -68,7 +65,7 @@ module Suave =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We are using the prefix &lt;code&gt;handle&lt;/code&gt; instead of &lt;code&gt;map&lt;/code&gt; here as we are going to do a side effect (log to console in case of an error) in addition to the transforming the type.&lt;/p&gt;
+&lt;p&gt;We are using the prefix &lt;code&gt;handle&lt;/code&gt; instead of &lt;code&gt;map&lt;/code&gt; here as we are going to do a side effect (printing in console in case of error) in addition to the transforming the type.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;The first step is transforming&lt;/p&gt;
@@ -99,9 +96,9 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;Async&amp;lt;WebPart&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping Async Failure&lt;/a&gt; in the previous post, We make use of the &lt;code&gt;map&lt;/code&gt; function on the Async module to carry out this tranformation.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping Async Failure&lt;/a&gt; in the previous post, We make use of the &lt;code&gt;map&lt;/code&gt; function on the Async module to carry out this transformation.&lt;/p&gt;
 
-&lt;p&gt;Let&amp;rsquo;s assume that we are having a method &lt;code&gt;handleUserSignupResult&lt;/code&gt; which maps a &lt;code&gt;Result&lt;/code&gt; type to &lt;code&gt;WebPart&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s assume that we have a method &lt;code&gt;handleUserSignupResult&lt;/code&gt; which maps a &lt;code&gt;Result&lt;/code&gt; type to &lt;code&gt;WebPart&lt;/code&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;UserSignupViewModel -&amp;gt; Result&amp;lt;UserId, UserSignupError&amp;gt; -&amp;gt; WebPart
 &lt;/code&gt;&lt;/pre&gt;
@@ -115,16 +112,18 @@ module Suave =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;The &lt;code&gt;map&lt;/code&gt; function in the &lt;code&gt;Async&lt;/code&gt; module is an extension provided by the Chessie library and it is not part of the standard &lt;code&gt;Async&lt;/code&gt; module&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;map&lt;/code&gt; function in the &lt;code&gt;Async&lt;/code&gt; module is an extension provided by the Chessie library, and it is not part of the standard &lt;code&gt;Async&lt;/code&gt; module&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;Now we have a scaffolding for transforming the domain type to the presentation type.&lt;/p&gt;
 
 &lt;h2 id=&#34;transforming-usersignupresult-to-webpart&#34;&gt;Transforming UserSignupResult to WebPart&lt;/h2&gt;
 
-&lt;p&gt;Let&amp;rsquo;s define the &lt;code&gt;handleUserSignupResult&lt;/code&gt; function that we left as a placeholder in the previous section&lt;/p&gt;
+&lt;p&gt;In this section, we are going to define the &lt;code&gt;handleUserSignupResult&lt;/code&gt; function that we left as a placeholder in the previous section.&lt;/p&gt;
 
-&lt;p&gt;If the result is success, we need to redirect the user to a signup success page.&lt;/p&gt;
+&lt;p&gt;We are going to define it by having separate functions for handling success and failures and then use them in the actual definition of &lt;code&gt;handleUserSignupResult&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;If the result is a success, we need to redirect the user to a signup success page.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
 ...
@@ -136,9 +135,9 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;We are leaving the second paramter as &lt;code&gt;_&lt;/code&gt;, as we are not interested in the result of the successful user signup (&lt;code&gt;UserId&lt;/code&gt;) here.&lt;/p&gt;
+&lt;p&gt;We are leaving the second parameter as &lt;code&gt;_&lt;/code&gt;, as we are not interested in the result of the successful user signup (&lt;code&gt;UserId&lt;/code&gt;) here.&lt;/p&gt;
 
-&lt;p&gt;We will be handing the path &lt;code&gt;/signup/success/{username}&lt;/code&gt; later in this blog post.&lt;/p&gt;
+&lt;p&gt;We will be handing the path &lt;code&gt;/signup/success/{username}&lt;/code&gt; &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-signup-success-page&#34; target=&#34;_blank&#34;&gt;later in this blog post&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;In case of failure, we need to account for two kinds of error&lt;/p&gt;
 
@@ -148,7 +147,7 @@ module Suave =
 &lt;li&gt;&lt;p&gt;Send Email Error&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;let&amp;rsquo;s define seperate functions for handing each kinds of error.&lt;/p&gt;
+&lt;p&gt;let&amp;rsquo;s define separate functions for handing each kind of error.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
   // ...
@@ -169,13 +168,13 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;We are updating the &lt;code&gt;Error&lt;/code&gt; property with the appropriate error messages and rerender the signup page in case of unique constraint violation errors.&lt;/p&gt;
+&lt;p&gt;We are updating the &lt;code&gt;Error&lt;/code&gt; property with the appropriate error messages and re-render the signup page in case of unique constraint violation errors.&lt;/p&gt;
 
-&lt;p&gt;For exceptions, which we modeled as &lt;code&gt;Error&lt;/code&gt; here, we rerender the signup page with an error message as &lt;em&gt;something went wrong&lt;/em&gt; and print the actual error on the console.&lt;/p&gt;
+&lt;p&gt;For exceptions, which we modeled as &lt;code&gt;Error&lt;/code&gt; here, we re-render the signup page with an error message as &lt;em&gt;something went wrong&lt;/em&gt; and printed the actual error in the console.&lt;/p&gt;
 
 &lt;p&gt;Ideally, we need to have a logger to capture these errors. We will be implementing them in an another blog post.&lt;/p&gt;
 
-&lt;p&gt;We need to do the similar thing for handling errors during sending emails.&lt;/p&gt;
+&lt;p&gt;We need to do the similar thing for handling error while sending emails.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
   // ...
@@ -190,7 +189,7 @@ module Suave =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;To avoid the complexity we are just printing the error.&lt;/p&gt;
+&lt;p&gt;To avoid the complexity, we are just printing the error.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;Then define the &lt;code&gt;handleUserSignupError&lt;/code&gt; function which handles the &lt;code&gt;UserSignupError&lt;/code&gt; using the two functions that we just defined.&lt;/p&gt;
@@ -208,9 +207,9 @@ module Suave =
 
 &lt;p&gt;The &lt;code&gt;errs&lt;/code&gt; parameter is a list of &lt;code&gt;UserSignupError&lt;/code&gt; as the Result type models failures as lists.&lt;/p&gt;
 
-&lt;p&gt;In our application, we are treating it as list with one error.&lt;/p&gt;
+&lt;p&gt;In our application, we are treating it as a list with one error.&lt;/p&gt;
 
-&lt;p&gt;Now we have functions to tranform both the Sucess and the Failure part of the &lt;code&gt;UserSignupResult&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now we have functions to transform both the Sucess and the Failure part of the &lt;code&gt;UserSignupResult&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;With the help of these functions, we can define the &lt;code&gt;handleUserSignupResult&lt;/code&gt; using the &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-trial.html&#34; target=&#34;_blank&#34;&gt;either&lt;/a&gt; function from Chessie&lt;/p&gt;
 
@@ -225,14 +224,14 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;With this we are done with the following transformation.&lt;/p&gt;
+&lt;p&gt;With this, we are done with the following transformation.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;AsyncResult&amp;lt;UserId, UserSignupError&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;wiring-up-webpart&#34;&gt;Wiring Up WebPart&lt;/h2&gt;
 
-&lt;p&gt;In the previous section, we defined functions to tranform the result of a domain functionality to its corresponding presentation component.&lt;/p&gt;
+&lt;p&gt;In the previous section, we defined functions to transform the result of a domain functionality to its corresponding presentation component.&lt;/p&gt;
 
 &lt;p&gt;The next work is wiring up this presentation component with the function which handles the user signup &lt;code&gt;POST&lt;/code&gt; request.&lt;/p&gt;
 
@@ -256,7 +255,7 @@ module Suave =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As a first step towards wiring up the user signup result, we need to use the pattern matching on the result instead of using the &lt;code&gt;either&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;As a first step towards wiring up the user signup result, we need to use the pattern matching on the validation result instead of using the &lt;code&gt;either&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserSignup ctx = async {
   // ...
@@ -275,7 +274,7 @@ module Suave =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The reason for this split is we will be doing an asynchronous operation if the request is valid. For the invalid request there is no asynchronous operation involved.&lt;/p&gt;
+&lt;p&gt;The reason for this split is we will be doing an asynchronous operation if the request is valid. For the invalid request, there is no asynchronous operation involved.&lt;/p&gt;
 
 &lt;p&gt;The next step is changing the signature of the &lt;code&gt;handleUserSignup&lt;/code&gt; to take &lt;code&gt;signupUser&lt;/code&gt; function as its parameter&lt;/p&gt;
 
@@ -304,7 +303,7 @@ module Suave =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;For valid signup request, we call the &lt;code&gt;signupUser&lt;/code&gt; function and then pass the return value of this function to the &lt;code&gt;handleUserSignupAsyncResult&lt;/code&gt; function which returns a &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;For valid signup request, we call the &lt;code&gt;signupUser&lt;/code&gt; function and then pass the return value of this function to the &lt;code&gt;handleUserSignupAsyncResult&lt;/code&gt; function which returns an  &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;Through &lt;code&gt;let!&lt;/code&gt; binding we retrieve the &lt;code&gt;WebPart&lt;/code&gt; from &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt; and then using it to send the response back to the user.&lt;/p&gt;
 
@@ -319,7 +318,7 @@ module Suave =
 
 &lt;p&gt;As mentioned earlier, we are going to implement the actual functionality of &lt;code&gt;CreateUser&lt;/code&gt; and &lt;code&gt;SendSignupEmail&lt;/code&gt; in the later blog posts.&lt;/p&gt;
 
-&lt;p&gt;But that doesn&amp;rsquo;t mean we need to wait till the end to see the final output in the browser.&lt;/p&gt;
+&lt;p&gt;But that doesn&amp;rsquo;t mean we need to wait until the end to see the final output in the browser.&lt;/p&gt;
 
 &lt;p&gt;These two types are just functions! So, We can provide a fake implementation of them and exercise the functionality that we wrote!&lt;/p&gt;
 
@@ -347,7 +346,7 @@ module Email =
 // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The next step is using the fake implementaion to complete the functionality&lt;/p&gt;
+&lt;p&gt;The next step is using the fake implementation to complete the functionality&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// ...
 module Suave =
@@ -371,7 +370,7 @@ module Suave =
 &lt;/ul&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We partiall apply the first two parameters of the &lt;code&gt;signupUser&lt;/code&gt; function to inject the depencencies that are responsible for creating the user and sending the signup email. Scott Wlaschin written &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/dependency-injection-1/&#34; target=&#34;_blank&#34;&gt;an excellent article&lt;/a&gt; on this subject.&lt;/p&gt;
+&lt;p&gt;We partially applied the first two parameters of the &lt;code&gt;signupUser&lt;/code&gt; function to inject the dependencies that are responsible for creating the user and sending the signup email. Scott Wlaschin has written &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/dependency-injection-1/&#34; target=&#34;_blank&#34;&gt;an excellent article&lt;/a&gt; on this subject.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
@@ -392,7 +391,7 @@ Email {Username = Username &amp;quot;demystifyfp&amp;quot;;
  VerificationCode = VerificationCode &amp;quot;oCzBXDY5wIyGlNFuG76a&amp;quot;;} sent
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;and in the browser we will get an empty page&lt;/p&gt;
+&lt;p&gt;and in the browser, we will get an empty page&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/signup-sucess-not-found.png&#34; alt=&#34;Signup Success Page Not Found&#34; /&gt;&lt;/p&gt;
 
@@ -413,17 +412,17 @@ Email {Username = Username &amp;quot;demystifyfp&amp;quot;;
 &amp;lt;div class=&amp;quot;container&amp;quot;&amp;gt;
   &amp;lt;p class=&amp;quot;well&amp;quot;&amp;gt; 
     Hi {{ model }}, Your account has been created. 
-    Check you email to activate your account. 
+    Check your email to activate the account. 
   &amp;lt;/p&amp;gt;
 &amp;lt;/div&amp;gt;
 {% endblock %}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This liquid template makes use of view &lt;code&gt;model&lt;/code&gt; of string to display the user name&lt;/p&gt;
+&lt;p&gt;This liquid template makes use of view &lt;code&gt;model&lt;/code&gt; of type string to display the user name&lt;/p&gt;
 
 &lt;p&gt;The next step is adding a route for rendering this template with the actual user name in the &lt;code&gt;webpart&lt;/code&gt; function.&lt;/p&gt;
 
-&lt;p&gt;As we are now exposing more than one paths in user signup (one for request and another for success), we need to use the &lt;code&gt;choose&lt;/code&gt; function to define a list of &lt;code&gt;WebPart&lt;/code&gt;s.&lt;/p&gt;
+&lt;p&gt;As we are now exposing more than one paths in user signup (one for the request and another for the successful signup), we need to use the &lt;code&gt;choose&lt;/code&gt; function to define a list of &lt;code&gt;WebPart&lt;/code&gt;s.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// UserSignup.fs
 // ...
@@ -443,7 +442,7 @@ module Suave =
 
 &lt;p&gt;Here the user name is being matched on the route. Then we partially apply page function with one parameter representing the path of the liquid template.&lt;/p&gt;
 
-&lt;p&gt;Now if run the application, we will get the following page upon receiving a valid user singup request.&lt;/p&gt;
+&lt;p&gt;Now if we run the application, we will get the following page upon receiving a valid user signup request.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/singup-sucess.png&#34; alt=&#34;Signup sucess&#34; /&gt;&lt;/p&gt;
 
@@ -451,11 +450,11 @@ module Suave =
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;In this blog post, we learned how to transform the representation of a domain model to its corresponding view layer represention.&lt;/p&gt;
+&lt;p&gt;In this blog post, we learned how to transform the result representation of a domain functionality to its corresponding view layer representation.&lt;/p&gt;
 
-&lt;p&gt;The separation of concerns enable us to add a new Web RPC API or even replacing Suave with any other library/framework without touching the existing functionality.&lt;/p&gt;
+&lt;p&gt;The separation of concerns enables us to add a new Web RPC API or even replacing Suave with any other library/framework without touching the existing functionality.&lt;/p&gt;
 
-&lt;p&gt;The source code of this blog post is avaliable on [GitHub]()&lt;/p&gt;
+&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.7&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
