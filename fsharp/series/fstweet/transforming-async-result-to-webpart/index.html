@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/">
+
+  
+
+  <title>Transforming Async Result to Webpart | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Transforming Async Result to Webpart</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-08-30 04:43:18 &#43;0530 IST" itemprop="datePublished">
+      Wed, Aug 30, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/chessie">Chessie</a
+    >, 
+    
+    <a href="/tags/rop">rop</a
+    >, 
+    
+    <a href="/tags/suave">suave</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ftransforming-async-result-to-webpart%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Transforming%20Async%20Result%20to%20Webpart&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ftransforming-async-result-to-webpart%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ftransforming-async-result-to-webpart%2f&amp;title=Transforming%20Async%20Result%20to%20Webpart"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ftransforming-async-result-to-webpart%2f&amp;title=Transforming%20Async%20Result%20to%20Webpart"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Transforming%20Async%20Result%20to%20Webpart&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ftransforming-async-result-to-webpart%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi there!</p>
+
+<p>In the <a href="/fsharp/series/fstweet/orchestrating-user-signup/" target="_blank">last post</a>, using the Chessie library we orchestrated the user signup process.</p>
+
+<p>There are three more things that we need to do wrap up the user signup workflow.</p>
+
+<ol>
+<li><p>Providing implementation for creating a new user in PostgreSQL</p></li>
+
+<li><p>Integrating with an email provider to send the signup email</p></li>
+
+<li><p>Adding the presentation layer to inform the user about his/her progress in the signup process.</p></li>
+</ol>
+
+<p>In this blog post, we are going to pick the third item. We are going to fake the implementation of user creation and sending email.</p>
+
+<h2 id="domain-to-presentation-layer">Domain To Presentation Layer</h2>
+
+<p>We have seen the expressive power of functions which transform a value from one type to an another in the previous post.</p>
+
+<p>We can apply the same thing while creating a presentation layer for a domain construct.</p>
+
+<p>Let&rsquo;s take our scenario.</p>
+
+<p>The domain layer returns <code>AsyncResult&lt;UserId, UserSignupError&gt;</code> and the presentation layer needs <code>WebPart</code> as we are using Suave.</p>
+
+<p>It is one of best practice to keep your implemenation agonistic of the library/framework!</p>
+
+<p>So, all we need is a function with the following signature.</p>
+
+<pre><code class="language-fsharp">UserSignupViewModel -&gt; 
+  AsyncResult&lt;UserId, UserSignupError&gt; -&gt;
+    Async&lt;WebPart&gt;
+</code></pre>
+
+<p>We need <code>UserSignupViewModel</code> to communicate the error details with the user. If you are wondering why are we returning <code>Async&lt;WebPart&gt;</code> instead of <code>WebPart</code>, just hold your curiosity for few more minutes!</p>
+
+<p>Let&rsquo;s start our implementation by creating a new function <code>handleUserSignupAsyncResult</code> in the <code>Suave</code> module.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+...
+module Suave =
+  // ...
+  let handleUserSignupAsyncResult viewModel aResult = 
+    // TODO
+  
+  let handleUserSignup ... = // ...
+</code></pre>
+
+<blockquote>
+<p>We are using the prefix <code>handle</code> instead of <code>map</code> here as we are going to do a side effect (log to console in case of an error) in addition to the transforming the type.</p>
+</blockquote>
+
+<p>The first step is transforming</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;UserId, UserSignupError&gt;
+</code></pre>
+
+<p>to</p>
+
+<pre><code class="language-fsharp">Async&lt;Result&lt;UserId, UserSignupError&gt;&gt;
+</code></pre>
+
+<p>As we seen in the previous post, we can make use of the <code>ofAsyncResult</code> function from Chessie, to do it</p>
+
+<pre><code class="language-fsharp">let handleUserSignupAsyncResult viewModel aResult = 
+  aResult
+  |&gt; Async.ofAsyncResult
+  // TODO
+</code></pre>
+
+<p>The next step is transforming</p>
+
+<pre><code class="language-fsharp">Async&lt;Result&lt;UserId, UserSignupError&gt;&gt;
+</code></pre>
+
+<p>to</p>
+
+<pre><code class="language-fsharp">Async&lt;WebPart&gt;
+</code></pre>
+
+<p>As we did for <a href="/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type" target="_blank">mapping Async Failure</a> in the previous post, We make use of the <code>map</code> function on the Async module to carry out this tranformation.</p>
+
+<p>Let&rsquo;s assume that we are having a method <code>handleUserSignupResult</code> which maps a <code>Result</code> type to <code>WebPart</code></p>
+
+<pre><code class="language-fsharp">UserSignupViewModel -&gt; Result&lt;UserId, UserSignupError&gt; -&gt; WebPart
+</code></pre>
+
+<p>We can complete the <code>handleUserSignupAsyncResult</code> function as</p>
+
+<pre><code class="language-fsharp">let handleUserSignupAsyncResult viewModel aResult = 
+  aResult
+  |&gt; Async.ofAsyncResult
+  |&gt; Async.map (handleUserSignupResult viewModel)
+</code></pre>
+
+<blockquote>
+<p>The <code>map</code> function in the <code>Async</code> module is an extension provided by the Chessie library and it is not part of the standard <code>Async</code> module</p>
+</blockquote>
+
+<p>Now we have a scaffolding for transforming the domain type to the presentation type.</p>
+
+<h2 id="transforming-usersignupresult-to-webpart">Transforming UserSignupResult to WebPart</h2>
+
+<p>Let&rsquo;s define the <code>handleUserSignupResult</code> function that we left as a placeholder in the previous section</p>
+
+<p>If the result is success, we need to redirect the user to a signup success page.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+...
+module Suave =
+  // ...
+  let handleUserSignupSuccess viewModel _ =
+    sprintf &quot;/signup/success/%s&quot; viewModel.Username
+    |&gt; Redirection.FOUND 
+  // ...
+</code></pre>
+
+<p>We are leaving the second paramter as <code>_</code>, as we are not interested in the result of the successful user signup (<code>UserId</code>) here.</p>
+
+<p>We will be handing the path <code>/signup/success/{username}</code> later in this blog post.</p>
+
+<p>In case of failure, we need to account for two kinds of error</p>
+
+<ol>
+<li><p>Create User Error</p></li>
+
+<li><p>Send Email Error</p></li>
+</ol>
+
+<p>let&rsquo;s define seperate functions for handing each kinds of error.</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+  let handleCreateUserError viewModel = function 
+  | EmailAlreadyExists -&gt;
+    let viewModel = 
+      {viewModel with Error = Some (&quot;email already exists&quot;)}
+    page signupTemplatePath viewModel
+  | UsernameAlreadyExists -&gt;
+    let viewModel = 
+      {viewModel with Error = Some (&quot;username already exists&quot;)}
+    page signupTemplatePath viewModel
+  | Error ex -&gt;
+    printfn &quot;Server Error : %A&quot; ex
+    let viewModel = 
+      {viewModel with Error = Some (&quot;something went wrong&quot;)}
+    page signupTemplatePath viewModel
+  // ...
+</code></pre>
+
+<p>We are updating the <code>Error</code> property with the appropriate error messages and rerender the signup page in case of unique constraint violation errors.</p>
+
+<p>For exceptions, which we modeled as <code>Error</code> here, we rerender the signup page with an error message as <em>something went wrong</em> and print the actual error on the console.</p>
+
+<p>Ideally, we need to have a logger to capture these errors. We will be implementing them in an another blog post.</p>
+
+<p>We need to do the similar thing for handling errors during sending emails.</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+  let handleSendEmailError viewModel err =
+    printfn &quot;error while sending email : %A&quot; err
+    let msg =
+      &quot;Something went wrong. Try after some time&quot;
+    let viewModel = 
+      {viewModel with Error = Some msg}
+    page signupTemplatePath viewModel
+  // ...
+</code></pre>
+
+<blockquote>
+<p>To avoid the complexity we are just printing the error.</p>
+</blockquote>
+
+<p>Then define the <code>handleUserSignupError</code> function which handles the <code>UserSignupError</code> using the two functions that we just defined.</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+  let handleUserSignupError viewModel errs = 
+    match List.head errs with
+    | CreateUserError cuErr -&gt;
+      handleCreateUserError viewModel cuErr
+    | SendEmailError err -&gt;
+      handleSendEmailError viewModel err
+  // ...
+</code></pre>
+
+<p>The <code>errs</code> parameter is a list of <code>UserSignupError</code> as the Result type models failures as lists.</p>
+
+<p>In our application, we are treating it as list with one error.</p>
+
+<p>Now we have functions to tranform both the Sucess and the Failure part of the <code>UserSignupResult</code>.</p>
+
+<p>With the help of these functions, we can define the <code>handleUserSignupResult</code> using the <a href="https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-trial.html" target="_blank">either</a> function from Chessie</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+...
+module Suave =
+  // ...
+  let handleUserSignupResult viewModel result =
+    either 
+      (handleUserSignupSuccess viewModel)
+      (handleUserSignupError viewModel) result
+  // ...
+</code></pre>
+
+<p>With this we are done with the following transformation.</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;UserId, UserSignupError&gt; -&gt; Async&lt;WebPart&gt;
+</code></pre>
+
+<h2 id="wiring-up-webpart">Wiring Up WebPart</h2>
+
+<p>In the previous section, we defined functions to tranform the result of a domain functionality to its corresponding presentation component.</p>
+
+<p>The next work is wiring up this presentation component with the function which handles the user signup <code>POST</code> request.</p>
+
+<p>As a recap, here is a skeleton of the request handler function that we already defined in the <a href="/fsharp/series/fstweet/user-signup-validation/#showing-validation-error" target="_blank">fifth part</a> of this blog series.</p>
+
+<pre><code class="language-fsharp">let handleUserSignup ctx = async {
+  match bindEmptyForm ctx.request with
+  | Choice1Of2 (vm : UserSignupViewModel) -&gt;
+    let result = // ...
+    let onSuccess (signupUserRequest, _) = 
+      printfn &quot;%A&quot; signupUserRequest
+      Redirection.FOUND &quot;/signup&quot; ctx
+    let onFailure msgs = 
+      let viewModel = 
+        {vm with Error = Some (List.head msgs)}
+      page &quot;user/signup.liquid&quot; viewModel ctx
+    return! either onSuccess onFailure result
+  | Choice2Of2 err -&gt;
+    // ..
+  // ...
+}
+</code></pre>
+
+<p>As a first step towards wiring up the user signup result, we need to use the pattern matching on the result instead of using the <code>either</code> function.</p>
+
+<pre><code class="language-fsharp">let handleUserSignup ctx = async {
+  // ...
+  | Choice1Of2 (vm : UserSignupViewModel) -&gt;
+    match result with
+    | Ok (userSignupReq, _) -&gt;
+      printfn &quot;%A&quot; signupUserRequest
+      Redirection.FOUND &quot;/signup&quot; ctx
+      return! webpart ctx
+    | Bad msgs -&gt;
+      let viewModel = 
+        {vm with Error = Some (List.head msgs)}
+      page &quot;user/signup.liquid&quot; viewModel ctx
+  | Choice2Of2 err -&gt; // ...
+  // ...
+}
+</code></pre>
+
+<p>The reason for this split is we will be doing an asynchronous operation if the request is valid. For the invalid request there is no asynchronous operation involved.</p>
+
+<p>The next step is changing the signature of the <code>handleUserSignup</code> to take <code>signupUser</code> function as its parameter</p>
+
+<pre><code class="language-fsharp">let handleUserSignup signupUser ctx = async {
+  // ...
+}
+</code></pre>
+
+<p>This <code>signupUser</code> is a function with the signature</p>
+
+<pre><code>UserSignupRequest -&gt; AsyncResult&lt;UserId, UserSignupError&gt;
+</code></pre>
+
+<p>Then in the pattern matching part of the valid request, replace the placeholders (printing and redirecting) with the actual functionality</p>
+
+<pre><code class="language-fsharp">let handleUserSignup signupUser ctx = async {
+  // ...
+  | Choice1Of2 (vm : UserSignupViewModel) -&gt;
+    match result with
+    | Ok (userSignupReq, _) -&gt;
+      let userSignupAsyncResult = signupUser userSignupReq
+      let! webpart =
+        handleUserSignupAsyncResult vm userSignupAsyncResult
+      return! webpart ctx
+  // ...
+}
+</code></pre>
+
+<p>For valid signup request, we call the <code>signupUser</code> function and then pass the return value of this function to the <code>handleUserSignupAsyncResult</code> function which returns a <code>Async&lt;WebPart&gt;</code></p>
+
+<p>Through <code>let!</code> binding we retrieve the <code>WebPart</code> from <code>Async&lt;WebPart&gt;</code> and then using it to send the response back to the user.</p>
+
+<blockquote>
+<p><code>WebPart</code> is a type alias of a function with the signature</p>
+
+<pre><code class="language-fsharp">  HttpContext -&gt; Async&lt;HttpContext option&gt;
+</code></pre>
+</blockquote>
+
+<h2 id="adding-fake-implementations-for-persistence-and-email">Adding Fake Implementations for Persistence and Email</h2>
+
+<p>As mentioned earlier, we are going to implement the actual functionality of <code>CreateUser</code> and <code>SendSignupEmail</code> in the later blog posts.</p>
+
+<p>But that doesn&rsquo;t mean we need to wait till the end to see the final output in the browser.</p>
+
+<p>These two types are just functions! So, We can provide a fake implementation of them and exercise the functionality that we wrote!</p>
+
+<p>Let&rsquo;s add two more modules above the <code>Suave</code> module with these fake implementations.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+// ...
+module Persistence =
+  open Domain
+  open Chessie.ErrorHandling
+
+  let createUser createUserReq = asyncTrial {
+    printfn &quot;%A created&quot; createUserReq 
+    return UserId 1
+  }
+    
+module Email =
+  open Domain
+  open Chessie.ErrorHandling
+
+  let sendSignupEmail signupEmailReq = asyncTrial {
+    printfn &quot;Email %A sent&quot; signupEmailReq
+    return ()
+  }
+// ...
+</code></pre>
+
+<p>The next step is using the fake implementaion to complete the functionality</p>
+
+<pre><code class="language-fsharp">// ...
+module Suave =
+  // ...
+  let webPart () =
+    let createUser = Persistence.createUser
+    let sendSignupEmail = Email.sendSignupEmail
+    let signupUser = 
+      Domain.signupUser createUser sendSignupEmail
+    path &quot;/signup&quot; 
+      &gt;=&gt; choose [
+        // ...
+        POST &gt;=&gt; handleUserSignup signupUser
+      ]
+</code></pre>
+
+<p>There are two patterns that we have employed here.</p>
+
+<ul>
+<li>Dependency Injection using Partial Application</li>
+</ul>
+
+<blockquote>
+<p>We partiall apply the first two parameters of the <code>signupUser</code> function to inject the depencencies that are responsible for creating the user and sending the signup email. Scott Wlaschin written <a href="https://fsharpforfunandprofit.com/posts/dependency-injection-1/" target="_blank">an excellent article</a> on this subject.</p>
+</blockquote>
+
+<ul>
+<li><a href="http://blog.ploeh.dk/2011/07/28/CompositionRoot/" target="_blank">Composition Root</a></li>
+</ul>
+
+<p>Now we can run the application.</p>
+
+<p>If we try to signup with a valid user signup request, we will get the following output in the console</p>
+
+<pre><code class="language-bash">{Username = Username &quot;demystifyfp&quot;;
+ PasswordHash =
+  PasswordHash &quot;$2a$10$UZczy11hA0e/2v0VlrmecehGlWv/OlxBPyFEdL4vObxAL7wQw0g/W&quot;;
+ Email = EmailAddress &quot;demystifyfp@gmail.com&quot;;
+ VerificationCode = VerificationCode &quot;oCzBXDY5wIyGlNFuG76a&quot;;} created
+Email {Username = Username &quot;demystifyfp&quot;;
+ EmailAddress = EmailAddress &quot;demystifyfp@gmail.com&quot;;
+ VerificationCode = VerificationCode &quot;oCzBXDY5wIyGlNFuG76a&quot;;} sent
+</code></pre>
+
+<p>and in the browser we will get an empty page</p>
+
+<p><img src="/img/fsharp/series/fstweet/signup-sucess-not-found.png" alt="Signup Success Page Not Found" /></p>
+
+<h2 id="adding-signup-success-page">Adding Signup Success Page</h2>
+
+<p>The final piece of work is adding a signup success page</p>
+
+<p>Create a new liquid template in the <code>views/user</code> directory</p>
+
+<pre><code class="language-html">&lt;!-- views/user/signup_success.liquid --&gt;
+{% extends &quot;master_page.liquid&quot; %}
+
+{% block head %}
+  &lt;title&gt; Signup Success &lt;/title&gt;
+{% endblock %}
+
+{% block content %}
+&lt;div class=&quot;container&quot;&gt;
+  &lt;p class=&quot;well&quot;&gt; 
+    Hi {{ model }}, Your account has been created. 
+    Check you email to activate your account. 
+  &lt;/p&gt;
+&lt;/div&gt;
+{% endblock %}
+</code></pre>
+
+<p>This liquid template makes use of view <code>model</code> of string to display the user name</p>
+
+<p>The next step is adding a route for rendering this template with the actual user name in the <code>webpart</code> function.</p>
+
+<p>As we are now exposing more than one paths in user signup (one for request and another for success), we need to use the <code>choose</code> function to define a list of <code>WebPart</code>s.</p>
+
+<pre><code class="language-fsharp">// UserSignup.fs
+// ...
+module Suave =
+  let webPart () =
+    // ...
+    choose [
+      path &quot;/signup&quot; 
+        // ...
+      pathScan 
+        &quot;/signup/success/%s&quot; 
+        (page &quot;user/signup_success.liquid&quot;)
+    ]
+</code></pre>
+
+<p>The <a href="https://suave.io/Suave.html#def:val Suave.Filters.pathScan" target="_blank">pathScan</a> from Suave enable us to do strongly typed pattern matching on the route. It takes a string (route) with <code>PrintfFormat</code> string and a function with parameters matching the values in the route.</p>
+
+<p>Here the user name is being matched on the route. Then we partially apply page function with one parameter representing the path of the liquid template.</p>
+
+<p>Now if run the application, we will get the following page upon receiving a valid user singup request.</p>
+
+<p><img src="/img/fsharp/series/fstweet/singup-sucess.png" alt="Signup sucess" /></p>
+
+<p>That&rsquo;s it :)</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learned how to transform the representation of a domain model to its corresponding view layer represention.</p>
+
+<p>The separation of concerns enable us to add a new Web RPC API or even replacing Suave with any other library/framework without touching the existing functionality.</p>
+
+<p>The source code of this blog post is avaliable on [GitHub]()</p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/"><span
+      aria-hidden="true">&larr;</span> Orchestrating User Signup</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
