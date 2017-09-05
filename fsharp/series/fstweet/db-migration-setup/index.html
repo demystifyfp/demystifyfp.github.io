@@ -252,8 +252,8 @@ type CreateUserTable()=
   override this.Up() = 
     base.Create.Table(&quot;Users&quot;)
       .WithColumn(&quot;Id&quot;).AsInt32().PrimaryKey().Identity()
-      .WithColumn(&quot;Username&quot;).AsString(12).NotNullable()
-      .WithColumn(&quot;Email&quot;).AsString(254).NotNullable()
+      .WithColumn(&quot;Username&quot;).AsString(12).Unique().NotNullable()
+      .WithColumn(&quot;Email&quot;).AsString(254).Unique().NotNullable()
       .WithColumn(&quot;PasswordHash&quot;).AsString().NotNullable()
       .WithColumn(&quot;EmailVerificationCode&quot;).AsString().NotNullable()
       .WithColumn(&quot;IsEmailVerified&quot;).AsBoolean()
@@ -396,6 +396,8 @@ FsTweet=# \d &quot;Users&quot;
  IsEmailVerified       | boolean                | not null
 Indexes:
     &quot;PK_Users&quot; PRIMARY KEY, btree (&quot;Id&quot;)
+    &quot;IX_Users_Email&quot; UNIQUE, btree (&quot;Email&quot;)
+    &quot;IX_Users_Username&quot; UNIQUE, btree (&quot;Username&quot;)
 </code></pre>
 
 <p>Cool! The migrations went well :)</p>

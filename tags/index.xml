@@ -7,13 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Wed, 30 Aug 2017 04:43:18 +0530</lastBuildDate>
+    <lastBuildDate>Thu, 31 Aug 2017 06:55:16 +0530</lastBuildDate>
     <atom:link href="/tags/" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Chessie</title>
       <link>http://www.demystifyfp.com/tags/chessie/</link>
-      <pubDate>Wed, 30 Aug 2017 04:43:18 +0530</pubDate>
+      <pubDate>Thu, 31 Aug 2017 06:55:16 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/chessie/</guid>
       <description></description>
@@ -58,7 +58,7 @@
     <item>
       <title>Fsharp</title>
       <link>http://www.demystifyfp.com/tags/fsharp/</link>
-      <pubDate>Wed, 30 Aug 2017 04:43:18 +0530</pubDate>
+      <pubDate>Thu, 31 Aug 2017 06:55:16 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/fsharp/</guid>
       <description></description>
@@ -85,9 +85,18 @@
     <item>
       <title>Rop</title>
       <link>http://www.demystifyfp.com/tags/rop/</link>
-      <pubDate>Wed, 30 Aug 2017 04:43:18 +0530</pubDate>
+      <pubDate>Thu, 31 Aug 2017 06:55:16 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/rop/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Sqlprovider</title>
+      <link>http://www.demystifyfp.com/tags/sqlprovider/</link>
+      <pubDate>Thu, 31 Aug 2017 06:55:16 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/tags/sqlprovider/</guid>
       <description></description>
     </item>
     

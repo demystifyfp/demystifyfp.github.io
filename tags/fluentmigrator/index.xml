@@ -88,8 +88,8 @@ type CreateUserTable()=
   override this.Up() = 
     base.Create.Table(&amp;quot;Users&amp;quot;)
       .WithColumn(&amp;quot;Id&amp;quot;).AsInt32().PrimaryKey().Identity()
-      .WithColumn(&amp;quot;Username&amp;quot;).AsString(12).NotNullable()
-      .WithColumn(&amp;quot;Email&amp;quot;).AsString(254).NotNullable()
+      .WithColumn(&amp;quot;Username&amp;quot;).AsString(12).Unique().NotNullable()
+      .WithColumn(&amp;quot;Email&amp;quot;).AsString(254).Unique().NotNullable()
       .WithColumn(&amp;quot;PasswordHash&amp;quot;).AsString().NotNullable()
       .WithColumn(&amp;quot;EmailVerificationCode&amp;quot;).AsString().NotNullable()
       .WithColumn(&amp;quot;IsEmailVerified&amp;quot;).AsBoolean()
@@ -232,6 +232,8 @@ FsTweet=# \d &amp;quot;Users&amp;quot;
  IsEmailVerified       | boolean                | not null
 Indexes:
     &amp;quot;PK_Users&amp;quot; PRIMARY KEY, btree (&amp;quot;Id&amp;quot;)
+    &amp;quot;IX_Users_Email&amp;quot; UNIQUE, btree (&amp;quot;Email&amp;quot;)
+    &amp;quot;IX_Users_Username&amp;quot; UNIQUE, btree (&amp;quot;Username&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Cool! The migrations went well :)&lt;/p&gt;

@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/</loc>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/</loc>
       <lastmod>2017-08-30T04:43:18+05:30</lastmod>
     </url>
@@ -87,7 +96,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/chessie/</loc>
-      <lastmod>2017-08-30T04:43:18+05:30</lastmod>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -147,7 +156,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/fsharp/</loc>
-      <lastmod>2017-08-30T04:43:18+05:30</lastmod>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -157,7 +166,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/fsharp/</loc>
-      <lastmod>2017-08-30T04:43:18+05:30</lastmod>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -196,7 +205,17 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/rop/</loc>
-      <lastmod>2017-08-30T04:43:18+05:30</lastmod>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/tags/sqlprovider/</loc>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -216,7 +235,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/</loc>
-      <lastmod>2017-08-30T04:43:18+05:30</lastmod>
+      <lastmod>2017-08-31T06:55:16+05:30</lastmod>
       <priority>0</priority>
     </url>
     

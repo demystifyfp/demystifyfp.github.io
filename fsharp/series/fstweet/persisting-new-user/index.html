@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/">
+
+  
+
+  <title>Persisting New User | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Persisting New User</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-08-31 06:55:16 &#43;0530 IST" itemprop="datePublished">
+      Thu, Aug 31, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/chessie">chessie</a
+    >, 
+    
+    <a href="/tags/rop">rop</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >, 
+    
+    <a href="/tags/sqlprovider">SQLProvider</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fpersisting-new-user%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Persisting%20New%20User&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fpersisting-new-user%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fpersisting-new-user%2f&amp;title=Persisting%20New%20User"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fpersisting-new-user%2f&amp;title=Persisting%20New%20User"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Persisting%20New%20User&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fpersisting-new-user%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi!</p>
+
+<p>Welcome back.</p>
+
+<p>We are on track to complete the user signup feature. In this blog post, we are going to implement the persistence layer for creating a user which <a href="/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email" target="_blank">we faked</a> in the last blog post.</p>
+
+<h2 id="initializing-sqlprovider">Initializing SQLProvider</h2>
+
+<p>We are going to use <a href="http://fsprojects.github.io/SQLProvider/" target="_blank">SQLProvider</a>, a SQL database type provider, to takes care of PostgreSQL interactions,</p>
+
+<p>As usual, let&rsquo;s add its NuGet package to our <em>Web</em> project using paket</p>
+
+<pre><code class="language-bash">&gt; forge paket add SQLProvider -g Database \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+</code></pre>
+
+<p>Then we need to initialize SQLProvider by providing <a href="http://fsprojects.github.io/SQLProvider/core/postgresql.html" target="_blank">the required parameters</a>.</p>
+
+<p>To do it, let&rsquo;s add a separate fsharp file <em>Db.fs</em> in the Web Project</p>
+
+<pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Db
+</code></pre>
+
+<p>Then move this file above <em>UserSignup.fs</em></p>
+
+<pre><code class="language-bash">&gt; forge moveUp web -n src/FsTweet.Web/Db.fs
+&gt; forge moveUp web -n src/FsTweet.Web/Db.fs
+</code></pre>
+
+<blockquote>
+<p>We are making use of the <em>Forge alias</em> that we set in the <a href="/fsharp/series/fstweet/user-signup/#a-new-file-for-user-signup" target="_blank">fourth part</a></p>
+</blockquote>
+
+<p>The next step is initializing the SQLProvider with all the required parameters</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Db.fs
+module Database
+
+open FSharp.Data.Sql
+
+[&lt;Literal&gt;]
+let private connString = 
+  &quot;Server=127.0.0.1;Port=5432;Database=FsTweet;&quot; +
+    &quot;User Id=postgres;Password=test;&quot;
+
+[&lt;Literal&gt;]
+let private npgsqlLibPath = 
+  @&quot;./../../packages/database/Npgsql/lib/net451&quot;
+
+[&lt;Literal&gt;]
+let private dbVendor = 
+  Common.DatabaseProviderTypes.POSTGRESQL
+
+type Db = SqlDataProvider&lt;
+            ConnectionString=connString,
+            DatabaseVendor=dbVendor,
+            ResolutionPath=npgsqlLibPath,
+            UseOptionTypes=true&gt;
+</code></pre>
+
+<p>The type <code>Db</code> represents the PostgreSQL database provided in the <code>connString</code> parameter. The <code>connString</code> that we are using here is the same one that we used while running the migration script.</p>
+
+<p>Like <a href="https://msdn.microsoft.com/en-us/library/system.data.entity.dbcontext(v=vs.113).aspx" target="_blank">DbContext</a> in Entity Framework, the SQLProvider offers a <code>dataContext</code> type to deal with the database interactions.</p>
+
+<p>The <code>dataContext</code> is specific to the database that we provided in the connection string, and this is available as a property of the <code>Db</code> type.</p>
+
+<p>As we will be passing this <code>dataContext</code> object around, in all our data access functions, we can define a specific type for it to save some key strokes!</p>
+
+<pre><code class="language-fsharp">module Database
+
+// ...
+type DataContext = Db.dataContext
+</code></pre>
+
+<h2 id="runtime-configuration-of-sqlprovider">Runtime Configuration of SQLProvider</h2>
+
+<p>In the previous section, we configured SQLProvider to enable typed access to the database. Upon initialization, it queries the meta tables of PostgreSQL database and creates types. These types can be accessed via <code>DataContext</code></p>
+
+<p>It&rsquo;s okay for developing an application and compiling it.</p>
+
+<p>But when the application goes live, we will be certainly pointing to a separate database! To use a different PostgreSQL database at run time, we need a separate <code>DataContext</code> pointing to that database.</p>
+
+<p>As <a href="https://12factor.net/config" target="_blank">suggested by the Twelve-Factor app</a>, let&rsquo;s use an environment variable to provide the connection string.</p>
+
+<p>We are already using one in our build script, which contains the connection string for the migration script.</p>
+
+<pre><code class="language-fsharp">// build.fsx
+//...
+let connString = 
+  environVarOrDefault 
+    &quot;FSTWEET_DB_CONN_STRING&quot;
+    @&quot;Server=127.0.0.1;Port=5432;...&quot;
+let dbConnection = 
+  ConnectionString (connString, DatabaseProvider.PostgreSQL)
+//...
+</code></pre>
+
+<p>The <code>connString</code> label here takes the value from the environment variable <code>FSTWEET_DB_CONN_STRING</code> if it exists otherwise it picks a default one</p>
+
+<p>If we set the value of this <code>connString</code> again to <code>FSTWEET_DB_CONN_STRING</code> environment variable, we are ready to go.</p>
+
+<p>Fake has an environment helper function <code>setEnvironVar</code> for this</p>
+
+<pre><code class="language-fsharp">// build.fsx
+// ...
+setEnvironVar &quot;FSTWEET_DB_CONN_STRING&quot; connString
+// ...
+</code></pre>
+
+<p>Now if we run the application using the fake build script, the environment variable <code>FSTWEET_DB_CONN_STRING</code> always has value!</p>
+
+<p>The next step is using this environment variable to get a new data context.</p>
+
+<h3 id="datacontext-one-per-request">DataContext One Per Request</h3>
+
+<p>That data context that is being exposed by the SQLProvider uses the <a href="https://martinfowler.com/eaaCatalog/unitOfWork.html" target="_blank">unit of work</a> pattern underneath.</p>
+
+<p>So, while using SQLProvider in an application that can be used by multiple users concurrently, we need to create a new data context for every request from the user that involves database operation.</p>
+
+<p>Let&rsquo;s assume that we have a function <code>getDataContext</code>, that takes a connection string and returns its associated SQLProvider&rsquo;s data context. There are two ways that we can use this function to create a new data context per request.</p>
+
+<ol>
+<li><p>For every database layer function, we can pass the connection string and inside that function that we can call the <code>getDataContext</code> using the connection string.</p></li>
+
+<li><p>An another option would be modifying the <code>getDataContext</code> function to return an another function that takes a parameter of type <code>unit</code> and returns the data context of the provided connection string.</p></li>
+</ol>
+
+<p>We are going to use the second option as its hides the details of getting an underlying data context.</p>
+
+<p>Let&rsquo;s see it in action to understand it better</p>
+
+<p>As a first step, define a type that represents the factory function to create a data context.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Db.fs
+// ...
+type GetDataContext = unit -&gt; DataContext
+</code></pre>
+
+<p>Then define the actual function</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Db.fs
+// ...
+let dataContext (connString : string) : GetDataContext =
+  fun _ -&gt; Db.GetDataContext connString
+</code></pre>
+
+<p>Then in the application bootstrap get the connection string value from the environment variable and call this function to get the factory function to create data context for every request</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/FsTweet.Web.fs
+// ...
+open System
+open Database 
+// ...
+let main argv =
+  let fsTweetConnString = 
+    Environment.GetEnvironmentVariable  &quot;FSTWEET_DB_CONN_STRING&quot;
+  let getDataCtx = dataContext fsTweetConnString
+
+  // ...
+</code></pre>
+
+<p>The next step is passing the <code>GetDataContext</code> function to the request handlers which we will address later in this blog post.</p>
+
+<h3 id="async-transaction-in-mono">Async Transaction in Mono</h3>
+
+<p>At the time of this writing, SQLProvider <a href="https://github.com/fsprojects/SQLProvider/blob/1.1.6/src/SQLProvider/SqlRuntime.Transactions.fs#L56-L59" target="_blank">doesn&rsquo;t support</a> transactions in Mono as the <code>TransactionScopeAsyncFlowOption</code> is <a href="https://github.com/mono/mono/blob/mono-5.4.0.167/mcs/class/System.Transactions/System.Transactions/TransactionScope.cs#L105-L123" target="_blank">not implemented</a> in Mono.</p>
+
+<p>So, if we use the datacontext from the above factory function in mono, we may get some errors associated with transaction when we asynchronously write any data to the database</p>
+
+<p>To circumvent this error, we can disable transactions in mono alone.</p>
+
+<pre><code class="language-fsharp">let dataContext (connString : string) : GetDataContext =
+  let isMono = 
+    System.Type.GetType (&quot;Mono.Runtime&quot;) &lt;&gt; null
+  match isMono with
+  | true -&gt; 
+    let opts = {
+      IsolationLevel = 
+        Transactions.IsolationLevel.DontCreateTransaction
+      Timeout = System.TimeSpan.MaxValue
+    } 
+    fun _ -&gt; Db.GetDataContext(connString, opts)
+  | _ -&gt; 
+    fun _ -&gt; Db.GetDataContext connString
+</code></pre>
+
+<blockquote>
+<p>Note: This is <em>NOT RECOMMENDED</em> in production.</p>
+</blockquote>
+
+<p>With this, we are done with the runtime configuration of SQLProvider</p>
+
+<h2 id="implementing-create-user-function">Implementing Create User Function</h2>
+
+<p>In the existing fake implementation of the <code>createUser</code> add <code>getDataCtx</code> as its first parameter and get the data context inside the function.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence =
+  // ...
+  open Database
+
+  let createUser (getDataCtx : GetDataContext) createUserReq = asyncTrial {
+    let ctx = getDataCtx ()
+  }
+</code></pre>
+
+<p>We need to explicitly specify the type of the parameter <code>GetDataContext</code> to use the types provided by the SQLProvider.</p>
+
+<p>The next step is creating a new user from the <code>createUserReq</code></p>
+
+<pre><code class="language-fsharp">let createUser ... = asyncTrail {
+  let ctx = getDataCtx ()
+
+  let users = ctx.Public.Users
+  let newUser = users.Create()
+
+  newUser.Email &lt;- createUserReq.Email.Value
+  newUser.EmailVerificationCode &lt;- 
+    createUserReq.VerificationCode.Value
+  newUser.Username &lt;- createUserReq.Username.Value
+  newUser.IsEmailVerified &lt;- false
+  newUser.PasswordHash &lt;- createUserReq.PasswordHash.Value
+}
+</code></pre>
+
+<p>Then we need to call the <code>SubmitUpdatesAsync</code> method on the <code>ctx</code> and return the <code>Id</code> of the newly created user.</p>
+
+<pre><code class="language-fsharp">let createUser ... = asyncTrail {
+  // ...
+  do! ctx.SubmitUpdatesAsync()
+  return UserId newUser.Id
+} 
+</code></pre>
+
+<p>Though it appears like that we have completed the functionality, one important task is pending in this function.</p>
+
+<p>That is Error Handling!</p>
+
+<p>Let&rsquo;s examine the return type of <code>SubmitUpdatesAsync</code> method, <code>Async&lt;unit&gt;</code>. In case of an error, while submitting the changes to the database, this method will throw an exception. It also applies to unique violation errors in the <code>Username</code> and <code>Email</code> columns in the <code>Users</code> table. That&rsquo;s not what we want!</p>
+
+<p>We want a value of type <code>CreateUserError</code> to represent the errors!</p>
+
+<p>As we did for transforming the <code>UserSignupResult</code> to <code>WebPart</code> in the <a href="/fsharp/series/fstweet/transforming-async-result-to-webpart/#transforming-usersignupresult-to-webpart" target="_blank">last blog post</a>, we need to transform <code>AsyncResult&lt;UserId, 'a&gt;</code> to <code>AsyncResult&lt;UserId, CreateUserError&gt;</code></p>
+
+<h3 id="async-exception-to-async-result">Async Exception to Async Result</h3>
+
+<p>As a first step, the first transformation that we need to work on is returning an <code>AsyncResult&lt;unit,Exception&gt;</code> instead of <code>Async&lt;unit&gt;</code> and an exception when we call <code>SubmitUpdatesAsync</code> on the <code>DataContext</code> object.</p>
+
+<p>To do, let&rsquo;s create a function <code>submitChanges</code> in <code>Database</code> module that takes a <code>DataContext</code> as its parameter</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Db.fs
+module Database
+// ...
+let submitChanges (ctx : DataContext) = 
+  // TODO
+</code></pre>
+
+<p>Then call the <code>SubmitUpdatesAsync</code> method and use <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.catch%5B't%5D-method-%5Bfsharp%5D" target="_blank">Async.Catch</a> function from the <code>Async</code> standard module which catches the exception thrown during the asynchronous operation and return the result of the operation as a <code>Choice</code> type.</p>
+
+<pre><code class="language-fsharp">let submitChanges (ctx : DataContext) = 
+  ctx.SubmitUpdatesAsync() // Async&lt;unit&gt;
+  |&gt; Async.Catch // Async&lt;Choice&lt;unit, System.Exception&gt;&gt;
+  // TODO
+</code></pre>
+
+<blockquote>
+<p>The return type of each function has been added as comments for clarity!</p>
+</blockquote>
+
+<p>The next step is mapping the <code>Async&lt;Choice&lt;'a, 'b&gt;&gt;</code> to <code>Async&lt;Result&lt;'a, 'b&gt;&gt;</code></p>
+
+<p>The Chessie library has a function <code>ofChoice</code> which transforms a <code>Choice</code> type to a <code>Result</code> type. With the help of this function and the <code>Async.map</code> function from Chessie library we can do the following</p>
+
+<pre><code class="language-fsharp">module Database
+// ...
+open Chessie.ErrorHandling
+// ...
+let submitChanges (ctx : DataContext) = 
+  ctx.SubmitUpdatesAsync() // Async&lt;unit&gt;
+  |&gt; Async.Catch // Async&lt;Choice&lt;unit, System.Exception&gt;&gt;
+  |&gt; Async.map ofChoice // Async&lt;Result&lt;unit, System.Exception&gt;&gt;
+  // TODO
+</code></pre>
+
+<p>The final step is transforming it to <code>AsyncResult</code> by using the <code>AR</code> union case as we did while <a href="/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type" target="_blank">mapping the Failure type of AsyncResult</a>.</p>
+
+<pre><code class="language-fsharp">// DataContext -&gt; AsyncResult&lt;unit, System.Exception&gt;
+let submitChanges (ctx : DataContext) = 
+  ctx.SubmitUpdatesAsync() // Async&lt;unit&gt;
+  |&gt; Async.Catch // Async&lt;Choice&lt;unit, System.Exception&gt;&gt;
+  |&gt; Async.map ofChoice // Async&lt;Result&lt;unit, System.Exception&gt;&gt;
+  |&gt; AR
+</code></pre>
+
+<p>Now we have a functional version of the <code>SubmitChangesAsync</code> method which returns an <code>AsyncResult</code>.</p>
+
+<h3 id="mapping-asyncresult-failure-type">Mapping AsyncResult Failure Type</h3>
+
+<p>If you got it right, you could have noticed that we are yet to do a step to complete the error handling.</p>
+
+<p>We need to transform the failure type of the Async Result from</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;unit, System.Exception&gt;
+</code></pre>
+
+<p>to</p>
+
+<pre><code class="language-fsharp">AsyncResult&lt;unit, CreateUserError&gt;
+</code></pre>
+
+<p>As this very similar to what we did while <a href="/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type" target="_blank">mapping the Failure type of AsyncResult</a> in the previous parts, let&rsquo;s jump in directly.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/FsTweet.Web.fs
+//...
+module Persistence =
+  // ...
+  // System.Exception -&gt; CreateUserError
+  let private mapException (ex : System.Exception) =
+    Error ex
+
+  let createUser ... = asyncTrail {
+    // ...
+    do! submitUpdates ctx
+        |&gt; mapAsyncFailure mapException
+    return UserId newUser.Id
+  } 
+</code></pre>
+
+<blockquote>
+<p>We will be handling the unique constraint violation errors later in this blog post.</p>
+</blockquote>
+
+<p>Great! With this, we can wrap up the implementation of the <code>createUser</code> function.</p>
+
+<h2 id="passing-the-dependency">Passing The Dependency</h2>
+
+<p>The new <code>createUser</code> function takes a first parameter <code>getDataCtx</code> of type <code>GetDataContext</code>.</p>
+
+<p>To make it available, first, we need to change the <code>webPart</code> function to receive this as a parameter and use it for partially applying it to the <code>createUser</code> function</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Suave =
+  // ...
+  open Database
+
+  let webPart getDataCtx =
+    let createUser = 
+      Persistence.createUser getDataCtx
+    // ...
+</code></pre>
+
+<p>Then in the <code>main</code> function call the <code>webPart</code> function with the <code>getDataCtx</code> which we created in the beginning of this blog post.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv = 
+  // ...
+  let app = 
+    choose [
+      // ...
+      UserSignup.Suave.webPart getDataCtx
+    ]
+</code></pre>
+
+<h2 id="handling-unique-constraint-violation-errors">Handling Unique Constraint Violation Errors</h2>
+
+<p>To handle the unique constraint violation errors gracefully, we need to understand some internals of the database abstraction provided by the SQLProvider.</p>
+
+<p>The SQLProvider internally uses the <a href="http://www.npgsql.org/" target="_blank">Npgsql</a> library to interact with PostgreSQL. As a matter of fact, through the <code>ResolutionPath</code> parameter, we provided a path in which the Npgsql DLL resides.</p>
+
+<p>The <code>Npgsql</code> library throws <a href="http://www.npgsql.org/api/Npgsql.PostgresException.html" target="_blank">PostgresException</a> when the PostgreSQL backend reports errors (e.g., query SQL issues, constraint violations).</p>
+
+<p>To infer whether the <code>PostgresException</code> has occurred due to the violation of the unique constraint, we need to check the <code>ConstraintName</code> and the <code>SqlState</code> property of this exception.</p>
+
+<p>For unique constraint violation, the <code>ConstraintName</code> property represents the name of the constraint that has been violated and the <code>SqlState</code> property, which represents <a href="https://www.postgresql.org/docs/current/static/errcodes-appendix.html" target="_blank">PostgreSQL error code</a>, will have the value <code>&quot;23505&quot;</code>.</p>
+
+<p>We can find out the unique constraints name associated with the <code>Username</code> and the <code>Email</code> by running the <code>\d &quot;Users&quot;</code> command in psql. The constraint names are <code>IX_Users_Username</code> and <code>IX_Users_Email</code> respectively.</p>
+
+<p>The SQLProvider exposes this <code>PostgresException</code> as an <code>AggregateException</code>.</p>
+
+<p>Now we have enough knowledge on how to capture the unique violation exceptions and represent it as a Domain type. So, Let&rsquo;s start our implementation.</p>
+
+<p>The first step is adding NuGet package reference of <code>Npgsql</code></p>
+
+<pre><code class="language-bash">&gt; forge paket add Npgsql -g Database \
+    --version 3.1.10 \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+</code></pre>
+
+<blockquote>
+<p>At the time of this writing, there is <a href="https://github.com/npgsql/npgsql/issues/1603" target="_blank">an issue</a> with the latest version of Npgsql. So, we are using the version <code>3.1.10</code> here.</p>
+</blockquote>
+
+<p>Then we need to add a reference to <code>System.Data</code>, as <code>PostgresException</code>, inherits <a href="https://msdn.microsoft.com/en-us/library/system.data.common.dbexception(v=vs.110).aspx" target="_blank">DbException</a> from this namespace.</p>
+
+<pre><code class="language-bash">&gt; forge add reference -n System.Data \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+</code></pre>
+
+<p>The next step is extending the <code>mapException</code> function that we defined in the previous section to map these <code>PostgresException</code>s to its corresponding error types.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence =
+  // ...
+  open Npgsql
+  open System
+  // ...
+
+  let private mapException (ex : System.Exception) =
+    match ex with
+    | :? AggregateException as agEx  -&gt;
+      match agEx.Flatten().InnerException with 
+      | :? PostgresException as pgEx -&gt;
+        match pgEx.ConstraintName, pgEx.SqlState with 
+        | &quot;IX_Users_Email&quot;, &quot;23505&quot; -&gt; EmailAlreadyExists
+        | &quot;IX_Users_Username&quot;, &quot;23505&quot; -&gt; UsernameAlreadyExists
+        | _ -&gt; 
+          Error pgEx
+      | _ -&gt; Error agEx
+    | _ -&gt; Error ex
+</code></pre>
+
+<p>We are doing pattern matching over the exception types here. First, we check whether the exception is of type <code>AggregateException</code>. If it is, then we flatten it to get the inner exception and check whether it is <code>PostgresException</code>.</p>
+
+<p>In case of <code>PostgresException</code>, we do the equality checks on the <code>ConstraintName</code> and the <code>SqlState</code> properties with the appropriate values and return the corresponding error types.</p>
+
+<p>For all the type mismatch on the exceptions, we return it as an <code>Error</code> case with the actual exception.</p>
+
+<h2 id="refactoring-mapexception-using-partial-active-patterns">Refactoring mapException Using Partial Active Patterns</h2>
+
+<p>Though we achieved what we want in the <code>mapException</code> function, it is a bit verbose. The crux is the equality check on the two properties, and the rest of the code just type casting from one type to other.</p>
+
+<p>Can we write it better to reflect what we intended to do over here?</p>
+
+<p>Yes, We Can!</p>
+
+<p>The answer is <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/active-patterns#partial-active-patterns" target="_blank">Partial Active Patterns</a>.</p>
+
+<p>Let&rsquo;s add a partial active pattern, <code>UniqueViolation</code>, in the <code>Database</code> module which does the pattern matching over the exception types and parameterizes the check on the constraint name.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Db.fs
+module Database
+// ...
+open Npgsql
+open System
+
+let (|UniqueViolation|_|) constraintName (ex : Exception) =
+  match ex with
+  | :? AggregateException as agEx  -&gt;
+    match agEx.Flatten().InnerException with 
+    | :? PostgresException as pgEx -&gt;
+      match pgEx.ConstraintName, pgEx.SqlState with
+      | constraintName, &quot;23505&quot; -&gt; Some ()
+      | _ -&gt; None
+    | _ -&gt; None
+  | _ -&gt; None
+</code></pre>
+
+<p>Then with the help of this partial active pattern, we can rewrite the <code>mapException</code> as</p>
+
+<pre><code class="language-fsharp">let private mapException (ex : System.Exception) =
+  match ex with
+  | UniqueViolation &quot;IX_Users_Email&quot; _ -&gt;
+    EmailAlreadyExists
+  | UniqueViolation &quot;IX_Users_Username&quot; _ -&gt; 
+    UsernameAlreadyExists
+  | _ -&gt; Error ex
+</code></pre>
+
+<p>More readable isn&rsquo;t it?</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>Excellent, We learned a lot of things in this blog post!</p>
+
+<p>We started with initializing SQLProvider, then configured it to work with a different database in runtime, and followed it up by creating a function to return a new Data Context for every database operation.</p>
+
+<p>Finally, we transformed the return type of SQLProvider to our custom Domain type!</p>
+
+<p>The source code of this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.9" target="_blank">GitHub</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/"><span
+      aria-hidden="true">&larr;</span> Transforming Async Result to Webpart</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
