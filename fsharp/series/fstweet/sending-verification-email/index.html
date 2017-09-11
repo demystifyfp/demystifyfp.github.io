@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/">
+
+  
+
+  <title>Sending Verification Email | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Sending Verification Email</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-09-09 22:46:00 &#43;0530 IST" itemprop="datePublished">
+      Sat, Sep 9, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/fsharp">fsharp</a
+    >, 
+    
+    <a href="/tags/postmark">Postmark</a
+    >, 
+    
+    <a href="/tags/chessie">Chessie</a
+    >, 
+    
+    <a href="/tags/rop">rop</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fsending-verification-email%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Sending%20Verification%20Email&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fsending-verification-email%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fsending-verification-email%2f&amp;title=Sending%20Verification%20Email"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fsending-verification-email%2f&amp;title=Sending%20Verification%20Email"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Sending%20Verification%20Email&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fsending-verification-email%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi there!</p>
+
+<p>Welcome to the tenth part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
+
+<p>In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we <a href="/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email" target="_blank">faked earlier</a>.</p>
+
+<h2 id="setting-up-postmark">Setting Up Postmark</h2>
+
+<p>To send email, we are going to use <a href="https://postmarkapp.com/" target="_blank">Postmark</a>, a transactional email service provider for web applications.</p>
+
+<p>There are three prerequisites that we need to do, before we use it in our application.</p>
+
+<ol>
+<li><p>A <a href="https://account.postmarkapp.com/sign_up" target="_blank">user account</a> in Postmark</p></li>
+
+<li><p>A new <a href="https://account.postmarkapp.com/servers" target="_blank">server</a>, kind of namespace to manage different applications in Postmark.</p></li>
+
+<li><p>A <a href="https://account.postmarkapp.com/servers" target="_blank">sender signature</a>, to use as a from address in the email that we will be sending from FsTweet.</p></li>
+</ol>
+
+<p>You make use of this <a href="https://postmarkapp.com/support/article/1002-getting-started-with-postmark" target="_blank">Getting started</a> guide from postmark to get these three prerequisites done.</p>
+
+<h3 id="configuring-singup-email-template">Configuring Singup Email Template</h3>
+
+<p>The next step is creating <a href="https://postmarkapp.com/why/templates" target="_blank">an email template</a> in Postmark for the signup email.</p>
+
+<p>Here is the HTML template that we will be using</p>
+
+<pre><code class="language-markdown">Hi {{ username }},
+
+Welcome to FsTweet!
+
+Confirm your email by clicking the below link
+
+http://localhost:8080/signup/verify/{{ verification_code }}
+
+Cheers,
+www.demystifyfp.com
+</code></pre>
+
+<blockquote>
+<p>HTML tags are not shown for brevity.</p>
+</blockquote>
+
+<p>The <code>username</code>, and the <code>verification_code</code> are placeholders in the template, that will be populated with the actual value while sending the email.</p>
+
+<p>Upon saving the template, you will get an unique identifier, like <code>3160924</code>. Keep a note of it as we will be using it shortly.</p>
+
+<p>With these we completed the setup on the Postmark side.</p>
+
+<h2 id="abstractions-for-sending-emails">Abstractions For Sending Emails</h2>
+
+<p>Postmark has a dotnet <a href="https://www.nuget.org/packages/Postmark/" target="_blank">client library</a> to make our job easier.</p>
+
+<p>As a first step, add its NuGet package in our web project.</p>
+
+<pre><code class="language-bash">&gt; forge paket add Postmark -g Email \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+</code></pre>
+
+<p>Then, create a new file <code>Email.fs</code> in the web project and move it above <code>UserSignup.fs</code> file</p>
+
+<pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Email
+&gt; forge moveUp web -n src/FsTweet.Web/Email.fs
+&gt; forge moveUp web -n src/FsTweet.Web/Email.fs
+</code></pre>
+
+<p>Let&rsquo;s add some basic types that we required for sending an email</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Email.fs
+module Email
+
+open Chessie.ErrorHandling
+open System
+
+type Email = {
+  To : string
+  TemplateId : int64
+  PlaceHolders : Map&lt;string,string&gt;
+}
+
+type SendEmail = Email -&gt; AsyncResult&lt;unit, Exception&gt;
+</code></pre>
+
+<p>The <code>Email</code> record represents the required details for sending an email and the <code>SendEmail</code> represents the function signature of a send email function.</p>
+
+<p>The next step, is adding a function which sends an email using Postmark.</p>
+
+<pre><code class="language-fsharp">// ...
+open PostmarkDotNet
+// ...
+
+let sendEmailViaPostmark senderEmailAddress (client : PostmarkClient) email =
+  // TODO
+</code></pre>
+
+<p>The <code>sendEmailViaPostmark</code> function takes the sender email address that we created as part of third prerequisite while setting up Postmark, a <code>PostmarkClient</code> and a value of the <code>Email</code> type that we just created.</p>
+
+<p>Then we need to create an object of type <code>TemplatedPostmarkMessage</code> and call the <code>SendMessageAsync</code> method on the postmark client.</p>
+
+<pre><code class="language-fsharp">let sendEmailViaPostmark senderEmailAddress (client : PostmarkClient) email =
+  let msg = 
+    new TemplatedPostmarkMessage(
+      From = senderEmailAddress,
+      To = email.To,
+      TemplateId = email.TemplateId,
+      TemplateModel = email.PlaceHolders
+    )
+  client.SendMessageAsync(msg)
+</code></pre>
+
+<p>The return type of <code>SendMessageAsync</code> method is <code>Task&lt;PostmarkResponse&gt;</code>. But what we need is <code>AsyncResult&lt;unit, Exception&gt;</code>.</p>
+
+<p>I guess you should know what we need to do now? Yes, transform!</p>
+
+<pre><code class="language-fsharp">let sendEmailViaPostmark ... =
+  // ...
+  client.SendMessageAsync(msg) // Task&lt;PostmarkResponse&gt;
+  |&gt; Async.AwaitTask // Async&lt;PostmarkResponse&gt;
+  |&gt; Async.Catch // Choice&lt;PostmarkResponse, Exception&gt;
+  // TODO
+</code></pre>
+
+<p>By making use of the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.awaittask%5B%27t%5D-method-%5Bfsharp%5D" target="_blank">AwaitTask</a> and the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.catch%5b't%5d-method-%5bfsharp%5d" target="_blank">Catch</a> function in the <code>Async</code> module, we tranformed <code>Task&lt;PostmarkResponse&gt;</code> to <code>Choice&lt;PostmarkResponse, Exception&gt;</code>.</p>
+
+<p>To transform this choice type to <code>AsyncResult&lt;unit, Exception&gt;</code>, we need to know a little more details.</p>
+
+<p>The <code>PostmarkClient</code> populates the <code>Status</code> property of the <code>PostmarkResponse</code> with the value <code>Success</code> if everything went well. We need to return a <code>unit</code> in this case.</p>
+
+<p>If the <code>Status</code> property doesn&rsquo;t have the <code>Success</code> value, the <code>Message</code> property of the <code>PostmarkResponse</code> communicates what went wrong.</p>
+
+<p>With these details, we can now write a function that transforms <code>Choice&lt;PostmarkResponse, Exception&gt;</code> to <code>Result&lt;unit, Exception&gt;</code></p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Email.fs
+// ...
+open System
+// ...
+let mapPostmarkResponse response =
+  match response with
+  | Choice1Of2 ( postmarkRes : PostmarkResponse) -&gt;
+    match postmarkRes.Status with
+    | PostmarkStatus.Success -&gt; 
+      ok ()
+    | _ -&gt;
+      let ex = new Exception(postmarkRes.Message)
+      fail ex
+  | Choice2Of2 ex -&gt; fail ex
+</code></pre>
+
+<p>Now we have a function to map <code>Choice</code> to <code>Result</code>.</p>
+
+<p>Going back to the <code>sendEmailViaPostmark</code> function, we can leverage this <code>mapPostmarkResponse</code> function to accomplish our initial objective.</p>
+
+<pre><code class="language-fsharp">let sendEmailViaPostmark ... =
+  // ...
+  client.SendMessageAsync(msg) // Task&lt;PostmarkResponse&gt;
+  |&gt; Async.AwaitTask // Async&lt;PostmarkResponse&gt;
+  |&gt; Async.Catch // Choice&lt;PostmarkResponse, Exception&gt;
+  |&gt; Async.map mapPostmarkResponse // Async&lt;Result&lt;unit, Exception&gt;&gt;
+  |&gt; AR // AsyncResult&lt;unit, Exception&gt;
+</code></pre>
+
+<p>Awesome! We transformed <code>Task&lt;PostmarkResponse&gt;</code> to <code>AsyncResult&lt;unit, Exception&gt;</code>.</p>
+
+<h2 id="injecting-the-dependencies">Injecting The Dependencies</h2>
+
+<p>There are two dependencies in the <code>sendEmailViaPostmark</code> function, <code>senderEmailAddress</code> and <code>client</code>.</p>
+
+<p>Let&rsquo;s write a function to inject these dependencies using partial application</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Email.fs
+// ...
+let initSendEmail senderEmailAddress serverToken =
+  let client = new PostmarkClient(serverToken)
+  sendEmailViaPostmark senderEmailAddress client
+</code></pre>
+
+<p>The <code>serverToken</code> parameter represents the <a href="https://postmarkapp.com/support/article/1008-what-are-the-account-and-server-api-tokens" target="_blank">Server API token</a> which will be used the <code>PostmarkClient</code> while communicating with the Postmark APIs to send an email.</p>
+
+<p>The <code>initSendEmail</code> function partially applied the first two arguments of the <code>sendEmailViaPostmark</code> function and returns a function having the signature
+<code>Email -&gt; AsyncResult&lt;unit, Exception&gt;</code>.</p>
+
+<p>Then during the application bootstrap, get the sender email address and the Postmark server token from environment variables and call the <code>initSendEmail</code> function to get a function to send email.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
+// ...
+open Email
+// ...
+let main argv =
+  // ...
+  let serverToken =
+    Environment.GetEnvironmentVariable &quot;FSTWEET_POSTMARK_SERVER_TOKEN&quot;
+
+  let senderEmailAddress =
+    Environment.GetEnvironmentVariable &quot;FSTWEET_SENDER_EMAIL_ADDRESS&quot;
+
+  let sendEmail = initSendEmail senderEmailAddress serverToken
+
+  // ...
+</code></pre>
+
+<p>The next step is adding the <code>sendEmail</code> function as a parameter in the <code>sendSignupEmail</code> function</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Email =
+  // ...
+  open Email
+
+  let sendSignupEmail sendEmail signupEmailReq = asyncTrial {
+    // ...
+  }
+</code></pre>
+
+<p>and pass the actual <code>sendEmail</code> function to it from the <code>main</code> function.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
+      UserSignup.Suave.webPart getDataCtx sendEmail
+    ]
+  // ...
+</code></pre>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Suave =
+  // ...
+  let webPart getDataCtx sendEmail =
+    // ...
+    let sendSignupEmail = Email.sendSignupEmail sendEmail
+    // ...
+</code></pre>
+
+<h2 id="sending-signup-email">Sending Signup Email</h2>
+
+<p>Everything has been setup to send an email to verify the email account of a new singup.</p>
+
+<p>The final task is putting the pieces together in the <code>sendSignupEmail</code> function.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Email =
+  // ...
+  let sendSignupEmail sendEmail signupEmailReq = asyncTrial {
+    let verificationCode =
+      signupEmailReq.VerificationCode.Value
+    let placeHolders = 
+      Map.empty
+        .Add(&quot;verification_code&quot;, verificationCode)
+        .Add(&quot;username&quot;, signupEmailReq.Username.Value)
+    let email = {
+      To = signupEmailReq.EmailAddress.Value
+      TemplateId = int64(3160924)
+      PlaceHolders = placeHolders
+    }
+    do! sendEmail email 
+      |&gt; mapAsyncFailure Domain.SendEmailError
+  }
+</code></pre>
+
+<p>The implementation of the <code>sendSignupEmail</code> function is striaght forward. We need to populate the individual properties of the <code>Email</code> record type with the appropriate values and then call the <code>sendEmail</code> email.</p>
+
+<p>Note that we are using <code>do!</code> as <code>sendEmail</code> returing <code>unit</code> for success.</p>
+
+<p>As usual, we are mapping the failure type of the Async result from <code>Exception</code> to <code>SendEmailError</code></p>
+
+<h2 id="configuring-send-email-during-development">Configuring Send Email During Development</h2>
+
+<p>In a typical application development process, we won&rsquo;t be sending actual email in the development environment as sending an email cost money.</p>
+
+<p>One of the standard way is faking the implementation and using the console as we did earlier.</p>
+
+<p>To enable this in our application,  let&rsquo;s add a new function <code>consoleSendEmail</code> function which prints the email record type in the console</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Email.fs
+// ...
+let consoleSendEmail email = asyncTrial {
+  printfn &quot;%A&quot; email
+}
+</code></pre>
+
+<p>Then in the <code>main</code> function, get the name of the environment from an environment variable and intiliaze the <code>signupEmail</code> function accordingly.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv = 
+  // ...
+  let env = 
+    Environment.GetEnvironmentVariable &quot;FSTWEET_ENVIRONMENT&quot;
+
+  let sendEmail = 
+    match env with
+    | &quot;dev&quot; -&gt; consoleSendEmail
+    | _ -&gt; initSendEmail senderEmailAddress serverToken
+  // ...
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>With the help of the abstractions and design that we created in the earlier blog posts, we are able to add support for sending an email with ease in the blog post.</p>
+
+<p>The source code of this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.10" target="_blank">GitHub</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/"><span
+      aria-hidden="true">&larr;</span> Persisting New User</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
