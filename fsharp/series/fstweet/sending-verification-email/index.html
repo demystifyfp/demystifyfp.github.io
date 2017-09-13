@@ -192,19 +192,19 @@
 
 <p>To send email, we are going to use <a href="https://postmarkapp.com/" target="_blank">Postmark</a>, a transactional email service provider for web applications.</p>
 
-<p>There are three prerequisites that we need to do, before we use it in our application.</p>
+<p>There are three prerequisites that we need to do before we use it in our application.</p>
 
 <ol>
 <li><p>A <a href="https://account.postmarkapp.com/sign_up" target="_blank">user account</a> in Postmark</p></li>
 
 <li><p>A new <a href="https://account.postmarkapp.com/servers" target="_blank">server</a>, kind of namespace to manage different applications in Postmark.</p></li>
 
-<li><p>A <a href="https://account.postmarkapp.com/servers" target="_blank">sender signature</a>, to use as a from address in the email that we will be sending from FsTweet.</p></li>
+<li><p>A <a href="https://account.postmarkapp.com/servers" target="_blank">sender signature</a>, to use as a FROM address in the email that we will be sending from FsTweet.</p></li>
 </ol>
 
 <p>You make use of this <a href="https://postmarkapp.com/support/article/1002-getting-started-with-postmark" target="_blank">Getting started</a> guide from postmark to get these three prerequisites done.</p>
 
-<h3 id="configuring-singup-email-template">Configuring Singup Email Template</h3>
+<h3 id="configuring-signup-email-template">Configuring Signup Email Template</h3>
 
 <p>The next step is creating <a href="https://postmarkapp.com/why/templates" target="_blank">an email template</a> in Postmark for the signup email.</p>
 
@@ -226,17 +226,17 @@ www.demystifyfp.com
 <p>HTML tags are not shown for brevity.</p>
 </blockquote>
 
-<p>The <code>username</code>, and the <code>verification_code</code> are placeholders in the template, that will be populated with the actual value while sending the email.</p>
+<p>The <code>username</code> and the <code>verification_code</code> are placeholders in the template, that will be populated with the actual value while sending the email.</p>
 
-<p>Upon saving the template, you will get an unique identifier, like <code>3160924</code>. Keep a note of it as we will be using it shortly.</p>
+<p>Upon saving the template, you will get a unique identifier, like <code>3160924</code>. Keep a note of it as we will be using it shortly.</p>
 
-<p>With these we completed the setup on the Postmark side.</p>
+<p>With these, we completed the setup on the Postmark side.</p>
 
 <h2 id="abstractions-for-sending-emails">Abstractions For Sending Emails</h2>
 
 <p>Postmark has a dotnet <a href="https://www.nuget.org/packages/Postmark/" target="_blank">client library</a> to make our job easier.</p>
 
-<p>As a first step, add its NuGet package in our web project.</p>
+<p>As a first step, we have to add its NuGet package in our web project.</p>
 
 <pre><code class="language-bash">&gt; forge paket add Postmark -g Email \
     -p src/FsTweet.Web/FsTweet.Web.fsproj
@@ -266,9 +266,9 @@ type Email = {
 type SendEmail = Email -&gt; AsyncResult&lt;unit, Exception&gt;
 </code></pre>
 
-<p>The <code>Email</code> record represents the required details for sending an email and the <code>SendEmail</code> represents the function signature of a send email function.</p>
+<p>The <code>Email</code> record represents the required details for sending an email, and the <code>SendEmail</code> represents the function signature of a send email function.</p>
 
-<p>The next step, is adding a function which sends an email using Postmark.</p>
+<p>The next step is adding a function which sends an email using Postmark.</p>
 
 <pre><code class="language-fsharp">// ...
 open PostmarkDotNet
@@ -278,7 +278,7 @@ let sendEmailViaPostmark senderEmailAddress (client : PostmarkClient) email =
   // TODO
 </code></pre>
 
-<p>The <code>sendEmailViaPostmark</code> function takes the sender email address that we created as part of third prerequisite while setting up Postmark, a <code>PostmarkClient</code> and a value of the <code>Email</code> type that we just created.</p>
+<p>The <code>sendEmailViaPostmark</code> function takes the sender email address that we created as part of the third prerequisite while setting up Postmark, a <code>PostmarkClient</code> and a value of the <code>Email</code> type that we just created.</p>
 
 <p>Then we need to create an object of type <code>TemplatedPostmarkMessage</code> and call the <code>SendMessageAsync</code> method on the postmark client.</p>
 
@@ -305,11 +305,11 @@ let sendEmailViaPostmark senderEmailAddress (client : PostmarkClient) email =
   // TODO
 </code></pre>
 
-<p>By making use of the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.awaittask%5B%27t%5D-method-%5Bfsharp%5D" target="_blank">AwaitTask</a> and the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.catch%5b't%5d-method-%5bfsharp%5d" target="_blank">Catch</a> function in the <code>Async</code> module, we tranformed <code>Task&lt;PostmarkResponse&gt;</code> to <code>Choice&lt;PostmarkResponse, Exception&gt;</code>.</p>
+<p>By making use of the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.awaittask%5B%27t%5D-method-%5Bfsharp%5D" target="_blank">AwaitTask</a> and the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.catch%5b't%5d-method-%5bfsharp%5d" target="_blank">Catch</a> function in the <code>Async</code> module, we transformed <code>Task&lt;PostmarkResponse&gt;</code> to <code>Choice&lt;PostmarkResponse, Exception&gt;</code>.</p>
 
-<p>To transform this choice type to <code>AsyncResult&lt;unit, Exception&gt;</code>, we need to know a little more details.</p>
+<p>To convert this choice type to <code>AsyncResult&lt;unit, Exception&gt;</code>, we need to know little more details.</p>
 
-<p>The <code>PostmarkClient</code> populates the <code>Status</code> property of the <code>PostmarkResponse</code> with the value <code>Success</code> if everything went well. We need to return a <code>unit</code> in this case.</p>
+<p>The <code>PostmarkClient</code> would populate the <code>Status</code> property of the <code>PostmarkResponse</code> with the value <code>Success</code> if everything went well. We need to return a <code>unit</code> in this case.</p>
 
 <p>If the <code>Status</code> property doesn&rsquo;t have the <code>Success</code> value, the <code>Message</code> property of the <code>PostmarkResponse</code> communicates what went wrong.</p>
 
@@ -331,7 +331,7 @@ let mapPostmarkResponse response =
   | Choice2Of2 ex -&gt; fail ex
 </code></pre>
 
-<p>Now we have a function to map <code>Choice</code> to <code>Result</code>.</p>
+<p>Now we have a function that map <code>Choice</code> to <code>Result</code>.</p>
 
 <p>Going back to the <code>sendEmailViaPostmark</code> function, we can leverage this <code>mapPostmarkResponse</code> function to accomplish our initial objective.</p>
 
@@ -348,7 +348,7 @@ let mapPostmarkResponse response =
 
 <h2 id="injecting-the-dependencies">Injecting The Dependencies</h2>
 
-<p>There are two dependencies in the <code>sendEmailViaPostmark</code> function, <code>senderEmailAddress</code> and <code>client</code>.</p>
+<p>There are two dependencies in the <code>sendEmailViaPostmark</code> function, <code>senderEmailAddress</code>, and <code>client</code>.</p>
 
 <p>Let&rsquo;s write a function to inject these dependencies using partial application</p>
 
@@ -359,12 +359,12 @@ let initSendEmail senderEmailAddress serverToken =
   sendEmailViaPostmark senderEmailAddress client
 </code></pre>
 
-<p>The <code>serverToken</code> parameter represents the <a href="https://postmarkapp.com/support/article/1008-what-are-the-account-and-server-api-tokens" target="_blank">Server API token</a> which will be used the <code>PostmarkClient</code> while communicating with the Postmark APIs to send an email.</p>
+<p>The <code>serverToken</code> parameter represents the <a href="https://postmarkapp.com/support/article/1008-what-are-the-account-and-server-api-tokens" target="_blank">Server API token</a> which will be used by the <code>PostmarkClient</code> while communicating with the Postmark APIs to send an email.</p>
 
-<p>The <code>initSendEmail</code> function partially applied the first two arguments of the <code>sendEmailViaPostmark</code> function and returns a function having the signature
+<p>The <code>initSendEmail</code> function partially applied the first two arguments of the <code>sendEmailViaPostmark</code> function and returned a function having the signature
 <code>Email -&gt; AsyncResult&lt;unit, Exception&gt;</code>.</p>
 
-<p>Then during the application bootstrap, get the sender email address and the Postmark server token from environment variables and call the <code>initSendEmail</code> function to get a function to send email.</p>
+<p>Then during the application bootstrap, get the sender email address and the Postmark server token from environment variables and call the <code>initSendEmail</code> function to get a function to send an email.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -422,7 +422,7 @@ module Suave =
 
 <h2 id="sending-signup-email">Sending Signup Email</h2>
 
-<p>Everything has been setup to send an email to verify the email account of a new singup.</p>
+<p>Everything has been setup to send an email to verify the email account of a new Signup.</p>
 
 <p>The final task is putting the pieces together in the <code>sendSignupEmail</code> function.</p>
 
@@ -449,15 +449,15 @@ module Email =
 
 <p>The implementation of the <code>sendSignupEmail</code> function is striaght forward. We need to populate the individual properties of the <code>Email</code> record type with the appropriate values and then call the <code>sendEmail</code> email.</p>
 
-<p>Note that we are using <code>do!</code> as <code>sendEmail</code> returing <code>unit</code> for success.</p>
+<p>Note that we are using <code>do!</code> as <code>sendEmail</code> asynchronously returing <code>unit</code> for success.</p>
 
 <p>As usual, we are mapping the failure type of the Async result from <code>Exception</code> to <code>SendEmailError</code></p>
 
 <h2 id="configuring-send-email-during-development">Configuring Send Email During Development</h2>
 
-<p>In a typical application development process, we won&rsquo;t be sending actual email in the development environment as sending an email cost money.</p>
+<p>In a typical application development process, we won&rsquo;t be sending actual email in the development environment as sending an email may cost money.</p>
 
-<p>One of the standard way is faking the implementation and using the console as we did earlier.</p>
+<p>One of the standard ways is faking the implementation and using the console as we did earlier.</p>
 
 <p>To enable this in our application,  let&rsquo;s add a new function <code>consoleSendEmail</code> function which prints the email record type in the console</p>
 
@@ -468,7 +468,7 @@ let consoleSendEmail email = asyncTrial {
 }
 </code></pre>
 
-<p>Then in the <code>main</code> function, get the name of the environment from an environment variable and intiliaze the <code>signupEmail</code> function accordingly.</p>
+<p>Then in the <code>main</code> function, get the name of the environment from an environment variable and initialize the <code>signupEmail</code> function accordingly.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -486,7 +486,7 @@ let main argv =
 
 <h2 id="summary">Summary</h2>
 
-<p>With the help of the abstractions and design that we created in the earlier blog posts, we are able to add support for sending an email with ease in the blog post.</p>
+<p>With the help of the abstractions and design that we created in the earlier blog posts, we can add support for sending an email with ease in the blog post.</p>
 
 <p>The source code of this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.10" target="_blank">GitHub</a></p>
 

@@ -28,19 +28,19 @@
 
 &lt;p&gt;To send email, we are going to use &lt;a href=&#34;https://postmarkapp.com/&#34; target=&#34;_blank&#34;&gt;Postmark&lt;/a&gt;, a transactional email service provider for web applications.&lt;/p&gt;
 
-&lt;p&gt;There are three prerequisites that we need to do, before we use it in our application.&lt;/p&gt;
+&lt;p&gt;There are three prerequisites that we need to do before we use it in our application.&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;A &lt;a href=&#34;https://account.postmarkapp.com/sign_up&#34; target=&#34;_blank&#34;&gt;user account&lt;/a&gt; in Postmark&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;A new &lt;a href=&#34;https://account.postmarkapp.com/servers&#34; target=&#34;_blank&#34;&gt;server&lt;/a&gt;, kind of namespace to manage different applications in Postmark.&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;A &lt;a href=&#34;https://account.postmarkapp.com/servers&#34; target=&#34;_blank&#34;&gt;sender signature&lt;/a&gt;, to use as a from address in the email that we will be sending from FsTweet.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;A &lt;a href=&#34;https://account.postmarkapp.com/servers&#34; target=&#34;_blank&#34;&gt;sender signature&lt;/a&gt;, to use as a FROM address in the email that we will be sending from FsTweet.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;You make use of this &lt;a href=&#34;https://postmarkapp.com/support/article/1002-getting-started-with-postmark&#34; target=&#34;_blank&#34;&gt;Getting started&lt;/a&gt; guide from postmark to get these three prerequisites done.&lt;/p&gt;
 
-&lt;h3 id=&#34;configuring-singup-email-template&#34;&gt;Configuring Singup Email Template&lt;/h3&gt;
+&lt;h3 id=&#34;configuring-signup-email-template&#34;&gt;Configuring Signup Email Template&lt;/h3&gt;
 
 &lt;p&gt;The next step is creating &lt;a href=&#34;https://postmarkapp.com/why/templates&#34; target=&#34;_blank&#34;&gt;an email template&lt;/a&gt; in Postmark for the signup email.&lt;/p&gt;
 
@@ -62,17 +62,17 @@ www.demystifyfp.com
 &lt;p&gt;HTML tags are not shown for brevity.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;The &lt;code&gt;username&lt;/code&gt;, and the &lt;code&gt;verification_code&lt;/code&gt; are placeholders in the template, that will be populated with the actual value while sending the email.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;username&lt;/code&gt; and the &lt;code&gt;verification_code&lt;/code&gt; are placeholders in the template, that will be populated with the actual value while sending the email.&lt;/p&gt;
 
-&lt;p&gt;Upon saving the template, you will get an unique identifier, like &lt;code&gt;3160924&lt;/code&gt;. Keep a note of it as we will be using it shortly.&lt;/p&gt;
+&lt;p&gt;Upon saving the template, you will get a unique identifier, like &lt;code&gt;3160924&lt;/code&gt;. Keep a note of it as we will be using it shortly.&lt;/p&gt;
 
-&lt;p&gt;With these we completed the setup on the Postmark side.&lt;/p&gt;
+&lt;p&gt;With these, we completed the setup on the Postmark side.&lt;/p&gt;
 
 &lt;h2 id=&#34;abstractions-for-sending-emails&#34;&gt;Abstractions For Sending Emails&lt;/h2&gt;
 
 &lt;p&gt;Postmark has a dotnet &lt;a href=&#34;https://www.nuget.org/packages/Postmark/&#34; target=&#34;_blank&#34;&gt;client library&lt;/a&gt; to make our job easier.&lt;/p&gt;
 
-&lt;p&gt;As a first step, add its NuGet package in our web project.&lt;/p&gt;
+&lt;p&gt;As a first step, we have to add its NuGet package in our web project.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add Postmark -g Email \
     -p src/FsTweet.Web/FsTweet.Web.fsproj
@@ -102,9 +102,9 @@ type Email = {
 type SendEmail = Email -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;Email&lt;/code&gt; record represents the required details for sending an email and the &lt;code&gt;SendEmail&lt;/code&gt; represents the function signature of a send email function.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;Email&lt;/code&gt; record represents the required details for sending an email, and the &lt;code&gt;SendEmail&lt;/code&gt; represents the function signature of a send email function.&lt;/p&gt;
 
-&lt;p&gt;The next step, is adding a function which sends an email using Postmark.&lt;/p&gt;
+&lt;p&gt;The next step is adding a function which sends an email using Postmark.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// ...
 open PostmarkDotNet
@@ -114,7 +114,7 @@ let sendEmailViaPostmark senderEmailAddress (client : PostmarkClient) email =
   // TODO
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function takes the sender email address that we created as part of third prerequisite while setting up Postmark, a &lt;code&gt;PostmarkClient&lt;/code&gt; and a value of the &lt;code&gt;Email&lt;/code&gt; type that we just created.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function takes the sender email address that we created as part of the third prerequisite while setting up Postmark, a &lt;code&gt;PostmarkClient&lt;/code&gt; and a value of the &lt;code&gt;Email&lt;/code&gt; type that we just created.&lt;/p&gt;
 
 &lt;p&gt;Then we need to create an object of type &lt;code&gt;TemplatedPostmarkMessage&lt;/code&gt; and call the &lt;code&gt;SendMessageAsync&lt;/code&gt; method on the postmark client.&lt;/p&gt;
 
@@ -141,11 +141,11 @@ let sendEmailViaPostmark senderEmailAddress (client : PostmarkClient) email =
   // TODO
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;By making use of the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.awaittask%5B%27t%5D-method-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;AwaitTask&lt;/a&gt; and the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.catch%5b&#39;t%5d-method-%5bfsharp%5d&#34; target=&#34;_blank&#34;&gt;Catch&lt;/a&gt; function in the &lt;code&gt;Async&lt;/code&gt; module, we tranformed &lt;code&gt;Task&amp;lt;PostmarkResponse&amp;gt;&lt;/code&gt; to &lt;code&gt;Choice&amp;lt;PostmarkResponse, Exception&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;By making use of the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.awaittask%5B%27t%5D-method-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;AwaitTask&lt;/a&gt; and the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/async.catch%5b&#39;t%5d-method-%5bfsharp%5d&#34; target=&#34;_blank&#34;&gt;Catch&lt;/a&gt; function in the &lt;code&gt;Async&lt;/code&gt; module, we transformed &lt;code&gt;Task&amp;lt;PostmarkResponse&amp;gt;&lt;/code&gt; to &lt;code&gt;Choice&amp;lt;PostmarkResponse, Exception&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;To transform this choice type to &lt;code&gt;AsyncResult&amp;lt;unit, Exception&amp;gt;&lt;/code&gt;, we need to know a little more details.&lt;/p&gt;
+&lt;p&gt;To convert this choice type to &lt;code&gt;AsyncResult&amp;lt;unit, Exception&amp;gt;&lt;/code&gt;, we need to know little more details.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;PostmarkClient&lt;/code&gt; populates the &lt;code&gt;Status&lt;/code&gt; property of the &lt;code&gt;PostmarkResponse&lt;/code&gt; with the value &lt;code&gt;Success&lt;/code&gt; if everything went well. We need to return a &lt;code&gt;unit&lt;/code&gt; in this case.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;PostmarkClient&lt;/code&gt; would populate the &lt;code&gt;Status&lt;/code&gt; property of the &lt;code&gt;PostmarkResponse&lt;/code&gt; with the value &lt;code&gt;Success&lt;/code&gt; if everything went well. We need to return a &lt;code&gt;unit&lt;/code&gt; in this case.&lt;/p&gt;
 
 &lt;p&gt;If the &lt;code&gt;Status&lt;/code&gt; property doesn&amp;rsquo;t have the &lt;code&gt;Success&lt;/code&gt; value, the &lt;code&gt;Message&lt;/code&gt; property of the &lt;code&gt;PostmarkResponse&lt;/code&gt; communicates what went wrong.&lt;/p&gt;
 
@@ -167,7 +167,7 @@ let mapPostmarkResponse response =
   | Choice2Of2 ex -&amp;gt; fail ex
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now we have a function to map &lt;code&gt;Choice&lt;/code&gt; to &lt;code&gt;Result&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now we have a function that map &lt;code&gt;Choice&lt;/code&gt; to &lt;code&gt;Result&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Going back to the &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function, we can leverage this &lt;code&gt;mapPostmarkResponse&lt;/code&gt; function to accomplish our initial objective.&lt;/p&gt;
 
@@ -184,7 +184,7 @@ let mapPostmarkResponse response =
 
 &lt;h2 id=&#34;injecting-the-dependencies&#34;&gt;Injecting The Dependencies&lt;/h2&gt;
 
-&lt;p&gt;There are two dependencies in the &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function, &lt;code&gt;senderEmailAddress&lt;/code&gt; and &lt;code&gt;client&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;There are two dependencies in the &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function, &lt;code&gt;senderEmailAddress&lt;/code&gt;, and &lt;code&gt;client&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s write a function to inject these dependencies using partial application&lt;/p&gt;
 
@@ -195,12 +195,12 @@ let initSendEmail senderEmailAddress serverToken =
   sendEmailViaPostmark senderEmailAddress client
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;serverToken&lt;/code&gt; parameter represents the &lt;a href=&#34;https://postmarkapp.com/support/article/1008-what-are-the-account-and-server-api-tokens&#34; target=&#34;_blank&#34;&gt;Server API token&lt;/a&gt; which will be used the &lt;code&gt;PostmarkClient&lt;/code&gt; while communicating with the Postmark APIs to send an email.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;serverToken&lt;/code&gt; parameter represents the &lt;a href=&#34;https://postmarkapp.com/support/article/1008-what-are-the-account-and-server-api-tokens&#34; target=&#34;_blank&#34;&gt;Server API token&lt;/a&gt; which will be used by the &lt;code&gt;PostmarkClient&lt;/code&gt; while communicating with the Postmark APIs to send an email.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;initSendEmail&lt;/code&gt; function partially applied the first two arguments of the &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function and returns a function having the signature
+&lt;p&gt;The &lt;code&gt;initSendEmail&lt;/code&gt; function partially applied the first two arguments of the &lt;code&gt;sendEmailViaPostmark&lt;/code&gt; function and returned a function having the signature
 &lt;code&gt;Email -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Then during the application bootstrap, get the sender email address and the Postmark server token from environment variables and call the &lt;code&gt;initSendEmail&lt;/code&gt; function to get a function to send email.&lt;/p&gt;
+&lt;p&gt;Then during the application bootstrap, get the sender email address and the Postmark server token from environment variables and call the &lt;code&gt;initSendEmail&lt;/code&gt; function to get a function to send an email.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -258,7 +258,7 @@ module Suave =
 
 &lt;h2 id=&#34;sending-signup-email&#34;&gt;Sending Signup Email&lt;/h2&gt;
 
-&lt;p&gt;Everything has been setup to send an email to verify the email account of a new singup.&lt;/p&gt;
+&lt;p&gt;Everything has been setup to send an email to verify the email account of a new Signup.&lt;/p&gt;
 
 &lt;p&gt;The final task is putting the pieces together in the &lt;code&gt;sendSignupEmail&lt;/code&gt; function.&lt;/p&gt;
 
@@ -285,15 +285,15 @@ module Email =
 
 &lt;p&gt;The implementation of the &lt;code&gt;sendSignupEmail&lt;/code&gt; function is striaght forward. We need to populate the individual properties of the &lt;code&gt;Email&lt;/code&gt; record type with the appropriate values and then call the &lt;code&gt;sendEmail&lt;/code&gt; email.&lt;/p&gt;
 
-&lt;p&gt;Note that we are using &lt;code&gt;do!&lt;/code&gt; as &lt;code&gt;sendEmail&lt;/code&gt; returing &lt;code&gt;unit&lt;/code&gt; for success.&lt;/p&gt;
+&lt;p&gt;Note that we are using &lt;code&gt;do!&lt;/code&gt; as &lt;code&gt;sendEmail&lt;/code&gt; asynchronously returing &lt;code&gt;unit&lt;/code&gt; for success.&lt;/p&gt;
 
 &lt;p&gt;As usual, we are mapping the failure type of the Async result from &lt;code&gt;Exception&lt;/code&gt; to &lt;code&gt;SendEmailError&lt;/code&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;configuring-send-email-during-development&#34;&gt;Configuring Send Email During Development&lt;/h2&gt;
 
-&lt;p&gt;In a typical application development process, we won&amp;rsquo;t be sending actual email in the development environment as sending an email cost money.&lt;/p&gt;
+&lt;p&gt;In a typical application development process, we won&amp;rsquo;t be sending actual email in the development environment as sending an email may cost money.&lt;/p&gt;
 
-&lt;p&gt;One of the standard way is faking the implementation and using the console as we did earlier.&lt;/p&gt;
+&lt;p&gt;One of the standard ways is faking the implementation and using the console as we did earlier.&lt;/p&gt;
 
 &lt;p&gt;To enable this in our application,  let&amp;rsquo;s add a new function &lt;code&gt;consoleSendEmail&lt;/code&gt; function which prints the email record type in the console&lt;/p&gt;
 
@@ -304,7 +304,7 @@ let consoleSendEmail email = asyncTrial {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then in the &lt;code&gt;main&lt;/code&gt; function, get the name of the environment from an environment variable and intiliaze the &lt;code&gt;signupEmail&lt;/code&gt; function accordingly.&lt;/p&gt;
+&lt;p&gt;Then in the &lt;code&gt;main&lt;/code&gt; function, get the name of the environment from an environment variable and initialize the &lt;code&gt;signupEmail&lt;/code&gt; function accordingly.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -322,7 +322,7 @@ let main argv =
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;With the help of the abstractions and design that we created in the earlier blog posts, we are able to add support for sending an email with ease in the blog post.&lt;/p&gt;
+&lt;p&gt;With the help of the abstractions and design that we created in the earlier blog posts, we can add support for sending an email with ease in the blog post.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.10&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
