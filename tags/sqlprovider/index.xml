@@ -472,9 +472,10 @@ let (|UniqueViolation|_|) constraintName (ex : Exception) =
   | :? AggregateException as agEx  -&amp;gt;
     match agEx.Flatten().InnerException with 
     | :? PostgresException as pgEx -&amp;gt;
-      match pgEx.ConstraintName, pgEx.SqlState with
-      | constraintName, &amp;quot;23505&amp;quot; -&amp;gt; Some ()
-      | _ -&amp;gt; None
+      if pgEx.ConstraintName = constraintName &amp;amp;&amp;amp; 
+          pgEx.SqlState = &amp;quot;23505&amp;quot; then
+        Some ()
+      else None
     | _ -&amp;gt; None
   | _ -&amp;gt; None
 &lt;/code&gt;&lt;/pre&gt;
@@ -500,7 +501,7 @@ let (|UniqueViolation|_|) constraintName (ex : Exception) =
 
 &lt;p&gt;Finally, we transformed the return type of SQLProvider to our custom Domain type!&lt;/p&gt;
 
-&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.9&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.8&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
