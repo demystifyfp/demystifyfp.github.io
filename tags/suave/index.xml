@@ -7,8 +7,378 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Wed, 30 Aug 2017 04:43:18 +0530</lastBuildDate>
+    <lastBuildDate>Sun, 17 Sep 2017 13:27:49 +0530</lastBuildDate>
     <atom:link href="/tags/suave/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Verifying User Email</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/</link>
+      <pubDate>Sun, 17 Sep 2017 13:27:49 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;In the previous blog post, we added support for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/&#34; target=&#34;_blank&#34;&gt;sending verification email&lt;/a&gt; using &lt;a href=&#34;https://postmarkapp.com/&#34; target=&#34;_blank&#34;&gt;Postmark&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link in the email.&lt;/p&gt;
+
+&lt;h2 id=&#34;a-type-for-the-verify-user-function&#34;&gt;A Type For The Verify User Function.&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by defining a type for the function which verifies the user.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type VerifyUser = string -&amp;gt; AsyncResult&amp;lt;Username option, System.Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It takes a verifcation code of type &lt;code&gt;string&lt;/code&gt; and asynchronously returns either &lt;code&gt;Username option&lt;/code&gt; or an exception if there are any fatal errors while verifying the user.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Username option&lt;/code&gt; type will have the value if the verification code matches otherwise it would be &lt;code&gt;None&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;implementing-the-verify-user-function&#34;&gt;Implementing the Verify User Function&lt;/h2&gt;
+
+&lt;p&gt;The implementation of the &lt;code&gt;VerifyUser&lt;/code&gt; function will take two parameters&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence = 
+  // ...
+  let verifyUser 
+    (getDataCtx : GetDataContext) 
+    (verificationCode : string) = asyncTrial {
+    // TODO
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first parameter &lt;code&gt;getDataCtx&lt;/code&gt; represents the factory function to get the SQLProvider&amp;rsquo;s datacontext that &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request&#34; target=&#34;_blank&#34;&gt;we implemented&lt;/a&gt; while persisting a new user. Upon partially applying this parameter alone will return a function of type &lt;code&gt;VerifyUser&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;As a first step, we need to query the users table to get the user associated with the verification code provided.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let verifyUser 
+    (getDataCtx : GetDataContext) 
+    (verificationCode : string) = asyncTrial {
+    
+    let ctx = getDataCtx ()
+    let userToVerify = 
+      query {
+        for u in ctx.Public.Users do
+        where (u.EmailVerificationCode = verificationCode)
+      } // 
+    // TODO
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;SQLProvider uses the &lt;a href=&#34;https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/query-expressions&#34; target=&#34;_blank&#34;&gt;F# Query Expressions&lt;/a&gt; to query a data source.&lt;/p&gt;
+
+&lt;p&gt;The query expression that we wrote here is returning a value of type &lt;code&gt;IQueryable&amp;lt;DataContext.public.UsersEntity&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;To get the first item from this &lt;code&gt;IQueryable&lt;/code&gt; asynchronously, we need to call &lt;code&gt;Seq.tryHeadAsync&lt;/code&gt; function (an extension function provided by the SQLProvider)&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let verifyUser ... = asyncTrial {
+    // ...
+    let userToVerify = 
+      query {
+        // ...
+      } |&amp;gt; Seq.tryHeadAsync
+    // TODO
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now &lt;code&gt;userToVerify&lt;/code&gt; will be of type &lt;code&gt;Async&amp;lt;DataContext.public.UsersEntity option&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Like &lt;code&gt;SubmitUpdatesAsync&lt;/code&gt; function, the &lt;code&gt;tryHeadAsync&lt;/code&gt; throws exceptions if there is any error during the execution of the query. So, we need to catch the exception and return it as an &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add a new function in the &lt;code&gt;Database&lt;/code&gt; module to do this&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Db.fs
+// ...
+let toAsyncResult queryable =
+  queryable // Async&amp;lt;&#39;a&amp;gt;
+  |&amp;gt; Async.Catch // Async&amp;lt;Choice&amp;lt;&#39;a, Exception&amp;gt;&amp;gt;
+  |&amp;gt; Async.map ofChoice // Async&amp;lt;Result&amp;lt;&#39;a, Exception&amp;gt;&amp;gt;
+  |&amp;gt; AR // AsyncResult&amp;lt;&#39;a, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This implementation to very similar to what we did in the implementaion of the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result&#34; target=&#34;_blank&#34;&gt;submitUpdates&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Now, with the help of this &lt;code&gt;toAsyncResult&lt;/code&gt; function, we can now do the exception handling in the &lt;code&gt;verifyUser&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence = 
+  // ...
+  let verifyUser ... = asyncTrial {
+    let! userToVerify = 
+      query {
+        // ...
+      } |&amp;gt; Seq.tryHeadAsync |&amp;gt; toAsyncResult
+    // TODO
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note that, We have changed &lt;code&gt;let&lt;/code&gt; to &lt;code&gt;let!&lt;/code&gt; to retrieve the &lt;code&gt;UsersEntity option&lt;/code&gt; from &lt;code&gt;AsyncResult&amp;lt;DataContext.public.UsersEntity option&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Great!&lt;/p&gt;
+
+&lt;p&gt;If the &lt;code&gt;userToVerify&lt;/code&gt; didn&amp;rsquo;t exist, we just need to return &lt;code&gt;None&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let verifyUser ... = asyncTrial {
+  let! userToVerify = // ...
+  match userToVerify with
+  | None -&amp;gt; return None
+  | Some user -&amp;gt;
+    // TODO
+} 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If the user exists, then we need to set the verification code to empty (to prevent from using it multiple times) and mark the user as verified and persist the changes.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let verifyUser ... = asyncTrial {
+  // ...
+  | Some user -&amp;gt;
+    user.EmailVerificationCode &amp;lt;- &amp;quot;&amp;quot;
+    user.IsEmailVerified &amp;lt;- true
+    do! submitUpdates ctx
+    // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last step is returning the username of the User to let the caller of the &lt;code&gt;verifyUser&lt;/code&gt; function to know that the user has been verified and greet the user with the username.&lt;/p&gt;
+
+&lt;p&gt;We already have a domain type &lt;code&gt;Username&lt;/code&gt; to represent the username. But the type of the username that we retrieved from the database is &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;So, We need to convert it from &lt;code&gt;string&lt;/code&gt; to &lt;code&gt;Username&lt;/code&gt;. To do it we defined a static function on the &lt;code&gt;Username&lt;/code&gt; type, &lt;code&gt;TryCreate&lt;/code&gt;, which takes a &lt;code&gt;string&lt;/code&gt; and returns &lt;code&gt;Result&amp;lt;Username, string&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We could use this function here but let&amp;rsquo;s ponder over the scenario.&lt;/p&gt;
+
+&lt;p&gt;While creating the user we used the &lt;code&gt;TryCreate&lt;/code&gt; function to validate and create the corresponding &lt;code&gt;Username&lt;/code&gt; type. In case of any validation errors we populated the &lt;code&gt;Failure&lt;/code&gt; part of the &lt;code&gt;Result&lt;/code&gt; type with the appropriate error message of type &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now, when we read the user from the database, ideally there shouldn&amp;rsquo;t be any validation errors. But we can&amp;rsquo;t gurentee this behaviour as the underlying the database table can be accessed and modified without using our validation pipeline.&lt;/p&gt;
+
+&lt;p&gt;In case, if the validation fails, it should be treated as a fatal error!&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We may not need this level of robustness but the objective here is to domenstrate how to build a strong system using F#.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;So, the function that we need has to have the following signature&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;string -&amp;gt; Result&amp;lt;Username, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As we will be using this function in the &lt;code&gt;asyncTrial&lt;/code&gt; computation expression, it would be helpful if we return it as an &lt;code&gt;AsyncResult&lt;/code&gt; instead of &lt;code&gt;Result&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;string -&amp;gt; AsyncResult&amp;lt;Username, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we compare this function signature with that of the &lt;code&gt;TryCreate&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;string -&amp;gt; Result&amp;lt;Username, string&amp;gt; 
+string -&amp;gt; AsyncResult&amp;lt;Username, Exception&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;we can get a clue that the we just need to map the failure type to &lt;code&gt;Exception&lt;/code&gt; from &lt;code&gt;string&lt;/code&gt; and lift &lt;code&gt;Result&lt;/code&gt; to &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We already have a function called &lt;code&gt;mapFailure&lt;/code&gt; to map the failure type but it is defined after the definition of &lt;code&gt;Username&lt;/code&gt;. To use it, we first move it before the &lt;code&gt;Username&lt;/code&gt; type definition&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserSignup.fs
+// ...
+module Domain =
+  // ...
+  let mapFailure f aResult = 
+    let mapFirstItem xs = 
+      List.head xs |&amp;gt; f |&amp;gt; List.singleton 
+    mapFailure mapFirstItem aResult
+
+  type Username = // ...
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and then define the function &lt;code&gt;TryCreateAsync&lt;/code&gt; using it&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Username = // ...
+  // ...
+  static member TryCreateAsync username =
+    Username.TryCreate username // Result&amp;lt;Username, string&amp;gt; 
+    |&amp;gt; mapFailure (System.Exception) // Result&amp;lt;Username, Exception&amp;gt;
+    |&amp;gt; Async.singleton // Async&amp;lt;Result&amp;lt;Username, Exception&amp;gt;&amp;gt;
+    |&amp;gt; AR // AsyncResult&amp;lt;Username, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Back to the &lt;code&gt;verifyUser&lt;/code&gt; function, we can now return the &lt;code&gt;Username&lt;/code&gt; if user verification succeeds&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence = 
+  // ...
+  let verifyUser ... = asyncTrial {
+    // ...
+    | Some user -&amp;gt;
+      // ...
+      let! username = 
+        Username.TryCreateAsync user.Username
+      return Some username
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is wiring up this persistence logic with the presentation layer.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-presentation-side-of-user-verification&#34;&gt;The Presentation Side of User Verification&lt;/h2&gt;
+
+&lt;p&gt;We are returning &lt;code&gt;Username option&lt;/code&gt; when the user verification completed without any errors. If it has a value, We need to show a success page otherwise we can show a not found page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  
+  // (Username option * &#39;a) -&amp;gt; WebPart
+  let onVerificationSuccess (username, _ )=
+    match username with
+    | Some (username : Username) -&amp;gt;
+      page &amp;quot;user/verification_success.liquid&amp;quot; username.Value
+    | _ -&amp;gt;
+      page &amp;quot;not_found.liquid&amp;quot; &amp;quot;invalid verification code&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are using a tuple of type &lt;code&gt;(Username option * &#39;a)&lt;/code&gt; as an input parameter here as the Success side of the &lt;code&gt;Result&lt;/code&gt; type is &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-result-2.html&#34; target=&#34;_blank&#34;&gt;a tuple of two values&lt;/a&gt;, success and warning. As we are not using warning here, we can ignore. We will be refactoring it in an another blog post.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add these two liquid template files.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- FsTweet.Web/views/user/verification_success.liquid --&amp;gt;
+{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; Email Verified &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+
+  Hi {{ model }}, Your email address has been verified. 
+  Now you can &amp;lt;a href=&amp;quot;/login&amp;quot;&amp;gt;login&amp;lt;/a&amp;gt;!
+
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- FsTweet.Web/views/not_found.liquid --&amp;gt;
+{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; Not Found :( &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+  {{model}} 
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In case of errors during user verification, we need to log the error in the console and render a generic error page to user&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
+  // ...
+
+  // System.Exception list -&amp;gt; WebPart
+  let onVerificationFailure errs =
+    let ex : System.Exception = List.head errs
+    printfn &amp;quot;%A&amp;quot; ex
+    page &amp;quot;server_error.liquid&amp;quot; &amp;quot;error while verifying email&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The input paramter &lt;code&gt;errs&lt;/code&gt; is of type &lt;code&gt;System.Exception list&lt;/code&gt; as the failure type of &lt;code&gt;Result&lt;/code&gt; is list of error type and we are using it as a list with single value.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Then add the liquid template for the showing the server error&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- FsTweet.Web/views/server_error.liquid --&amp;gt;
+{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; Internal Error :( &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+  {{model}} 
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we have functions that maps success and failure parts of the &lt;code&gt;Result&lt;/code&gt; to its corresponding &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The next step is using these two functions to map &lt;code&gt;AsyncResult&amp;lt;Username option, Exception&amp;gt;&lt;/code&gt; to &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
+  // ...
+  let handleVerifyUserAsyncResult aResult =
+    aResult // AsyncResult&amp;lt;Username option, Exception&amp;gt;
+    |&amp;gt; Async.ofAsyncResult // Async&amp;lt;Result&amp;lt;Username option, Exception&amp;gt;&amp;gt;
+    |&amp;gt; Async.map 
+      (either onVerificationSuccess onVerificationFailure) // Async&amp;lt;WebPart&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now the presentation side is ready, the next step is wiring the persistence and the persentation layer.&lt;/p&gt;
+
+&lt;h2 id=&#34;adding-verify-signup-endpoint&#34;&gt;Adding Verify Signup Endpoint&lt;/h2&gt;
+
+&lt;p&gt;As a first step, let&amp;rsquo;s add route and webpart for handling the signup verify request from the user.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+  let webPart getDataCtx sendEmail =
+    // ...
+    let verifyUser = Persistence.verifyUser getDataCtx
+    choose [
+      // ...
+      pathScan &amp;quot;/signup/verify/%s&amp;quot; (handleSignupVerify verifyUser)
+    ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;handleSignupVerify&lt;/code&gt; is not defined yet, so let&amp;rsquo;s add it above the &lt;code&gt;webPart&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+  let handleSignupVerify 
+    (verifyUser : VerifyUser) verificationCode ctx = async {
+      // TODO
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This function first verifies the user using the &lt;code&gt;verificationCode&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleSignupVerify ... = async {
+  let verifyUserAsyncResult = verifyUser verificationCode
+  // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then map the &lt;code&gt;verifyUserAsyncResult&lt;/code&gt; to the webpart using the &lt;code&gt;handleVerifyUserAsyncResult&lt;/code&gt; function we just defined&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleSignupVerify ... = async {
+  let verifyUserAsyncResult = verifyUser verificationCode
+  let! webpart = handleVerifyUserAsyncResult verifyUserAsyncResult
+  // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And finally call the webpart function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleSignupVerify ... = async {
+  let verifyUserAsyncResult = verifyUser verificationCode
+  let! webpart = handleVerifyUserAsyncResult verifyUserAsyncResult
+  return! webpart ctx
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;With this blog post, we have completed the user signup workflow.&lt;/p&gt;
+
+&lt;p&gt;I hope you find it useful and learned how to put the pieces together to build fully functional feature in a robust way.&lt;/p&gt;
+
+&lt;p&gt;The source code of this part can be found on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.10&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Transforming Async Result to Webpart</title>

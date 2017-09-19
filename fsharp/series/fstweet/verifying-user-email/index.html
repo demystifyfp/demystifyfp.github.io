@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/">
+
+  
+
+  <title>Verifying User Email | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Verifying User Email</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-09-17 13:27:49 &#43;0530 IST" itemprop="datePublished">
+      Sun, Sep 17, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/suave">suave</a
+    >, 
+    
+    <a href="/tags/chessie">chessie</a
+    >, 
+    
+    <a href="/tags/rop">rop</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fverifying-user-email%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Verifying%20User%20Email&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fverifying-user-email%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fverifying-user-email%2f&amp;title=Verifying%20User%20Email"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fverifying-user-email%2f&amp;title=Verifying%20User%20Email"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Verifying%20User%20Email&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fverifying-user-email%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi,</p>
+
+<p>In the previous blog post, we added support for <a href="/fsharp/series/fstweet/sending-verification-email/" target="_blank">sending verification email</a> using <a href="https://postmarkapp.com/" target="_blank">Postmark</a>.</p>
+
+<p>In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link in the email.</p>
+
+<h2 id="a-type-for-the-verify-user-function">A Type For The Verify User Function.</h2>
+
+<p>Let&rsquo;s get started by defining a type for the function which verifies the user.</p>
+
+<pre><code class="language-fsharp">type VerifyUser = string -&gt; AsyncResult&lt;Username option, System.Exception&gt;
+</code></pre>
+
+<p>It takes a verifcation code of type <code>string</code> and asynchronously returns either <code>Username option</code> or an exception if there are any fatal errors while verifying the user.</p>
+
+<p>The <code>Username option</code> type will have the value if the verification code matches otherwise it would be <code>None</code>.</p>
+
+<h2 id="implementing-the-verify-user-function">Implementing the Verify User Function</h2>
+
+<p>The implementation of the <code>VerifyUser</code> function will take two parameters</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence = 
+  // ...
+  let verifyUser 
+    (getDataCtx : GetDataContext) 
+    (verificationCode : string) = asyncTrial {
+    // TODO
+  } 
+</code></pre>
+
+<p>The first parameter <code>getDataCtx</code> represents the factory function to get the SQLProvider&rsquo;s datacontext that <a href="/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request" target="_blank">we implemented</a> while persisting a new user. Upon partially applying this parameter alone will return a function of type <code>VerifyUser</code></p>
+
+<p>As a first step, we need to query the users table to get the user associated with the verification code provided.</p>
+
+<pre><code class="language-fsharp">let verifyUser 
+    (getDataCtx : GetDataContext) 
+    (verificationCode : string) = asyncTrial {
+    
+    let ctx = getDataCtx ()
+    let userToVerify = 
+      query {
+        for u in ctx.Public.Users do
+        where (u.EmailVerificationCode = verificationCode)
+      } // 
+    // TODO
+  } 
+</code></pre>
+
+<p>SQLProvider uses the <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/query-expressions" target="_blank">F# Query Expressions</a> to query a data source.</p>
+
+<p>The query expression that we wrote here is returning a value of type <code>IQueryable&lt;DataContext.public.UsersEntity&gt;</code>.</p>
+
+<p>To get the first item from this <code>IQueryable</code> asynchronously, we need to call <code>Seq.tryHeadAsync</code> function (an extension function provided by the SQLProvider)</p>
+
+<pre><code class="language-fsharp">let verifyUser ... = asyncTrial {
+    // ...
+    let userToVerify = 
+      query {
+        // ...
+      } |&gt; Seq.tryHeadAsync
+    // TODO
+  } 
+</code></pre>
+
+<p>Now <code>userToVerify</code> will be of type <code>Async&lt;DataContext.public.UsersEntity option&gt;</code>.</p>
+
+<p>Like <code>SubmitUpdatesAsync</code> function, the <code>tryHeadAsync</code> throws exceptions if there is any error during the execution of the query. So, we need to catch the exception and return it as an <code>AsyncResult</code>.</p>
+
+<p>Let&rsquo;s add a new function in the <code>Database</code> module to do this</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Db.fs
+// ...
+let toAsyncResult queryable =
+  queryable // Async&lt;'a&gt;
+  |&gt; Async.Catch // Async&lt;Choice&lt;'a, Exception&gt;&gt;
+  |&gt; Async.map ofChoice // Async&lt;Result&lt;'a, Exception&gt;&gt;
+  |&gt; AR // AsyncResult&lt;'a, Exception&gt;
+</code></pre>
+
+<p>This implementation to very similar to what we did in the implementaion of the <a href="/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result" target="_blank">submitUpdates</a></p>
+
+<p>Now, with the help of this <code>toAsyncResult</code> function, we can now do the exception handling in the <code>verifyUser</code> function.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence = 
+  // ...
+  let verifyUser ... = asyncTrial {
+    let! userToVerify = 
+      query {
+        // ...
+      } |&gt; Seq.tryHeadAsync |&gt; toAsyncResult
+    // TODO
+  } 
+</code></pre>
+
+<p>Note that, We have changed <code>let</code> to <code>let!</code> to retrieve the <code>UsersEntity option</code> from <code>AsyncResult&lt;DataContext.public.UsersEntity option&gt;</code>.</p>
+
+<p>Great!</p>
+
+<p>If the <code>userToVerify</code> didn&rsquo;t exist, we just need to return <code>None</code></p>
+
+<pre><code class="language-fsharp">let verifyUser ... = asyncTrial {
+  let! userToVerify = // ...
+  match userToVerify with
+  | None -&gt; return None
+  | Some user -&gt;
+    // TODO
+} 
+</code></pre>
+
+<p>If the user exists, then we need to set the verification code to empty (to prevent from using it multiple times) and mark the user as verified and persist the changes.</p>
+
+<pre><code class="language-fsharp">let verifyUser ... = asyncTrial {
+  // ...
+  | Some user -&gt;
+    user.EmailVerificationCode &lt;- &quot;&quot;
+    user.IsEmailVerified &lt;- true
+    do! submitUpdates ctx
+    // TODO
+}
+</code></pre>
+
+<p>The last step is returning the username of the User to let the caller of the <code>verifyUser</code> function to know that the user has been verified and greet the user with the username.</p>
+
+<p>We already have a domain type <code>Username</code> to represent the username. But the type of the username that we retrieved from the database is <code>string</code>.</p>
+
+<p>So, We need to convert it from <code>string</code> to <code>Username</code>. To do it we defined a static function on the <code>Username</code> type, <code>TryCreate</code>, which takes a <code>string</code> and returns <code>Result&lt;Username, string&gt;</code>.</p>
+
+<p>We could use this function here but let&rsquo;s ponder over the scenario.</p>
+
+<p>While creating the user we used the <code>TryCreate</code> function to validate and create the corresponding <code>Username</code> type. In case of any validation errors we populated the <code>Failure</code> part of the <code>Result</code> type with the appropriate error message of type <code>string</code>.</p>
+
+<p>Now, when we read the user from the database, ideally there shouldn&rsquo;t be any validation errors. But we can&rsquo;t gurentee this behaviour as the underlying the database table can be accessed and modified without using our validation pipeline.</p>
+
+<p>In case, if the validation fails, it should be treated as a fatal error!</p>
+
+<blockquote>
+<p>We may not need this level of robustness but the objective here is to domenstrate how to build a strong system using F#.</p>
+</blockquote>
+
+<p>So, the function that we need has to have the following signature</p>
+
+<pre><code class="language-fsharp">string -&gt; Result&lt;Username, Exception&gt;
+</code></pre>
+
+<p>As we will be using this function in the <code>asyncTrial</code> computation expression, it would be helpful if we return it as an <code>AsyncResult</code> instead of <code>Result</code></p>
+
+<pre><code class="language-fsharp">string -&gt; AsyncResult&lt;Username, Exception&gt;
+</code></pre>
+
+<p>If we compare this function signature with that of the <code>TryCreate</code> function</p>
+
+<pre><code class="language-fsharp">string -&gt; Result&lt;Username, string&gt; 
+string -&gt; AsyncResult&lt;Username, Exception&gt; 
+</code></pre>
+
+<p>we can get a clue that the we just need to map the failure type to <code>Exception</code> from <code>string</code> and lift <code>Result</code> to <code>AsyncResult</code>.</p>
+
+<p>We already have a function called <code>mapFailure</code> to map the failure type but it is defined after the definition of <code>Username</code>. To use it, we first move it before the <code>Username</code> type definition</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Domain =
+  // ...
+  let mapFailure f aResult = 
+    let mapFirstItem xs = 
+      List.head xs |&gt; f |&gt; List.singleton 
+    mapFailure mapFirstItem aResult
+
+  type Username = // ...
+  // ...
+</code></pre>
+
+<p>and then define the function <code>TryCreateAsync</code> using it</p>
+
+<pre><code class="language-fsharp">type Username = // ...
+  // ...
+  static member TryCreateAsync username =
+    Username.TryCreate username // Result&lt;Username, string&gt; 
+    |&gt; mapFailure (System.Exception) // Result&lt;Username, Exception&gt;
+    |&gt; Async.singleton // Async&lt;Result&lt;Username, Exception&gt;&gt;
+    |&gt; AR // AsyncResult&lt;Username, Exception&gt;
+</code></pre>
+
+<p>Back to the <code>verifyUser</code> function, we can now return the <code>Username</code> if user verification succeeds</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Persistence = 
+  // ...
+  let verifyUser ... = asyncTrial {
+    // ...
+    | Some user -&gt;
+      // ...
+      let! username = 
+        Username.TryCreateAsync user.Username
+      return Some username
+  } 
+</code></pre>
+
+<p>The next step is wiring up this persistence logic with the presentation layer.</p>
+
+<h2 id="the-presentation-side-of-user-verification">The Presentation Side of User Verification</h2>
+
+<p>We are returning <code>Username option</code> when the user verification completed without any errors. If it has a value, We need to show a success page otherwise we can show a not found page.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  
+  // (Username option * 'a) -&gt; WebPart
+  let onVerificationSuccess (username, _ )=
+    match username with
+    | Some (username : Username) -&gt;
+      page &quot;user/verification_success.liquid&quot; username.Value
+    | _ -&gt;
+      page &quot;not_found.liquid&quot; &quot;invalid verification code&quot;
+</code></pre>
+
+<blockquote>
+<p>We are using a tuple of type <code>(Username option * 'a)</code> as an input parameter here as the Success side of the <code>Result</code> type is <a href="https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-result-2.html" target="_blank">a tuple of two values</a>, success and warning. As we are not using warning here, we can ignore. We will be refactoring it in an another blog post.</p>
+</blockquote>
+
+<p>Let&rsquo;s add these two liquid template files.</p>
+
+<pre><code class="language-html">&lt;!-- FsTweet.Web/views/user/verification_success.liquid --&gt;
+{% extends &quot;master_page.liquid&quot; %}
+
+{% block head %}
+  &lt;title&gt; Email Verified &lt;/title&gt;
+{% endblock %}
+
+{% block content %}
+
+  Hi {{ model }}, Your email address has been verified. 
+  Now you can &lt;a href=&quot;/login&quot;&gt;login&lt;/a&gt;!
+
+{% endblock %}
+</code></pre>
+
+<pre><code class="language-html">&lt;!-- FsTweet.Web/views/not_found.liquid --&gt;
+{% extends &quot;master_page.liquid&quot; %}
+
+{% block head %}
+  &lt;title&gt; Not Found :( &lt;/title&gt;
+{% endblock %}
+
+{% block content %}
+  {{model}} 
+{% endblock %}
+</code></pre>
+
+<p>In case of errors during user verification, we need to log the error in the console and render a generic error page to user</p>
+
+<pre><code class="language-fsharp">module Suave = 
+  // ...
+
+  // System.Exception list -&gt; WebPart
+  let onVerificationFailure errs =
+    let ex : System.Exception = List.head errs
+    printfn &quot;%A&quot; ex
+    page &quot;server_error.liquid&quot; &quot;error while verifying email&quot;
+</code></pre>
+
+<blockquote>
+<p>The input paramter <code>errs</code> is of type <code>System.Exception list</code> as the failure type of <code>Result</code> is list of error type and we are using it as a list with single value.</p>
+</blockquote>
+
+<p>Then add the liquid template for the showing the server error</p>
+
+<pre><code class="language-html">&lt;!-- FsTweet.Web/views/server_error.liquid --&gt;
+{% extends &quot;master_page.liquid&quot; %}
+
+{% block head %}
+  &lt;title&gt; Internal Error :( &lt;/title&gt;
+{% endblock %}
+
+{% block content %}
+  {{model}} 
+{% endblock %}
+</code></pre>
+
+<p>Now we have functions that maps success and failure parts of the <code>Result</code> to its corresponding <code>WebPart</code>.</p>
+
+<p>The next step is using these two functions to map <code>AsyncResult&lt;Username option, Exception&gt;</code> to <code>Async&lt;WebPart&gt;</code></p>
+
+<pre><code class="language-fsharp">module Suave = 
+  // ...
+  let handleVerifyUserAsyncResult aResult =
+    aResult // AsyncResult&lt;Username option, Exception&gt;
+    |&gt; Async.ofAsyncResult // Async&lt;Result&lt;Username option, Exception&gt;&gt;
+    |&gt; Async.map 
+      (either onVerificationSuccess onVerificationFailure) // Async&lt;WebPart&gt;
+</code></pre>
+
+<p>Now the presentation side is ready, the next step is wiring the persistence and the persentation layer.</p>
+
+<h2 id="adding-verify-signup-endpoint">Adding Verify Signup Endpoint</h2>
+
+<p>As a first step, let&rsquo;s add route and webpart for handling the signup verify request from the user.</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+  let webPart getDataCtx sendEmail =
+    // ...
+    let verifyUser = Persistence.verifyUser getDataCtx
+    choose [
+      // ...
+      pathScan &quot;/signup/verify/%s&quot; (handleSignupVerify verifyUser)
+    ]
+</code></pre>
+
+<p>The <code>handleSignupVerify</code> is not defined yet, so let&rsquo;s add it above the <code>webPart</code> function</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+  let handleSignupVerify 
+    (verifyUser : VerifyUser) verificationCode ctx = async {
+      // TODO
+  }
+</code></pre>
+
+<p>This function first verifies the user using the <code>verificationCode</code></p>
+
+<pre><code class="language-fsharp">let handleSignupVerify ... = async {
+  let verifyUserAsyncResult = verifyUser verificationCode
+  // TODO
+}
+</code></pre>
+
+<p>Then map the <code>verifyUserAsyncResult</code> to the webpart using the <code>handleVerifyUserAsyncResult</code> function we just defined</p>
+
+<pre><code class="language-fsharp">let handleSignupVerify ... = async {
+  let verifyUserAsyncResult = verifyUser verificationCode
+  let! webpart = handleVerifyUserAsyncResult verifyUserAsyncResult
+  // TODO
+}
+</code></pre>
+
+<p>And finally call the webpart function</p>
+
+<pre><code class="language-fsharp">let handleSignupVerify ... = async {
+  let verifyUserAsyncResult = verifyUser verificationCode
+  let! webpart = handleVerifyUserAsyncResult verifyUserAsyncResult
+  return! webpart ctx
+}
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>With this blog post, we have completed the user signup workflow.</p>
+
+<p>I hope you find it useful and learned how to put the pieces together to build fully functional feature in a robust way.</p>
+
+<p>The source code of this part can be found on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.10" target="_blank">GitHub</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/"><span
+      aria-hidden="true">&larr;</span> Sending Verification Email</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
