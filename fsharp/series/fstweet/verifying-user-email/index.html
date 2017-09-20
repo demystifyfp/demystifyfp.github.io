@@ -186,7 +186,7 @@
 
 <p>In the previous blog post, we added support for <a href="/fsharp/series/fstweet/sending-verification-email/" target="_blank">sending verification email</a> using <a href="https://postmarkapp.com/" target="_blank">Postmark</a>.</p>
 
-<p>In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link in the email.</p>
+<p>In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link that we sent in the email.</p>
 
 <h2 id="a-type-for-the-verify-user-function">A Type For The Verify User Function.</h2>
 
@@ -195,7 +195,7 @@
 <pre><code class="language-fsharp">type VerifyUser = string -&gt; AsyncResult&lt;Username option, System.Exception&gt;
 </code></pre>
 
-<p>It takes a verifcation code of type <code>string</code> and asynchronously returns either <code>Username option</code> or an exception if there are any fatal errors while verifying the user.</p>
+<p>It takes a verification code of type <code>string</code> and asynchronously returns either <code>Username option</code> or an exception if there are any fatal errors while verifying the user.</p>
 
 <p>The <code>Username option</code> type will have the value if the verification code matches otherwise it would be <code>None</code>.</p>
 
@@ -214,9 +214,9 @@ module Persistence =
   } 
 </code></pre>
 
-<p>The first parameter <code>getDataCtx</code> represents the factory function to get the SQLProvider&rsquo;s datacontext that <a href="/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request" target="_blank">we implemented</a> while persisting a new user. Upon partially applying this parameter alone will return a function of type <code>VerifyUser</code></p>
+<p>The first parameter <code>getDataCtx</code> represents the factory function to get the SQLProvider&rsquo;s datacontext that <a href="/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request" target="_blank">we implemented</a> while persisting a new user. When we partially applying this argument alone, we will get a function of type <code>VerifyUser</code></p>
 
-<p>As a first step, we need to query the users table to get the user associated with the verification code provided.</p>
+<p>We first need to query the <code>Users</code> table to get the user associated with the verification code provided.</p>
 
 <pre><code class="language-fsharp">let verifyUser 
     (getDataCtx : GetDataContext) 
@@ -250,7 +250,7 @@ module Persistence =
 
 <p>Now <code>userToVerify</code> will be of type <code>Async&lt;DataContext.public.UsersEntity option&gt;</code>.</p>
 
-<p>Like <code>SubmitUpdatesAsync</code> function, the <code>tryHeadAsync</code> throws exceptions if there is any error during the execution of the query. So, we need to catch the exception and return it as an <code>AsyncResult</code>.</p>
+<p>Like <code>SubmitUpdatesAsync</code> function, the <code>tryHeadAsync</code> throws exceptions if there is an error during the execution of the query. So, we need to catch the exception and return it as an <code>AsyncResult</code>.</p>
 
 <p>Let&rsquo;s add a new function in the <code>Database</code> module to do this</p>
 
@@ -263,7 +263,7 @@ let toAsyncResult queryable =
   |&gt; AR // AsyncResult&lt;'a, Exception&gt;
 </code></pre>
 
-<p>This implementation to very similar to what we did in the implementaion of the <a href="/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result" target="_blank">submitUpdates</a></p>
+<p>This implementation to very similar to what we did in the implementation of the <a href="/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result" target="_blank">submitUpdates</a> function.</p>
 
 <p>Now, with the help of this <code>toAsyncResult</code> function, we can now do the exception handling in the <code>verifyUser</code> function.</p>
 
@@ -307,22 +307,22 @@ module Persistence =
 }
 </code></pre>
 
-<p>The last step is returning the username of the User to let the caller of the <code>verifyUser</code> function to know that the user has been verified and greet the user with the username.</p>
+<p>The last step is returning the username of the User to let the caller of the <code>verifyUser</code> function know that the user has been verified and greet the user with the username.</p>
 
-<p>We already have a domain type <code>Username</code> to represent the username. But the type of the username that we retrieved from the database is <code>string</code>.</p>
+<p>We already have a domain type <code>Username</code> to represent the username. But the type of the username that we retrieved from the database is a <code>string</code>.</p>
 
 <p>So, We need to convert it from <code>string</code> to <code>Username</code>. To do it we defined a static function on the <code>Username</code> type, <code>TryCreate</code>, which takes a <code>string</code> and returns <code>Result&lt;Username, string&gt;</code>.</p>
 
-<p>We could use this function here but let&rsquo;s ponder over the scenario.</p>
+<p>We could use this function here but before committing, let&rsquo;s ponder over the scenario.</p>
 
-<p>While creating the user we used the <code>TryCreate</code> function to validate and create the corresponding <code>Username</code> type. In case of any validation errors we populated the <code>Failure</code> part of the <code>Result</code> type with the appropriate error message of type <code>string</code>.</p>
+<p>While creating the user we used the <code>TryCreate</code> function to validate and create the corresponding <code>Username</code> type. In case of any validation errors, we populated the <code>Failure</code> part of the <code>Result</code> type with the appropriate error message of type <code>string</code>.</p>
 
-<p>Now, when we read the user from the database, ideally there shouldn&rsquo;t be any validation errors. But we can&rsquo;t gurentee this behaviour as the underlying the database table can be accessed and modified without using our validation pipeline.</p>
+<p>Now, when we read the user from the database, ideally there shouldn&rsquo;t be any validation errors. But we can&rsquo;t guarantee this behavior as the underlying the database table can be accessed and modified without using our validation pipeline.</p>
 
 <p>In case, if the validation fails, it should be treated as a fatal error!</p>
 
 <blockquote>
-<p>We may not need this level of robustness but the objective here is to domenstrate how to build a strong system using F#.</p>
+<p>We may not need this level of robustness, but the objective here is to demonstrate how to build a robust system using F#.</p>
 </blockquote>
 
 <p>So, the function that we need has to have the following signature</p>
@@ -341,9 +341,9 @@ module Persistence =
 string -&gt; AsyncResult&lt;Username, Exception&gt; 
 </code></pre>
 
-<p>we can get a clue that the we just need to map the failure type to <code>Exception</code> from <code>string</code> and lift <code>Result</code> to <code>AsyncResult</code>.</p>
+<p>we can get a clue that we just need to map the failure type to <code>Exception</code> from <code>string</code> and lift <code>Result</code> to <code>AsyncResult</code>.</p>
 
-<p>We already have a function called <code>mapFailure</code> to map the failure type but it is defined after the definition of <code>Username</code>. To use it, we first move it before the <code>Username</code> type definition</p>
+<p>We already have a function called <code>mapFailure</code> to map the failure type, but it is defined after the definition of <code>Username</code>. To use it, we first move it before the <code>Username</code> type definition.</p>
 
 <pre><code class="language-fsharp">// src/FsTweet.Web/UserSignup.fs
 // ...
@@ -451,7 +451,7 @@ module Suave =
 </code></pre>
 
 <blockquote>
-<p>The input paramter <code>errs</code> is of type <code>System.Exception list</code> as the failure type of <code>Result</code> is list of error type and we are using it as a list with single value.</p>
+<p>The input parameter <code>errs</code> is of type <code>System.Exception list</code> as the failure type of <code>Result</code> is a list of error type, and we are using it as a list with the single value.</p>
 </blockquote>
 
 <p>Then add the liquid template for the showing the server error</p>
@@ -468,7 +468,7 @@ module Suave =
 {% endblock %}
 </code></pre>
 
-<p>Now we have functions that maps success and failure parts of the <code>Result</code> to its corresponding <code>WebPart</code>.</p>
+<p>Now we have functions that map success and failure parts of the <code>Result</code> to its corresponding <code>WebPart</code>.</p>
 
 <p>The next step is using these two functions to map <code>AsyncResult&lt;Username option, Exception&gt;</code> to <code>Async&lt;WebPart&gt;</code></p>
 
@@ -481,11 +481,11 @@ module Suave =
       (either onVerificationSuccess onVerificationFailure) // Async&lt;WebPart&gt;
 </code></pre>
 
-<p>Now the presentation side is ready, the next step is wiring the persistence and the persentation layer.</p>
+<p>Now the presentation side is ready; the next step is wiring the persistence and the presentation layer.</p>
 
 <h2 id="adding-verify-signup-endpoint">Adding Verify Signup Endpoint</h2>
 
-<p>As a first step, let&rsquo;s add route and webpart for handling the signup verify request from the user.</p>
+<p>As a first step, let&rsquo;s add a route and a webpart function for handling the signup verify request from the user.</p>
 
 <pre><code class="language-fsharp">module Suave =
   // ...
@@ -538,9 +538,13 @@ module Suave =
 
 <p>With this blog post, we have completed the user signup workflow.</p>
 
-<p>I hope you find it useful and learned how to put the pieces together to build fully functional feature in a robust way.</p>
+<p>I hope you found it useful and learned how to put the pieces together to build fully functional feature robustly.</p>
 
 <p>The source code of this part can be found on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.10" target="_blank">GitHub</a></p>
+
+<h2 id="exercise">Exercise</h2>
+
+<p>How about sending a welcome email to the user upon successful verification of his/her email?</p>
 
     </div>
   </div>

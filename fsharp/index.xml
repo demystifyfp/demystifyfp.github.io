@@ -22,7 +22,7 @@
 
 &lt;p&gt;In the previous blog post, we added support for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/&#34; target=&#34;_blank&#34;&gt;sending verification email&lt;/a&gt; using &lt;a href=&#34;https://postmarkapp.com/&#34; target=&#34;_blank&#34;&gt;Postmark&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link in the email.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link that we sent in the email.&lt;/p&gt;
 
 &lt;h2 id=&#34;a-type-for-the-verify-user-function&#34;&gt;A Type For The Verify User Function.&lt;/h2&gt;
 
@@ -31,7 +31,7 @@
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type VerifyUser = string -&amp;gt; AsyncResult&amp;lt;Username option, System.Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;It takes a verifcation code of type &lt;code&gt;string&lt;/code&gt; and asynchronously returns either &lt;code&gt;Username option&lt;/code&gt; or an exception if there are any fatal errors while verifying the user.&lt;/p&gt;
+&lt;p&gt;It takes a verification code of type &lt;code&gt;string&lt;/code&gt; and asynchronously returns either &lt;code&gt;Username option&lt;/code&gt; or an exception if there are any fatal errors while verifying the user.&lt;/p&gt;
 
 &lt;p&gt;The &lt;code&gt;Username option&lt;/code&gt; type will have the value if the verification code matches otherwise it would be &lt;code&gt;None&lt;/code&gt;.&lt;/p&gt;
 
@@ -50,9 +50,9 @@ module Persistence =
   } 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The first parameter &lt;code&gt;getDataCtx&lt;/code&gt; represents the factory function to get the SQLProvider&amp;rsquo;s datacontext that &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request&#34; target=&#34;_blank&#34;&gt;we implemented&lt;/a&gt; while persisting a new user. Upon partially applying this parameter alone will return a function of type &lt;code&gt;VerifyUser&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The first parameter &lt;code&gt;getDataCtx&lt;/code&gt; represents the factory function to get the SQLProvider&amp;rsquo;s datacontext that &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request&#34; target=&#34;_blank&#34;&gt;we implemented&lt;/a&gt; while persisting a new user. When we partially applying this argument alone, we will get a function of type &lt;code&gt;VerifyUser&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;As a first step, we need to query the users table to get the user associated with the verification code provided.&lt;/p&gt;
+&lt;p&gt;We first need to query the &lt;code&gt;Users&lt;/code&gt; table to get the user associated with the verification code provided.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let verifyUser 
     (getDataCtx : GetDataContext) 
@@ -86,7 +86,7 @@ module Persistence =
 
 &lt;p&gt;Now &lt;code&gt;userToVerify&lt;/code&gt; will be of type &lt;code&gt;Async&amp;lt;DataContext.public.UsersEntity option&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Like &lt;code&gt;SubmitUpdatesAsync&lt;/code&gt; function, the &lt;code&gt;tryHeadAsync&lt;/code&gt; throws exceptions if there is any error during the execution of the query. So, we need to catch the exception and return it as an &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Like &lt;code&gt;SubmitUpdatesAsync&lt;/code&gt; function, the &lt;code&gt;tryHeadAsync&lt;/code&gt; throws exceptions if there is an error during the execution of the query. So, we need to catch the exception and return it as an &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s add a new function in the &lt;code&gt;Database&lt;/code&gt; module to do this&lt;/p&gt;
 
@@ -99,7 +99,7 @@ let toAsyncResult queryable =
   |&amp;gt; AR // AsyncResult&amp;lt;&#39;a, Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This implementation to very similar to what we did in the implementaion of the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result&#34; target=&#34;_blank&#34;&gt;submitUpdates&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;This implementation to very similar to what we did in the implementation of the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result&#34; target=&#34;_blank&#34;&gt;submitUpdates&lt;/a&gt; function.&lt;/p&gt;
 
 &lt;p&gt;Now, with the help of this &lt;code&gt;toAsyncResult&lt;/code&gt; function, we can now do the exception handling in the &lt;code&gt;verifyUser&lt;/code&gt; function.&lt;/p&gt;
 
@@ -143,22 +143,22 @@ module Persistence =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The last step is returning the username of the User to let the caller of the &lt;code&gt;verifyUser&lt;/code&gt; function to know that the user has been verified and greet the user with the username.&lt;/p&gt;
+&lt;p&gt;The last step is returning the username of the User to let the caller of the &lt;code&gt;verifyUser&lt;/code&gt; function know that the user has been verified and greet the user with the username.&lt;/p&gt;
 
-&lt;p&gt;We already have a domain type &lt;code&gt;Username&lt;/code&gt; to represent the username. But the type of the username that we retrieved from the database is &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;We already have a domain type &lt;code&gt;Username&lt;/code&gt; to represent the username. But the type of the username that we retrieved from the database is a &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;So, We need to convert it from &lt;code&gt;string&lt;/code&gt; to &lt;code&gt;Username&lt;/code&gt;. To do it we defined a static function on the &lt;code&gt;Username&lt;/code&gt; type, &lt;code&gt;TryCreate&lt;/code&gt;, which takes a &lt;code&gt;string&lt;/code&gt; and returns &lt;code&gt;Result&amp;lt;Username, string&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;We could use this function here but let&amp;rsquo;s ponder over the scenario.&lt;/p&gt;
+&lt;p&gt;We could use this function here but before committing, let&amp;rsquo;s ponder over the scenario.&lt;/p&gt;
 
-&lt;p&gt;While creating the user we used the &lt;code&gt;TryCreate&lt;/code&gt; function to validate and create the corresponding &lt;code&gt;Username&lt;/code&gt; type. In case of any validation errors we populated the &lt;code&gt;Failure&lt;/code&gt; part of the &lt;code&gt;Result&lt;/code&gt; type with the appropriate error message of type &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;While creating the user we used the &lt;code&gt;TryCreate&lt;/code&gt; function to validate and create the corresponding &lt;code&gt;Username&lt;/code&gt; type. In case of any validation errors, we populated the &lt;code&gt;Failure&lt;/code&gt; part of the &lt;code&gt;Result&lt;/code&gt; type with the appropriate error message of type &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Now, when we read the user from the database, ideally there shouldn&amp;rsquo;t be any validation errors. But we can&amp;rsquo;t gurentee this behaviour as the underlying the database table can be accessed and modified without using our validation pipeline.&lt;/p&gt;
+&lt;p&gt;Now, when we read the user from the database, ideally there shouldn&amp;rsquo;t be any validation errors. But we can&amp;rsquo;t guarantee this behavior as the underlying the database table can be accessed and modified without using our validation pipeline.&lt;/p&gt;
 
 &lt;p&gt;In case, if the validation fails, it should be treated as a fatal error!&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We may not need this level of robustness but the objective here is to domenstrate how to build a strong system using F#.&lt;/p&gt;
+&lt;p&gt;We may not need this level of robustness, but the objective here is to demonstrate how to build a robust system using F#.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;So, the function that we need has to have the following signature&lt;/p&gt;
@@ -177,9 +177,9 @@ module Persistence =
 string -&amp;gt; AsyncResult&amp;lt;Username, Exception&amp;gt; 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;we can get a clue that the we just need to map the failure type to &lt;code&gt;Exception&lt;/code&gt; from &lt;code&gt;string&lt;/code&gt; and lift &lt;code&gt;Result&lt;/code&gt; to &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;we can get a clue that we just need to map the failure type to &lt;code&gt;Exception&lt;/code&gt; from &lt;code&gt;string&lt;/code&gt; and lift &lt;code&gt;Result&lt;/code&gt; to &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;We already have a function called &lt;code&gt;mapFailure&lt;/code&gt; to map the failure type but it is defined after the definition of &lt;code&gt;Username&lt;/code&gt;. To use it, we first move it before the &lt;code&gt;Username&lt;/code&gt; type definition&lt;/p&gt;
+&lt;p&gt;We already have a function called &lt;code&gt;mapFailure&lt;/code&gt; to map the failure type, but it is defined after the definition of &lt;code&gt;Username&lt;/code&gt;. To use it, we first move it before the &lt;code&gt;Username&lt;/code&gt; type definition.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserSignup.fs
 // ...
@@ -287,7 +287,7 @@ module Suave =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;The input paramter &lt;code&gt;errs&lt;/code&gt; is of type &lt;code&gt;System.Exception list&lt;/code&gt; as the failure type of &lt;code&gt;Result&lt;/code&gt; is list of error type and we are using it as a list with single value.&lt;/p&gt;
+&lt;p&gt;The input parameter &lt;code&gt;errs&lt;/code&gt; is of type &lt;code&gt;System.Exception list&lt;/code&gt; as the failure type of &lt;code&gt;Result&lt;/code&gt; is a list of error type, and we are using it as a list with the single value.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;Then add the liquid template for the showing the server error&lt;/p&gt;
@@ -304,7 +304,7 @@ module Suave =
 {% endblock %}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now we have functions that maps success and failure parts of the &lt;code&gt;Result&lt;/code&gt; to its corresponding &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now we have functions that map success and failure parts of the &lt;code&gt;Result&lt;/code&gt; to its corresponding &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;The next step is using these two functions to map &lt;code&gt;AsyncResult&amp;lt;Username option, Exception&amp;gt;&lt;/code&gt; to &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;&lt;/p&gt;
 
@@ -317,11 +317,11 @@ module Suave =
       (either onVerificationSuccess onVerificationFailure) // Async&amp;lt;WebPart&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now the presentation side is ready, the next step is wiring the persistence and the persentation layer.&lt;/p&gt;
+&lt;p&gt;Now the presentation side is ready; the next step is wiring the persistence and the presentation layer.&lt;/p&gt;
 
 &lt;h2 id=&#34;adding-verify-signup-endpoint&#34;&gt;Adding Verify Signup Endpoint&lt;/h2&gt;
 
-&lt;p&gt;As a first step, let&amp;rsquo;s add route and webpart for handling the signup verify request from the user.&lt;/p&gt;
+&lt;p&gt;As a first step, let&amp;rsquo;s add a route and a webpart function for handling the signup verify request from the user.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
   // ...
@@ -374,9 +374,13 @@ module Suave =
 
 &lt;p&gt;With this blog post, we have completed the user signup workflow.&lt;/p&gt;
 
-&lt;p&gt;I hope you find it useful and learned how to put the pieces together to build fully functional feature in a robust way.&lt;/p&gt;
+&lt;p&gt;I hope you found it useful and learned how to put the pieces together to build fully functional feature robustly.&lt;/p&gt;
 
 &lt;p&gt;The source code of this part can be found on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.10&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;exercise&#34;&gt;Exercise&lt;/h2&gt;
+
+&lt;p&gt;How about sending a welcome email to the user upon successful verification of his/her email?&lt;/p&gt;
 </description>
     </item>
     
