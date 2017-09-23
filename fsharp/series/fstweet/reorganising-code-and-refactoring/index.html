@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/">
+
+  
+
+  <title>Reorganising Code and Refactoring | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Reorganising Code and Refactoring</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-09-21 04:55:36 &#43;0530 IST" itemprop="datePublished">
+      Thu, Sep 21, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/fsharp">fsharp</a
+    >, 
+    
+    <a href="/tags/refactoring">refactoring</a
+    >, 
+    
+    <a href="/tags/chessie">Chessie</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2freorganising-code-and-refactoring%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Reorganising%20Code%20and%20Refactoring&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2freorganising-code-and-refactoring%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2freorganising-code-and-refactoring%2f&amp;title=Reorganising%20Code%20and%20Refactoring"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2freorganising-code-and-refactoring%2f&amp;title=Reorganising%20Code%20and%20Refactoring"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Reorganising%20Code%20and%20Refactoring&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2freorganising-code-and-refactoring%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi there!</p>
+
+<p>Welcome to the twelth part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
+
+<p>We have came a long way so far and we have lot more things to do!</p>
+
+<p>Before we get going, Let&rsquo;s spend some time to reorganise some of the code that we wrote and refactor certain functions to help ourselves to move faster.</p>
+
+<p>The <em>UserSignup.fs</em> file has some helper functions for working with the Chessie library. As a first step, we will move them to a separate file.</p>
+
+<p>Let&rsquo;s create a new file <code>Chessie.fs</code> in the <code>web</code> project.</p>
+
+<pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Chessie
+</code></pre>
+
+<p>Then move it above <code>Db.fs</code>. In other words move it up four times.</p>
+
+<pre><code class="language-bash">&gt; repeat 4 forge moveUp web -n src/FsTweet.Web/Chessie.fs
+</code></pre>
+
+<blockquote>
+<p>We are using the in-built command, <code>repeat</code>, from <a href="http://ohmyz.sh/" target="_blank">omyzsh</a> to repeat the <code>forge moveUp</code> four times.</p>
+</blockquote>
+
+<h2 id="moving-mapfailure-function">Moving mapFailure Function</h2>
+
+<p>In the <a href="{{ relref &quot;verifying-user-email.md&quot; }}" target="_blank">previous blog post</a>, while implementing the static member function <code>TryCreateAsync</code> in the <code>Username</code> type, we moved the <code>mapFailure</code> from its previous place to above the <code>Username</code> type to use it in the <code>TryCreateAsync</code> function.</p>
+
+<p>It is a cue for us to reconsider the placement of the <code>mapFailure</code> function, as we may need to move it to somewhere else if we want to use it in an another function.</p>
+
+<p>So, let&rsquo;s move this function to the <code>Chessie.fs</code> file that we just created.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
+module Chessie
+
+open Chessie.ErrorHandling
+
+let mapFailure f result = 
+  let mapFirstItem xs = 
+    List.head xs |&gt; f |&gt; List.singleton 
+  mapFailure mapFirstItem result
+</code></pre>
+
+<p>After we move this function to here, we need to refer this <code>Chessie</code> module in the <code>Domain</code> module.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+namespace UserSignup
+
+module Domain =
+  // ...
+  open Chessie
+</code></pre>
+
+<h2 id="overriding-the-either-function">Overriding The either function</h2>
+
+<p>We are making use of the <code>either</code> function from the chessie library to map the <code>Result</code> to <code>WebPart</code> with some compromises on the design.</p>
+
+<p>To fix this, let&rsquo;s have a look at the signature of the <code>either</code> function</p>
+
+<pre><code class="language-fsharp">('b -&gt; 'c) -&gt; ('d -&gt; 'c) -&gt; (Result&lt;'b, 'd&gt; -&gt; 'c)
+</code></pre>
+
+<p>It takes a function to map the success part <code>('b -&gt; 'c)</code> and an another function to map the failure part <code>('d -&gt; 'c)</code> and returns a function that takes a <code>Result&lt;'b, 'd&gt;</code> type and returns <code>'c</code>.</p>
+
+<p>It is the same thing that we needed but the problem is the actual type of <code>'b</code> and <code>'d</code></p>
+
+<p>The success part <code>'b</code> has a type <code>('TSuccess, 'TMessage list)</code> to represent both the success and the warning part. As we are not making use of warning in FsTweet, instead of this tuple and we just need the success part <code>'TSuccess</code> alone.</p>
+
+<p>To achieve it let&rsquo;s add a <code>onSuccess</code> adapter function which maps only the success type</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+// ('a -&gt; 'b) -&gt; ('a * 'c) -&gt; 'b
+let onSuccess f (x, _) = f x
+</code></pre>
+
+<p>Then move our attention to the failure part <code>d</code> which has a type <code>'TMessage list</code> representing the list of errors. In FsTweet, we are short circuiting as soon as we found the first error and we are not capturing all the errors. So, in our case the type <code>'TMessage list</code> will always have a list with only one item <code>'TMessage</code>.</p>
+
+<p>Like <code>onSuccess</code>, we can have a function <code>onFailure</code> to map the first item of the list.</p>
+
+<pre><code class="language-fsharp">module Chessie
+// ...
+
+// ('a -&gt; 'b) -&gt; ('a  list) -&gt; 'b
+let onFailure f xs = 
+  xs |&gt; List.head |&gt; f
+</code></pre>
+
+<p>The <code>onFailure</code> takes the first item from the list and uses it as the argument while calling the map function <code>f</code>.</p>
+
+<p>Now with the help of these two functions, <code>onSuccess</code> and <code>onFailure</code>, we can override the <code>either</code> function.</p>
+
+<pre><code class="language-fsharp">module Chessie
+// ...
+
+// ('b -&gt; 'c) -&gt; ('d -&gt; 'c) -&gt; (Result&lt;'b, 'd&gt; -&gt; 'c)
+let either onSuccessF onFailureF = 
+  either (onSuccess onSuccessF) (onFailure onFailureF)
+</code></pre>
+
+<p>The overrided version <code>either</code> has the same signature but treats the success part without warnings and the failure part as a single item instead of a list.</p>
+
+<p>Let&rsquo;s use this in the <code>Suave</code> module in the functions that transform <code>Result&lt;Username option, Exception list&gt;</code> to <code>WebPart</code>.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+namespace UserSignup
+// ...
+module Sauve =
+  // ...
+  open Chessie
+  // ...
+
+  // let onVerificationSuccess (username, _ ) = 
+  let onVerificationSuccess username = 
+    // ...
+
+  // let onVerificationFailure errs =
+  //   let ex : System.Exception = List.head errs
+  let onVerificationFailure (ex : System.Exception) =
+    // ...
+
+  // ...
+</code></pre>
+
+<p>Thanks to the adapter functions, <code>onSuccess</code> and <code>onFailure</code>, now the function signatures are clearly expressing our intent without an compromises.</p>
+
+<p>Let&rsquo;s do the same thing for the functions that map <code>Result&lt;UserId, UserSignupError&gt;</code> to <code>WebPart</code></p>
+
+<pre><code class="language-fsharp">module Suave = 
+  // ...
+
+  //  let handleUserSignupError viewModel errs = 
+  //    match List.head errs with
+  let onUserSignupFailure viewModel err = 
+    match err with
+    // ...
+
+  // let handleUserSignupSuccess viewModel _ =
+  let onUserSignupSuccess viewModel _ =
+    // ...
+
+  let handleUserSignupResult viewModel result =
+    (*
+      either 
+      (handleUserSignupSuccess viewModel)
+      (handleUserSignupError viewModel) result
+    *)
+    either 
+      (onUserSignupSuccess viewModel)
+      (onUserSignupFailure viewModel) result
+
+  // ...
+</code></pre>
+
+<blockquote>
+<p>While changing the function signature, we have also changed the prefix <code>handle</code> to <code>on</code> to keep it consitent with the nomanclature that we are using to the functions that are mapping the success and failure parts of a <code>Result</code> type.</p>
+</blockquote>
+
+<h2 id="revisting-the-mapasyncfailure-function">Revisting the mapAsyncFailure function</h2>
+
+<p>Let&rsquo;s begin this change by looking at the signature of the <code>mapAsyncFailure</code> function</p>
+
+<pre><code class="language-fsharp">('a -&gt; 'b) -&gt; AsyncResult&lt;'c, 'a&gt; -&gt; AsyncResult&lt;'c, 'b&gt;
+</code></pre>
+
+<p>It maps the failure part <code>'a</code> to <code>'b</code> with the help of the mapping function <code>('a -&gt; 'b)</code> of an <code>AsyncResult</code>. But the name <code>mapAsyncFailure</code> not clearly communicates this.</p>
+
+<p>The better name would be <code>mapAsyncResultFailure</code>.</p>
+
+<p>An another option would be having the function <code>mapFailure</code> in the module <code>AsyncResult</code> so that the caller will use it as <code>AsyncResult.mapFailure</code></p>
+
+<p>We can also use an abbreviation <code>AR</code> to represent <code>AsyncResult</code> and we can call the function as <code>AR.mapFailure</code></p>
+
+<p>Let&rsquo;s choose <code>AR.mapFailure</code> as it is shorter.</p>
+
+<p>To enable this, we need to create a new module <code>AR</code> and decorate it with the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/core.requirequalifiedaccessattribute-class-%5Bfsharp%5D" target="_blank">RequireQualifiedAccess</a> Attribute so that functions inside this module can&rsquo;t be called without the module name.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+[&lt;RequireQualifiedAccess&gt;]
+module AR =
+  // TODO
+</code></pre>
+
+<p>Then move the <code>mapAsyncFailure</code> function to this module and rename it to <code>mapFailure</code></p>
+
+<pre><code class="language-fsharp">module AR =
+  let mapFailure f aResult =
+    aResult
+    |&gt; Async.ofAsyncResult 
+    |&gt; Async.map (mapFailure f) |&gt; AR
+</code></pre>
+
+<p>And finally we need to use this moved and renamed function in the <code>Persistence</code> and <code>Email</code> modules in the <em>UserSignup.fs</em> file.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Persistence =
+  // ...
+  open Chessie
+  // ...
+
+  let createUser ... = 
+    // ...
+    // |&gt; mapAsyncFailure mapException
+    |&gt; AR.mapFailure mapException
+
+  // ...
+</code></pre>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Email = 
+  // ...
+  open Chessie
+  // ...
+
+  let sendSignupEmail ... =
+    // ...
+    // |&gt; mapAsyncFailure Domain.SendEmailError
+    |&gt; AR.mapFailure Domain.SendEmailError
+</code></pre>
+
+<h2 id="defining-ar-catch-function">Defining AR.catch function</h2>
+
+<p>Let&rsquo;s switch our focus to the <code>Database</code> module and give some attention the following piece of code.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Db.fs
+// ...
+let submitUpdates ... = 
+  // ...
+  |&gt; Async.Catch
+  |&gt; Async.map ofChoice
+  |&gt; AR
+
+let toAsyncResult ... =
+  // ...
+  |&gt; Async.Catch
+  |&gt; Async.map ofChoice
+  |&gt; AR 
+</code></pre>
+
+<p>The three lines of code that were repeated, takes an asynchronous computation <code>Async&lt;'a&gt;</code> and exceutes it with exception handling using <code>Async.Catch</code> function and then map the <code>Async&lt;Choice&lt;'a, Exception&gt;&gt;</code> to <code>AsyncResult&lt;'a, Exception&gt;</code>.</p>
+
+<p>In other words we can extract these three lines to a separate function which has the signature</p>
+
+<pre><code class="language-fsharp">Async&lt;'a&gt; -&gt; AsyncResult&lt;'a, Exception&gt;
+</code></pre>
+
+<p>Let&rsquo;s create this function in the <code>AR</code> module</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
+// ...
+module AR =
+  // ...
+
+  let catch aComputation =
+    aComputation // Async&lt;'a&gt;
+    |&gt; Async.Catch // Async&lt;Choice&lt;'a, Exception&gt;&gt;
+    |&gt; Async.map ofChoice // Async&lt;Result&lt;'a, Exception&gt;&gt;
+    |&gt; AR // AsyncResult&lt;'a, Exception&gt;
+</code></pre>
+
+<p>Then use it in the <code>submitUpdates</code> function and remove the <code>toAsyncResult</code> function in the <code>Database</code> module</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Db.fs
+// ...
+open Chessie
+// ...
+
+let submitUpdates ... = 
+  // ...
+  |&gt; AR.catch
+</code></pre>
+
+<p>Finally change the <code>verifyUser</code> function to use this function instead of the removed function <code>toAsyncResult</code></p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Persistence =
+  // ...
+  open Chessie
+  // ...
+
+  let verifyUser ... = 
+    // ...
+    // } |&gt; Seq.tryHeadAsync |&gt; toAsyncResult
+    } |&gt; Seq.tryHeadAsync |&gt; AR.catch
+    // ...
+
+  // ...
+</code></pre>
+
+<p>With these we are done with the refactoring and reorganising of the functions associated with the Chessie library.</p>
+
+<h2 id="the-user-module">The User Module</h2>
+
+<p>The <code>Domain</code> module in the <em>UserSignup.fs</em> file has the following types that represents the individual properties of an user in FsTweet</p>
+
+<pre><code class="language-fsharp">Username
+UserId
+EmailAddress
+Password
+PasswordHash 
+</code></pre>
+
+<p>So, let&rsquo;s put these types in a separate module <code>User</code> and use it in the <code>Domain</code> module of <code>UserSignup</code></p>
+
+<p>Create a new file, <em>User.fs</em>, in the web project and move it above <code>Db.fs</code> file</p>
+
+<pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/User
+&gt; repeat 4 forge moveUp web -n src/FsTweet.Web/User.fs
+</code></pre>
+
+<p>Then move the types that we just listed</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+module User 
+
+type Username = ...
+type UserId = ...
+type EmailAddress = ...
+type Password = ...
+type PasswordHash = ...
+</code></pre>
+
+<p>Finally use this module in the <em>UserSignup.fs</em> file</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+namespace UserSignup
+
+module Domain =
+  // ...
+  open User
+  // ...
+module Persistence =
+  // ...
+  open User
+  // ...
+// ...
+module Suave =
+  // ...
+  open User
+  // ...
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learned how to create adapter funtions and override a functionality provided by a library to fit our custom requirements. The key to this refactoring is understanding of the function signatures.</p>
+
+<p>The source code associated with this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.11" target="_blank">GitHub</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/"><span
+      aria-hidden="true">&larr;</span> Verifying User Email</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

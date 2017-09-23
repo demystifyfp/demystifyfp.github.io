@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Refactoring on Demystify FP</title>
+    <link>http://www.demystifyfp.com/tags/refactoring/</link>
+    <description>Recent content in Refactoring on Demystify FP</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Demystify FP</copyright>
+    <lastBuildDate>Thu, 21 Sep 2017 04:55:36 +0530</lastBuildDate>
+    <atom:link href="/tags/refactoring/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Reorganising Code and Refactoring</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</link>
+      <pubDate>Thu, 21 Sep 2017 04:55:36 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</guid>
+      <description>
+
+&lt;p&gt;Hi there!&lt;/p&gt;
+
+&lt;p&gt;Welcome to the twelth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;We have came a long way so far and we have lot more things to do!&lt;/p&gt;
+
+&lt;p&gt;Before we get going, Let&amp;rsquo;s spend some time to reorganise some of the code that we wrote and refactor certain functions to help ourselves to move faster.&lt;/p&gt;
+
+&lt;p&gt;The &lt;em&gt;UserSignup.fs&lt;/em&gt; file has some helper functions for working with the Chessie library. As a first step, we will move them to a separate file.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a new file &lt;code&gt;Chessie.fs&lt;/code&gt; in the &lt;code&gt;web&lt;/code&gt; project.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/Chessie
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then move it above &lt;code&gt;Db.fs&lt;/code&gt;. In other words move it up four times.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; repeat 4 forge moveUp web -n src/FsTweet.Web/Chessie.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are using the in-built command, &lt;code&gt;repeat&lt;/code&gt;, from &lt;a href=&#34;http://ohmyz.sh/&#34; target=&#34;_blank&#34;&gt;omyzsh&lt;/a&gt; to repeat the &lt;code&gt;forge moveUp&lt;/code&gt; four times.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;moving-mapfailure-function&#34;&gt;Moving mapFailure Function&lt;/h2&gt;
+
+&lt;p&gt;In the &lt;a href=&#34;{{ relref &amp;quot;verifying-user-email.md&amp;quot; }}&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, while implementing the static member function &lt;code&gt;TryCreateAsync&lt;/code&gt; in the &lt;code&gt;Username&lt;/code&gt; type, we moved the &lt;code&gt;mapFailure&lt;/code&gt; from its previous place to above the &lt;code&gt;Username&lt;/code&gt; type to use it in the &lt;code&gt;TryCreateAsync&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;p&gt;It is a cue for us to reconsider the placement of the &lt;code&gt;mapFailure&lt;/code&gt; function, as we may need to move it to somewhere else if we want to use it in an another function.&lt;/p&gt;
+
+&lt;p&gt;So, let&amp;rsquo;s move this function to the &lt;code&gt;Chessie.fs&lt;/code&gt; file that we just created.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+module Chessie
+
+open Chessie.ErrorHandling
+
+let mapFailure f result = 
+  let mapFirstItem xs = 
+    List.head xs |&amp;gt; f |&amp;gt; List.singleton 
+  mapFailure mapFirstItem result
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After we move this function to here, we need to refer this &lt;code&gt;Chessie&lt;/code&gt; module in the &lt;code&gt;Domain&lt;/code&gt; module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+namespace UserSignup
+
+module Domain =
+  // ...
+  open Chessie
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;overriding-the-either-function&#34;&gt;Overriding The either function&lt;/h2&gt;
+
+&lt;p&gt;We are making use of the &lt;code&gt;either&lt;/code&gt; function from the chessie library to map the &lt;code&gt;Result&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt; with some compromises on the design.&lt;/p&gt;
+
+&lt;p&gt;To fix this, let&amp;rsquo;s have a look at the signature of the &lt;code&gt;either&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;(&#39;b -&amp;gt; &#39;c) -&amp;gt; (&#39;d -&amp;gt; &#39;c) -&amp;gt; (Result&amp;lt;&#39;b, &#39;d&amp;gt; -&amp;gt; &#39;c)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It takes a function to map the success part &lt;code&gt;(&#39;b -&amp;gt; &#39;c)&lt;/code&gt; and an another function to map the failure part &lt;code&gt;(&#39;d -&amp;gt; &#39;c)&lt;/code&gt; and returns a function that takes a &lt;code&gt;Result&amp;lt;&#39;b, &#39;d&amp;gt;&lt;/code&gt; type and returns &lt;code&gt;&#39;c&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;It is the same thing that we needed but the problem is the actual type of &lt;code&gt;&#39;b&lt;/code&gt; and &lt;code&gt;&#39;d&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;The success part &lt;code&gt;&#39;b&lt;/code&gt; has a type &lt;code&gt;(&#39;TSuccess, &#39;TMessage list)&lt;/code&gt; to represent both the success and the warning part. As we are not making use of warning in FsTweet, instead of this tuple and we just need the success part &lt;code&gt;&#39;TSuccess&lt;/code&gt; alone.&lt;/p&gt;
+
+&lt;p&gt;To achieve it let&amp;rsquo;s add a &lt;code&gt;onSuccess&lt;/code&gt; adapter function which maps only the success type&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+// (&#39;a -&amp;gt; &#39;b) -&amp;gt; (&#39;a * &#39;c) -&amp;gt; &#39;b
+let onSuccess f (x, _) = f x
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then move our attention to the failure part &lt;code&gt;d&lt;/code&gt; which has a type &lt;code&gt;&#39;TMessage list&lt;/code&gt; representing the list of errors. In FsTweet, we are short circuiting as soon as we found the first error and we are not capturing all the errors. So, in our case the type &lt;code&gt;&#39;TMessage list&lt;/code&gt; will always have a list with only one item &lt;code&gt;&#39;TMessage&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Like &lt;code&gt;onSuccess&lt;/code&gt;, we can have a function &lt;code&gt;onFailure&lt;/code&gt; to map the first item of the list.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Chessie
+// ...
+
+// (&#39;a -&amp;gt; &#39;b) -&amp;gt; (&#39;a  list) -&amp;gt; &#39;b
+let onFailure f xs = 
+  xs |&amp;gt; List.head |&amp;gt; f
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;onFailure&lt;/code&gt; takes the first item from the list and uses it as the argument while calling the map function &lt;code&gt;f&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Now with the help of these two functions, &lt;code&gt;onSuccess&lt;/code&gt; and &lt;code&gt;onFailure&lt;/code&gt;, we can override the &lt;code&gt;either&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Chessie
+// ...
+
+// (&#39;b -&amp;gt; &#39;c) -&amp;gt; (&#39;d -&amp;gt; &#39;c) -&amp;gt; (Result&amp;lt;&#39;b, &#39;d&amp;gt; -&amp;gt; &#39;c)
+let either onSuccessF onFailureF = 
+  either (onSuccess onSuccessF) (onFailure onFailureF)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The overrided version &lt;code&gt;either&lt;/code&gt; has the same signature but treats the success part without warnings and the failure part as a single item instead of a list.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s use this in the &lt;code&gt;Suave&lt;/code&gt; module in the functions that transform &lt;code&gt;Result&amp;lt;Username option, Exception list&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+namespace UserSignup
+// ...
+module Sauve =
+  // ...
+  open Chessie
+  // ...
+
+  // let onVerificationSuccess (username, _ ) = 
+  let onVerificationSuccess username = 
+    // ...
+
+  // let onVerificationFailure errs =
+  //   let ex : System.Exception = List.head errs
+  let onVerificationFailure (ex : System.Exception) =
+    // ...
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Thanks to the adapter functions, &lt;code&gt;onSuccess&lt;/code&gt; and &lt;code&gt;onFailure&lt;/code&gt;, now the function signatures are clearly expressing our intent without an compromises.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s do the same thing for the functions that map &lt;code&gt;Result&amp;lt;UserId, UserSignupError&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
+  // ...
+
+  //  let handleUserSignupError viewModel errs = 
+  //    match List.head errs with
+  let onUserSignupFailure viewModel err = 
+    match err with
+    // ...
+
+  // let handleUserSignupSuccess viewModel _ =
+  let onUserSignupSuccess viewModel _ =
+    // ...
+
+  let handleUserSignupResult viewModel result =
+    (*
+      either 
+      (handleUserSignupSuccess viewModel)
+      (handleUserSignupError viewModel) result
+    *)
+    either 
+      (onUserSignupSuccess viewModel)
+      (onUserSignupFailure viewModel) result
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;While changing the function signature, we have also changed the prefix &lt;code&gt;handle&lt;/code&gt; to &lt;code&gt;on&lt;/code&gt; to keep it consitent with the nomanclature that we are using to the functions that are mapping the success and failure parts of a &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;revisting-the-mapasyncfailure-function&#34;&gt;Revisting the mapAsyncFailure function&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s begin this change by looking at the signature of the &lt;code&gt;mapAsyncFailure&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;(&#39;a -&amp;gt; &#39;b) -&amp;gt; AsyncResult&amp;lt;&#39;c, &#39;a&amp;gt; -&amp;gt; AsyncResult&amp;lt;&#39;c, &#39;b&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It maps the failure part &lt;code&gt;&#39;a&lt;/code&gt; to &lt;code&gt;&#39;b&lt;/code&gt; with the help of the mapping function &lt;code&gt;(&#39;a -&amp;gt; &#39;b)&lt;/code&gt; of an &lt;code&gt;AsyncResult&lt;/code&gt;. But the name &lt;code&gt;mapAsyncFailure&lt;/code&gt; not clearly communicates this.&lt;/p&gt;
+
+&lt;p&gt;The better name would be &lt;code&gt;mapAsyncResultFailure&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;An another option would be having the function &lt;code&gt;mapFailure&lt;/code&gt; in the module &lt;code&gt;AsyncResult&lt;/code&gt; so that the caller will use it as &lt;code&gt;AsyncResult.mapFailure&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;We can also use an abbreviation &lt;code&gt;AR&lt;/code&gt; to represent &lt;code&gt;AsyncResult&lt;/code&gt; and we can call the function as &lt;code&gt;AR.mapFailure&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s choose &lt;code&gt;AR.mapFailure&lt;/code&gt; as it is shorter.&lt;/p&gt;
+
+&lt;p&gt;To enable this, we need to create a new module &lt;code&gt;AR&lt;/code&gt; and decorate it with the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/core.requirequalifiedaccessattribute-class-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;RequireQualifiedAccess&lt;/a&gt; Attribute so that functions inside this module can&amp;rsquo;t be called without the module name.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+[&amp;lt;RequireQualifiedAccess&amp;gt;]
+module AR =
+  // TODO
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then move the &lt;code&gt;mapAsyncFailure&lt;/code&gt; function to this module and rename it to &lt;code&gt;mapFailure&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module AR =
+  let mapFailure f aResult =
+    aResult
+    |&amp;gt; Async.ofAsyncResult 
+    |&amp;gt; Async.map (mapFailure f) |&amp;gt; AR
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And finally we need to use this moved and renamed function in the &lt;code&gt;Persistence&lt;/code&gt; and &lt;code&gt;Email&lt;/code&gt; modules in the &lt;em&gt;UserSignup.fs&lt;/em&gt; file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Persistence =
+  // ...
+  open Chessie
+  // ...
+
+  let createUser ... = 
+    // ...
+    // |&amp;gt; mapAsyncFailure mapException
+    |&amp;gt; AR.mapFailure mapException
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Email = 
+  // ...
+  open Chessie
+  // ...
+
+  let sendSignupEmail ... =
+    // ...
+    // |&amp;gt; mapAsyncFailure Domain.SendEmailError
+    |&amp;gt; AR.mapFailure Domain.SendEmailError
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;defining-ar-catch-function&#34;&gt;Defining AR.catch function&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s switch our focus to the &lt;code&gt;Database&lt;/code&gt; module and give some attention the following piece of code.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Db.fs
+// ...
+let submitUpdates ... = 
+  // ...
+  |&amp;gt; Async.Catch
+  |&amp;gt; Async.map ofChoice
+  |&amp;gt; AR
+
+let toAsyncResult ... =
+  // ...
+  |&amp;gt; Async.Catch
+  |&amp;gt; Async.map ofChoice
+  |&amp;gt; AR 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The three lines of code that were repeated, takes an asynchronous computation &lt;code&gt;Async&amp;lt;&#39;a&amp;gt;&lt;/code&gt; and exceutes it with exception handling using &lt;code&gt;Async.Catch&lt;/code&gt; function and then map the &lt;code&gt;Async&amp;lt;Choice&amp;lt;&#39;a, Exception&amp;gt;&amp;gt;&lt;/code&gt; to &lt;code&gt;AsyncResult&amp;lt;&#39;a, Exception&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;In other words we can extract these three lines to a separate function which has the signature&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;Async&amp;lt;&#39;a&amp;gt; -&amp;gt; AsyncResult&amp;lt;&#39;a, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create this function in the &lt;code&gt;AR&lt;/code&gt; module&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+// ...
+module AR =
+  // ...
+
+  let catch aComputation =
+    aComputation // Async&amp;lt;&#39;a&amp;gt;
+    |&amp;gt; Async.Catch // Async&amp;lt;Choice&amp;lt;&#39;a, Exception&amp;gt;&amp;gt;
+    |&amp;gt; Async.map ofChoice // Async&amp;lt;Result&amp;lt;&#39;a, Exception&amp;gt;&amp;gt;
+    |&amp;gt; AR // AsyncResult&amp;lt;&#39;a, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then use it in the &lt;code&gt;submitUpdates&lt;/code&gt; function and remove the &lt;code&gt;toAsyncResult&lt;/code&gt; function in the &lt;code&gt;Database&lt;/code&gt; module&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Db.fs
+// ...
+open Chessie
+// ...
+
+let submitUpdates ... = 
+  // ...
+  |&amp;gt; AR.catch
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally change the &lt;code&gt;verifyUser&lt;/code&gt; function to use this function instead of the removed function &lt;code&gt;toAsyncResult&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Persistence =
+  // ...
+  open Chessie
+  // ...
+
+  let verifyUser ... = 
+    // ...
+    // } |&amp;gt; Seq.tryHeadAsync |&amp;gt; toAsyncResult
+    } |&amp;gt; Seq.tryHeadAsync |&amp;gt; AR.catch
+    // ...
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With these we are done with the refactoring and reorganising of the functions associated with the Chessie library.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-user-module&#34;&gt;The User Module&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code&gt;Domain&lt;/code&gt; module in the &lt;em&gt;UserSignup.fs&lt;/em&gt; file has the following types that represents the individual properties of an user in FsTweet&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;Username
+UserId
+EmailAddress
+Password
+PasswordHash 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So, let&amp;rsquo;s put these types in a separate module &lt;code&gt;User&lt;/code&gt; and use it in the &lt;code&gt;Domain&lt;/code&gt; module of &lt;code&gt;UserSignup&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Create a new file, &lt;em&gt;User.fs&lt;/em&gt;, in the web project and move it above &lt;code&gt;Db.fs&lt;/code&gt; file&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/User
+&amp;gt; repeat 4 forge moveUp web -n src/FsTweet.Web/User.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then move the types that we just listed&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/User.fs
+module User 
+
+type Username = ...
+type UserId = ...
+type EmailAddress = ...
+type Password = ...
+type PasswordHash = ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally use this module in the &lt;em&gt;UserSignup.fs&lt;/em&gt; file&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+namespace UserSignup
+
+module Domain =
+  // ...
+  open User
+  // ...
+module Persistence =
+  // ...
+  open User
+  // ...
+// ...
+module Suave =
+  // ...
+  open User
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we learned how to create adapter funtions and override a functionality provided by a library to fit our custom requirements. The key to this refactoring is understanding of the function signatures.&lt;/p&gt;
+
+&lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.11&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
