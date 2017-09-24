@@ -124,7 +124,7 @@ let either onSuccessF onFailureF =
 
 &lt;p&gt;Let&amp;rsquo;s use this in the &lt;code&gt;Suave&lt;/code&gt; module in the functions that transform &lt;code&gt;Result&amp;lt;Username option, Exception list&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/UserSignup.fs
 namespace UserSignup
 // ...
 module Sauve =
@@ -132,13 +132,13 @@ module Sauve =
   open Chessie
   // ...
 
-  // let onVerificationSuccess (username, _ ) = 
-  let onVerificationSuccess username = 
+- let onVerificationSuccess (username, _ ) = 
++ let onVerificationSuccess username = 
     // ...
 
-  // let onVerificationFailure errs =
-  //   let ex : System.Exception = List.head errs
-  let onVerificationFailure (ex : System.Exception) =
+- let onVerificationFailure errs =
+-   let ex : System.Exception = List.head errs
++ let onVerificationFailure (ex : System.Exception) =
     // ...
 
   // ...
@@ -148,28 +148,27 @@ module Sauve =
 
 &lt;p&gt;Let&amp;rsquo;s do the same thing for the functions that map &lt;code&gt;Result&amp;lt;UserId, UserSignupError&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Suave = 
   // ...
 
-  //  let handleUserSignupError viewModel errs = 
-  //    match List.head errs with
-  let onUserSignupFailure viewModel err = 
-    match err with
+- let handleUserSignupError viewModel errs = 
+-   match List.head errs with
++ let onUserSignupFailure viewModel err = 
++   match err with
     // ...
 
-  // let handleUserSignupSuccess viewModel _ =
-  let onUserSignupSuccess viewModel _ =
+- let handleUserSignupSuccess viewModel _ =
++ let onUserSignupSuccess viewModel _ =
     // ...
 
   let handleUserSignupResult viewModel result =
-    (*
-      either 
-      (handleUserSignupSuccess viewModel)
-      (handleUserSignupError viewModel) result
-    *)
-    either 
-      (onUserSignupSuccess viewModel)
-      (onUserSignupFailure viewModel) result
+    
+-  either 
+-   (handleUserSignupSuccess viewModel)
+-   (handleUserSignupError viewModel) result
++    either 
++     (onUserSignupSuccess viewModel)
++     (onUserSignupFailure viewModel) result
 
   // ...
 &lt;/code&gt;&lt;/pre&gt;
@@ -217,7 +216,7 @@ module AR =
 
 &lt;p&gt;And finally we need to use this moved and renamed function in the &lt;code&gt;Persistence&lt;/code&gt; and &lt;code&gt;Email&lt;/code&gt; modules in the &lt;em&gt;UserSignup.fs&lt;/em&gt; file.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/UserSignup.fs
 // ...
 module Persistence =
   // ...
@@ -226,13 +225,13 @@ module Persistence =
 
   let createUser ... = 
     // ...
-    // |&amp;gt; mapAsyncFailure mapException
-    |&amp;gt; AR.mapFailure mapException
+-   |&amp;gt; mapAsyncFailure mapException
++   |&amp;gt; AR.mapFailure mapException
 
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/UserSignup.fs
 // ...
 module Email = 
   // ...
@@ -241,8 +240,8 @@ module Email =
 
   let sendSignupEmail ... =
     // ...
-    // |&amp;gt; mapAsyncFailure Domain.SendEmailError
-    |&amp;gt; AR.mapFailure Domain.SendEmailError
+-   |&amp;gt; mapAsyncFailure Domain.SendEmailError
++   |&amp;gt; AR.mapFailure Domain.SendEmailError
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h2 id=&#34;defining-ar-catch-function&#34;&gt;Defining AR.catch function&lt;/h2&gt;
@@ -299,7 +298,7 @@ let submitUpdates ... =
 
 &lt;p&gt;Finally change the &lt;code&gt;verifyUser&lt;/code&gt; function to use this function instead of the removed function &lt;code&gt;toAsyncResult&lt;/code&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/UserSignup.fs
 // ...
 module Persistence =
   // ...
@@ -308,8 +307,8 @@ module Persistence =
 
   let verifyUser ... = 
     // ...
-    // } |&amp;gt; Seq.tryHeadAsync |&amp;gt; toAsyncResult
-    } |&amp;gt; Seq.tryHeadAsync |&amp;gt; AR.catch
+-   } |&amp;gt; Seq.tryHeadAsync |&amp;gt; toAsyncResult
++   } |&amp;gt; Seq.tryHeadAsync |&amp;gt; AR.catch
     // ...
 
   // ...

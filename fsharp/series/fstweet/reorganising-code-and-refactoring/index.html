@@ -285,7 +285,7 @@ let either onSuccessF onFailureF =
 
 <p>Let&rsquo;s use this in the <code>Suave</code> module in the functions that transform <code>Result&lt;Username option, Exception list&gt;</code> to <code>WebPart</code>.</p>
 
-<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+<pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
 namespace UserSignup
 // ...
 module Sauve =
@@ -293,13 +293,13 @@ module Sauve =
   open Chessie
   // ...
 
-  // let onVerificationSuccess (username, _ ) = 
-  let onVerificationSuccess username = 
+- let onVerificationSuccess (username, _ ) = 
++ let onVerificationSuccess username = 
     // ...
 
-  // let onVerificationFailure errs =
-  //   let ex : System.Exception = List.head errs
-  let onVerificationFailure (ex : System.Exception) =
+- let onVerificationFailure errs =
+-   let ex : System.Exception = List.head errs
++ let onVerificationFailure (ex : System.Exception) =
     // ...
 
   // ...
@@ -309,28 +309,27 @@ module Sauve =
 
 <p>Let&rsquo;s do the same thing for the functions that map <code>Result&lt;UserId, UserSignupError&gt;</code> to <code>WebPart</code></p>
 
-<pre><code class="language-fsharp">module Suave = 
+<pre><code class="language-diff">module Suave = 
   // ...
 
-  //  let handleUserSignupError viewModel errs = 
-  //    match List.head errs with
-  let onUserSignupFailure viewModel err = 
-    match err with
+- let handleUserSignupError viewModel errs = 
+-   match List.head errs with
++ let onUserSignupFailure viewModel err = 
++   match err with
     // ...
 
-  // let handleUserSignupSuccess viewModel _ =
-  let onUserSignupSuccess viewModel _ =
+- let handleUserSignupSuccess viewModel _ =
++ let onUserSignupSuccess viewModel _ =
     // ...
 
   let handleUserSignupResult viewModel result =
-    (*
-      either 
-      (handleUserSignupSuccess viewModel)
-      (handleUserSignupError viewModel) result
-    *)
-    either 
-      (onUserSignupSuccess viewModel)
-      (onUserSignupFailure viewModel) result
+    
+-  either 
+-   (handleUserSignupSuccess viewModel)
+-   (handleUserSignupError viewModel) result
++    either 
++     (onUserSignupSuccess viewModel)
++     (onUserSignupFailure viewModel) result
 
   // ...
 </code></pre>
@@ -378,7 +377,7 @@ module AR =
 
 <p>And finally we need to use this moved and renamed function in the <code>Persistence</code> and <code>Email</code> modules in the <em>UserSignup.fs</em> file.</p>
 
-<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+<pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
 // ...
 module Persistence =
   // ...
@@ -387,13 +386,13 @@ module Persistence =
 
   let createUser ... = 
     // ...
-    // |&gt; mapAsyncFailure mapException
-    |&gt; AR.mapFailure mapException
+-   |&gt; mapAsyncFailure mapException
++   |&gt; AR.mapFailure mapException
 
   // ...
 </code></pre>
 
-<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+<pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
 // ...
 module Email = 
   // ...
@@ -402,8 +401,8 @@ module Email =
 
   let sendSignupEmail ... =
     // ...
-    // |&gt; mapAsyncFailure Domain.SendEmailError
-    |&gt; AR.mapFailure Domain.SendEmailError
+-   |&gt; mapAsyncFailure Domain.SendEmailError
++   |&gt; AR.mapFailure Domain.SendEmailError
 </code></pre>
 
 <h2 id="defining-ar-catch-function">Defining AR.catch function</h2>
@@ -460,7 +459,7 @@ let submitUpdates ... =
 
 <p>Finally change the <code>verifyUser</code> function to use this function instead of the removed function <code>toAsyncResult</code></p>
 
-<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+<pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
 // ...
 module Persistence =
   // ...
@@ -469,8 +468,8 @@ module Persistence =
 
   let verifyUser ... = 
     // ...
-    // } |&gt; Seq.tryHeadAsync |&gt; toAsyncResult
-    } |&gt; Seq.tryHeadAsync |&gt; AR.catch
+-   } |&gt; Seq.tryHeadAsync |&gt; toAsyncResult
++   } |&gt; Seq.tryHeadAsync |&gt; AR.catch
     // ...
 
   // ...
@@ -623,6 +622,8 @@ module Suave =
 
       
       <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/diff.min.js"></script>
       
 
       
