@@ -177,6 +177,65 @@ module Sauve =
 &lt;p&gt;While changing the function signature, we have also changed the prefix &lt;code&gt;handle&lt;/code&gt; to &lt;code&gt;on&lt;/code&gt; to keep it consitent with the nomanclature that we are using to the functions that are mapping the success and failure parts of a &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
 &lt;/blockquote&gt;
 
+&lt;h2 id=&#34;pattern-matching-on-result-type&#34;&gt;Pattern Matching On Result type&lt;/h2&gt;
+
+&lt;p&gt;An another similar piece of code that requires refactoring is pattern matching on the result type.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s have a look at the &lt;code&gt;handleUserSignup&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  let handleUserSignup ... = async {
+    match result with
+    | Ok (userSignupReq, _) -&amp;gt;
+      // ...
+    | Bad msgs -&amp;gt;
+      let viewModel = {vm with Error = Some (List.head msgs)}
+      // ...
+    // ...
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Like the adapter functions, &lt;code&gt;onSuccess&lt;/code&gt; and &lt;code&gt;onFailure&lt;/code&gt;, we need adapters while doing the pattern matching on the &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create an &lt;a href=&#34;https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/active-patterns&#34; target=&#34;_blank&#34;&gt;Active Pattern&lt;/a&gt; to carry out this for us.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+let (|Success|Failure|) result = 
+  match result with
+  | Ok (x,_) -&amp;gt; Success x
+  | Bad errs -&amp;gt; Failure (List.head errs)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With the help of this active pattern, we can now rewrite the &lt;code&gt;handleUserSignup&lt;/code&gt; function as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  let handleUserSignup ... = async {
+    match result with
+-   | Ok (userSignupReq, _) -&amp;gt;
++   | Success userSignupReq -&amp;gt;
+      // ...
+-   | Bad msgs -&amp;gt;
+-     let viewModel = {vm with Error = Some (List.head msgs)}
++   | Failure msg -&amp;gt;
++     let viewModel = {vm with Error = Some msg}
+      // ...
+    // ...
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Elegant! Let&amp;rsquo;s switch our attention to the &lt;code&gt;AsyncResult&lt;/code&gt;&lt;/p&gt;
+
 &lt;h2 id=&#34;revisting-the-mapasyncfailure-function&#34;&gt;Revisting the mapAsyncFailure function&lt;/h2&gt;
 
 &lt;p&gt;Let&amp;rsquo;s begin this change by looking at the signature of the &lt;code&gt;mapAsyncFailure&lt;/code&gt; function&lt;/p&gt;
@@ -329,10 +388,10 @@ PasswordHash
 
 &lt;p&gt;So, let&amp;rsquo;s put these types in a separate module &lt;code&gt;User&lt;/code&gt; and use it in the &lt;code&gt;Domain&lt;/code&gt; module of &lt;code&gt;UserSignup&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;Create a new file, &lt;em&gt;User.fs&lt;/em&gt;, in the web project and move it above &lt;code&gt;Db.fs&lt;/code&gt; file&lt;/p&gt;
+&lt;p&gt;Create a new file, &lt;em&gt;User.fs&lt;/em&gt;, in the web project and move it above &lt;code&gt;UserSignup.fs&lt;/code&gt; file&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/User
-&amp;gt; repeat 4 forge moveUp web -n src/FsTweet.Web/User.fs
+&amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/User.fs
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Then move the types that we just listed&lt;/p&gt;

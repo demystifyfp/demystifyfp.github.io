@@ -11,6 +11,256 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Adding Login Page</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/</link>
+      <pubDate>Sat, 23 Sep 2017 15:47:03 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/</guid>
+      <description>
+
+&lt;p&gt;Hi!&lt;/p&gt;
+
+&lt;p&gt;Welcome back to the thirteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;In this blog post we are going to start the implementation of a new feature, enabling users to login to FsTweet.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by creating a new file &lt;em&gt;Auth.fs&lt;/em&gt; in the &lt;code&gt;web&lt;/code&gt; project and move it above &lt;em&gt;FsTweet.Web.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/Auth
+&amp;gt; forge moveUp web -n src/FsTweet.Web/Auth.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;serving-the-login-page&#34;&gt;Serving The Login Page&lt;/h2&gt;
+
+&lt;p&gt;The first step is rendering the login page in response to the &lt;code&gt;/login&lt;/code&gt; HTTP GET request. As we did for the user signup, we are going to have multiple modules in the &lt;code&gt;Auth.fs&lt;/code&gt; representing different layers of the application.&lt;/p&gt;
+
+&lt;p&gt;To start with, let&amp;rsquo;s create a module &lt;code&gt;Suave&lt;/code&gt; with a view model for the login page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
+namespace Auth
+module Suave =
+  type LoginViewModel = {
+    Username : string
+    Password : string
+    Error : string option
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As we seen in the &lt;code&gt;UserSignupViewModel&lt;/code&gt;, we need a empty view model while rendering the login page for the first time.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+  let emptyLoginViewModel = {
+    Username = &amp;quot;&amp;quot;
+    Password = &amp;quot;&amp;quot;
+    Error = None
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we need to create a liquid template for the login page. Let&amp;rsquo;s create a new file &lt;code&gt;user/login.liquid&lt;/code&gt; in the &lt;em&gt;views&lt;/em&gt; directory&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- FsTweet.Web/views/user/login.liquid --&amp;gt;
+{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; Login &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+&amp;lt;div&amp;gt;
+  &amp;lt;p class=&amp;quot;alert alert-danger&amp;quot;&amp;gt;
+    {{ model.Error.Value }}
+  &amp;lt;/p&amp;gt;
+  &amp;lt;form method=&amp;quot;POST&amp;quot; action=&amp;quot;/login&amp;quot;&amp;gt;   
+    &amp;lt;input 
+      type=&amp;quot;text&amp;quot; id=&amp;quot;Username&amp;quot; name=&amp;quot;Username&amp;quot; 
+      value=&amp;quot;{{model.Username}}&amp;quot; required&amp;gt;
+
+    &amp;lt;input 
+      type=&amp;quot;password&amp;quot; id=&amp;quot;Password&amp;quot; name=&amp;quot;Password&amp;quot; 
+      value=&amp;quot;{{model.Password}}&amp;quot; required&amp;gt;
+
+    &amp;lt;button type=&amp;quot;submit&amp;quot;&amp;gt;Login&amp;lt;/button&amp;gt;
+  &amp;lt;/form&amp;gt;
+&amp;lt;/div&amp;gt;
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;For brevity, the styles and some HTML tags are ignored.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The next step is creating a new function to render this template with a view model.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
+module Suave =
+  open Suave.DotLiquid
+  // ...
+  let loginTemplatePath = &amp;quot;user/login.liquid&amp;quot;
+
+  let renderLoginPage (viewModel : LoginViewModel) = 
+    page loginTemplatePath viewModel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then create a new function &lt;code&gt;webpart&lt;/code&gt; to wire this function with the &lt;code&gt;/login&lt;/code&gt; path&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+  open Suave.Filters
+  open Suave.DotLiquid
+  // ...
+
+  let webpart () =
+    path &amp;quot;/login&amp;quot; 
+      &amp;gt;=&amp;gt; renderLoginPage emptyLoginViewModel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last step is calling this &lt;code&gt;webpart&lt;/code&gt; function from the &lt;code&gt;main&lt;/code&gt; function and append this webpart to the application&amp;rsquo;s webpart list.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
+      Auth.Suave.webpart ()
+    ]
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
+
+&lt;p&gt;If we run the application now, you can see a beautiful login page&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/login.png&#34; alt=&#34;Login Page&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;handling-the-login-request&#34;&gt;Handling the Login Request&lt;/h2&gt;
+
+&lt;p&gt;To handle the HTTP POST request on &lt;code&gt;/login&lt;/code&gt;, let&amp;rsquo;s create a new function &lt;code&gt;handleUserLogin&lt;/code&gt; (aka &lt;code&gt;WebPart&lt;/code&gt;) and wire it up in the &lt;code&gt;webpart&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
+module Suave =
+  // ...
+  let handleUserLogin ctx = async {
+    // TODO
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Suave =
++ open Suave
+// ...  
+
+let webpart () =
+- path &amp;quot;/login&amp;quot; 
+-   &amp;gt;=&amp;gt; renderLoginPage emptyLoginViewModel
++ path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
++   GET &amp;gt;=&amp;gt; renderLoginPage emptyLoginViewModel
++   POST &amp;gt;=&amp;gt; handleUserLogin
++ ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To handle the request for login, we first need to bind the submitted form values to a value of &lt;code&gt;LoginViewModel&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserLogin ctx = async {
+  match bindEmptyForm ctx.request with
+  | Choice1Of2 (vm : LoginViewModel) -&amp;gt;
+    // TODO
+  | Choice2Of2 err -&amp;gt;
+    // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If there is an error while doing model binding, we can populate the &lt;code&gt;Error&lt;/code&gt; field of an empty &lt;code&gt;LoginViewModel&lt;/code&gt; and rerender the login page&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;let handleUserLogin ctx = async {
+  match bindEmptyForm ctx.request with
+  | Choice1Of2 (vm : LoginViewModel) -&amp;gt;
+    // TODO
+  | Choice2Of2 err -&amp;gt;
++   let viewModel = 
++     {emptyLoginViewModel with Error = Some err}
++   return! renderLoginPage viewModel ctx
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If the model binding is successful, we need to validate the incoming &lt;code&gt;LoginViewModel&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;validating-the-login-request&#34;&gt;Validating the Login Request&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code&gt;username&lt;/code&gt; and the &lt;code&gt;password&lt;/code&gt; fields of the &lt;code&gt;LoginViewModel&lt;/code&gt; are of types &lt;code&gt;string&lt;/code&gt;. But what we want to carry out the login operation is their correponding domain models &lt;code&gt;Username&lt;/code&gt; and &lt;code&gt;Password&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s define a new module &lt;code&gt;Domain&lt;/code&gt; in &lt;em&gt;Auth.fs&lt;/em&gt; above &lt;code&gt;Suave&lt;/code&gt; and define a domain type for the login request.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
+namespace Auth
+
+module Domain =
+  open User
+  type LoginRequest = {
+    Username : Username
+    Password : Password
+  }
+
+module Suave = 
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then define a static member function &lt;code&gt;TryCreate&lt;/code&gt; which creates &lt;code&gt;LoginRequest&lt;/code&gt; using the &lt;code&gt;trial&lt;/code&gt; computation expression and the &lt;code&gt;TryCreate&lt;/code&gt; functions of &lt;code&gt;Username&lt;/code&gt; and &lt;code&gt;Password&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  open Chessie.ErrorHandling
+  // ...
+  type LoginRequest = // ...
+  
+  // (string * string) -&amp;gt; Result&amp;lt;LoginRequest,string&amp;gt;
+  with static member TryCreate (username, password) = 
+        trial {
+          let! username = Username.TryCreate username
+          let! password = Password.TryCreate password
+          return {
+            Username = username
+            Password = password
+          }
+        }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in &lt;code&gt;handleUserLogin&lt;/code&gt; function, we can make use of this function to validate the &lt;code&gt;LoginViewModel&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  open Chessie
+  // ...
+  let handleUserLogin ctx = async {
+    // ...
+    | Choice1Of2 (vm : LoginViewModel) -&amp;gt;
+      let result = 
+        LoginRequest.TryCreate (vm.Username, vm.Password)
+      match result with
+      | Success req -&amp;gt; 
+        // TODO
+      | Failure err -&amp;gt;
+        let viewModel = {vm with Error = Some err}
+        return! renderLoginPage viewModel ctx
+    // ...
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The Success and Failure active pattern that &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/#pattern-matching-on-result-type&#34; target=&#34;_blank&#34;&gt;we defined in the previous post&lt;/a&gt; made our job easier here to pattern match on the &lt;code&gt;Result&amp;lt;LoginRequest,string&amp;gt;&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;p&gt;If there is any error, we populate the view model with the error message and rerender the login page.&lt;/p&gt;
+
+&lt;p&gt;For a valid login request, we need to do implement the actual behaviour. Let&amp;rsquo;s leave this as a &lt;code&gt;TODO&lt;/code&gt; and revisit it in the next blog post.&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we added implementations for rending the login page. Then we added functions to handle and validate the login request from the user.&lt;/p&gt;
+
+&lt;p&gt;The source code can be found in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.12&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Reorganising Code and Refactoring</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</link>
       <pubDate>Thu, 21 Sep 2017 04:55:36 +0530</pubDate>
@@ -177,6 +427,65 @@ module Sauve =
 &lt;p&gt;While changing the function signature, we have also changed the prefix &lt;code&gt;handle&lt;/code&gt; to &lt;code&gt;on&lt;/code&gt; to keep it consitent with the nomanclature that we are using to the functions that are mapping the success and failure parts of a &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
 &lt;/blockquote&gt;
 
+&lt;h2 id=&#34;pattern-matching-on-result-type&#34;&gt;Pattern Matching On Result type&lt;/h2&gt;
+
+&lt;p&gt;An another similar piece of code that requires refactoring is pattern matching on the result type.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s have a look at the &lt;code&gt;handleUserSignup&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  let handleUserSignup ... = async {
+    match result with
+    | Ok (userSignupReq, _) -&amp;gt;
+      // ...
+    | Bad msgs -&amp;gt;
+      let viewModel = {vm with Error = Some (List.head msgs)}
+      // ...
+    // ...
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Like the adapter functions, &lt;code&gt;onSuccess&lt;/code&gt; and &lt;code&gt;onFailure&lt;/code&gt;, we need adapters while doing the pattern matching on the &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create an &lt;a href=&#34;https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/active-patterns&#34; target=&#34;_blank&#34;&gt;Active Pattern&lt;/a&gt; to carry out this for us.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+let (|Success|Failure|) result = 
+  match result with
+  | Ok (x,_) -&amp;gt; Success x
+  | Bad errs -&amp;gt; Failure (List.head errs)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With the help of this active pattern, we can now rewrite the &lt;code&gt;handleUserSignup&lt;/code&gt; function as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  let handleUserSignup ... = async {
+    match result with
+-   | Ok (userSignupReq, _) -&amp;gt;
++   | Success userSignupReq -&amp;gt;
+      // ...
+-   | Bad msgs -&amp;gt;
+-     let viewModel = {vm with Error = Some (List.head msgs)}
++   | Failure msg -&amp;gt;
++     let viewModel = {vm with Error = Some msg}
+      // ...
+    // ...
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Elegant! Let&amp;rsquo;s switch our attention to the &lt;code&gt;AsyncResult&lt;/code&gt;&lt;/p&gt;
+
 &lt;h2 id=&#34;revisting-the-mapasyncfailure-function&#34;&gt;Revisting the mapAsyncFailure function&lt;/h2&gt;
 
 &lt;p&gt;Let&amp;rsquo;s begin this change by looking at the signature of the &lt;code&gt;mapAsyncFailure&lt;/code&gt; function&lt;/p&gt;
@@ -329,10 +638,10 @@ PasswordHash
 
 &lt;p&gt;So, let&amp;rsquo;s put these types in a separate module &lt;code&gt;User&lt;/code&gt; and use it in the &lt;code&gt;Domain&lt;/code&gt; module of &lt;code&gt;UserSignup&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;Create a new file, &lt;em&gt;User.fs&lt;/em&gt;, in the web project and move it above &lt;code&gt;Db.fs&lt;/code&gt; file&lt;/p&gt;
+&lt;p&gt;Create a new file, &lt;em&gt;User.fs&lt;/em&gt;, in the web project and move it above &lt;code&gt;UserSignup.fs&lt;/code&gt; file&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/User
-&amp;gt; repeat 4 forge moveUp web -n src/FsTweet.Web/User.fs
+&amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/User.fs
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Then move the types that we just listed&lt;/p&gt;

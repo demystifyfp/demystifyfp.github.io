@@ -338,6 +338,65 @@ module Sauve =
 <p>While changing the function signature, we have also changed the prefix <code>handle</code> to <code>on</code> to keep it consitent with the nomanclature that we are using to the functions that are mapping the success and failure parts of a <code>Result</code> type.</p>
 </blockquote>
 
+<h2 id="pattern-matching-on-result-type">Pattern Matching On Result type</h2>
+
+<p>An another similar piece of code that requires refactoring is pattern matching on the result type.</p>
+
+<p>Let&rsquo;s have a look at the <code>handleUserSignup</code> function</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  let handleUserSignup ... = async {
+    match result with
+    | Ok (userSignupReq, _) -&gt;
+      // ...
+    | Bad msgs -&gt;
+      let viewModel = {vm with Error = Some (List.head msgs)}
+      // ...
+    // ...
+  }
+  // ...
+</code></pre>
+
+<p>Like the adapter functions, <code>onSuccess</code> and <code>onFailure</code>, we need adapters while doing the pattern matching on the <code>Result</code> type.</p>
+
+<p>Let&rsquo;s create an <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/active-patterns" target="_blank">Active Pattern</a> to carry out this for us.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
+module Chessie
+// ...
+
+let (|Success|Failure|) result = 
+  match result with
+  | Ok (x,_) -&gt; Success x
+  | Bad errs -&gt; Failure (List.head errs)
+</code></pre>
+
+<p>With the help of this active pattern, we can now rewrite the <code>handleUserSignup</code> function as</p>
+
+<pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
+// ...
+module Suave = 
+  // ...
+  let handleUserSignup ... = async {
+    match result with
+-   | Ok (userSignupReq, _) -&gt;
++   | Success userSignupReq -&gt;
+      // ...
+-   | Bad msgs -&gt;
+-     let viewModel = {vm with Error = Some (List.head msgs)}
++   | Failure msg -&gt;
++     let viewModel = {vm with Error = Some msg}
+      // ...
+    // ...
+  }
+  // ...
+</code></pre>
+
+<p>Elegant! Let&rsquo;s switch our attention to the <code>AsyncResult</code></p>
+
 <h2 id="revisting-the-mapasyncfailure-function">Revisting the mapAsyncFailure function</h2>
 
 <p>Let&rsquo;s begin this change by looking at the signature of the <code>mapAsyncFailure</code> function</p>
@@ -490,10 +549,10 @@ PasswordHash
 
 <p>So, let&rsquo;s put these types in a separate module <code>User</code> and use it in the <code>Domain</code> module of <code>UserSignup</code></p>
 
-<p>Create a new file, <em>User.fs</em>, in the web project and move it above <code>Db.fs</code> file</p>
+<p>Create a new file, <em>User.fs</em>, in the web project and move it above <code>UserSignup.fs</code> file</p>
 
 <pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/User
-&gt; repeat 4 forge moveUp web -n src/FsTweet.Web/User.fs
+&gt; repeat 2 forge moveUp web -n src/FsTweet.Web/User.fs
 </code></pre>
 
 <p>Then move the types that we just listed</p>
@@ -547,6 +606,9 @@ module Suave =
       aria-hidden="true">&larr;</span> Verifying User Email</a></li>
     
 
+    
+    <li class="next"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/">Adding Login Page <span
+      aria-hidden="true">&rarr;</span></a></li>
     
   </ul>
 </nav>
