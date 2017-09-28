@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/">
+
+  
+
+  <title>Handling Login Request | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Handling Login Request</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-09-28 07:37:43 &#43;0530 IST" itemprop="datePublished">
+      Thu, Sep 28, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/chessie">Chessie</a
+    >, 
+    
+    <a href="/tags/rop">rop</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >, 
+    
+    <a href="/tags/sqlprovider">SQLProvider</a
+    >, 
+    
+    <a href="/tags/suave">suave</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fhandling-login-request%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Handling%20Login%20Request&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fhandling-login-request%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fhandling-login-request%2f&amp;title=Handling%20Login%20Request"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fhandling-login-request%2f&amp;title=Handling%20Login%20Request"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Handling%20Login%20Request&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fhandling-login-request%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi there!</p>
+
+<p>In the previous blog post we have validated the login request from the user and mapped it to a domain type <code>LoginRequest</code>.</p>
+
+<p>The next step is authenticating the user to login to the application. This involves following steps.</p>
+
+<ol>
+<li>Finding the user with the given username</li>
+<li>If the user exists, matching the provided password with the user&rsquo;s corresponding password hash.</li>
+<li>If the password matches, creating a user session (cookie) and redirecting the user to the home page.</li>
+<li>Handling the errors while performing the above three steps.</li>
+</ol>
+
+<p>We are going to implement all the above steps except creating a user session in this blog post.</p>
+
+<p>Let&rsquo;s get started!</p>
+
+<h2 id="finding-the-user-by-username">Finding The User By Username</h2>
+
+<p>To find the user by his/her username, we first need to have domain type representing <code>User</code>.</p>
+
+<p>So, as a first step, let&rsquo;s create a record type for representing the <code>User</code>.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+type User = {
+  UserId : UserId
+  Username : Username
+  PasswordHash : PasswordHash
+}
+</code></pre>
+
+<p>The <code>EmailAddress</code> of the user, will be either verified or not verified.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+type UserEmailAddress = 
+| Verified of EmailAddress
+| NotVerified of EmailAddress
+</code></pre>
+
+<p>To retrieve the string representation of the <code>EmailAddress</code> in both the cases, let&rsquo;s add a member property <code>Value</code></p>
+
+<pre><code class="language-fsharp">type UserEmailAddress = 
+// ...
+with member this.Value =
+      match this with
+      | Verified e | NotVerified e -&gt; e.Value
+</code></pre>
+
+<p>Then add a <code>EmailAddress</code> field in the <code>User</code> record of this type</p>
+
+<pre><code class="language-fsharp">type User = {
+  // ...
+  EmailAddress : UserEmailAddress
+}
+</code></pre>
+
+<p>Now we have a domain type to represent the user. The next step is defining a type for the function which retireves <code>User</code> by <code>Username</code></p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+type FindUser = 
+  Username -&gt; AsyncResult&lt;User option, System.Exception&gt;
+</code></pre>
+
+<p>As the user may not exists for a given <code>Username</code> we are using <code>User option</code>.</p>
+
+<p>Great! Let&rsquo;s define the persistence layer which implements this.</p>
+
+<p>Create a new module <code>Persistence</code> in the <em>User.fs</em> and add a <code>findUser</code> function</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+module Persistence =
+  open Database
+
+  let findUser (getDataCtx : GetDataContext) (username : Username) = asyncTrial {
+    // TODO
+  }
+</code></pre>
+
+<p>Finding the user by <code>Username</code> is very similar to what <a href="https://github.com/demystifyfp/FsTweet/blob/v0.12/src/FsTweet.Web/UserSignup.fs#L141-L147" target="_blank">we did in</a> the <code>verifyUser</code> function. There we found the user by verification code and here we need find by <code>Username</code>. So, let&rsquo;s dive in directly.</p>
+
+<pre><code class="language-fsharp">module Persistence =
+  // ...
+  open FSharp.Data.Sql
+  open Chessie
+
+  let findUser ... = asyncTrial {
+    let ctx = getDataCtx()
+    let! userToFind = 
+      query {
+        for u in ctx.Public.Users do
+          where (u.Username = username.Value)
+      } |&gt; Seq.tryHeadAsync |&gt; AR.catch
+    // TODO
+  }
+</code></pre>
+
+<p>If the user didn&rsquo;t exist, we need to return <code>None</code></p>
+
+<pre><code class="language-fsharp">let findUser ... = asyncTrial {
+  // ...
+  match userToFind with
+  | None -&gt; return None
+  | Some user -&gt; 
+    // TODO 
+}
+</code></pre>
+
+<p>If the user exists, we need to transform that user that we retireved to its corresponding <code>User</code> domain model. In other words we need to define function that has the signature</p>
+
+<pre><code class="language-fsharp">DataContext.``public.UsersEntity`` -&gt; AsyncResult&lt;User, System.Exception&gt;
+</code></pre>
+
+<p>Let&rsquo;s create this function</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+module Persistence =
+  let mapUser (user : DataContext.``public.UsersEntity``) = 
+    // TODO
+  // ...
+</code></pre>
+
+<p>We already have <code>TryCreate</code> functions in <code>Username</code> and <code>EmailAddress</code> to create themselves from the string type.</p>
+
+<p>But we didn&rsquo;t have one for the <code>PasswordHash</code>. As we need it in this <code>mapUser</code> function, let&rsquo;s define it.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+module User 
+  // ...
+  type PasswordHash = ...
+  // ...
+
+  // string -&gt; Result&lt;PasswordHash, string&gt;
+  static member TryCreate passwordHash =
+    try 
+      BCrypt.InterrogateHash passwordHash |&gt; ignore
+      PasswordHash passwordHash |&gt; ok
+    with
+    | _ -&gt; fail &quot;Invalid Password Hash&quot;
+</code></pre>
+
+<p>The <code>InterrogateHash</code> function from the <a href="https://github.com/BcryptNet/bcrypt.net" target="_blank">BCrypt</a> library, takes a hash and outputs its component parts if it is valid. In case of invalid hash it throws an exception.</p>
+
+<p>Now, coming back to the <code>mapUser</code> that we just started, let&rsquo;s map the username, the password hash, and the email address of the user</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+module Persistence =
+  let mapUser (user : DataContext.``public.UsersEntity``) = 
+    let userResult = trial {
+      let! username = Username.TryCreate user.Username
+      let! passwordHash = PasswordHash.TryCreate user.PasswordHash
+      let! email = EmailAddress.TryCreate user.Email
+      // TODO
+    }
+    // TODO
+  // ...
+</code></pre>
+
+<p>Then we need to check wheather the user email address is verified or not and create the corresponding <code>UserEmailAddress</code> type.</p>
+
+<pre><code class="language-fsharp">let mapUser ... = 
+  let userResult = trial {
+    // ...
+    let userEmail =
+      match user.IsEmailVerified with
+      | true -&gt; Verified email
+      | _ -&gt; NotVerified email
+    // TODO
+  }
+  // TODO
+</code></pre>
+
+<p>Now we have all the individual fields of the <code>User</code> record, we can return it from <code>trial</code> computation expression</p>
+
+<pre><code class="language-fsharp">let mapUser ... = 
+  let userResult = trial {
+    // ...
+    return {
+      UserId = UserId user.Id
+      Username = username
+      PasswordHash = passwordHash
+      Email = userEmail
+    } 
+  }
+  // TODO
+</code></pre>
+
+<p>The <code>userResult</code> is of type <code>Result&lt;User, string&gt;</code> with the failure (of <code>string</code> type) side representing the validation error that may occur while mapping the user representation from the database to the domain model. It also means that data that we retrieved in not consistent and hence we need to treat this failure as Exception.</p>
+
+<pre><code class="language-fsharp">// DataContext.``public.UsersEntity`` -&gt; AsyncResult&lt;User, System.Exception&gt;
+let mapUser ... = 
+  let userResult = trial { ... }
+  userResult // Result&lt;User, string&gt;
+  |&gt; mapFailure System.Exception // Result&lt;User, Exception&gt;
+  |&gt; Async.singleton // Async&lt;Result&lt;User, Exception&gt;&gt;
+  |&gt; AR // AsyncResult&lt;User, Exception&gt;
+</code></pre>
+
+<p>We mapped the failure side of <code>userResult</code> to <code>System.Exception</code> and transformed <code>Result</code> to <code>AsyncResult</code>.</p>
+
+<p>With the help of this <code>mapUser</code> function, we can now return the <code>User</code> domain type from the <code>findUser</code> function if the user exists for the given username</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+module Persistence =
+  // ...
+  let mapUser ... = ...
+
+  let findUser ... = asyncTrial {
+    match userToFind with
+    // ...
+    | Some user -&gt; 
+      let! user = mapUser user
+      return Some user
+  }
+</code></pre>
+
+<h2 id="implementing-the-login-function">Implementing The Login Function</h2>
+
+<p>The next step after finding the user is, verifying his/her password hash with the password provided.</p>
+
+<p>To do it, we need to have a function in the <code>PasswordHash</code> type.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/User.fs
+// ...
+type PasswordHash = ...
+  // ...
+
+  // Password -&gt; PasswordHash -&gt; bool
+  static member VerifyPassword 
+                  (password : Password) (passwordHash : PasswordHash) =
+    BCrypt.Verify(password.Value, passwordHash.Value)
+
+// ...
+</code></pre>
+
+<p>The <code>Verify</code> function from the <em>BCrypt</em> library takes care of verifing the password with the hash and returns <code>true</code> if there is a match and <code>false</code> otherwise.</p>
+
+<p>Now we have the required functions for implementing the login function and let&rsquo;s start our implementation of the login function by defining a type for it.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+module Domain = 
+  // ...
+  type Login = 
+    FindUser -&gt; LoginRequest -&gt; AsyncResult&lt;User, LoginError&gt;
+</code></pre>
+
+<p>The <code>LoginError</code> type is not defined yet. So, let&rsquo;s define it</p>
+
+<pre><code class="language-fsharp">module Domain = 
+  // ...
+  
+  type LoginError =
+  | UsernameNotFound
+  | EmailNotVerified
+  | PasswordMisMatch
+  | Error of System.Exception
+
+  type Login = ...
+</code></pre>
+
+<p>The <code>LoginError</code> discriminated union elegantly represents all the possible errors that may happen while perfoming the login operation.</p>
+
+<p>The implemention of the <code>login</code> function starts with find the user and maps its failure to the <code>Error</code> union case if there is any error while finding the user.</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...
+  open Chessie
+
+  let login (findUser : FindUser) (req : LoginRequest) = asyncTrial {
+    let! userToFind = 
+      findUser req.Username |&gt; AR.mapFailure Error
+    // TODO
+  }
+</code></pre>
+
+<p>If the user to find didn&rsquo;t exist, we need to return the <code>UsernameNotFound</code> error.</p>
+
+<pre><code class="language-fsharp">let login ... = asyncTrial {
+  // ...
+  match userToFind with
+  | None -&gt; 
+    return UsernameNotFound
+  // TODO
+}
+</code></pre>
+
+<p>Though it appears good, there is an error in above implementation.</p>
+
+<p>The function signature of the login function currently is</p>
+
+<pre><code class="language-fsharp">FindUser -&gt; LoginRequest -&gt; AsyncResult&lt;LoginError, LoginError&gt;
+</code></pre>
+
+<p>Let&rsquo;s focus our attention to the return type <code>AsyncResult&lt;LoginError, LoginError&gt;</code>.</p>
+
+<p>The F# Compiler infers the failure part of the <code>AsyncResult</code> as <code>LoginError</code> from the expression</p>
+
+<pre><code class="language-fsharp">asyncTrial {
+  let! userToFind = 
+    findUser req.Username // AsyncResult&lt;User, Exception&gt;
+    |&gt; AR.mapFailure Error // AsyncResult&lt;User, LoginError&gt;
+}
+</code></pre>
+
+<p>when we return the <code>UsernameNotFound</code> union case, F# Compiler infers it as the success side of the <code>AsyncResult</code>.</p>
+
+<pre><code class="language-fsharp">asyncTrial {
+  return UsernameNotFound // LoginError
+}
+</code></pre>
+
+<p>It is because the <code>return</code> keyword behind the scenes calls the <code>Return</code> function of the <code>AsyncTrialBuilder</code> type and this <code>Return</code> function populates the success side of the <code>AsyncResult</code>.</p>
+
+<blockquote>
+<p>Here is the code snippet of the <code>Return</code> function copied from the <a href="https://github.com/fsprojects/Chessie/blob/master/src/Chessie/ErrorHandling.fs" target="_blank">Chessie</a> library for your reference</p>
+
+<pre><code class="language-fsharp">type AsyncTrialBuilder() = 
+  member __.Return value : AsyncResult&lt;'a, 'b&gt; = 
+    value
+    |&gt; ok
+    |&gt; Async.singleton
+    |&gt; AR
+</code></pre>
+</blockquote>
+
+<p>To fix this type mismatch we need to do what the <code>Return</code> function does but for the failure side.</p>
+
+<pre><code class="language-fsharp">let login ... = asyncTrial {
+  // ...
+  match userToFind with
+  | None -&gt; 
+    let! result =
+      UsernameNotFound // LoginError
+      |&gt; fail // Result&lt;'a, LoginError&gt;
+      |&gt; Async.singleton // Async&lt;Result&lt;'a, LoginError&gt;&gt;
+      |&gt; AR // AsyncResult&lt;'a, LoginError&gt;
+    return result
+  // TODO
+}
+</code></pre>
+
+<p>The <code>let!</code> expression followed by <code>return</code> can replaced with <code>return!</code> which does the both.</p>
+
+<pre><code class="language-fsharp">let login ... = asyncTrial {
+  // ...
+  match userToFind with
+  | None -&gt; 
+    return! UsernameNotFound 
+      |&gt; fail 
+      |&gt; Async.singleton 
+      |&gt; AR 
+  // TODO
+}
+</code></pre>
+
+<p>The next thing that we have to do in the login function, checking whether the user&rsquo;s email is verified or not. If it is not verified, we return the <code>EmailNotVerified</code> error.</p>
+
+<pre><code class="language-fsharp">let login ... = asyncTrial {
+  // ...
+  match userToFind with
+  // ...
+  | Some user -&gt;
+    match user.EmailAddress with
+    | NotVerified _ -&gt; 
+      return! 
+        EmailNotVerified
+        |&gt; fail 
+        |&gt; Async.singleton 
+        |&gt; AR 
+    // TODO
+}
+</code></pre>
+
+<p>If the user&rsquo;s email address is verified, then we need to verify his/her password and return <code>PasswordMisMatch</code> error if there is a mismatch.</p>
+
+<pre><code class="language-fsharp">let login ... = asyncTrial {
+  // ...
+  match userToFind with
+  // ...
+  | Some user -&gt;
+    match user.EmailAddress with
+    // ...
+    | Verified _ -&gt; 
+      let isMatchingPassword =
+        PasswordHash.VerifyPassword req.Password user.PasswordHash
+      match isMatchingPassword with
+      | false -&gt; 
+        return! 
+          PasswordMisMatch
+          |&gt; fail 
+          |&gt; Async.singleton 
+          |&gt; AR 
+      // TODO
+}
+</code></pre>
+
+<p>I am sure you would be thinking about refactoring the following piece of code which is getting repated in all the three places when we return a failure from the <code>asyncTrial</code> computation expression.</p>
+
+<pre><code class="language-fsharp">|&gt; fail 
+|&gt; Async.singleton 
+|&gt; AR 
+</code></pre>
+
+<p>To refactor it, let&rsquo;s have a look at the signature of the <code>fail</code> function from the <em>Chessie</em> library.</p>
+
+<pre><code class="language-fsharp">'b -&gt; Result&lt;'a, 'b&gt;
+</code></pre>
+
+<p>The three lines of code that was getting repeated to the same transformation but on the <code>AsyncResult</code> instead of <code>Result</code></p>
+
+<pre><code class="language-fsharp">'b -&gt; AsyncResult&lt;'a, 'b&gt;
+</code></pre>
+
+<p>So, let&rsquo;s create <code>fail</code> function in the <code>AR</code> module which implements this logic</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
+// ...
+module AR =
+  // ...
+  let fail x =
+    x // 'b
+    |&gt; fail // Result&lt;'a, 'b&gt;
+    |&gt; Async.singleton // Async&lt;Result&lt;'a, 'b&gt;&gt;
+    |&gt; AR // AsyncResult&lt;'a, 'b&gt;
+</code></pre>
+
+<p>With the help of this new function we can simplify the <code>login</code> function as below</p>
+
+<pre><code class="language-diff">
+- return! 
+-   UsernameNotFound 
+-   |&gt; fail 
+-   |&gt; Async.singleton 
+-   |&gt; AR 
++ return! AR.fail UsernameNotFound
+...
+-   return! 
+-     EmailNotVerified 
+-     |&gt; fail 
+-     |&gt; Async.singleton 
+-     |&gt; AR 
++   return! AR.fail EmailNotVerified
+...
+-    return! 
+-      PasswordMisMatch
+-      |&gt; fail 
+-      |&gt; Async.singleton 
+-      |&gt; AR 
++    return! AR.fail PasswordMisMatch 
+</code></pre>
+
+<p>Coming back to the <code>login</code> function, if the password does match, we just need to return the <code>User</code>.</p>
+
+<pre><code class="language-fsharp">let login ... = asyncTrial {
+  // ...
+  match userToFind with
+  // ...
+  | Some user -&gt;
+    match user.EmailAddress with
+    // ...
+    | Verified _ -&gt; 
+      let isMatchingPassword = ...
+      match isMatchingPassword with
+      // ...
+      | true -&gt; return User
+}
+</code></pre>
+
+<p>The presentation layer can take this value of <code>User</code> type being returned and send it to the end user either as a <a href="https://en.wikipedia.org/wiki/HTTP_cookie" target="_blank">HTTP Cookie</a> or a <a href="https://en.wikipedia.org/wiki/JSON_Web_Token" target="_blank">JWT</a>.</p>
+
+<h2 id="the-presentation-layer-for-transforming-login-response">The Presentation Layer For Transforming Login Response</h2>
+
+<p>If there is any error while doing login, we need to populate the login view model with the corressponding error message and rerender the login page.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+// ...
+module Suave =
+  // ...
+  
+  // LoginViewModel -&gt; LoginError -&gt; WebPart
+  let onLoginFailure viewModel loginError =
+    match loginError with
+    | PasswordMisMatch -&gt;
+       let vm = 
+        {viewModel with Error = Some &quot;password didn't match&quot;}
+       renderLoginPage vm
+    | EmailNotVerified -&gt; 
+       let vm = 
+        {viewModel with Error = Some &quot;email not verified&quot;}
+       renderLoginPage vm
+    | UsernameNotFound -&gt; 
+       let vm = 
+        {viewModel with Error = Some &quot;invalid username&quot;}
+       renderLoginPage vm
+    | Error ex -&gt; 
+      printfn &quot;%A&quot; ex
+      let vm = 
+        {viewModel with Error = Some &quot;something went wrong&quot;}
+      renderLoginPage vm
+  // ...
+</code></pre>
+
+<p>In case of login success, we return the username as a response. In the next blog post, we will be revisiting this piece of code.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+// ...
+module Suave =
+  // ...
+  open User
+  // ...
+  // User -&gt; WebPart
+  let onLoginSuccess (user : User) = 
+    Successful.OK user.Username.Value
+  // ...
+</code></pre>
+
+<p>With the help of these two function, we can transform the <code>Result&lt;User,LoginError&gt;</code> to <code>WebPart</code> using the either function</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+
+  // LoginViewModel -&gt; Result&lt;User,LoginError&gt; -&gt; WebPart
+  let handleLoginResult viewModel loginResult = 
+    either onLoginSuccess (onLoginFailure viewModel) loginResult
+
+  // ...
+</code></pre>
+
+<p>The next piece of work is transforming the async version of login result</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+
+  // LoginViewModel -&gt; AsyncResult&lt;User,LoginError&gt; -&gt; Async&lt;WebPart&gt;
+  let handleLoginAsyncResult viewModel aLoginResult = 
+    aLoginResult
+    |&gt; Async.ofAsyncResult
+    |&gt; Async.map (handleLoginResult viewModel)
+</code></pre>
+
+<p>The final step is wiring the domain, peristence and the presentation layers associated with the login.</p>
+
+<p>First, pass the <code>getDataCtx</code> function from the <code>main</code> function to the <code>webpart</code> function</p>
+
+<pre><code class="language-diff">// FsTweet.Web/FsTweet.Web.fs
+-      Auth.Suave.webpart ()
++      Auth.Suave.webpart getDataCtx
+</code></pre>
+
+<p>Then in the <code>webpart</code> function in the add getDataCtx as its parameter and use it to parially apply in the <code>findUser</code> function</p>
+
+<pre><code class="language-diff">-  let webpart () =
++  let webpart getDataCtx =
++    let findUser = Persistence.findUser getDataCtx
+</code></pre>
+
+<p>Followed up with passing the parially applied <code>findUser</code> function to the <code>handlerUserLogin</code> function and remove the <code>TODO</code> placeholder in the <code>handlerUserLogin</code> function.</p>
+
+<pre><code class="language-diff">-  let handleUserLogin ctx = async {
++  let handleUserLogin findUser ctx = async {
+...
+-        return! Successful.OK &quot;TODO&quot; ctx
+...
+-      POST &gt;=&gt; handleUserLogin
++      POST &gt;=&gt; handleUserLogin findUser
+</code></pre>
+
+<p>Finally in the <code>handleUserLogin</code> function, if the login request is valid, call the <code>login</code> function with the provided <code>findUser</code> function and the validated login requet and transform the result of the login function with to <code>WebPart</code> using the <code>handleLoginAsyncResult</code> defined earlier.</p>
+
+<pre><code class="language-fsharp">let handleUserLogin findUser ctx = async {
+  // ...
+    let result = ...
+    match result with
+    | Success req -&gt; 
+      let aLoginResult = login findUser req 
+      let! webpart = 
+        handleLoginAsyncResult vm aLoginResult
+      return! webpart ctx
+  // ...
+}
+</code></pre>
+
+<p>That&rsquo;s it!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>We covered a lot of ground in this blog post. We started with finding the user by username and then we moved to implement the login function. And finally we transformed the result of the login function to the corresponding webparts.</p>
+
+<p>The source code of this blog post is available <a href="https://github.com/demystifyfp/FsTweet/releases/tag/v0.13" target="_blank">here</a>.</p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/"><span
+      aria-hidden="true">&larr;</span> Adding Login Page</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
