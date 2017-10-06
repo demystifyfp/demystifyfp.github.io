@@ -181,11 +181,11 @@
 
 <p>Hi there!</p>
 
-<p>Welcome to the twelth part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
+<p>Welcome to the twelfth part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
 
-<p>We have came a long way so far and we have lot more things to do!</p>
+<p>We have come a long way so far, and we have lot more things to do!</p>
 
-<p>Before we get going, Let&rsquo;s spend some time to reorganise some of the code that we wrote and refactor certain functions to help ourselves to move faster.</p>
+<p>Before we get going, Let&rsquo;s spend some time to reorganize some of the code that we wrote and refactor specific functions to help ourselves to move faster.</p>
 
 <p>The <em>UserSignup.fs</em> file has some helper functions for working with the Chessie library. As a first step, we will move them to a separate file.</p>
 
@@ -194,20 +194,20 @@
 <pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Chessie
 </code></pre>
 
-<p>Then move it above <code>Db.fs</code>. In other words move it up four times.</p>
+<p>Then move it above <code>Db.fs</code>. In other words, move it up four times.</p>
 
 <pre><code class="language-bash">&gt; repeat 4 forge moveUp web -n src/FsTweet.Web/Chessie.fs
 </code></pre>
 
 <blockquote>
-<p>We are using the in-built command, <code>repeat</code>, from <a href="http://ohmyz.sh/" target="_blank">omyzsh</a> to repeat the <code>forge moveUp</code> four times.</p>
+<p>We are using the inbuilt command, <code>repeat</code>, from <a href="http://ohmyz.sh/" target="_blank">omyzsh</a> to repeat the <code>forge moveUp</code> four times.</p>
 </blockquote>
 
 <h2 id="moving-mapfailure-function">Moving mapFailure Function</h2>
 
-<p>In the <a href="{{ relref &quot;verifying-user-email.md&quot; }}" target="_blank">previous blog post</a>, while implementing the static member function <code>TryCreateAsync</code> in the <code>Username</code> type, we moved the <code>mapFailure</code> from its previous place to above the <code>Username</code> type to use it in the <code>TryCreateAsync</code> function.</p>
+<p>In the <a href="/fsharp/series/fstweet/verifying-user-email/" target="_blank">previous blog post</a>, while implementing the static member function <code>TryCreateAsync</code> in the <code>Username</code> type, we moved the <code>mapFailure</code> from its earlier place to above the <code>Username</code> type to use it in the <code>TryCreateAsync</code> function.</p>
 
-<p>It is a cue for us to reconsider the placement of the <code>mapFailure</code> function, as we may need to move it to somewhere else if we want to use it in an another function.</p>
+<p>It is a cue for us to reconsider the placement of the <code>mapFailure</code> function. If we want to use it in an another function, we may need to move it to somewhere else.</p>
 
 <p>So, let&rsquo;s move this function to the <code>Chessie.fs</code> file that we just created.</p>
 
@@ -234,7 +234,7 @@ module Domain =
 
 <h2 id="overriding-the-either-function">Overriding The either function</h2>
 
-<p>We are making use of the <code>either</code> function from the chessie library to map the <code>Result</code> to <code>WebPart</code> with some compromises on the design.</p>
+<p>We are making use of the <code>either</code> function from the Chessie library to map the <code>Result</code> to <code>WebPart</code> with some compromises on the design.</p>
 
 <p>To fix this, let&rsquo;s have a look at the signature of the <code>either</code> function</p>
 
@@ -243,11 +243,11 @@ module Domain =
 
 <p>It takes a function to map the success part <code>('b -&gt; 'c)</code> and an another function to map the failure part <code>('d -&gt; 'c)</code> and returns a function that takes a <code>Result&lt;'b, 'd&gt;</code> type and returns <code>'c</code>.</p>
 
-<p>It is the same thing that we needed but the problem is the actual type of <code>'b</code> and <code>'d</code></p>
+<p>It is the same thing that we needed, but the problem is the actual type of <code>'b</code> and <code>'d</code></p>
 
-<p>The success part <code>'b</code> has a type <code>('TSuccess, 'TMessage list)</code> to represent both the success and the warning part. As we are not making use of warning in FsTweet, instead of this tuple and we just need the success part <code>'TSuccess</code> alone.</p>
+<p>The success part <code>'b</code> has a type <code>('TSuccess, 'TMessage list)</code> to represent both the success and the warning part. As we are not making use of warnings in FsTweet, instead of this tuple and we just need the success part <code>'TSuccess</code> alone.</p>
 
-<p>To achieve it let&rsquo;s add a <code>onSuccess</code> adapter function which maps only the success type</p>
+<p>To achieve it let&rsquo;s add a <code>onSuccess</code> adapter function which maps only the success type and drops the warnings list in the tuple.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/Chessie.fs
 module Chessie
@@ -257,9 +257,9 @@ module Chessie
 let onSuccess f (x, _) = f x
 </code></pre>
 
-<p>Then move our attention to the failure part <code>d</code> which has a type <code>'TMessage list</code> representing the list of errors. In FsTweet, we are short circuiting as soon as we found the first error and we are not capturing all the errors. So, in our case the type <code>'TMessage list</code> will always have a list with only one item <code>'TMessage</code>.</p>
+<p>Then move our attention to the failure part <code>d</code> which has a type <code>'TMessage list</code> representing the list of errors. In FsTweet, we are short-circuiting as soon as we found the first error and we are not capturing all the errors. So, in our case, the type <code>'TMessage list</code> will always have a list with only one item <code>'TMessage</code>.</p>
 
-<p>Like <code>onSuccess</code>, we can have a function <code>onFailure</code> to map the first item of the list.</p>
+<p>Like <code>onSuccess</code>, we can have a function <code>onFailure</code> to map the first item of the list alone.</p>
 
 <pre><code class="language-fsharp">module Chessie
 // ...
@@ -269,7 +269,7 @@ let onFailure f xs =
   xs |&gt; List.head |&gt; f
 </code></pre>
 
-<p>The <code>onFailure</code> takes the first item from the list and uses it as the argument while calling the map function <code>f</code>.</p>
+<p>The <code>onFailure</code> function takes the first item from the list and uses it as the argument while calling the map function <code>f</code>.</p>
 
 <p>Now with the help of these two functions, <code>onSuccess</code> and <code>onFailure</code>, we can override the <code>either</code> function.</p>
 
@@ -305,9 +305,9 @@ module Sauve =
   // ...
 </code></pre>
 
-<p>Thanks to the adapter functions, <code>onSuccess</code> and <code>onFailure</code>, now the function signatures are clearly expressing our intent without an compromises.</p>
+<p>Thanks to the adapter functions, <code>onSuccess</code> and <code>onFailure</code>, now the function signatures are expressing our intent without any compromises.</p>
 
-<p>Let&rsquo;s do the same thing for the functions that map <code>Result&lt;UserId, UserSignupError&gt;</code> to <code>WebPart</code></p>
+<p>Let&rsquo;s do the same thing for the functions that map <code>Result&lt;UserId, UserSignupError&gt;</code> to <code>WebPart</code>.</p>
 
 <pre><code class="language-diff">module Suave = 
   // ...
@@ -335,7 +335,7 @@ module Sauve =
 </code></pre>
 
 <blockquote>
-<p>While changing the function signature, we have also changed the prefix <code>handle</code> to <code>on</code> to keep it consitent with the nomanclature that we are using to the functions that are mapping the success and failure parts of a <code>Result</code> type.</p>
+<p>While changing the function signature, we have also modified the prefix <code>handle</code> to <code>on</code> to keep it consistent with the nomenclature that we are using to the functions that are mapping the success and failure parts of a <code>Result</code> type.</p>
 </blockquote>
 
 <h2 id="pattern-matching-on-result-type">Pattern Matching On Result type</h2>
@@ -360,7 +360,7 @@ module Suave =
   // ...
 </code></pre>
 
-<p>Like the adapter functions, <code>onSuccess</code> and <code>onFailure</code>, we need adapters while doing the pattern matching on the <code>Result</code> type.</p>
+<p>Like the adapter functions, <code>onSuccess</code> and <code>onFailure</code>, we need adapters while pattern matching on the <code>Result</code> type.</p>
 
 <p>Let&rsquo;s create an <a href="https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/active-patterns" target="_blank">Active Pattern</a> to carry out this for us.</p>
 
@@ -395,24 +395,24 @@ module Suave =
   // ...
 </code></pre>
 
-<p>Elegant! Let&rsquo;s switch our attention to the <code>AsyncResult</code></p>
+<p>Elegant! Let&rsquo;s switch our attention to the <code>AsyncResult</code>.</p>
 
-<h2 id="revisting-the-mapasyncfailure-function">Revisting the mapAsyncFailure function</h2>
+<h2 id="revisiting-the-mapasyncfailure-function">Revisiting the mapAsyncFailure function</h2>
 
 <p>Let&rsquo;s begin this change by looking at the signature of the <code>mapAsyncFailure</code> function</p>
 
 <pre><code class="language-fsharp">('a -&gt; 'b) -&gt; AsyncResult&lt;'c, 'a&gt; -&gt; AsyncResult&lt;'c, 'b&gt;
 </code></pre>
 
-<p>It maps the failure part <code>'a</code> to <code>'b</code> with the help of the mapping function <code>('a -&gt; 'b)</code> of an <code>AsyncResult</code>. But the name <code>mapAsyncFailure</code> not clearly communicates this.</p>
+<p>It takes a maping function <code>('a -&gt; 'b)</code> and an <code>AsyncResult</code> and maps the failure side of the <code>AsyncResult</code>. But the name <code>mapAsyncFailure</code> not clearly communicates this.</p>
 
 <p>The better name would be <code>mapAsyncResultFailure</code>.</p>
 
 <p>An another option would be having the function <code>mapFailure</code> in the module <code>AsyncResult</code> so that the caller will use it as <code>AsyncResult.mapFailure</code></p>
 
-<p>We can also use an abbreviation <code>AR</code> to represent <code>AsyncResult</code> and we can call the function as <code>AR.mapFailure</code></p>
+<p>We can also use an abbreviation <code>AR</code> to represent <code>AsyncResult</code>, and we can call the function as <code>AR.mapFailure</code>.</p>
 
-<p>Let&rsquo;s choose <code>AR.mapFailure</code> as it is shorter.</p>
+<p>Let&rsquo;s choose <code>AR.mapFailure</code> as it is shorter than the other one.</p>
 
 <p>To enable this, we need to create a new module <code>AR</code> and decorate it with the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/core.requirequalifiedaccessattribute-class-%5Bfsharp%5D" target="_blank">RequireQualifiedAccess</a> Attribute so that functions inside this module can&rsquo;t be called without the module name.</p>
 
@@ -434,7 +434,7 @@ module AR =
     |&gt; Async.map (mapFailure f) |&gt; AR
 </code></pre>
 
-<p>And finally we need to use this moved and renamed function in the <code>Persistence</code> and <code>Email</code> modules in the <em>UserSignup.fs</em> file.</p>
+<p>And finally, we need to use this moved and renamed function in the <code>Persistence</code> and <code>Email</code> modules in the <em>UserSignup.fs</em> file.</p>
 
 <pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
 // ...
@@ -483,9 +483,9 @@ let toAsyncResult ... =
   |&gt; AR 
 </code></pre>
 
-<p>The three lines of code that were repeated, takes an asynchronous computation <code>Async&lt;'a&gt;</code> and exceutes it with exception handling using <code>Async.Catch</code> function and then map the <code>Async&lt;Choice&lt;'a, Exception&gt;&gt;</code> to <code>AsyncResult&lt;'a, Exception&gt;</code>.</p>
+<p>The repeated three lines of code take an asynchronous computation <code>Async&lt;'a&gt;</code> and execute it with exception handling using <code>Async.Catch</code> function and then map the <code>Async&lt;Choice&lt;'a, Exception&gt;&gt;</code> to <code>AsyncResult&lt;'a, Exception&gt;</code>.</p>
 
-<p>In other words we can extract these three lines to a separate function which has the signature</p>
+<p>In other words, we can extract these three lines to a separate function which has the signature</p>
 
 <pre><code class="language-fsharp">Async&lt;'a&gt; -&gt; AsyncResult&lt;'a, Exception&gt;
 </code></pre>
@@ -516,7 +516,7 @@ let submitUpdates ... =
   |&gt; AR.catch
 </code></pre>
 
-<p>Finally change the <code>verifyUser</code> function to use this function instead of the removed function <code>toAsyncResult</code></p>
+<p>Finally, change the <code>verifyUser</code> function to use this function instead of the removed function <code>toAsyncResult</code></p>
 
 <pre><code class="language-diff">// FsTweet.Web/UserSignup.fs
 // ...
@@ -534,11 +534,11 @@ module Persistence =
   // ...
 </code></pre>
 
-<p>With these we are done with the refactoring and reorganising of the functions associated with the Chessie library.</p>
+<p>With these, we are done with the refactoring and reorganizing of the functions associated with the Chessie library.</p>
 
 <h2 id="the-user-module">The User Module</h2>
 
-<p>The <code>Domain</code> module in the <em>UserSignup.fs</em> file has the following types that represents the individual properties of an user in FsTweet</p>
+<p>The <code>Domain</code> module in the <em>UserSignup.fs</em> file has the following types that represent the individual properties of a user in FsTweet</p>
 
 <pre><code class="language-fsharp">Username
 UserId
@@ -547,7 +547,7 @@ Password
 PasswordHash 
 </code></pre>
 
-<p>So, let&rsquo;s put these types in a separate module <code>User</code> and use it in the <code>Domain</code> module of <code>UserSignup</code></p>
+<p>So, let&rsquo;s put these types in a separate namespace <code>User</code> and use it in the <code>Domain</code> module of <code>UserSignup</code>.</p>
 
 <p>Create a new file, <em>User.fs</em>, in the web project and move it above <code>UserSignup.fs</code> file</p>
 
@@ -567,7 +567,7 @@ type Password = ...
 type PasswordHash = ...
 </code></pre>
 
-<p>Finally use this module in the <em>UserSignup.fs</em> file</p>
+<p>Finally, use this module in the <em>UserSignup.fs</em> file</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
 namespace UserSignup
@@ -589,7 +589,7 @@ module Suave =
 
 <h2 id="summary">Summary</h2>
 
-<p>In this blog post, we learned how to create adapter funtions and override a functionality provided by a library to fit our custom requirements. The key to this refactoring is understanding of the function signatures.</p>
+<p>In this blog post, we learned how to create adapter functions and override a functionality provided by a library to fit our requirements. The key to this refactoring is the understanding of the function signatures.</p>
 
 <p>The source code associated with this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.11" target="_blank">GitHub</a></p>
 
