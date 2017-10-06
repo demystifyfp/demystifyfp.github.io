@@ -7,8 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Thu, 28 Sep 2017 07:37:43 +0530</lastBuildDate>
+    <lastBuildDate>Mon, 02 Oct 2017 13:48:35 +0530</lastBuildDate>
     <atom:link href="/tags/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Authentication</title>
+      <link>http://www.demystifyfp.com/tags/authentication/</link>
+      <pubDate>Mon, 02 Oct 2017 13:48:35 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/tags/authentication/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Chessie</title>
@@ -58,7 +67,7 @@
     <item>
       <title>Fsharp</title>
       <link>http://www.demystifyfp.com/tags/fsharp/</link>
-      <pubDate>Thu, 28 Sep 2017 07:37:43 +0530</pubDate>
+      <pubDate>Mon, 02 Oct 2017 13:48:35 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/fsharp/</guid>
       <description></description>
@@ -121,7 +130,7 @@
     <item>
       <title>Suave</title>
       <link>http://www.demystifyfp.com/tags/suave/</link>
-      <pubDate>Thu, 28 Sep 2017 07:37:43 +0530</pubDate>
+      <pubDate>Mon, 02 Oct 2017 13:48:35 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/tags/suave/</guid>
       <description></description>

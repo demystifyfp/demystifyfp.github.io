@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/</loc>
+      <lastmod>2017-10-02T13:48:35+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/</loc>
       <lastmod>2017-09-28T07:37:43+05:30</lastmod>
     </url>
@@ -131,6 +140,16 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/tags/authentication/</loc>
+      <lastmod>2017-10-02T13:48:35+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/categories/</loc>
       <priority>0</priority>
     </url>
@@ -201,7 +220,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/fsharp/</loc>
-      <lastmod>2017-09-28T07:37:43+05:30</lastmod>
+      <lastmod>2017-10-02T13:48:35+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -211,7 +230,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/fsharp/</loc>
-      <lastmod>2017-09-28T07:37:43+05:30</lastmod>
+      <lastmod>2017-10-02T13:48:35+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -290,7 +309,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/suave/</loc>
-      <lastmod>2017-09-28T07:37:43+05:30</lastmod>
+      <lastmod>2017-10-02T13:48:35+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -300,7 +319,7 @@
     <url>
     
       <loc>http://www.demystifyfp.com/tags/</loc>
-      <lastmod>2017-09-28T07:37:43+05:30</lastmod>
+      <lastmod>2017-10-02T13:48:35+05:30</lastmod>
       <priority>0</priority>
     </url>
     

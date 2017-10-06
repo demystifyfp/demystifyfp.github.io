@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.26" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.0/css/academicons.min.css" integrity="sha512-GGGNUPDhnG8LEAEDsjqYIQns+Gu8RBs4j5XGlxl7UfRaZBhCCm5jenJkeJL8uPuOXGqgl8/H1gjlWQDRjd3cUQ==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Lato:400,700%7CMerriweather%7CRoboto+Mono">
+  <link rel="stylesheet" href="/css/hugo-academic.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/">
+
+  
+
+  <title>Creating User Session and Authenticating User | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Creating User Session and Authenticating User</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    <time datetime="2017-10-02 13:48:35 &#43;0530 IST" itemprop="datePublished">
+      Mon, Oct 2, 2017
+    </time>
+  </span>
+
+  
+
+  
+  
+  
+  <span class="article-tags">
+    <i class="fa fa-tags"></i>
+    
+    <a href="/tags/suave">suave</a
+    >, 
+    
+    <a href="/tags/authentication">authentication</a
+    >, 
+    
+    <a href="/tags/fsharp">fsharp</a
+    >
+    
+  </span>
+  
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fcreating-user-session-and-authenticating-user%2f"
+         target="_blank">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Creating%20User%20Session%20and%20Authenticating%20User&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fcreating-user-session-and-authenticating-user%2f"
+         target="_blank">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fcreating-user-session-and-authenticating-user%2f&amp;title=Creating%20User%20Session%20and%20Authenticating%20User"
+         target="_blank">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fcreating-user-session-and-authenticating-user%2f&amp;title=Creating%20User%20Session%20and%20Authenticating%20User"
+         target="_blank">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Creating%20User%20Session%20and%20Authenticating%20User&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fcreating-user-session-and-authenticating-user%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hi!</p>
+
+<p>Welcome back to the fifteenth part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
+
+<p>In the <a href="/fsharp/series/fstweet/handling-login-request/" target="_blank">previous blog post</a>, we have implemented the backend logic to verify the login credentials of a user. Upon successful verification of the provided credentials, we just responded with a username.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+// ...
+module Suave =
+  // ...
+  open User
+  // ...
+  // User -&gt; WebPart
+  let onLoginSuccess (user : User) = 
+    Successful.OK user.Username.Value
+  // ...
+</code></pre>
+
+<p>In this blog post, we are going to replace this placeholder with the actual implementation.</p>
+
+<h2 id="creating-session-cookie">Creating Session Cookie</h2>
+
+<p>As HTTP is <a href="https://stackoverflow.com/questions/13200152/why-say-that-http-is-a-stateless-protocol" target="_blank">a stateless protocol</a>, we need to create a unique session id for every successful login verification and a <a href="https://en.wikipedia.org/wiki/HTTP_cookie" target="_blank">HTTP cookie</a> to holds this session id.</p>
+
+<p>This session cookie, will be present in all the subsequent requests from the user and we can use it to authenticate the user instead of prompting the username and the password for each requests.</p>
+
+<p>To create this session id and the cookie, we are going to leverage the <a href="https://suave.io/Suave.html#def:val Suave.Authentication.authenticated" target="_blank">authenticated</a> function from Suave.</p>
+
+<p>It takes two parameters and return a <code>Webpart</code></p>
+
+<pre><code class="language-fsharp">CookieLife -&gt; bool -&gt; Webpart
+</code></pre>
+
+<p>The <code>CookieLife</code> defines the lifespan of a cookie in the user&rsquo;s browser and the <code>bool</code> parameter is to specify the presence of the cookie in <code>HTTPS</code> alone.</p>
+
+<pre><code class="language-diff">module Suave = 
++ open Suave.Authentication
++ open Suave.Cookie
+  // ...
+
+  let onLoginSuccess (user : User) = 
+-   Successful.OK user.Username.Value
++   authenticated CookieLife.Session false
+
+  // ...
+</code></pre>
+
+<p>The <code>CookieLife.Session</code> defines that the cookie will be present til the user he quits the browser. There is an another option <code>MaxAge of TimeSpan</code> to define the lifespan of cookie using TimeSpan. And as we are not using HTTPS, we need to set the second parameter as <code>false</code>.</p>
+
+<p>The session id in the cookie doesn&rsquo;t personally identify the user. So, we need to store the associated user information in some other place.</p>
+
+<pre><code class="language-bash">+------------------+--------------------+
+|     SessionId    |       UserId       |
+|                  |                    |
++---------------------------------------+
+|                  |                    |
+|                  |                    |
++------------------+--------------------+
+</code></pre>
+
+<p>There are multiple ways we can achieve it.</p>
+
+<ol>
+<li><p>Adding a new table in the database and persist the relationship.</p></li>
+
+<li><p>We can even use a NoSQL datastore to store this key-value data</p></li>
+
+<li><p>We can store it an in-memory cache in the server.</p></li>
+
+<li><p>We can make use of an another HTTP cookie.</p></li>
+</ol>
+
+<p>Every approach has its own pros and cons and we need to pick the opt one.</p>
+
+<p>Suave library has an absraction to deal with this state management.</p>
+
+<blockquote>
+<p><a href="https://github.com/SuaveIO/suave/blob/master/src/Suave/State.fs" target="_blank">https://github.com/SuaveIO/suave/blob/master/src/Suave/State.fs</a></p>
+
+<pre><code class="language-fsharp">type StateStore =
+  /// Get an item from the state store
+  abstract get&lt;'T&gt; : string -&gt; 'T option
+  /// Set an item in the state store
+  abstract set&lt;'T&gt; : string -&gt; 'T -&gt; WebPart
+</code></pre>
+</blockquote>
+
+<p>It also provides two out of the box implementations of this abstraction, <code>MemoryCacheStateStore</code> and <code>CookieStateStore</code> that corresponds to the third and fourth ways defined above respectively.</p>
+
+<p>In our case, We are going to use <code>CookieStateStore</code>.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+// ...
+module Suave =
+  // ...
+  open Suave.State.CookieStateStore
+
+  // ...
+  // string -&gt; 'a -&gt; HttpContext -&gt; WebPart
+  let setState key value ctx =
+    match HttpContext.state ctx with
+    | Some state -&gt;
+       state.set key value
+    | _ -&gt; never
+    
+  let userSessionKey = &quot;fsTweetUser&quot;
+
+  // User -&gt; WebPart
+  let createUserSession (user : User) =
+    statefulForSession 
+    &gt;=&gt; context (setState userSessionKey user)
+
+  // ...
+</code></pre>
+
+<p>The <code>statefulForSession</code> function, a WebPart from Suave, intializes the <code>state</code> in the <code>HttpContext</code> with <code>CookieStateStore</code>.</p>
+
+<p>The <code>setState</code> function takes a key and a value, along with a <code>HttpContext</code>. If there is a state store present in the <code>HttpContext</code>, it stores the key and the value pair. In the absense of a state store it does nothing and we are making the <code>never</code> WebPart from Suave to denote it.</p>
+
+<p>An important thing that we need to notice here is <code>setState</code> function doesn&rsquo;t know what is the underlying <code>StateStore</code> that we are using.</p>
+
+<p>In the <code>createUserSession</code> function, we are initializing the <code>StateStore</code> to use <code>CookieStateStore</code> by calling the <code>statefulForSession</code> function and then calling the <code>setState</code> to store the user information in the state cookie.</p>
+
+<p>We are making use of the <code>context</code> function (aka combinator) while calling the <code>setState</code>. The <code>context</code> function from the Suave library which is having the following signature</p>
+
+<pre><code class="language-fsharp">(HttpContext -&gt; WebPart) -&gt; WebPart
+</code></pre>
+
+<p>The final step in calling this <code>createUserSession</code> function from the <code>onLoginSuccess</code> function and redirects the user to his/her home page.</p>
+
+<pre><code class="language-fsharp">let onLoginSuccess (user : User) = 
+  authenticated CookieLife.Session false 
+    &gt;=&gt; createUserSession user
+    &gt;=&gt; Redirection.FOUND &quot;/wall&quot;
+</code></pre>
+
+<h2 id="rending-the-wall-page-with-a-placeholder">Rending The Wall Page With A Placeholder</h2>
+
+<p>In the previous section, upon successful login, we are redirecting to the wall page (<code>/wall</code>). This is currently not exist. So, let&rsquo;s add it with a placeholder and we will revisit in an another blog post.</p>
+
+<p>Let&rsquo;s get started by creating a new fsharp file <em>Wall.fs</em> and move it above <em>FsTweet.Web.fs</em></p>
+
+<pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Wall
+&gt; forge moveUp web -n src/FsTweet.Web/Wall.fs
+</code></pre>
+
+<p>Then in the <em>Wall.fs</em> file add this initial implementation of User&rsquo;s wall.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Wall.fs
+namespace Wall
+
+module Suave =
+  open Suave
+  open Suave.Filters
+  open Suave.Operators
+
+  let renderWall ctx = async {
+    return! Successful.OK &quot;TODO&quot; ctx
+  }
+  
+  let webpart () =
+    path &quot;/wall&quot; &gt;=&gt; renderWall
+</code></pre>
+
+<p>And finally call this <code>webpart</code> function from the <code>main</code> function</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
+      Wall.Suave.webpart ()
+    ]
+  // ...
+</code></pre>
+
+<p>Now if we run the application and login using a registered account, we will be redirected to the wall page and we can find the cookies for <code>auth</code> and <code>state</code> in the browser.</p>
+
+<p><img src="/img/fsharp/series/fstweet/wall-page-with-cookies.png" alt="Wall Page With Cookies" /></p>
+
+<p>The values of these cookies are encrypted using a randomly generated key in the server side by Suave. We can either provide this key or let the suave to generate one.</p>
+
+<p>The downside of letting suave to generate the key is, it will generate a new key whenever the server restarts. And also if we run multiple instances of <code>FsTweet.Web</code> behind a load balancer, each instance will have its own server key.</p>
+
+<p>So, the ideal thing would be explicitly providing the server key.</p>
+
+<p>As mentioned in the <em>Server Keys</em> section of the <a href="https://suave.io/sessions.html" target="_blank">official documentation</a>, To generate a key let&rsquo;s create a script file <em>script.fsx</em> and add the provided code snippet to generate the key.</p>
+
+<pre><code class="language-fsharp">// script.fsx
+#r &quot;./packages/Suave/lib/net40/Suave.dll&quot;
+
+open Suave.Utils
+open System
+
+Crypto.generateKey Crypto.KeyLength
+|&gt; Convert.ToBase64String
+|&gt; printfn &quot;%s&quot;
+</code></pre>
+
+<p>When we run this script, it will be print a key.</p>
+
+<p>The next step is passing this a key as an environment variable to the application and configuring the suave web server to use this key</p>
+
+<pre><code class="language-diff">// FsTweet.Web/FsTweet.Web.fs
+
+let main argv = 
+  // ...
++  let serverKey = 
++    Environment.GetEnvironmentVariable &quot;FSTWEET_SERVER_KEY&quot;
++    |&gt; ServerKey.fromBase64
++  let serverConfig = 
++    {defaultConfig with serverKey = serverKey}
+
++  startWebServer serverConfig app
+-  startWebServer defaultConfig app
+</code></pre>
+
+<h2 id="protecting-webparts">Protecting WebParts</h2>
+
+<p>Currently, the Wall page can be accessed even with out login as we are not protecting it.</p>
+
+<p>To protect it, we need to do the following things</p>
+
+<ol>
+<li>Validate the Auth Token present in the cookie</li>
+<li>Deserialize the <code>User</code> type from the user state cookie.</li>
+<li>Call a WebPart with the deserialized user type only if step one and two are successful</li>
+<li>Redirect user to the login page if either step one or two failed.</li>
+</ol>
+
+<p>For validating the auth token present in the cookie, <code>Suave.Authentication</code> module has a function called <code>authenticate</code>.</p>
+
+<p>This <code>authenticate</code> function takes five parameters</p>
+
+<ol>
+<li><p><em>relativeExpiry</em> (<code>CookieLife</code>) - How long does the authentication cookie last?</p></li>
+
+<li><p><em>secure</em> (<code>bool</code>) - HttpsOnly?</p></li>
+
+<li><p><em>missingCookie</em> (<code>unit -&gt; Choice&lt;byte[],WebPart&gt;</code>) - What to do if authentication cookie is missing?</p></li>
+
+<li><p><em>decryptionFailure</em> (<code>SecretBoxDecryptionError -&gt; Choice&lt;byte[],WebPart&gt;</code>) - What to do if there is any error while decrypting the value present in the cookie?</p></li>
+
+<li><p><em>fSuccess</em> (<code>WebPart</code>) - What to do upon successful verification of authentication cookie?</p></li>
+</ol>
+
+<p>Let&rsquo;s put this <code>authenticate</code> function in action</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+module Suave = 
+  // ...
+  let redirectToLoginPage =
+    Redirection.FOUND &quot;/login&quot;
+
+  let requiresAuth fSuccess =
+    authenticate CookieLife.Session false
+      (fun _ -&gt; Choice2Of2 redirectToLoginPage)
+      (fun _ -&gt; Choice2Of2 redirectToLoginPage)
+      ??? // TODO
+  // ...
+</code></pre>
+
+<p>For both <code>missingCookie</code> and <code>decryptionFailure</code>, we are redirecting the user to the login page and for a valid a auth session cookie, we need to give some thoughts.</p>
+
+<p>We need to retrieve the <code>User</code> value that we persisted in the cookie upon successful login and then we have to call the provided <code>fSuccess</code>. If there is any error while retrieving the user from cookie, we need to redirect to the login page.</p>
+
+<pre><code class="language-fsharp">module Suave = 
+  // ...
+
+  // HttpContext -&gt; User option
+  let retrieveUser ctx : User option =
+      match HttpContext.state ctx with
+      | Some state -&gt; 
+        state.get userSessionKey
+      | _ -&gt; None
+
+  // WebPart -&gt; (User -&gt; WebPart) -&gt; HttpContext -&gt; WebPart
+  let initUserSession fFailure fSuccess ctx =
+    match retrieveUser ctx with
+    | Some user -&gt; fSuccess user
+    | _ -&gt; fFailure
+
+  // WebPart -&gt; (User -&gt; WebPart) -&gt; WebPart
+  let userSession fFailure fSuccess = 
+    statefulForSession 
+    &gt;=&gt; context (initUserSession fFailure fSuccess)
+
+  // ...
+
+  // (User -&gt; WebPart) -&gt; WebPart
+  let requiresAuth fSuccess =
+    authenticate ...
+      ...
+      (userSession redirectToLoginPage fSuccess)
+
+  // ...
+</code></pre>
+
+<p>In the <code>userSession</code> function, we are initializing the user state from the <code>CookieStateStore</code> by calling the <code>statefulForSession</code> function and then we retrive the logged in user from the state cookie.</p>
+
+<p>With the help of the <code>requiresAuth</code> function, now we can define a WebPart that can be accessed only by the authenticated user.</p>
+
+<p>Going back to <code>renderWall</code> function that we created in <em>Wall.fs</em>, we can now make it accesible only for the authenticated user by doing the following changes.</p>
+
+<pre><code class="language-diff">// FsTweet.Web/Wall.fs
+module Suave =
+  // ...
++ open User
++ open Auth.Suave
+
+- let renderWall ctx = async {
++ let renderWall (user : User) ctx = async {
+-   return! Successful.OK &quot;TODO&quot; ctx
++   return! Successful.OK user.Username.Value ctx
++ }
+
+  let webpart () =
+-   path &quot;/wall&quot; &gt;=&gt; renderWall
++   path &quot;/wall&quot; &gt;=&gt; requiresAuth renderWall
+</code></pre>
+
+<p>Instead of displaying a plain text, <code>TODO</code>, we have replaced it with the username of the loggedin user. We will be revisiting this <code>renderWall</code> function in the later blog posts.</p>
+
+<h2 id="handling-optional-authentication">Handling Optional Authentication</h2>
+
+<p>Say if the user is already logged in and if he/she visits <code>/login</code> page, right now we are rendering the login page and prompting the user to login again.</p>
+
+<p>But better user experience would be redirecting the user to the wall page.</p>
+
+<p>To acheive it, let&rsquo;s create new function <code>mayRequiresAuth</code>.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
+module Suave = 
+  // ...
+
+  // (User option -&gt; WebPart) -&gt; WebPart
+  let optionalUserSession fSuccess =
+    statefulForSession
+    &gt;=&gt; context (fun ctx -&gt; fSuccess (retrieveUser ctx))
+
+  // (User option -&gt; WebPart) -&gt; WebPart
+  let mayRequiresAuth fSuccess =
+    authenticate CookieLife.Session false
+      (fun _ -&gt; Choice2Of2 (fSuccess None))
+      (fun _ -&gt; Choice2Of2 (fSuccess None))
+      (optionalUserSession fSuccess)
+
+  // ...
+</code></pre>
+
+<p>The <code>mayRequiresAuth</code> function is similar to <code>requiresAuth</code> except that it calls the <code>fSuccess</code> function with a <code>User option</code> type instead of redirecting to login page if the user didn&rsquo;t login.</p>
+
+<p>The next step is changing the <code>renderLoginPage</code> function to accomodate this new requirement.</p>
+
+<pre><code class="language-diff">// FsTweet.Web/Auth.fs
+
+module Suave =
+  // ...
+-  let renderLoginPage (viewModel : LoginViewModel) = 
+-    page loginTemplatePath viewModel
++  let renderLoginPage (viewModel : LoginViewModel) hasUserLoggedIn = 
++    match hasUserLoggedIn with
++    | Some _ -&gt; Redirection.FOUND &quot;/wall&quot;
++    | _ -&gt; page loginTemplatePath viewModel
+
+  // ...
+
+   let webpart getDataCtx =
+      let findUser = Persistence.findUser getDataCtx
+      path &quot;/login&quot; &gt;=&gt; choose [
+-       GET &gt;=&gt; renderLoginPage emptyLoginViewModel
++       GET &gt;=&gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
+        POST &gt;=&gt; handleUserLogin findUser
+      ]
+</code></pre>
+
+<p>As we have changed the <code>renderLoginPage</code> function to take an extra parameter <code>hasUserLoggedIn</code>, we need to add a <code>None</code> as the last argument wherever we are calling the  <code>renderLoginPage</code> function.</p>
+
+<pre><code class="language-diff">...
+- renderLoginPage vm
++ renderLoginPage vm None
+...
+
+- return! renderLoginPage viewModel ctx
++ return! renderLoginPage viewModel None ctx
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learned how to do authentication in Suave and manage state using cookies. The source code associated with this part is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.14" target="_blank">GitHub</a></p>
+
+    </div>
+  </div>
+
+</article>
+
+<div class="container">
+  <nav>
+  <ul class="pager">
+    
+    <li class="previous"><a href="http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/"><span
+      aria-hidden="true">&larr;</span> Handling Login Request</a></li>
+    
+
+    
+  </ul>
+</nav>
+
+</div>
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread">
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the <a href="https://github.com/gcushen/hugo-academic" target="_blank">Academic
+      theme</a> for <a href="http://gohugo.io" target="_blank">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js" integrity="sha512-jGsMH83oKe9asCpkOVkBnUrDDTp8wl+adkB2D+//JtlxO4SrLoJdhbOysIFQJloQFD+C4Fl1rMsQZF76JjV0eQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.2/imagesloaded.pkgd.min.js" integrity="sha512-iHzEu7GbSc705hE2skyH6/AlTpOfBmkx7nUqTLGzPYR+C1tRaItbRlJ7hT/D3YQ9SV0fqLKzp4XY9wKulTBGTw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/TweenMax.min.js" integrity="sha512-Z5heTz36xTemt1TbtbfXtTq5lMfYnOkXM2/eWcTTiLU01+Sw4ku1i7vScDc8fWhrP2abz9GQzgKH5NGBLoYlAw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/1.19.1/plugins/ScrollToPlugin.min.js" integrity="sha512-CDeU7pRtkPX6XJtF/gcFWlEwyaX7mcAp5sO3VIu/ylsdR74wEw4wmBpD5yYTrmMAiAboi9thyBUr1vXRPA7t0Q==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+
+    
+    
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/highlight.min.js"></script>
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.9.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
