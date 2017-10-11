@@ -572,6 +572,14 @@ module Suave =
 
 <p>In this blog post, we learned how to do authentication in Suave and manage state using cookies. The source code associated with this part is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.14" target="_blank">GitHub</a></p>
 
+<h2 id="exercises">Exercises</h2>
+
+<ol>
+<li><p>Instead of stroing the user information in a cookie, store and retrieve it from a new table in the PostgreSQL database. You can get the session id from the auth cookie by using the <code>HttpContext.sessionId</code> function in the <code>Suave.Authentication</code> module.</p></li>
+
+<li><p>Suave supports cookies with sliding expiry. Replace the <code>CookieLife.Session</code> with <code>CookieLife.MaxAge</code> and implement sliding expiry.</p></li>
+</ol>
+
     </div>
   </div>
 
