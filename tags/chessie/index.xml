@@ -7,8 +7,831 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Thu, 28 Sep 2017 07:37:43 +0530</lastBuildDate>
+    <lastBuildDate>Mon, 09 Oct 2017 19:51:48 +0530</lastBuildDate>
     <atom:link href="/tags/chessie/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Posting New Tweet</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</link>
+      <pubDate>Mon, 09 Oct 2017 19:51:48 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</guid>
+      <description>
+
+&lt;p&gt;Hi there!&lt;/p&gt;
+
+&lt;p&gt;In this sixteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to implement core feature of Twitter, posting a tweet.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s dive in!&lt;/p&gt;
+
+&lt;h2 id=&#34;rendering-the-wall-page&#34;&gt;Rendering The Wall Page&lt;/h2&gt;
+
+&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/#rending-the-wall-page-with-a-placeholder&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have left the user&amp;rsquo;s wall page with a placeholder. So, As a first step, let&amp;rsquo;s replace this with an actual page to enable the user to post tweets.&lt;/p&gt;
+
+&lt;p&gt;This initial version of user&amp;rsquo;s wall page, will display a &lt;code&gt;textarea&lt;/code&gt; to capture the tweet being posted and placeholder to display the list of tweets in the wall.&lt;/p&gt;
+
+&lt;p&gt;It will also greet the user with a message &lt;em&gt;Hi {username}&lt;/em&gt; along with links to go his/her profile page and logout. We will adding implementations for profile and logout in the later posts.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;em&gt;Wall.fs&lt;/em&gt;, define a new type &lt;code&gt;WallViewModel&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;namespace Wall
+
+module Suave =
+  // ...
+  open Suave.DotLiquid
+
+  type WallViewModel = {
+    Username :  string
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and render the &lt;code&gt;user/wall.liquid&lt;/code&gt; template with this view model&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;  let renderWall (user : User) ctx = async {
+-    return! Successful.OK user.Username.Value ctx
++    let vm = {Username = user.Username.Value }
++    return! page &amp;quot;user/wall.liquid&amp;quot; vm ctx
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create a new dotliqud template &lt;em&gt;wall.liquid&lt;/em&gt; in the &lt;em&gt;views/user&lt;/em&gt; directly and update it as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; {{model.Username}}  &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+&amp;lt;div&amp;gt;
+  &amp;lt;div&amp;gt;
+    &amp;lt;p class=&amp;quot;username&amp;quot;&amp;gt;Hi {{model.Username}}&amp;lt;/p&amp;gt;
+    &amp;lt;a href=&amp;quot;/{{model.Username}}&amp;quot;&amp;gt;My Profile&amp;lt;/a&amp;gt;
+    &amp;lt;a href=&amp;quot;/logout&amp;quot;&amp;gt;Logout&amp;lt;/a&amp;gt;
+  &amp;lt;/div&amp;gt;
+  &amp;lt;div&amp;gt;
+    &amp;lt;div&amp;gt;
+      &amp;lt;form&amp;gt;
+        &amp;lt;textarea id=&amp;quot;tweet&amp;quot;&amp;gt;&amp;lt;/textarea&amp;gt;     
+        &amp;lt;button&amp;gt; Tweet &amp;lt;/button&amp;gt;
+      &amp;lt;/form&amp;gt;
+    &amp;lt;/div&amp;gt;
+  &amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Styles are ignore for brevity.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Now, if you run the application, you will be able to see the updated wall page after login.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/wall_v0.png&#34; alt=&#34;user wall v0.1&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;full-page-refresh&#34;&gt;Full Page Refresh&lt;/h2&gt;
+
+&lt;p&gt;In the both signup and login pages, we are doing full page refresh when the user submitted the form. But in the wall page, doing a full page refresh while posting a new tweet is not a good user experience.&lt;/p&gt;
+
+&lt;p&gt;The better option would be having a javascript code on the wall page, doing a &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/AJAX/Getting_Started&#34; target=&#34;_blank&#34;&gt;AJAX&lt;/a&gt; POST request with a JSON payload when the user click the &lt;code&gt;Tweet&lt;/code&gt; button.&lt;/p&gt;
+
+&lt;p&gt;That means we need to have a corresponding end point on the server responding to this request!&lt;/p&gt;
+
+&lt;h2 id=&#34;revisting-the-requiresauth-function&#34;&gt;Revisting The requiresAuth function&lt;/h2&gt;
+
+&lt;p&gt;Before creating a HTTP endpoint to handle new tweet, let&amp;rsquo;s have a revisit to our authentication implementation to add support for JSON HTTP endpoints.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let requiresAuth fSuccess =
+authenticate CookieLife.Session false
+  (fun _ -&amp;gt; Choice2Of2 redirectToLoginPage)
+  (fun _ -&amp;gt; Choice2Of2 redirectToLoginPage)
+  (userSession redirectToLoginPage fSuccess)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Currently, we are redirecting the user to login page, if the user didn&amp;rsquo;t have access. But this approach will not work out for AJAX requests, as it doesn&amp;rsquo;t full page refresh.&lt;/p&gt;
+
+&lt;p&gt;What we want is a HTTP response from the server with a status code &lt;code&gt;401 Unauthorized&lt;/code&gt; and a JSON body.&lt;/p&gt;
+
+&lt;p&gt;To enable this, let&amp;rsquo;s refactor the &lt;code&gt;requiresAuth&lt;/code&gt; as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
+// ...
+module Suave = 
+  // ...
+  // WebPart -&amp;gt; WebPart -&amp;gt; WebPart
+  let onAuthenticate fSuccess fFailure =
+    authenticate CookieLife.Session false
+      (fun _ -&amp;gt; Choice2Of2 fFailure)
+      (fun _ -&amp;gt; Choice2Of2 fFailure)
+      (userSession fFailure fSuccess)
+
+  let requiresAuth fSuccess =
+    onAuthenticate fSuccess redirectToLoginPage
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We have extracted the &lt;code&gt;requiresAuth&lt;/code&gt; function into a new function &lt;code&gt;onAuthenticate&lt;/code&gt; and added a new parameter &lt;code&gt;fFailure&lt;/code&gt; to parameterize what to do when authentication fails.&lt;/p&gt;
+
+&lt;p&gt;Then in the &lt;code&gt;requiresAuth&lt;/code&gt; function, we are calling the &lt;code&gt;onAuthenticate&lt;/code&gt; function with the &lt;code&gt;redirectToLoginPage&lt;/code&gt; webpart for authentication failures.&lt;/p&gt;
+
+&lt;p&gt;Now with the help of the new function &lt;code&gt;onAuthenticate&lt;/code&gt;, we can send an unauthorized response in case of an authentication failure using a new function &lt;code&gt;requiresAuth2&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let requiresAuth2 fSuccess =
+  onAuthenticate fSuccess (RequestErrors.UNAUTHORIZED &amp;quot;???&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;RequestErrors.UNAUTHORIZED&lt;/code&gt; function, takes a &lt;code&gt;string&lt;/code&gt; to populate the request body and return a &lt;code&gt;WebPart&lt;/code&gt;. To send JSON string as a response body we need to do few more work!&lt;/p&gt;
+
+&lt;h3 id=&#34;sending-json-response&#34;&gt;Sending JSON Response&lt;/h3&gt;
+
+&lt;p&gt;To send a JSON response, there is no out of the box direct in Suave as the library doesn&amp;rsquo;t want to have a dependency on any other external libaries other than &lt;a href=&#34;https://www.nuget.org/packages/FSharp.Core&#34; target=&#34;_blank&#34;&gt;FSharp.Core&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;However, we can do it with ease with the basic HTTP abstractions provided by Suave.&lt;/p&gt;
+
+&lt;p&gt;We just need to serialize the return value to the JSON string representation and send the response with the header &lt;code&gt;Content-Type&lt;/code&gt; populated with &lt;code&gt;application/json&lt;/code&gt; value.&lt;/p&gt;
+
+&lt;p&gt;To do the JSON serialization and deserialization (which we will be doing later in this blog post), let&amp;rsquo;s add a &lt;a href=&#34;https://xyncro.tech/chiron/&#34; target=&#34;_blank&#34;&gt;Chiron&lt;/a&gt; Nuget Package to the &lt;em&gt;FsTweet.Web&lt;/em&gt; project.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add Chiron -p src/FsTweet.Web/FsTweet.Web.fsproj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Chiron is a JSON library for F#. It can handle all of the usual things you’d want to do with JSON, (parsing and formatting, serialization and deserialization).&lt;/p&gt;
+
+&lt;p&gt;Chiron works rather differently to most .NET JSON libraries with which you might be familiar, using neither reflection nor annotation, but instead uses a simple functional style to be very explicit about the relationship of types to JSON. This gives a lot of power and flexibility - &lt;em&gt;Chrion Documentation&lt;/em&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Then create a new fsharp file &lt;em&gt;Json.fs&lt;/em&gt; to put all the Json related functionalities.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/Json
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And move this file above &lt;em&gt;User.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; repeat 6 forge moveUp web -n src/FsTweet.Web/Json.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To send an error message to the front-end, we are going to use the following JSON structure&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;msg&amp;quot; : &amp;quot;...&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add a function, &lt;code&gt;unauthorized&lt;/code&gt;, in the &lt;em&gt;Json.fs&lt;/em&gt; file that returns a WebPart having a &lt;code&gt;401 Unauthorized&lt;/code&gt; response with a JSON body.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
+
+[&amp;lt;RequireQualifiedAccess&amp;gt;]
+module JSON 
+
+open Suave
+open Suave.Operators
+open Chiron
+
+// WebPart
+let unauthorized =
+  [&amp;quot;msg&amp;quot;, String &amp;quot;login required&amp;quot;] // (string * Json) list
+  |&amp;gt; Map.ofList // Map&amp;lt;string,Json&amp;gt;
+  |&amp;gt; Object // Json
+  |&amp;gt; Json.format // string
+  |&amp;gt; RequestErrors.UNAUTHORIZED // Webpart
+  &amp;gt;=&amp;gt; Writers.addHeader 
+        &amp;quot;Content-type&amp;quot; &amp;quot;application/json; charset=utf-8&amp;quot;
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;String&lt;/code&gt; and &lt;code&gt;Object&lt;/code&gt; are the union cases of the &lt;code&gt;Json&lt;/code&gt; discriminated type in the Chiron library.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;Json.format&lt;/code&gt; function creates the &lt;code&gt;string&lt;/code&gt; representation of the underlying &lt;code&gt;Json&lt;/code&gt; type and then we pass it to the &lt;code&gt;RequestErrors.UNAUTHORIZED&lt;/code&gt; function to populate the response body with this JSON formatted string and finally we set the &lt;code&gt;Content-Type&lt;/code&gt; header.&lt;/p&gt;
+
+&lt;p&gt;Now we can rewrite the &lt;code&gt;requiresAuth2&lt;/code&gt; function as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;let requiresAuth2 fSuccess =
+-  onAuthenticate fSuccess (RequestErrors.UNAUTHORIZED &amp;quot;???&amp;quot;)
++  onAuthenticate fSuccess JSON.unauthorized
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this we are done with the authentication side of HTTP endpoints serving JSON response.&lt;/p&gt;
+
+&lt;h2 id=&#34;handling-new-tweet-post-request&#34;&gt;Handling New Tweet POST Request&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add a scaffholding for handling the new Tweet HTTP POST request.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
+module Suave = 
+  // ...
+  let handleNewTweet (user : User) ctx = async {
+    // TODO
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;add then wire this up with a new HTTP endpoint.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Wall.fs
+module Suave = 
+   // ...
+-  let webpart () =
+-    path &amp;quot;/wall&amp;quot; &amp;gt;=&amp;gt; requiresAuth renderWall 
++  let webpart () = 
++    choose [
++      path &amp;quot;/wall&amp;quot; &amp;gt;=&amp;gt; requiresAuth renderWall
++      POST &amp;gt;=&amp;gt; path &amp;quot;/tweets&amp;quot;  
++        &amp;gt;=&amp;gt; requiresAuth2 handleNewTweet  
++    ] 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first step in &lt;code&gt;handleNewTweet&lt;/code&gt; parsing the incoming JSON body and deserialize it to a fsharp record type. To carry out these two functionalities, &lt;code&gt;Chiron&lt;/code&gt; library has two functions &lt;code&gt;Json.tryParse&lt;/code&gt; and &lt;code&gt;Json.tryDeserialize&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add a new function &lt;code&gt;parse&lt;/code&gt; in &lt;em&gt;Json.fs&lt;/em&gt; to parse the JSON request body in the &lt;code&gt;HttpRequest&lt;/code&gt; to Chiron&amp;rsquo;s &lt;code&gt;Json&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
+// ...
+open System.Text
+open Chessie.ErrorHandling
+
+// HttpRequest -&amp;gt; Result&amp;lt;Json,string&amp;gt;
+let parse req = 
+  req.rawForm // byte []
+  |&amp;gt; Encoding.UTF8.GetString // string
+  |&amp;gt; Json.tryParse // Choice&amp;lt;Json, string&amp;gt;
+  |&amp;gt; ofChoice // Result&amp;lt;Json, string&amp;gt;
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we can call this function to parse the incoming the HTTP request.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleNewTweet (user : User) ctx = async {
+  match parse ctx.request  with
+  | Success json -&amp;gt; 
+    // TODO
+  | Failure err -&amp;gt; 
+    // TODO
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If there is any parser error we need to return bad request with a JSON body. To do it, let&amp;rsquo;s leverage the same JSON structure that we have used for sending JSON response for unauthorized requests.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
+// ...
+
+// string -&amp;gt; WebPart
+let badRequest err =
+  [&amp;quot;msg&amp;quot;, String err ] // (string * Json) list
+  |&amp;gt; Map.ofList // Map&amp;lt;string,Json&amp;gt;
+  |&amp;gt; Object // Json
+  |&amp;gt; Json.format // string
+  |&amp;gt; RequestErrors.BAD_REQUEST // Webpart
+  &amp;gt;=&amp;gt; Writers.addHeader 
+        &amp;quot;Content-type&amp;quot; &amp;quot;application/json; charset=utf-8&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;badRequest&lt;/code&gt; function and the &lt;code&gt;unauthorized&lt;/code&gt; binding both has some common code. So, let&amp;rsquo;s extract the common part out.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
+// ...
+
+let contentType = &amp;quot;application/json; charset=utf-8&amp;quot;
+
+// (string -&amp;gt; WebPart) -&amp;gt; Json -&amp;gt; WebPart
+let json fWebpart json = 
+  json // Json
+  |&amp;gt; Json.format // string
+  |&amp;gt; fWebpart // WebPart
+  &amp;gt;=&amp;gt; Writers.addHeader &amp;quot;Content-type&amp;quot; contentType // WebPart
+
+// (string -&amp;gt; WebPart) -&amp;gt; string -&amp;gt; WebPart
+let error fWebpart msg  = 
+  [&amp;quot;msg&amp;quot;, String msg] // (string * Json) list
+  |&amp;gt; Map.ofList // Map&amp;lt;string,Json&amp;gt;
+  |&amp;gt; Object // Json
+  |&amp;gt; json fWebpart // WebPart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then change the &lt;code&gt;unauthorized&lt;/code&gt; and &lt;code&gt;badRequest&lt;/code&gt; functions to use this new function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let badRequest msg = 
+  error RequestErrors.BAD_REQUEST msg
+
+let unauthorized = 
+  error RequestErrors.UNAUTHORIZED &amp;quot;login required&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Going back to the &lt;code&gt;handleNewTweet&lt;/code&gt; function, if there is any error while parsing the request JSON, we can return a bad request as response&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Wall.fs
+// ...
+module Suave =
+  // ...
+  let handleNewTweet (user : User) ctx = async {
+    match parse ctx.request  with
+    | Success json -&amp;gt; 
+      // TODO
+    | Failure err -&amp;gt; 
+-     // TODO
++     return! JSON.badRequest err ctx
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s switch our focus to handle a valid JSON request from the user.&lt;/p&gt;
+
+&lt;p&gt;The JSON structure of the new tweet POST request will be&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;post&amp;quot; : &amp;quot;Hello, World!&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To represent this JSON on the server side (like View Model), Let&amp;rsquo;s create a new type &lt;code&gt;PostRequest&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
+module Suave = 
+  // ...
+  type PostRequest = PostRequest of string
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To deserialize the &lt;code&gt;Json&lt;/code&gt; type that we get after parsing to &lt;code&gt;PostRequest&lt;/code&gt;, Chiron library requires &lt;code&gt;PostRequest&lt;/code&gt; type to have a static member function &lt;code&gt;FromJson&lt;/code&gt; with the signature &lt;code&gt;PostRequest -&amp;gt; Json&amp;lt;PostRequest&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
+  // ...
+  open Chiron
+
+  // ...
+  type PostRequest = PostRequest of string with
+    // PostRequest -&amp;gt; Json&amp;lt;PostRequest&amp;gt;
+    static member FromJson (_ : PostRequest) = json {
+      let! post = Json.read &amp;quot;post&amp;quot;
+      return PostRequest post 
+    }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are making use of the &lt;code&gt;json&lt;/code&gt; computation expression from Chrion library to create &lt;code&gt;PostRequest&lt;/code&gt; from &lt;code&gt;Json&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then in the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we can deserialize we &lt;code&gt;Json&lt;/code&gt; to &lt;code&gt;PostRequest&lt;/code&gt; using the &lt;code&gt;Json.tryDeserialize&lt;/code&gt; function from Chiron.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleNewTweet (user : User) ctx = async {
+  match parse ctx.request  with
+  | Success json -&amp;gt; 
+    match Json.tryDeserialize json with
+    | Choice1Of2 (PostRequest post) -&amp;gt; 
+      // TODO
+    | Choice2Of2 err -&amp;gt; 
+      return! JSON.badRequest err ctx
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;Json.tryDeserialize&lt;/code&gt; function takes &lt;code&gt;Json&lt;/code&gt; as its input and return &lt;code&gt;Choice&amp;lt;&#39;a, string&amp;gt;&lt;/code&gt; where the actual type of &lt;code&gt;&#39;a&lt;/code&gt; is inferred from the usage of &lt;code&gt;Choice&lt;/code&gt; and also the actual type of &lt;code&gt;&#39;a&lt;/code&gt; should have a static member function &lt;code&gt;FromJson&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;In case of any deserialization error, we are returning it as a bad request using the &lt;code&gt;JSON.badRequest&lt;/code&gt; function that we created earlier.&lt;/p&gt;
+
+&lt;p&gt;Now we have the server side representation of the &lt;code&gt;PostRequest&lt;/code&gt;. The next step is validating the new tweet being posted.&lt;/p&gt;
+
+&lt;p&gt;Create a new file &lt;em&gt;Tweet.fs&lt;/em&gt; in &lt;em&gt;FsTweet.Web&lt;/em&gt; project and move it above &lt;em&gt;FsTweet.Web.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/Tweet
+&amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/Tweet.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain side representation of a Tweet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
+namespace Tweet
+open Chessie.ErrorHandling
+
+type Post = private Post of string with
+  // string -&amp;gt; Result&amp;lt;Post, string&amp;gt;
+  static member TryCreate (post : string) =
+    match post with
+    | null | &amp;quot;&amp;quot;  -&amp;gt; 
+      fail &amp;quot;Tweet should not be empty&amp;quot;
+    | x when x.Length &amp;gt; 140 -&amp;gt; 
+      fail &amp;quot;Tweet should not be more than 140 characters&amp;quot;
+    | x -&amp;gt; 
+      Post x |&amp;gt; ok
+
+  
+  member this.Value = 
+    let (Post post) = this
+    post
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can now use this &lt;code&gt;Post.TryCreate&lt;/code&gt; static member function to validate the &lt;code&gt;PostRequest&lt;/code&gt; in the &lt;code&gt;handleNewTweet&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Wall.fs
+// ...
+module Suave =
+  // ...
+  let handleNewTweet (user : User) ctx = async {
+    match parse ctx.request  with
+    | Success json -&amp;gt; 
+      match Json.tryDeserialize json with
+      | Choice1Of2 (PostRequest post) -&amp;gt; 
+-       // TODO
++       match Post.TryCreate post with
++       | Success post -&amp;gt; 
++         // TODO
++       | Failure err -&amp;gt; 
++         return! JSON.badRequest err ctx  
+      // ...        
+    // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this, we are having a server side representation of valid tweet post being posted.&lt;/p&gt;
+
+&lt;p&gt;The next step is persisting it!&lt;/p&gt;
+
+&lt;h2 id=&#34;persisting-new-tweet&#34;&gt;Persisting New Tweet&lt;/h2&gt;
+
+&lt;p&gt;To persist a new tweet, we need a new table in our PostgreSQL database. So, let&amp;rsquo;s add this in our migration file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Db.Migrations/FsTweet.Db.Migrations.fs
+
+// ...
+
+[&amp;lt;Migration(201710071212L, &amp;quot;Creating Tweet Table&amp;quot;)&amp;gt;]
+type CreateTweetTable()=
+  inherit Migration()
+
+  override this.Up() =
+    base.Create.Table(&amp;quot;Tweets&amp;quot;)
+      .WithColumn(&amp;quot;Id&amp;quot;).AsGuid().PrimaryKey()
+      .WithColumn(&amp;quot;Post&amp;quot;).AsString(144).NotNullable()
+      .WithColumn(&amp;quot;UserId&amp;quot;).AsInt32().ForeignKey(&amp;quot;Users&amp;quot;, &amp;quot;Id&amp;quot;)
+      .WithColumn(&amp;quot;TweetedAt&amp;quot;).AsDateTimeOffset().NotNullable()
+    |&amp;gt; ignore
+  
+  override this.Down() = 
+    base.Delete.Table(&amp;quot;Tweets&amp;quot;) |&amp;gt; ignore
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then run the application using &lt;code&gt;forge run&lt;/code&gt; command to create the &lt;code&gt;Tweets&lt;/code&gt; table using this migration.&lt;/p&gt;
+
+&lt;p&gt;Upon successful execution, we will be having a &lt;code&gt;Tweets&lt;/code&gt; table in our database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; psql -d FsTweet
+
+FsTweet=# \d &amp;quot;Tweets&amp;quot;;;
+
+              Table &amp;quot;public.Tweets&amp;quot;
+  Column   |           Type           | Modifiers
+-----------+--------------------------+-----------
+ Id        | uuid                     | not null
+ Post      | character varying(144)   | not null
+ UserId    | integer                  | not null
+ TweetedAt | timestamp with time zone | not null
+Indexes:
+    &amp;quot;PK_Tweets&amp;quot; PRIMARY KEY, btree (&amp;quot;Id&amp;quot;)
+Foreign-key constraints:
+    &amp;quot;FK_Tweets_UserId_Users_Id&amp;quot; 
+      FOREIGN KEY (&amp;quot;UserId&amp;quot;) REFERENCES &amp;quot;Users&amp;quot;(&amp;quot;Id&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then define a new type for representing the function persisting a new tweet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
+
+// ...
+open User
+open System
+// ...
+
+type PostId = PostId of Guid
+
+type CreatePost = 
+  UserId -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;PostId, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then create a new module &lt;code&gt;Persistence&lt;/code&gt; in &lt;em&gt;Tweet.fs&lt;/em&gt; and define the &lt;code&gt;createPost&lt;/code&gt; function which provides the implementation of the peristing a new tweet in PostgreSQL using SQLProvider.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
+// ...
+module Persistence =
+
+  open User
+  open Database
+  open System
+
+  let createPost (getDataCtx : GetDataContext) 
+        (UserId userId) (post : Post) = asyncTrial {
+
+    let ctx = getDataCtx()
+    let newTweet = ctx.Public.Tweets.Create()
+    let newPostId = Guid.NewGuid()
+
+    newTweet.UserId &amp;lt;- userId
+    newTweet.Id &amp;lt;- newPostId
+    newTweet.Post &amp;lt;- post.Value
+    newTweet.TweetedAt &amp;lt;- DateTime.UtcNow
+
+    do! submitUpdates ctx 
+    return PostId newPostId
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To wire this up with peristence logic with the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we need to transform the &lt;code&gt;AsyncResult&amp;lt;PostId, Exception&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Before we go ahead and implement it, let&amp;rsquo;s add few helper functions in &lt;em&gt;Json.fs&lt;/em&gt; to send &lt;code&gt;Ok&lt;/code&gt; and &lt;code&gt;InternalServerError&lt;/code&gt; responses with JSON body&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
+// ...
+
+// WebPart 
+let internalError =
+  error ServerErrors.INTERNAL_ERROR &amp;quot;something went wrong&amp;quot;
+
+// Json -&amp;gt; WebPart
+let ok =
+  json (Successful.OK)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then define what we need to for both &lt;code&gt;Success&lt;/code&gt; and &lt;code&gt;Failure&lt;/code&gt; case.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
+// ... 
+module Suave = 
+  // ...
+  open Chessie.ErrorHandling
+  open Chessie
+
+  // ...
+
+  // PostId -&amp;gt; WebPart
+  let onCreateTweetSuccess (PostId id) = 
+    [&amp;quot;id&amp;quot;, String (id.ToString())] // (string * Json) list
+    |&amp;gt; Map.ofList // Map&amp;lt;string, Json&amp;gt;
+    |&amp;gt; Object // Json
+    |&amp;gt; JSON.ok // WebPart
+
+  // Exception -&amp;gt; WebPart
+  let onCreateTweetFailure (ex : System.Exception) =
+    printfn &amp;quot;%A&amp;quot; ex
+    JSON.internalError
+
+  // Result&amp;lt;PostId, Exception&amp;gt; -&amp;gt; WebPart
+  let handleCreateTweetResult result = 
+    either onCreateTweetSuccess onCreateTweetFailure result 
+
+  // AsyncResult&amp;lt;PostId, Exception&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
+  let handleAsyncCreateTweetResult aResult =
+    aResult // AsyncResult&amp;lt;PostId, Exception&amp;gt;
+    |&amp;gt; Async.ofAsyncResult // Async&amp;lt;Result&amp;lt;PostId, Exception&amp;gt;&amp;gt;
+    |&amp;gt; Async.map handleCreateTweetResult // Async&amp;lt;WebPart&amp;gt;
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final piece is passing the dependency &lt;code&gt;getDataCtx&lt;/code&gt; for the &lt;code&gt;createPost&lt;/code&gt; function from the application&amp;rsquo;s main function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Auth.fs
+// ...
+-      Wall.Suave.webpart ()
++      Wall.Suave.webpart getDataCtx
+    ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Wall.fs
+// ...
+-  let handleNewTweet (user : User) ctx = async {
++  let handleNewTweet createTweet (user : User) ctx = async {
+// ...
+
+-  let webpart () = 
++  let webpart getDataCtx =
++    let createTweet = Persistence.createPost getDataCtx 
+     choose [
+       path &amp;quot;/wall&amp;quot; &amp;gt;=&amp;gt; requiresAuth renderWall
+       POST &amp;gt;=&amp;gt; path &amp;quot;/tweets&amp;quot;  
+-        &amp;gt;=&amp;gt; requiresAuth2 handleNewTweet
++        &amp;gt;=&amp;gt; requiresAuth2 (handleNewTweet createTweet)  
+    ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then invoke the &lt;code&gt;createPost&lt;/code&gt; function in the &lt;code&gt;handleNewTweet&lt;/code&gt; function and transform the result to &lt;code&gt;WebPart&lt;/code&gt; using the &lt;code&gt;handleAsyncCreateTweetResult&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;+  let handleNewTweet createTweet (user : User) ctx = async {
+      // ...
+        match Post.TryCreate post with
+        | Success post -&amp;gt; 
+-         // TODO
++         let aCreateTweetResult = 
++           createTweet user.UserId post
++         let! webpart = 
++           handleAsyncCreateTweetResult aCreateTweetResult
++         return! webpart ctx
+      // ...
+    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this we have successfully added support for creating a new tweet.&lt;/p&gt;
+
+&lt;p&gt;To invoke this HTTP API from the front end, let&amp;rsquo;s create a new javascript file &lt;em&gt;FsTweet.Web/assets/js/wall.js&lt;/em&gt; and update it as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;$(function(){
+  $(&amp;quot;#tweetForm&amp;quot;).submit(function(event){
+    event.preventDefault();
+
+    $.ajax({
+      url : &amp;quot;/tweets&amp;quot;,
+      type: &amp;quot;post&amp;quot;,
+      data: JSON.stringify({post : $(&amp;quot;#tweet&amp;quot;).val()}),
+      contentType: &amp;quot;application/json&amp;quot;
+    }).done(function(){
+      alert(&amp;quot;successfully posted&amp;quot;)
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.log({
+        jqXHR : jqXHR, 
+        textStatus : textStatus, 
+        errorThrown: errorThrown})
+      alert(&amp;quot;something went wrong!&amp;quot;)
+    });
+
+  });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in the &lt;em&gt;wall.liquid&lt;/em&gt; template include this script file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- FsTweet.Web/views/user/wall.liquid --&amp;gt;
+// ...
+{% block scripts %}
+&amp;lt;script src=&amp;quot;/assets/js/wall.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are making use of the &lt;code&gt;scripts block&lt;/code&gt; defined the &lt;em&gt;master_page.liquid&lt;/em&gt; here.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;div id=&amp;quot;scripts&amp;quot;&amp;gt;
+  &amp;lt;!-- ... --&amp;gt;
+  {% block scripts %}
+  {% endblock %}
+&amp;lt;/div&amp;gt;	
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Let&amp;rsquo;s run the application and do a test drive to verify this new feature.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_post.png&#34; alt=&#34;First Tweet Post&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can also verify it in the database&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_query.png&#34; alt=&#34;First Tweet Query&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Awesome! We made it!!&lt;/p&gt;
+
+&lt;h2 id=&#34;revisiting-asyncresult-to-webpart-transformation&#34;&gt;Revisiting AsyncResult to WebPart Transformation&lt;/h2&gt;
+
+&lt;p&gt;In all the places to transform &lt;code&gt;AsyncResult&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt; we were using the following functions&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
+
+// Result&amp;lt;PostId, Exception&amp;gt; -&amp;gt; WebPart
+let handleCreateTweetResult result = ...
+
+// AsyncResult&amp;lt;PostId, Exception&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
+let handleAsyncCreateTweetResult aResult = ...
+
+// FsTweet.Web/Auth.fs
+
+// LoginViewModel -&amp;gt; Result&amp;lt;User,LoginError&amp;gt; -&amp;gt; WebPart
+let handleLoginResult viewModel loginResult = 
+
+// LoginViewModel -&amp;gt; AsyncResult&amp;lt;User,LoginError&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
+let handleLoginAsyncResult viewModel aLoginResult = 
+
+// FsTweet.Web/UserSignup.fs
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can generialize this transformation as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;   (&#39;a -&amp;gt; &#39;b) -&amp;gt; (&#39;c -&amp;gt; &#39;b) -&amp;gt; AsyncResult&amp;lt;&#39;a, &#39;c&amp;gt; -&amp;gt; Async&amp;lt;&#39;b&amp;gt;
+//  onSuccess     onFailure      aResult              aWebPart
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It is similar to the signature of the &lt;code&gt;either&lt;/code&gt; function in the Chessie library&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;(&#39;a -&amp;gt; &#39;b) -&amp;gt; (&#39;c -&amp;gt; &#39;b) -&amp;gt; Result&amp;lt;&#39;a, &#39;c&amp;gt; -&amp;gt; &#39;b
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The only difference is the function that we need should work with &lt;code&gt;AsyncResult&lt;/code&gt; instead of &lt;code&gt;Result&lt;/code&gt;. In other words, we need an &lt;code&gt;either&lt;/code&gt; function for &lt;code&gt;AsyncResult&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create this out&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Chessie.fs
+// ...
+
+module AR = 
+  // ...
+  let either onSuccess onFailure aResult = 
+    aResult
+    |&amp;gt; Async.ofAsyncResult
+    |&amp;gt; Async.map (either onSuccess onFailure)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this we can refactor the &lt;em&gt;Wall.fs&lt;/em&gt; as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Wall.fs
+// ...
+
+-  let handleCreateTweetResult result = 
+-    either onCreateTweetSuccess onCreateTweetFailure result 
+-
+-  let handleAsyncCreateTweetResult aResult =
+-    aResult
+-    |&amp;gt; Async.ofAsyncResult
+-    |&amp;gt; Async.map handleCreateTweetResult
+
+// ...
+   let handleNewTweet createTweet (user : User) ctx = async {
+      // ...
+        match Post.TryCreate post with
+        | Success post -&amp;gt; 
+-        let aCreateTweetResult = createTweet user.UserId post
+          let! webpart = 
+-          handleAsyncCreateTweetResult aCreateTweetResult
++          createTweet user.UserId post
++          |&amp;gt; AR.either onCreateTweetSuccess onCreateTweetFailure
+        // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now it looks cleaner, Isn&amp;rsquo;t it?&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Making this similar refactoring in &lt;em&gt;UserSignup.fs&lt;/em&gt; and &lt;em&gt;Auth.fs&lt;/em&gt; as well&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;unifying-json-parse-and-deserialize&#34;&gt;Unifying JSON parse and deserialize&lt;/h2&gt;
+
+&lt;p&gt;In the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we are doing two things to get the server side representation of the tweet being posted, parsing and deserializing.&lt;/p&gt;
+
+&lt;p&gt;If there is any error while doing any of these, we are returning bad request as response.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleNewTweet ... = async {
+  // ...
+  match parse ctx.request  with
+  | Success json -&amp;gt; 
+      match Json.tryDeserialize json with
+      | Choice1Of2 (PostRequest post) -&amp;gt;
+      // ...
+      | Choice2Of2 err -&amp;gt;
+      // ...
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can unify these two functions together that has the following signature&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;HttpRequest -&amp;gt; Result&amp;lt;^a, string&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: We are using &lt;code&gt;^a&lt;/code&gt; instead of &lt;code&gt;&#39;a&lt;/code&gt;. i.e., &lt;code&gt;^a&lt;/code&gt; is a &lt;a href=&#34;https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/generics/statically-resolved-type-parameters&#34; target=&#34;_blank&#34;&gt;Statically resolved type parameter&lt;/a&gt;. We need this as we &lt;code&gt;Json.tryDeserialize&lt;/code&gt; requires the &lt;code&gt;FromJson&lt;/code&gt; static member function constraint.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Let&amp;rsquo; name this function &lt;code&gt;deserialize&lt;/code&gt; and the implemenation in &lt;em&gt;Json.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
+// ...
+
+// HttpRequest -&amp;gt; Result&amp;lt;^a, string&amp;gt;
+let inline deserialize&amp;lt; ^a when (^a or FromJsonDefaults) 
+                          : (static member FromJson: ^a -&amp;gt; ^a Json)&amp;gt; 
+                          req : Result&amp;lt; ^a, string&amp;gt; =
+
+  parse req // Result&amp;lt;Json, string&amp;gt;
+  |&amp;gt; bind (fun json -&amp;gt; 
+            json 
+            |&amp;gt; Json.tryDeserialize 
+            |&amp;gt; ofChoice) // Result&amp;lt;^a, string&amp;gt;
+
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Chiron library has &lt;code&gt;FromJsonDefaults&lt;/code&gt; type to extend the fsharp primitive types to have the &lt;code&gt;FromJson&lt;/code&gt; static member function. The &lt;code&gt;bind&lt;/code&gt; function is from Chessie library, which maps the success part of the &lt;code&gt;Result&lt;/code&gt; with the provided function.&lt;/p&gt;
+
+&lt;p&gt;With this new function, we can rewrite the &lt;code&gt;handleNewTweet&lt;/code&gt; function as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;   let handleNewTweet ctx = async {
+-    match parse ctx.request  with
+-    | Success json -&amp;gt; 
+-       match Json.tryDeserialize json with
+-       | Choice1Of2 (PostRequest post) -&amp;gt; 
++    match deserialize ctx.request  with
++    | Success (PostRequest post) -&amp;gt; 
+   // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we saw how to expose JSON HTTP endpoints in Suave and also learned how to use the Chiron libary to deal with JSON.&lt;/p&gt;
+
+&lt;p&gt;The source code associated with this blog post is available on [GitHub]()&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Handling Login Request</title>
