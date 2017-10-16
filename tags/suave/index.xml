@@ -168,7 +168,7 @@ module Suave =
 
 &lt;p&gt;And move this file above &lt;em&gt;User.fs&lt;/em&gt;&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; repeat 6 forge moveUp web -n src/FsTweet.Web/Json.fs
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; repeat 7 forge moveUp web -n src/FsTweet.Web/Json.fs
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;To send an error message to the front-end, we are going to use the following JSON structure&lt;/p&gt;
@@ -499,13 +499,13 @@ open User
 open System
 // ...
 
-type PostId = PostId of Guid
+type TweetId = TweetId of Guid
 
-type CreatePost = 
-  UserId -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;PostId, Exception&amp;gt;
+type CreateTweet = 
+  UserId -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;TweetId, Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then create a new module &lt;code&gt;Persistence&lt;/code&gt; in &lt;em&gt;Tweet.fs&lt;/em&gt; and define the &lt;code&gt;createPost&lt;/code&gt; function which provides the implementation of the peristing a new tweet in PostgreSQL using SQLProvider.&lt;/p&gt;
+&lt;p&gt;Then create a new module &lt;code&gt;Persistence&lt;/code&gt; in &lt;em&gt;Tweet.fs&lt;/em&gt; and define the &lt;code&gt;createTweet&lt;/code&gt; function which provides the implementation of the peristing a new tweet in PostgreSQL using SQLProvider.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
 // ...
@@ -515,24 +515,24 @@ module Persistence =
   open Database
   open System
 
-  let createPost (getDataCtx : GetDataContext) 
+  let createTweet (getDataCtx : GetDataContext) 
         (UserId userId) (post : Post) = asyncTrial {
 
     let ctx = getDataCtx()
     let newTweet = ctx.Public.Tweets.Create()
-    let newPostId = Guid.NewGuid()
+    let newTweetId = Guid.NewGuid()
 
     newTweet.UserId &amp;lt;- userId
-    newTweet.Id &amp;lt;- newPostId
+    newTweet.Id &amp;lt;- newTweetId
     newTweet.Post &amp;lt;- post.Value
     newTweet.TweetedAt &amp;lt;- DateTime.UtcNow
 
     do! submitUpdates ctx 
-    return PostId newPostId
+    return TweetId newTweetId
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;To wire this up with peristence logic with the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we need to transform the &lt;code&gt;AsyncResult&amp;lt;PostId, Exception&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To wire this up with peristence logic with the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we need to transform the &lt;code&gt;AsyncResult&amp;lt;TweetId, Exception&amp;gt;&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Before we go ahead and implement it, let&amp;rsquo;s add few helper functions in &lt;em&gt;Json.fs&lt;/em&gt; to send &lt;code&gt;Ok&lt;/code&gt; and &lt;code&gt;InternalServerError&lt;/code&gt; responses with JSON body&lt;/p&gt;
 
@@ -559,8 +559,8 @@ module Suave =
 
   // ...
 
-  // PostId -&amp;gt; WebPart
-  let onCreateTweetSuccess (PostId id) = 
+  // TweetId -&amp;gt; WebPart
+  let onCreateTweetSuccess (TweetId id) = 
     [&amp;quot;id&amp;quot;, String (id.ToString())] // (string * Json) list
     |&amp;gt; Map.ofList // Map&amp;lt;string, Json&amp;gt;
     |&amp;gt; Object // Json
@@ -571,20 +571,20 @@ module Suave =
     printfn &amp;quot;%A&amp;quot; ex
     JSON.internalError
 
-  // Result&amp;lt;PostId, Exception&amp;gt; -&amp;gt; WebPart
+  // Result&amp;lt;TweetId, Exception&amp;gt; -&amp;gt; WebPart
   let handleCreateTweetResult result = 
     either onCreateTweetSuccess onCreateTweetFailure result 
 
-  // AsyncResult&amp;lt;PostId, Exception&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
+  // AsyncResult&amp;lt;TweetId, Exception&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
   let handleAsyncCreateTweetResult aResult =
-    aResult // AsyncResult&amp;lt;PostId, Exception&amp;gt;
-    |&amp;gt; Async.ofAsyncResult // Async&amp;lt;Result&amp;lt;PostId, Exception&amp;gt;&amp;gt;
+    aResult // AsyncResult&amp;lt;TweetId, Exception&amp;gt;
+    |&amp;gt; Async.ofAsyncResult // Async&amp;lt;Result&amp;lt;TweetId, Exception&amp;gt;&amp;gt;
     |&amp;gt; Async.map handleCreateTweetResult // Async&amp;lt;WebPart&amp;gt;
 
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The final piece is passing the dependency &lt;code&gt;getDataCtx&lt;/code&gt; for the &lt;code&gt;createPost&lt;/code&gt; function from the application&amp;rsquo;s main function.&lt;/p&gt;
+&lt;p&gt;The final piece is passing the dependency &lt;code&gt;getDataCtx&lt;/code&gt; for the &lt;code&gt;createTweet&lt;/code&gt; function from the application&amp;rsquo;s main function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Auth.fs
 // ...
@@ -601,7 +601,7 @@ module Suave =
 
 -  let webpart () = 
 +  let webpart getDataCtx =
-+    let createTweet = Persistence.createPost getDataCtx 
++    let createTweet = Persistence.createTweet getDataCtx 
      choose [
        path &amp;quot;/wall&amp;quot; &amp;gt;=&amp;gt; requiresAuth renderWall
        POST &amp;gt;=&amp;gt; path &amp;quot;/tweets&amp;quot;  
@@ -610,7 +610,7 @@ module Suave =
     ]
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;And then invoke the &lt;code&gt;createPost&lt;/code&gt; function in the &lt;code&gt;handleNewTweet&lt;/code&gt; function and transform the result to &lt;code&gt;WebPart&lt;/code&gt; using the &lt;code&gt;handleAsyncCreateTweetResult&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;And then invoke the &lt;code&gt;createTweet&lt;/code&gt; function in the &lt;code&gt;handleNewTweet&lt;/code&gt; function and transform the result to &lt;code&gt;WebPart&lt;/code&gt; using the &lt;code&gt;handleAsyncCreateTweetResult&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;+  let handleNewTweet createTweet (user : User) ctx = async {
       // ...
@@ -689,10 +689,10 @@ module Suave =
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
 
-// Result&amp;lt;PostId, Exception&amp;gt; -&amp;gt; WebPart
+// Result&amp;lt;TweetId, Exception&amp;gt; -&amp;gt; WebPart
 let handleCreateTweetResult result = ...
 
-// AsyncResult&amp;lt;PostId, Exception&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
+// AsyncResult&amp;lt;TweetId, Exception&amp;gt; -&amp;gt; Async&amp;lt;WebPart&amp;gt;
 let handleAsyncCreateTweetResult aResult = ...
 
 // FsTweet.Web/Auth.fs
@@ -829,7 +829,7 @@ let inline deserialize&amp;lt; ^a when (^a or FromJsonDefaults)
 
 &lt;p&gt;In this blog post, we saw how to expose JSON HTTP endpoints in Suave and also learned how to use the Chiron libary to deal with JSON.&lt;/p&gt;
 
-&lt;p&gt;The source code associated with this blog post is available on [GitHub]()&lt;/p&gt;
+&lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.15&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

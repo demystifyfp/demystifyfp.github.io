@@ -140,6 +140,15 @@
     
     <url>
     
+      <loc>http://www.demystifyfp.com/fsharp/series/fstweet/</loc>
+      <lastmod>2017-08-15T20:02:30+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</loc>
       <lastmod>2017-08-15T20:02:30+05:30</lastmod>
     </url>
@@ -249,7 +258,6 @@
     <url>
     
       <loc>http://www.demystifyfp.com/fsharp/</loc>
-      <lastmod>2017-10-09T19:51:48+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -309,6 +317,15 @@
     
       <loc>http://www.demystifyfp.com/tags/rop/</loc>
       <lastmod>2017-10-09T19:51:48+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>http://www.demystifyfp.com/fsharp/series/</loc>
       <priority>0</priority>
     </url>
     
