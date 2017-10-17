@@ -11,6 +11,211 @@
     <atom:link href="/fsharp/series/fstweet/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Adding User Feed</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</link>
+      <pubDate>Sat, 14 Oct 2017 08:19:14 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;Welcome back to the seventeeth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we saw to how to persist a new tweet from the user. But after persisting the new tweet, we haven&amp;rsquo;t do anything. In real twitter we have a user feed, which shows a timeline with tweets from him/her and from others whom he/she follows.&lt;/p&gt;
+
+&lt;p&gt;In this blog post, we are going to address the first part of user&amp;rsquo;s timeline, viewing his/her tweets in the Wall page.&lt;/p&gt;
+
+&lt;h2 id=&#34;publishing-a-new-tweet&#34;&gt;Publishing a New Tweet&lt;/h2&gt;
+
+&lt;p&gt;Earlier, we just created a new tweet in the database when the user submitted a tweet. To add support for user feeds and timeline, we need to notify an external system after persisting the new tweet.&lt;/p&gt;
+
+&lt;p&gt;In other words, it&amp;rsquo;s no longer just create tweet, it&amp;rsquo;s create tweet and notify tweet!&lt;/p&gt;
+
+&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#defining-the-signupuser-function-signature&#34; target=&#34;_blank&#34;&gt;orachestrating the user signup&lt;/a&gt;, we define a new function which carry out both of the mentioned operations.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by defining a new type to represent a Tweet!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
+// ...
+
+type Tweet = {
+  UserId : UserId
+  PostId : PostId
+  Post : Post
+}
+
+module Persistence = ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create a new module &lt;code&gt;Domain&lt;/code&gt; in &lt;em&gt;Wall.fs&lt;/em&gt; and define a type for notifying the arrival of a new tweet.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
+
+module Domain = 
+  open Tweet
+  open System
+  open Chessie.ErrorHandling 
+
+  type NotifyTweet = Tweet -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;NotifyTweet&lt;/code&gt; type typify a notify tweet function that takes &lt;code&gt;Tweet&lt;/code&gt; and returns either &lt;code&gt;uint&lt;/code&gt; or &lt;code&gt;Exception&lt;/code&gt; asynchronously.&lt;/p&gt;
+
+&lt;p&gt;Then create a new type &lt;code&gt;PublishTweet&lt;/code&gt; to represent the signature of the orchastration function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...
+  open User
+
+  // ...
+
+  type PublishTweet =
+      CreateTweet -&amp;gt; NotifyTweet -&amp;gt; 
+        User -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;TweetId, PublishTweetError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This &lt;code&gt;PublishTweet&lt;/code&gt; type represents a function that takes two higher order functions, &lt;code&gt;CreateTweet&lt;/code&gt; to create the tweet in the database and &lt;code&gt;NotifyTweet&lt;/code&gt; to notify that the user has posted a tweet, the &lt;code&gt;User&lt;/code&gt; who posts the tweet and the tweet &lt;code&gt;Post&lt;/code&gt; itself.&lt;/p&gt;
+
+&lt;p&gt;It returns either &lt;code&gt;TweetId&lt;/code&gt; or &lt;code&gt;PublishTweetError&lt;/code&gt; asynchronously.&lt;/p&gt;
+
+&lt;p&gt;We don&amp;rsquo;t have the &lt;code&gt;PublishTweetError&lt;/code&gt; type defined yet. So, let&amp;rsquo;s add it first.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type PublishTweetError =
+| CreateTweetError of Exception
+| NotifyTweetError of (TweetId * Exception)
+
+type PublishTweet = ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, implement the &lt;code&gt;publishTweet&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Wall.fs
+
+module Domain = 
+  // ...
+  open Chessie
+
+  // ...
+
+  let publishTweet createTweet notifyTweet 
+        (user : User) post = asyncTrial {
+
+    let! tweetId = 
+      createTweet user.UserId post
+      |&amp;gt; AR.mapFailure CreateTweetError
+
+    let tweet = {
+      Id = tweetId
+      UserId = user.UserId
+      Username = user.Username
+      Post = post
+    }
+    do! notifyTweet tweet 
+        |&amp;gt; AR.mapFailure (fun ex -&amp;gt; NotifyTweetError(tweetId, ex))
+
+    return tweetId
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;publishTweet&lt;/code&gt; function making use of the abstractions that we built earlier and implement the orchastration.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are mapping the possible failure of each operation to its corresponding union case of the &lt;code&gt;PublishTweetError&lt;/code&gt; type using the &lt;code&gt;AR.mapFailure&lt;/code&gt; function that we &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/#revisiting-the-mapasyncfailure-function&#34; target=&#34;_blank&#34;&gt;defined earlier&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There is no function implementing the &lt;code&gt;NotifyTweet&lt;/code&gt; type yet in our application and our next step is adding it.&lt;/p&gt;
+
+&lt;h2 id=&#34;getstream-io&#34;&gt;GetStream.IO&lt;/h2&gt;
+
+&lt;p&gt;To implement newsfeed and timeline we are going to use &lt;a href=&#34;https://getstream.io/&#34; target=&#34;_blank&#34;&gt;GetStream&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://github.com/tschellenbach/stream-framework/&#34; target=&#34;_blank&#34;&gt;Stream Framework&lt;/a&gt; is a open source solution, which allows you to build scalable news feed, activity streams and notification systems.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;GetStream.io&lt;/em&gt; is the &lt;a href=&#34;https://en.wikipedia.org/wiki/Software_as_a_service&#34; target=&#34;_blank&#34;&gt;SASS&lt;/a&gt; provider of the stream framework and we are going to use its &lt;a href=&#34;https://getstream.io/pricing/&#34; target=&#34;_blank&#34;&gt;free plan&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;GetStream.io&lt;/em&gt; has a simple and powerful in-browser &lt;a href=&#34;(https://getstream.io/get_started/)&#34; target=&#34;_blank&#34;&gt;getting started documentation&lt;/a&gt; to get you started right.  Follow this documentation to create an app in &lt;em&gt;GetStream.io&lt;/em&gt; and get a basic understanding of how it works.&lt;/p&gt;
+
+&lt;p&gt;After completing this documentation (roughly take 10-15 minutes), if you navigate to the dashboard, you can find the following UI component&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/get_stream_dashbord.png&#34; alt=&#34;Get Stream Dashboard&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Keep a of note the App Id, Key, and Secret. We will be using it shortly while integrating it.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a new file &lt;em&gt;Stream.fs&lt;/em&gt; in the web project&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/Stream
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and move it above &lt;em&gt;Json.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; repeat 7 forge moveUp web -n src/FsTweet.Web/Stream.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add the &lt;a href=&#34;https://www.nuget.org/packages/stream-net&#34; target=&#34;_blank&#34;&gt;stream-net&lt;/a&gt; nuget package. &lt;em&gt;stream-net&lt;/em&gt; is a .NET library for building newsfeed and activity stream applications with &lt;em&gt;Getstream.io&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add stream-net -p src/FsTweet.Web/FsTweet.Web.fsproj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To model the configuration parameters that are required to talk to &lt;em&gt;GetStream.io&lt;/em&gt;, Let&amp;rsquo;s define a record type &lt;code&gt;Config&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Stream.fs
+[&amp;lt;RequireQualifiedAccess&amp;gt;]
+module GetStream
+
+type Config = {
+  ApiSecret : string
+  ApiKey : string
+  AppId : string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We also need a &lt;code&gt;Client&lt;/code&gt; record type to hold the actual &lt;em&gt;GetStream.io&lt;/em&gt; client and this config.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Stream.fs
+// ...
+open Stream
+
+type Client = {
+  Config : Config
+  StreamClient : StreamClient
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To initialize this &lt;code&gt;Client&lt;/code&gt; type let&amp;rsquo;s add a constructor function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let newClient config = {
+  StreamClient = 
+    new StreamClient(config.ApiKey, config.ApiSecret)
+  Config = config
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final step is creating a new stream client during the application bootstrap.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv = 
+   // ...
+
++  let streamConfig : GetStream.Config = {
++      ApiKey = 
++        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_KEY&amp;quot;
++      ApiSecret = 
++        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_SECRET&amp;quot;
++      AppId = 
++        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_APP_ID&amp;quot;
++  }
+
++
++  let getStreamClient = GetStream.newClient streamConfig
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are getting the required configuration parameters from the respective environment variables.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Posting New Tweet</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</link>
       <pubDate>Mon, 09 Oct 2017 19:51:48 +0530</pubDate>
@@ -5671,220 +5876,6 @@ let serveAssets =
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;In this blog post, we learned how to serve static asset files in Suave. The source code can be found in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.2&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Setting Up Server Side Rendering using DotLiquid</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</link>
-      <pubDate>Wed, 16 Aug 2017 20:34:02 +0530</pubDate>
-      
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</guid>
-      <description>
-
-&lt;p&gt;Hi,&lt;/p&gt;
-
-&lt;p&gt;Welcome to the second part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; series.&lt;/p&gt;
-
-&lt;p&gt;In this post, we are going to extend our &lt;code&gt;FsTweet&lt;/code&gt; app to render &lt;code&gt;Hello, World!&lt;/code&gt; as HTML document from the server side using &lt;a href=&#34;http://dotliquidmarkup.org/&#34; target=&#34;_blank&#34;&gt;DotLiquid&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;adding-packages-references&#34;&gt;Adding Packages References&lt;/h2&gt;
-
-&lt;p&gt;Suave has &lt;a href=&#34;https://suave.io/dotliquid.html&#34; target=&#34;_blank&#34;&gt;good support&lt;/a&gt; for doing server side rendering using DotLiquid. To make use of this in our project, we need to refer the associated NuGet packages in &lt;em&gt;FsTweet.Web.fsproj&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Let&amp;rsquo;s use Forge to add the required packages using Paket&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket add DotLiquid -V 2.0.64
-&amp;gt; forge paket add Suave.DotLiquid
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;At the time of this writing, there are some breaking changes in the latest version of DotLiquid. As the current version of Suave.DotLiquid uses DotLiquid version &lt;code&gt;2.0.64&lt;/code&gt;, we are sticking to the same here.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The next step is referring these packages in the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;To do this, add the package names in the &lt;em&gt;paket.references&lt;/em&gt; file of &lt;em&gt;FsTweet.Web&lt;/em&gt; project&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;...
-DotLiquid
-Suave.DotLiquid
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;If you prefer to do the same from your bash, you can use the following commands&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;  &amp;gt; echo &amp;gt;&amp;gt; src/FsTweet.Web/paket.references #adds an empty new line
-  &amp;gt; echo &#39;DotLiquid&#39; &amp;gt;&amp;gt; src/FsTweet.Web/paket.references
-  &amp;gt; echo &#39;Suave.DotLiquid&#39; &amp;gt;&amp;gt; src/FsTweet.Web/paket.references
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The last step is running the &lt;code&gt;forge install&lt;/code&gt; command, an alias for the &lt;code&gt;paket install&lt;/code&gt; command.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge install
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This command adds the references of the NuGet packages provided in the &lt;em&gt;paket.references&lt;/em&gt; file to the &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt; file.&lt;/p&gt;
-
-&lt;h2 id=&#34;initializing-dotliquid&#34;&gt;Initializing DotLiquid&lt;/h2&gt;
-
-&lt;p&gt;Now we have the required NuGet packages onboard&lt;/p&gt;
-
-&lt;p&gt;DotLiquid requires the following global initilization settings to enable us to render the &lt;a href=&#34;https://shopify.github.io/liquid/&#34; target=&#34;_blank&#34;&gt;liquid templates&lt;/a&gt;.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;A directory path which contains all our views&lt;/li&gt;
-&lt;li&gt;Naming Convention to be used when referring view models in the views.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The &lt;a href=&#34;https://www.nuget.org/packages/Suave.DotLiquid/&#34; target=&#34;_blank&#34;&gt;Suave.DotLiquid&lt;/a&gt; has helper functions to do this for us.&lt;/p&gt;
-
-&lt;p&gt;Let&amp;rsquo;s have a directory called &lt;code&gt;views&lt;/code&gt; in the &lt;code&gt;FsTweet.Web&lt;/code&gt; project to put the liquid template files&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/FsTweet.Web/views
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The add a new function called &lt;code&gt;initDotLiquid&lt;/code&gt;, which invokes the required helper functions to initialize DotLiquid to use this &lt;code&gt;views&lt;/code&gt; directory for templates and &lt;code&gt;CSharpNamingConvention&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
-// ...
-open Suave.DotLiquid
-open System.IO
-open System.Reflection
-
-let currentPath =
-  Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
-
-let initDotLiquid () =
-  setCSharpNamingConvention ()
-  let templatesDir = Path.Combine(currentPath, &amp;quot;views&amp;quot;)
-  setTemplatesDir templatesDir
-
-[&amp;lt;EntryPoint&amp;gt;]
-let main argv =
-  initDotLiquid ()
-  // ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;updating-build-script-to-copy-views-directory&#34;&gt;Updating Build Script To Copy Views Directory&lt;/h2&gt;
-
-&lt;p&gt;With the above DotLiquid configuration in place, while running the &lt;code&gt;FsTweet.Web&lt;/code&gt; application, we need to have the &lt;code&gt;views&lt;/code&gt; directory in the current directory.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;├── build
-│   ├── ...
-│   ├── FsTweet.Web.exe
-│   └── views/
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can achieve it in two ways.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Adding the liquid templates files in the views directory to &lt;code&gt;FsTweet.Web.fsproj&lt;/code&gt; file with the &lt;code&gt;Build Action&lt;/code&gt; property as &lt;code&gt;Content&lt;/code&gt; and &lt;code&gt;Copy to Output&lt;/code&gt; property to either &lt;code&gt;Copy always&lt;/code&gt; or &lt;code&gt;Copy if newer&lt;/code&gt; as mentioned in the &lt;a href=&#34;https://msdn.microsoft.com/en-us/library/0c6xyb66(v=vs.100).aspx&#34; target=&#34;_blank&#34;&gt;project file properties&lt;/a&gt; documentation.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;The second option is leveraging our build script to copy the entire &lt;code&gt;views&lt;/code&gt; directory to the &lt;code&gt;build&lt;/code&gt; directory.&lt;/p&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;We are going to use the latter one as it is a one time work rather than fiddling with the properties whenever we add a new liquid template file.&lt;/p&gt;
-
-&lt;p&gt;To do this let&amp;rsquo;s add a new Target in the FAKE build script called &lt;code&gt;Views&lt;/code&gt; and copy the directory the FAKE&amp;rsquo;s &lt;code&gt;CopyDir&lt;/code&gt; function&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let noFilter = fun _ -&amp;gt; true
-
-Target &amp;quot;Views&amp;quot; (fun _ -&amp;gt;
-    let srcDir = &amp;quot;./src/FsTweet.Web/views&amp;quot;
-    let targetDir = combinePaths buildDir &amp;quot;views&amp;quot;
-    CopyDir targetDir srcDir noFilter
-)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then modify the build order to invoke &lt;code&gt;Views&lt;/code&gt; Target before &lt;code&gt;Run&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Build order
-&amp;quot;Clean&amp;quot;
-  ==&amp;gt; &amp;quot;Build&amp;quot;
-  ==&amp;gt; &amp;quot;Views&amp;quot;
-  ==&amp;gt; &amp;quot;Run&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
-
-&lt;p&gt;Now it&amp;rsquo;s time to add some liquid templates and see it in action&lt;/p&gt;
-
-&lt;h2 id=&#34;defining-and-rending-dotliquid-templates&#34;&gt;Defining And Rending DotLiquid Templates&lt;/h2&gt;
-
-&lt;p&gt;The first step is defining a master page template with some placeholders.&lt;/p&gt;
-
-&lt;p&gt;Add a new file &lt;em&gt;master_page.liquid&lt;/em&gt; in the &lt;code&gt;views&lt;/code&gt; directory and update it as below&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- src/FsTweet.Web/views/master_page.liquid --&amp;gt;
-&amp;lt;!DOCTYPE HTML&amp;gt;
-&amp;lt;html&amp;gt;
-  &amp;lt;head&amp;gt;
-    {% block head %}
-    {% endblock %}
-  &amp;lt;/head&amp;gt;
-  &amp;lt;body&amp;gt;
-    &amp;lt;div id=&amp;quot;content&amp;quot;&amp;gt;
-      {% block content %}
-      {% endblock %}
-    &amp;lt;/div&amp;gt;
-    &amp;lt;div id=&amp;quot;scripts&amp;quot;&amp;gt;
-      {% block scripts %}
-      {% endblock %}
-    &amp;lt;/div&amp;gt;		
-  &amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This &lt;code&gt;master_page&lt;/code&gt; template defines three placeholders &lt;code&gt;head&lt;/code&gt;, &lt;code&gt;content&lt;/code&gt; and &lt;code&gt;scripts&lt;/code&gt; which will be filled by its child pages.&lt;/p&gt;
-
-&lt;p&gt;The next step is adding a child page liquid template &lt;em&gt;guest/home.liquid&lt;/em&gt; with some title and content&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;{% extends &amp;quot;master_page.liquid&amp;quot; %}
-
-{% block head %}
-  &amp;lt;title&amp;gt; FsTweet - Powered by F# &amp;lt;/title&amp;gt;
-{% endblock %}
-
-{% block content %}
-&amp;lt;p&amp;gt;Hello, World!&amp;lt;/p&amp;gt;
-{% endblock %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This guest home page template &lt;code&gt;extends&lt;/code&gt; the &lt;code&gt;master_page&lt;/code&gt; template and provides values for the &lt;code&gt;head&lt;/code&gt; and &lt;code&gt;content&lt;/code&gt; placeholders.&lt;/p&gt;
-
-&lt;h2 id=&#34;rendering-using-suave-dotliquid&#34;&gt;Rendering Using Suave.DotLiquid&lt;/h2&gt;
-
-&lt;p&gt;The final step is rendering the liquid templates from Suave.&lt;/p&gt;
-
-&lt;p&gt;The &lt;em&gt;Suave.DotLiquid&lt;/em&gt; package has a function called &lt;code&gt;page&lt;/code&gt; which takes a relative file path (from the templates root directory) and a view model and returns a WebPart&lt;/p&gt;
-
-&lt;p&gt;We just need to define the app using this &lt;code&gt;page&lt;/code&gt; function. As the page is not using a view model we can use an empty string for the second parameter.&lt;/p&gt;
-
-&lt;p&gt;Let&amp;rsquo;s also add a &lt;code&gt;path&lt;/code&gt; filter in Suave to render the page only if the path is a root (&lt;code&gt;/&lt;/code&gt;)&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
-// ...
-open Suave.Operators
-open Suave.Filters
-// ...
-[&amp;lt;EntryPoint&amp;gt;]
-let main argv =
-  initDotLiquid ()  
-  let app = 
-    path &amp;quot;/&amp;quot; &amp;gt;=&amp;gt; page &amp;quot;guest/home.liquid&amp;quot; &amp;quot;&amp;quot;
-  startWebServer defaultConfig app
-  0
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now if you build and run the application using the &lt;code&gt;forge run&lt;/code&gt; command, you can see an HTML document with the &lt;code&gt;Hello, World!&lt;/code&gt; content in the browser on &lt;em&gt;&lt;a href=&#34;http://localhost:8080/&#34; target=&#34;_blank&#34;&gt;http://localhost:8080/&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-
-&lt;p&gt;In this blog post, we have seen how to set up a Suave application to render server side views using DotLiquid and also how to make use of FAKE build script to manage static files.&lt;/p&gt;
-
-&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.1&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     
