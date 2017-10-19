@@ -204,7 +204,7 @@ module Domain =
   type NotifyTweet = Tweet -&gt; AsyncResult&lt;unit, Exception&gt;
 </code></pre>
 
-<p>The <code>NotifyTweet</code> type typify a notify tweet function that takes <code>Tweet</code> and returns either <code>uint</code> or <code>Exception</code> asynchronously.</p>
+<p>The <code>NotifyTweet</code> type typify a notify tweet function that takes <code>Tweet</code> and returns either <code>unit</code> or <code>Exception</code> asynchronously.</p>
 
 <p>Then create a new type <code>PublishTweet</code> to represent the signature of the orchastration function.</p>
 
@@ -286,6 +286,8 @@ module Domain =
 
 <p>Keep a of note the App Id, Key, and Secret. We will be using it shortly while integrating it.</p>
 
+<h2 id="configuring-getstream-io">Configuring GetStream.io</h2>
+
 <p>Let&rsquo;s create a new file <em>Stream.fs</em> in the web project</p>
 
 <pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Stream
@@ -355,7 +357,165 @@ let main argv =
 +  let getStreamClient = GetStream.newClient streamConfig
 </code></pre>
 
-<p>We are getting the required configuration parameters from the respective environment variables.</p>
+<p>We are getting the required configuration parameters from the respective environment variables populated with the corressponding values in the dashboard that we have seen earlier.</p>
+
+<h2 id="notifying-new-tweet">Notifying New Tweet</h2>
+
+<p>Notifying a new tweet using <em>GetStrem.io</em> involves two steps.</p>
+
+<ol>
+<li><p>Retreiving the <a href="https://getstream.io/get_started/#flat_feed" target="_blank">user feed</a> of the user.</p></li>
+
+<li><p>Create <a href="https://getstream.io/docs/#adding-activities" target="_blank">a new activity</a> of type <code>tweet</code> and add it to the user feed.</p></li>
+</ol>
+
+<p>To retreive the user feed of the user, let&rsquo;s add a function <code>userFeed</code> in</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Stream.fs
+// ...
+
+// Client -&gt; 'a -&gt; StreamFeed
+let userFeed getStreamClient userId =
+  getStreamClient.StreamClient.Feed(&quot;user&quot;, userId.ToString())
+</code></pre>
+
+<p>Then in the <em>Wall.fs</em>, create a new module <code>GetStream</code> and add a new function <code>notifyTweet</code> to add a new activity to the user feed.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Wall.fs
+// ...
+
+module GetStream = 
+  open Tweet
+  open User
+  open Stream
+  open Chessie.ErrorHandling
+
+  // GetStream.Client -&gt; Tweet -&gt; AsyncResult&lt;Activity, Exception&gt;
+  let notifyTweet (getStreamClient: GetStream.Client) (tweet : Tweet) = 
+    
+    let (UserId userId) = tweet.UserId
+    let (TweetId tweetId) = tweet.Id
+    let userFeed =
+      GetStream.userFeed getStreamClient userId
+    
+    let activity = 
+      new Activity(userId.ToString(), &quot;tweet&quot;, tweetId.ToString())
+
+    // Adding custom data to the activity 
+    activity.SetData(&quot;tweet&quot;, tweet.Post.Value)
+    activity.SetData(&quot;username&quot;, tweet.Username.Value)
+    
+    userFeed.AddActivity(activity) // Task&lt;Activity&gt;
+    |&gt; Async.AwaitTask // Async&lt;Activity&gt;
+    |&gt; Async.Catch // Async&lt;Choice&lt;Activity,Exception&gt;&gt;
+    |&gt; Async.map ofChoice // Async&lt;Result&lt;Activity,Exception&gt;&gt;
+    |&gt; AR // AsyncResult&lt;Activity,Exception&gt;
+
+// ...
+</code></pre>
+
+<p>The <code>AddActivity</code> function in the <code>Activity</code> (from the <code>stream-net</code> library) returns <code>Task&lt;Activity&gt;</code> and we are transforming it to <code>AsyncResult&lt;Activity,Exception&gt;</code>.</p>
+
+<p>The <code>NotifyTweet</code> type that we defined earlier has the function signature returning <code>AsyncResult&lt;unit,Exception&gt;</code> but the implemenation function <code>notifyTweet</code> returns <code>AsyncResult&lt;Activity,Exception&gt;</code>.</p>
+
+<p>So, while transforming we need to ignore the <code>Activity</code> and map it to <code>unit</code> instead. To do it add a new function <code>mapStreamResponse</code></p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Wall.fs
+// ...
+module GetStream = 
+  // ...
+  let mapStreamResponse response =
+    match response with
+    | Choice1Of2 _ -&gt; ok ()
+    | Choice2Of2 ex -&gt; fail ex
+  
+  let notifyTweet ... = ...
+</code></pre>
+
+<p>and use this function instead of <code>ofChoice</code> in the <code>notifyTweet</code> function.</p>
+
+<pre><code class="language-diff">let notifyTweet (getStreamClient: GetStream.Client) (tweet : Tweet) = 
+    
+   ...
+  
+   userFeed.AddActivity(activity) // Task&lt;Activity&gt;
+   |&gt; Async.AwaitTask // Async&lt;Activity&gt;
+   |&gt; Async.Catch // Async&lt;Choice&lt;Activity,Exception&gt;&gt;
+-  |&gt; Async.map ofChoice // Async&lt;Result&lt;Activity,Exception&gt;&gt;
++  |&gt; Async.map mapStreamResponse // Async&lt;Result&lt;unit,Exception&gt;&gt;
+   |&gt; AR // AsyncResult&lt;unit,Exception&gt;
+</code></pre>
+
+<p>Now we have a implementation for notifying when a user tweets.</p>
+
+<h2 id="wiring-up-the-presentation-layer">Wiring Up The Presentation Layer</h2>
+
+<p>Currently, in the <code>handleNewTweet</code> we are justing creating a tweet using the <code>createTweet</code> function. To publish the new tweet which does both creating and notifying, we need to change it <code>publishTweet</code> and transform its success and failure to <code>Webpart</code>.</p>
+
+<pre><code class="language-diff">// FsTweet.Web/Wall.fs
+module Suave =
+   ...
+
+-  let onCreateTweetSuccess (PostId id) = 
++  let onPublishTweetSuccess (PostId id) = 
+     ...
+
+-  let onCreateTweetFailure (ex : System.Exception) =		 
+-    printfn &quot;%A&quot; ex
+-    JSON.internalError
+
++  let onPublishTweetFailure (err : PublishTweetError) =
++    match err with
++    | NotifyTweetError (postId, ex) -&gt;
++      printfn &quot;%A&quot; ex
++      onPublishTweetSuccess postId
++    | CreatePostError ex -&gt;
++      printfn &quot;%A&quot; ex
++      JSON.internalError
+
+-  let handleNewTweet createTweet (user : User) ctx = async {
++  let handleNewTweet publishTweet (user : User) ctx = async {
+     ...
+        let! webpart = 		         
+-          createTweet user.UserId post		 
++          publishTweet user.UserId post
+-          |&gt; AR.either onCreateTweetSuccess onCreateTweetFailure
++          |&gt; AR.either onPublishTweetSuccess onPublishTweetFailure
+</code></pre>
+
+<blockquote>
+<p>For <code>NotifyTweetError</code>, we are just printing the error and assumes it as success for simplicity.</p>
+</blockquote>
+
+<p>The final piece passing the <code>publishTweet</code> dependency to the <code>handleNewTweet</code></p>
+
+<pre><code class="language-diff">// FsTweet.Web/Wall.fs
+module Suave =
+    ...
+-   let webpart getDataCtx =
++   let webpart getDataCtx getStreamClient =
+
+-    let createTweet = Persistence.createPost getDataCtx 		 
++    let createPost = Persistence.createPost getDataCtx 
+
++    let notifyTweet = GetStream.notifyTweet getStreamClient
++    let publishTweet = publishTweet createPost notifyTweet
+
+      choose [		      
+        path &quot;/wall&quot; &gt;=&gt; requiresAuth (renderWall getStreamClient)
+        POST &gt;=&gt; path &quot;/tweets&quot; 
+-        &gt;=&gt; requiresAuth2 (handleNewTweet createTweet)  		 
++        &gt;=&gt; requiresAuth2 (handleNewTweet publishTweet)  
+</code></pre>
+
+<p>and then pass the <code>getStreamClient</code> from the <code>main</code> function.</p>
+
+<pre><code class="language-diff">// FsTweet.Web/FsTweet.Web.fs
+// ...
+-      Wall.Suave.webpart getDataCtx 
++      Wall.Suave.webpart getDataCtx getStreamClient
+    ]
+</code></pre>
 
     </div>
   </div>
