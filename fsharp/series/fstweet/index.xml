@@ -638,6 +638,8 @@ It generate the html elements of the tweet view using &lt;a href=&#34;https://mu
 
 &lt;p&gt;In this blog post we learned how to integrate &lt;em&gt;GetStream.io&lt;/em&gt; in FsTweet to notify the new tweets and also added the initial version of user wall.&lt;/p&gt;
 
+&lt;p&gt;In the upcoming blog posts, we will be adding the user timeline.&lt;/p&gt;
+
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.16&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
