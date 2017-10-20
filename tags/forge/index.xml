@@ -18,6 +18,8 @@
       <guid>http://www.demystifyfp.com/fsharp/series/fstweet/user-signup/</guid>
       <description>
 
+&lt;p&gt;Hi,&lt;/p&gt;
+
 &lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/static-assets/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we added a cool landing page for &lt;em&gt;FsTweet&lt;/em&gt; to increase the user signups. But the signup form and its backend are not ready yet!&lt;/p&gt;
 
 &lt;p&gt;In this fourth part, we will be extending &lt;em&gt;FsTweet&lt;/em&gt; to serve the signup page and implement its backend scaffolding&lt;/p&gt;
