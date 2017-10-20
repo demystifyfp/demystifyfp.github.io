@@ -22,7 +22,7 @@
 
 &lt;p&gt;Welcome back to the seventeeth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we saw to how to persist a new tweet from the user. But after persisting the new tweet, we haven&amp;rsquo;t do anything. In real twitter we have a user feed, which shows a timeline with tweets from him/her and from others whom he/she follows.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we saw to how to persist a new tweet from the user. But after persisting the new tweet, we haven&amp;rsquo;t do anything. In real twitter we have a user feed, which shows a timeline with tweets from him/her and from others whom he/she follows.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to address the first part of user&amp;rsquo;s timeline, viewing his/her tweets in the Wall page.&lt;/p&gt;
 
