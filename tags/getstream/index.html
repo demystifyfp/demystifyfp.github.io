@@ -44,18 +44,18 @@
   
 
   
-  <link rel="alternate" href="http://www.demystifyfp.com/tags/chessie/index.xml" type="application/rss+xml" title="Demystify FP">
-  <link rel="feed" href="http://www.demystifyfp.com/tags/chessie/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="alternate" href="http://www.demystifyfp.com/tags/getstream/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/tags/getstream/index.xml" type="application/rss+xml" title="Demystify FP">
   
 
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
 
-  <link rel="canonical" href="http://www.demystifyfp.com/tags/chessie/">
+  <link rel="canonical" href="http://www.demystifyfp.com/tags/getstream/">
 
   
 
-  <title>Chessie | Demystify FP</title>
+  <title>Getstream | Demystify FP</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
@@ -130,7 +130,7 @@
 
 <div class="universal-wrapper">
 
-  <h1>Chessie</h1>
+  <h1>Getstream</h1>
 
   
 
@@ -148,133 +148,8 @@ In this blog post, we are going to address the first part of user&rsquo;s timeli
     </div>
   </div>
   
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/">Posting New Tweet</a></h2>
-    <div class="article-style">
-      
-      Hi there!
-In this sixteenth part of Creating a Twitter Clone in F# using Suave blog post series, we are going to implement core feature of Twitter, posting a tweet.
-Let&rsquo;s dive in!
-Rendering The Wall Page In the previous blog post, we have left the user&rsquo;s wall page with a placeholder. So, As a first step, let&rsquo;s replace this with an actual page to enable the user to post tweets.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/">Handling Login Request</a></h2>
-    <div class="article-style">
-      
-      Hi there!
-In the previous blog post we have validated the login request from the user and mapped it to a domain type LoginRequest.
-The next step is authenticating the user to login to the application. This involves following steps.
- Finding the user with the given username If the user exists, matching the provided password with the user&rsquo;s corresponding password hash. If the password matches, creating a user session (cookie) and redirecting the user to the home page.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/">Adding Login Page</a></h2>
-    <div class="article-style">
-      
-      Hi!
-Welcome back to the thirteenth part of Creating a Twitter Clone in F# using Suave blog post series.
-In this blog post we are going to start the implementation of a new feature, enabling users to login to FsTweet.
-Let&rsquo;s get started by creating a new file Auth.fs in the web project and move it above FsTweet.Web.fs
-&gt; forge newFs web -n src/FsTweet.Web/Auth &gt; forge moveUp web -n src/FsTweet.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/">Reorganising Code and Refactoring</a></h2>
-    <div class="article-style">
-      
-      Hi there!
-Welcome to the twelfth part of Creating a Twitter Clone in F# using Suave blog post series.
-We have come a long way so far, and we have lot more things to do!
-Before we get going, Let&rsquo;s spend some time to reorganize some of the code that we wrote and refactor specific functions to help ourselves to move faster.
-The UserSignup.fs file has some helper functions for working with the Chessie library.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/">Verifying User Email</a></h2>
-    <div class="article-style">
-      
-      Hi,
-In the previous blog post, we added support for sending verification email using Postmark.
-In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link that we sent in the email.
-A Type For The Verify User Function. Let&rsquo;s get started by defining a type for the function which verifies the user.
-type VerifyUser = string -&gt; AsyncResult&lt;Username option, System.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/">Sending Verification Email</a></h2>
-    <div class="article-style">
-      
-      Hi there!
-Welcome to the tenth part of Creating a Twitter Clone in F# using Suave blog post series.
-In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we faked earlier.
-Setting Up Postmark To send email, we are going to use Postmark, a transactional email service provider for web applications.
-There are three prerequisites that we need to do before we use it in our application.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/">Persisting New User</a></h2>
-    <div class="article-style">
-      
-      Hi!
-Welcome back.
-We are on track to complete the user signup feature. In this blog post, we are going to implement the persistence layer for creating a user which we faked in the last blog post.
-Initializing SQLProvider We are going to use SQLProvider, a SQL database type provider, to takes care of PostgreSQL interactions,
-As usual, let&rsquo;s add its NuGet package to our Web project using paket
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/">Transforming Async Result to Webpart</a></h2>
-    <div class="article-style">
-      
-      Hi there!
-In the last post, using the Chessie library, we orchestrated the user signup process.
-There are three more things that we need to do wrap up the user signup workflow.
- Providing implementation for creating a new user in PostgreSQL
- Integrating with an email provider to send the signup email
- Adding the presentation layer to inform the user about his/her progress in the signup process.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/">Orchestrating User Signup</a></h2>
-    <div class="article-style">
-      
-      Hi,
-Welcome back to the seventh part of Creating a Twitter Clone in F# using Suave blog post series.
-In this part, we will be orchestrating the user signup use case.
-Requirements Before diving into the implementation, let&rsquo;s spend some time to jot down the requirements of the user sign up.
- If the user submitted invalid details, we should let him/her know about the error (which we already implemented in the fifth part)
-      
-    </div>
-  </div>
-  
 
   
-<nav>
-  <ul class="pager">
-    
-    
-    <li><a href="/tags/chessie/page/2/">&gt;</a></li>
-    
-  </ul>
-</nav>
-
 
 
 </div>
