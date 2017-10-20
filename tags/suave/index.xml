@@ -586,7 +586,7 @@ module Suave =
 
 &lt;p&gt;The final piece is passing the dependency &lt;code&gt;getDataCtx&lt;/code&gt; for the &lt;code&gt;createTweet&lt;/code&gt; function from the application&amp;rsquo;s main function.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Auth.fs
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
 // ...
 -      Wall.Suave.webpart ()
 +      Wall.Suave.webpart getDataCtx
