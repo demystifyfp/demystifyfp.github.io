@@ -687,7 +687,7 @@ module Suave =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Create a new dotliqud template &lt;em&gt;wall.liquid&lt;/em&gt; in the &lt;em&gt;views/user&lt;/em&gt; directly and update it as below&lt;/p&gt;
+&lt;p&gt;Create a new dotliqud template &lt;em&gt;wall.liquid&lt;/em&gt; in the &lt;em&gt;views/user&lt;/em&gt; directory and update it as below&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;{% extends &amp;quot;master_page.liquid&amp;quot; %}
 
@@ -725,22 +725,22 @@ module Suave =
 
 &lt;p&gt;In both signup and login pages, we are doing full page refresh when the user submitted the form. But on the wall page, doing a complete page refresh while posting a new tweet is not a good user experience.&lt;/p&gt;
 
-&lt;p&gt;The better option would be have some javascript code on the wall page, doing an &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/AJAX/Getting_Started&#34; target=&#34;_blank&#34;&gt;AJAX&lt;/a&gt; POST request with a JSON payload when the user clicks the &lt;code&gt;Tweet&lt;/code&gt; button.&lt;/p&gt;
+&lt;p&gt;The better option would be the javascript code on the wall page doing an &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/AJAX/Getting_Started&#34; target=&#34;_blank&#34;&gt;AJAX&lt;/a&gt; POST request with a JSON payload when the user clicks the &lt;code&gt;Tweet&lt;/code&gt; button.&lt;/p&gt;
 
 &lt;p&gt;That means we need to have a corresponding endpoint on the server responding to this request!&lt;/p&gt;
 
 &lt;h2 id=&#34;revisiting-the-requiresauth-function&#34;&gt;Revisiting The requiresAuth function&lt;/h2&gt;
 
-&lt;p&gt;Before creating an HTTP endpoint to handle new tweet, let&amp;rsquo;s have a revisit to our authentication implementation to add support for JSON HTTP endpoints.&lt;/p&gt;
+&lt;p&gt;Before creating an HTTP endpoint to handle the new tweet HTTP POST request, let&amp;rsquo;s revisit our authentication implementation to add support for JSON HTTP endpoints.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let requiresAuth fSuccess =
-authenticate CookieLife.Session false
-  (fun _ -&amp;gt; Choice2Of2 redirectToLoginPage)
-  (fun _ -&amp;gt; Choice2Of2 redirectToLoginPage)
-  (userSession redirectToLoginPage fSuccess)
+  authenticate CookieLife.Session false
+    (fun _ -&amp;gt; Choice2Of2 redirectToLoginPage)
+    (fun _ -&amp;gt; Choice2Of2 redirectToLoginPage)
+    (userSession redirectToLoginPage fSuccess)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Currently, we are redirecting the user to login page, if the user didn&amp;rsquo;t have access. But this approach will not work out for AJAX requests, as it doesn&amp;rsquo;t full page refresh.&lt;/p&gt;
+&lt;p&gt;Currently, we are redirecting the user to login page, if the user didn&amp;rsquo;t have access. But this approach will not work out for AJAX requests, as it doesn&amp;rsquo;t do full page refresh.&lt;/p&gt;
 
 &lt;p&gt;What we want is an HTTP response from the server with a status code &lt;code&gt;401 Unauthorized&lt;/code&gt; and a JSON body.&lt;/p&gt;
 
@@ -772,11 +772,11 @@ module Suave =
   onAuthenticate fSuccess (RequestErrors.UNAUTHORIZED &amp;quot;???&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;RequestErrors.UNAUTHORIZED&lt;/code&gt; function, takes a &lt;code&gt;string&lt;/code&gt; to populate the request body and return a &lt;code&gt;WebPart&lt;/code&gt;. To send JSON string as a response body, we need to do few more work!&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;RequestErrors.UNAUTHORIZED&lt;/code&gt; function from Suave, takes a &lt;code&gt;string&lt;/code&gt; to populate the request body and return a &lt;code&gt;WebPart&lt;/code&gt;. To send JSON string as a response body, we need to do few more work!&lt;/p&gt;
 
 &lt;h3 id=&#34;sending-json-response&#34;&gt;Sending JSON Response&lt;/h3&gt;
 
-&lt;p&gt;For sending a JSON response, there is no out of the box direct in Suave as the library doesn&amp;rsquo;t want to have a dependency on any other external libraries other than &lt;a href=&#34;https://www.nuget.org/packages/FSharp.Core&#34; target=&#34;_blank&#34;&gt;FSharp.Core&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;For sending a JSON response, there is no out of the box support in Suave as the library doesn&amp;rsquo;t want to have a dependency on any other external libraries other than &lt;a href=&#34;https://www.nuget.org/packages/FSharp.Core&#34; target=&#34;_blank&#34;&gt;FSharp.Core&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;However, we can do it with ease with the fundamental HTTP abstractions provided by Suave.&lt;/p&gt;
 
@@ -874,7 +874,7 @@ module Suave =
 +    ] 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The first step in &lt;code&gt;handleNewTweet&lt;/code&gt; is parsing the incoming JSON body, and the next step is deserializing it to a fsharp record type. &lt;em&gt;Chiron&lt;/em&gt; library has two functions &lt;code&gt;Json.tryParse&lt;/code&gt; and &lt;code&gt;Json.tryDeserialize&lt;/code&gt; to do these two steps respectively.&lt;/p&gt;
+&lt;p&gt;The first step in &lt;code&gt;handleNewTweet&lt;/code&gt; is parsing the incoming JSON body, and the next step is deserializing it to a fsharp type. &lt;em&gt;Chiron&lt;/em&gt; library has two functions &lt;code&gt;Json.tryParse&lt;/code&gt; and &lt;code&gt;Json.tryDeserialize&lt;/code&gt; to do these two steps respectively.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s add a new function &lt;code&gt;parse&lt;/code&gt; in &lt;em&gt;Json.fs&lt;/em&gt; to parse the JSON request body in the &lt;code&gt;HttpRequest&lt;/code&gt; to Chiron&amp;rsquo;s &lt;code&gt;Json&lt;/code&gt; type.&lt;/p&gt;
 
@@ -985,7 +985,7 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;To deserialize the &lt;code&gt;Json&lt;/code&gt; type that we get after parsing to &lt;code&gt;PostRequest&lt;/code&gt;, Chiron library requires &lt;code&gt;PostRequest&lt;/code&gt; type to have a static member function &lt;code&gt;FromJson&lt;/code&gt; with the signature &lt;code&gt;PostRequest -&amp;gt; Json&amp;lt;PostRequest&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;To deserialize the &lt;code&gt;Json&lt;/code&gt; type &lt;em&gt;(that we get after parsing)&lt;/em&gt; to &lt;code&gt;PostRequest&lt;/code&gt;, Chiron library requires &lt;code&gt;PostRequest&lt;/code&gt; type to have a static member function &lt;code&gt;FromJson&lt;/code&gt; with the signature &lt;code&gt;PostRequest -&amp;gt; Json&amp;lt;PostRequest&amp;gt;&lt;/code&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
   // ...
@@ -1003,7 +1003,7 @@ module Suave =
 
 &lt;p&gt;We are making use of the &lt;code&gt;json&lt;/code&gt; computation expression from Chrion library to create &lt;code&gt;PostRequest&lt;/code&gt; from &lt;code&gt;Json&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Then in the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we can deserialize we &lt;code&gt;Json&lt;/code&gt; to &lt;code&gt;PostRequest&lt;/code&gt; using the &lt;code&gt;Json.tryDeserialize&lt;/code&gt; function from Chiron.&lt;/p&gt;
+&lt;p&gt;Then in the &lt;code&gt;handleNewTweet&lt;/code&gt; function, we can deserialize the &lt;code&gt;Json&lt;/code&gt; to &lt;code&gt;PostRequest&lt;/code&gt; using the &lt;code&gt;Json.tryDeserialize&lt;/code&gt; function from Chiron.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleNewTweet (user : User) ctx = async {
   match parse ctx.request  with
@@ -1020,7 +1020,7 @@ module Suave =
 
 &lt;p&gt;In case of any deserialization error, we are returning it as a bad request using the &lt;code&gt;JSON.badRequest&lt;/code&gt; function that we created earlier.&lt;/p&gt;
 
-&lt;p&gt;Now we have the server side representation of the &lt;code&gt;PostRequest&lt;/code&gt;. The next step is validating this new tweet.&lt;/p&gt;
+&lt;p&gt;Now we have the server side representation of a tweet post in form of &lt;code&gt;PostRequest&lt;/code&gt;. The next step is validating this new tweet post.&lt;/p&gt;
 
 &lt;p&gt;Create a new file &lt;em&gt;Tweet.fs&lt;/em&gt; in &lt;em&gt;FsTweet.Web&lt;/em&gt; project and move it above &lt;em&gt;FsTweet.Web.fs&lt;/em&gt;&lt;/p&gt;
 
@@ -1028,7 +1028,7 @@ module Suave =
 &amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/Tweet.fs
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain side representation of a Tweet.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain model of the tweet post.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
 namespace Tweet
@@ -1072,9 +1072,7 @@ module Suave =
     // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;With this, we are having a server-side representation of valid tweet post.&lt;/p&gt;
-
-&lt;p&gt;The next step is persisting it!&lt;/p&gt;
+&lt;p&gt;The next step after validation is persisting the new tweet!&lt;/p&gt;
 
 &lt;h2 id=&#34;persisting-new-tweet&#34;&gt;Persisting New Tweet&lt;/h2&gt;
 
@@ -1424,7 +1422,7 @@ module AR =
 &lt;p&gt;Note: We are using &lt;code&gt;^a&lt;/code&gt; instead of &lt;code&gt;&#39;a&lt;/code&gt;. i.e., &lt;code&gt;^a&lt;/code&gt; is a &lt;a href=&#34;https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/generics/statically-resolved-type-parameters&#34; target=&#34;_blank&#34;&gt;Statically resolved type parameter&lt;/a&gt;. We need this as the &lt;code&gt;Json.tryDeserialize&lt;/code&gt; function requires the &lt;code&gt;FromJson&lt;/code&gt; static member function constraint on the type &lt;code&gt;^a&lt;/code&gt;.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;Let&amp;rsquo; name this function &lt;code&gt;deserialize&lt;/code&gt; and the implementation in &lt;em&gt;Json.fs&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo; name this function &lt;code&gt;deserialize&lt;/code&gt; and add the implementation in &lt;em&gt;Json.fs&lt;/em&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Json.fs
 // ...
