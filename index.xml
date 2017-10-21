@@ -1886,14 +1886,14 @@ module Suave =
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;In the previous blog post we have validated the login request from the user and mapped it to a domain type &lt;code&gt;LoginRequest&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have validated the login request from the user and mapped it to a domain type &lt;code&gt;LoginRequest&lt;/code&gt;. The next step is authenticating the user to login to the application.&lt;/p&gt;
 
-&lt;p&gt;The next step is authenticating the user to login to the application. This involves following steps.&lt;/p&gt;
+&lt;p&gt;It involves following steps.&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;Finding the user with the given username&lt;/li&gt;
 &lt;li&gt;If the user exists, matching the provided password with the user&amp;rsquo;s corresponding password hash.&lt;/li&gt;
-&lt;li&gt;If the password matches, creating a user session (cookie) and redirecting the user to the home page.&lt;/li&gt;
+&lt;li&gt;If the password matches, creating a user session (cookie) and redirecting the user to the homepage.&lt;/li&gt;
 &lt;li&gt;Handling the errors while performing the above three steps.&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -1916,7 +1916,7 @@ type User = {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;EmailAddress&lt;/code&gt; of the user, will be either verified or not verified.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;EmailAddress&lt;/code&gt; of the user will be either verified or not verified.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/User.fs
 // ...
@@ -1934,7 +1934,7 @@ with member this.Value =
       | Verified e | NotVerified e -&amp;gt; e.Value
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then add a &lt;code&gt;EmailAddress&lt;/code&gt; field in the &lt;code&gt;User&lt;/code&gt; record of this type&lt;/p&gt;
+&lt;p&gt;Then add &lt;code&gt;EmailAddress&lt;/code&gt; field in the &lt;code&gt;User&lt;/code&gt; record of this type&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type User = {
   // ...
@@ -1950,7 +1950,7 @@ type FindUser =
   Username -&amp;gt; AsyncResult&amp;lt;User option, System.Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As the user may not exists for a given &lt;code&gt;Username&lt;/code&gt; we are using &lt;code&gt;User option&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;As the user may not exist for a given &lt;code&gt;Username&lt;/code&gt;, we are using &lt;code&gt;User option&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Great! Let&amp;rsquo;s define the persistence layer which implements this.&lt;/p&gt;
 
@@ -1966,7 +1966,7 @@ module Persistence =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Finding the user by &lt;code&gt;Username&lt;/code&gt; is very similar to what &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/blob/v0.12/src/FsTweet.Web/UserSignup.fs#L141-L147&#34; target=&#34;_blank&#34;&gt;we did in&lt;/a&gt; the &lt;code&gt;verifyUser&lt;/code&gt; function. There we found the user by verification code and here we need find by &lt;code&gt;Username&lt;/code&gt;. So, let&amp;rsquo;s dive in directly.&lt;/p&gt;
+&lt;p&gt;Finding the user by &lt;code&gt;Username&lt;/code&gt; is very similar to what &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/blob/v0.12/src/FsTweet.Web/UserSignup.fs#L141-L147&#34; target=&#34;_blank&#34;&gt;we did in&lt;/a&gt; the &lt;code&gt;verifyUser&lt;/code&gt; function. There we found the user by verification code, and here we need to find by &lt;code&gt;Username&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Persistence =
   // ...
@@ -1995,7 +1995,7 @@ module Persistence =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;If the user exists, we need to transform that user that we retireved to its corresponding &lt;code&gt;User&lt;/code&gt; domain model. In other words we need to define function that has the signature&lt;/p&gt;
+&lt;p&gt;If the user exists, we need to transform that user that we retrieved to its corresponding &lt;code&gt;User&lt;/code&gt; domain model. To do it, we need a function that has the signature&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;DataContext.``public.UsersEntity`` -&amp;gt; AsyncResult&amp;lt;User, System.Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
@@ -2005,6 +2005,7 @@ module Persistence =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/User.fs
 // ...
 module Persistence =
+  // ...
   let mapUser (user : DataContext.``public.UsersEntity``) = 
     // TODO
   // ...
@@ -2029,7 +2030,7 @@ module User
     | _ -&amp;gt; fail &amp;quot;Invalid Password Hash&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;InterrogateHash&lt;/code&gt; function from the &lt;a href=&#34;https://github.com/BcryptNet/bcrypt.net&#34; target=&#34;_blank&#34;&gt;BCrypt&lt;/a&gt; library, takes a hash and outputs its component parts if it is valid. In case of invalid hash it throws an exception.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;InterrogateHash&lt;/code&gt; function from the &lt;a href=&#34;https://github.com/BcryptNet/bcrypt.net&#34; target=&#34;_blank&#34;&gt;BCrypt&lt;/a&gt; library takes a hash and outputs its components if it is valid. In case of invalid hash, it throws an exception.&lt;/p&gt;
 
 &lt;p&gt;Now, coming back to the &lt;code&gt;mapUser&lt;/code&gt; that we just started, let&amp;rsquo;s map the username, the password hash, and the email address of the user&lt;/p&gt;
 
@@ -2047,7 +2048,7 @@ module Persistence =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then we need to check wheather the user email address is verified or not and create the corresponding &lt;code&gt;UserEmailAddress&lt;/code&gt; type.&lt;/p&gt;
+&lt;p&gt;Then we need to check whether the user email address is verified or not and create the corresponding &lt;code&gt;UserEmailAddress&lt;/code&gt; type.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapUser ... = 
   let userResult = trial {
@@ -2061,7 +2062,7 @@ module Persistence =
   // TODO
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now we have all the individual fields of the &lt;code&gt;User&lt;/code&gt; record, we can return it from &lt;code&gt;trial&lt;/code&gt; computation expression&lt;/p&gt;
+&lt;p&gt;Now we have all the individual fields of the &lt;code&gt;User&lt;/code&gt; record; we can return it from &lt;code&gt;trial&lt;/code&gt; computation expression&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapUser ... = 
   let userResult = trial {
@@ -2076,7 +2077,7 @@ module Persistence =
   // TODO
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;userResult&lt;/code&gt; is of type &lt;code&gt;Result&amp;lt;User, string&amp;gt;&lt;/code&gt; with the failure (of &lt;code&gt;string&lt;/code&gt; type) side representing the validation error that may occur while mapping the user representation from the database to the domain model. It also means that data that we retrieved in not consistent and hence we need to treat this failure as Exception.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;userResult&lt;/code&gt; is of type &lt;code&gt;Result&amp;lt;User, string&amp;gt;&lt;/code&gt; with the failure (of &lt;code&gt;string&lt;/code&gt; type) side representing the validation error that may occur while mapping the user representation from the database to the domain model. It also means that data that we retrieved is not consistent, and hence we need to treat this failure as Exception.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// DataContext.``public.UsersEntity`` -&amp;gt; AsyncResult&amp;lt;User, System.Exception&amp;gt;
 let mapUser ... = 
@@ -2125,9 +2126,11 @@ type PasswordHash = ...
 // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;Verify&lt;/code&gt; function from the &lt;em&gt;BCrypt&lt;/em&gt; library takes care of verifing the password with the hash and returns &lt;code&gt;true&lt;/code&gt; if there is a match and &lt;code&gt;false&lt;/code&gt; otherwise.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;Verify&lt;/code&gt; function from the &lt;em&gt;BCrypt&lt;/em&gt; library takes care of verifying the password with the hash and returns &lt;code&gt;true&lt;/code&gt; if there is a match and &lt;code&gt;false&lt;/code&gt; otherwise.&lt;/p&gt;
 
-&lt;p&gt;Now we have the required functions for implementing the login function and let&amp;rsquo;s start our implementation of the login function by defining a type for it.&lt;/p&gt;
+&lt;p&gt;Now we have the required functions for implementing the login function.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start our implementation of the login function by defining a type for it.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
 module Domain = 
@@ -2150,9 +2153,9 @@ module Domain =
   type Login = ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;LoginError&lt;/code&gt; discriminated union elegantly represents all the possible errors that may happen while perfoming the login operation.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;LoginError&lt;/code&gt; discriminated union elegantly represents all the possible errors that may happen while performing the login operation.&lt;/p&gt;
 
-&lt;p&gt;The implemention of the &lt;code&gt;login&lt;/code&gt; function starts with find the user and maps its failure to the &lt;code&gt;Error&lt;/code&gt; union case if there is any error while finding the user.&lt;/p&gt;
+&lt;p&gt;The implementation of the &lt;code&gt;login&lt;/code&gt; function starts with finding the user and mapping its failure to the &lt;code&gt;Error&lt;/code&gt; union case if there is any error.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
   // ...
@@ -2176,7 +2179,7 @@ module Domain =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Though it appears good, there is an error in above implementation.&lt;/p&gt;
+&lt;p&gt;Though it appears correct, there is an error in above implementation.&lt;/p&gt;
 
 &lt;p&gt;The function signature of the login function currently is&lt;/p&gt;
 
@@ -2185,7 +2188,7 @@ module Domain =
 
 &lt;p&gt;Let&amp;rsquo;s focus our attention to the return type &lt;code&gt;AsyncResult&amp;lt;LoginError, LoginError&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;The F# Compiler infers the failure part of the &lt;code&gt;AsyncResult&lt;/code&gt; as &lt;code&gt;LoginError&lt;/code&gt; from the expression&lt;/p&gt;
+&lt;p&gt;The F# Compiler infers the failure part of the &lt;code&gt;AsyncResult&lt;/code&gt; as &lt;code&gt;LoginError&lt;/code&gt; from the below expression&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;asyncTrial {
   let! userToFind = 
@@ -2231,7 +2234,7 @@ module Domain =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;let!&lt;/code&gt; expression followed by &lt;code&gt;return&lt;/code&gt; can replaced with &lt;code&gt;return!&lt;/code&gt; which does the both.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;let!&lt;/code&gt; expression followed by &lt;code&gt;return&lt;/code&gt; can be replaced with &lt;code&gt;return!&lt;/code&gt; which does the both.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let login ... = asyncTrial {
   // ...
@@ -2286,7 +2289,7 @@ module Domain =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;I am sure you would be thinking about refactoring the following piece of code which is getting repated in all the three places when we return a failure from the &lt;code&gt;asyncTrial&lt;/code&gt; computation expression.&lt;/p&gt;
+&lt;p&gt;I am sure you would be thinking about refactoring the following piece of code which is getting repeated in all the three places when we return a failure from the &lt;code&gt;asyncTrial&lt;/code&gt; computation expression.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;|&amp;gt; fail 
 |&amp;gt; Async.singleton 
@@ -2298,7 +2301,7 @@ module Domain =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;&#39;b -&amp;gt; Result&amp;lt;&#39;a, &#39;b&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The three lines of code that was getting repeated to the same transformation but on the &lt;code&gt;AsyncResult&lt;/code&gt; instead of &lt;code&gt;Result&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The three lines of code that was getting repeated do the same transformation but on the &lt;code&gt;AsyncResult&lt;/code&gt; instead of &lt;code&gt;Result&lt;/code&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;&#39;b -&amp;gt; AsyncResult&amp;lt;&#39;a, &#39;b&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
@@ -2316,7 +2319,7 @@ module AR =
     |&amp;gt; AR // AsyncResult&amp;lt;&#39;a, &#39;b&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;With the help of this new function we can simplify the &lt;code&gt;login&lt;/code&gt; function as below&lt;/p&gt;
+&lt;p&gt;With the help of this new function, we can simplify the &lt;code&gt;login&lt;/code&gt; function as below&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;
 - return! 
@@ -2358,11 +2361,11 @@ module AR =
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The presentation layer can take this value of &lt;code&gt;User&lt;/code&gt; type being returned and send it to the end user either as a &lt;a href=&#34;https://en.wikipedia.org/wiki/HTTP_cookie&#34; target=&#34;_blank&#34;&gt;HTTP Cookie&lt;/a&gt; or a &lt;a href=&#34;https://en.wikipedia.org/wiki/JSON_Web_Token&#34; target=&#34;_blank&#34;&gt;JWT&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The presentation layer can take this value of &lt;code&gt;User&lt;/code&gt; type and send it to the end user either as an &lt;a href=&#34;https://en.wikipedia.org/wiki/HTTP_cookie&#34; target=&#34;_blank&#34;&gt;HTTP Cookie&lt;/a&gt; or a &lt;a href=&#34;https://en.wikipedia.org/wiki/JSON_Web_Token&#34; target=&#34;_blank&#34;&gt;JWT&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;the-presentation-layer-for-transforming-login-response&#34;&gt;The Presentation Layer For Transforming Login Response&lt;/h2&gt;
 
-&lt;p&gt;If there is any error while doing login, we need to populate the login view model with the corressponding error message and rerender the login page.&lt;/p&gt;
+&lt;p&gt;If there is any error while doing login, we need to populate the login view model with the corresponding error message and rerender the login page.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
 // ...
@@ -2430,7 +2433,7 @@ module Suave =
     |&amp;gt; Async.map (handleLoginResult viewModel)
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The final step is wiring the domain, peristence and the presentation layers associated with the login.&lt;/p&gt;
+&lt;p&gt;The final step is wiring the domain, persistence and the presentation layers associated with the login.&lt;/p&gt;
 
 &lt;p&gt;First, pass the &lt;code&gt;getDataCtx&lt;/code&gt; function from the &lt;code&gt;main&lt;/code&gt; function to the &lt;code&gt;webpart&lt;/code&gt; function&lt;/p&gt;
 
@@ -2439,14 +2442,14 @@ module Suave =
 +      Auth.Suave.webpart getDataCtx
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then in the &lt;code&gt;webpart&lt;/code&gt; function in the add getDataCtx as its parameter and use it to parially apply in the &lt;code&gt;findUser&lt;/code&gt; function&lt;/p&gt;
+&lt;p&gt;Then in the &lt;code&gt;webpart&lt;/code&gt; function in the add getDataCtx as its parameter and use it to partially apply in the &lt;code&gt;findUser&lt;/code&gt; function&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let webpart () =
 +  let webpart getDataCtx =
 +    let findUser = Persistence.findUser getDataCtx
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Followed up with passing the parially applied &lt;code&gt;findUser&lt;/code&gt; function to the &lt;code&gt;handlerUserLogin&lt;/code&gt; function and remove the &lt;code&gt;TODO&lt;/code&gt; placeholder in the &lt;code&gt;handlerUserLogin&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;Followed up with passing the partially applied &lt;code&gt;findUser&lt;/code&gt; function to the &lt;code&gt;handlerUserLogin&lt;/code&gt; function and remove the &lt;code&gt;TODO&lt;/code&gt; placeholder in the &lt;code&gt;handlerUserLogin&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let handleUserLogin ctx = async {
 +  let handleUserLogin findUser ctx = async {
@@ -2457,7 +2460,7 @@ module Suave =
 +      POST &amp;gt;=&amp;gt; handleUserLogin findUser
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Finally in the &lt;code&gt;handleUserLogin&lt;/code&gt; function, if the login request is valid, call the &lt;code&gt;login&lt;/code&gt; function with the provided &lt;code&gt;findUser&lt;/code&gt; function and the validated login requet and transform the result of the login function with to &lt;code&gt;WebPart&lt;/code&gt; using the &lt;code&gt;handleLoginAsyncResult&lt;/code&gt; defined earlier.&lt;/p&gt;
+&lt;p&gt;Finally in the &lt;code&gt;handleUserLogin&lt;/code&gt; function, if the login request is valid, call the &lt;code&gt;login&lt;/code&gt; function with the provided &lt;code&gt;findUser&lt;/code&gt; function and the validated login request and transform the result of the login function with to &lt;code&gt;WebPart&lt;/code&gt; using the &lt;code&gt;handleLoginAsyncResult&lt;/code&gt; defined earlier.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserLogin findUser ctx = async {
   // ...
@@ -2476,7 +2479,7 @@ module Suave =
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;We covered a lot of ground in this blog post. We started with finding the user by username and then we moved to implement the login function. And finally we transformed the result of the login function to the corresponding webparts.&lt;/p&gt;
+&lt;p&gt;We covered a lot of ground in this blog post. We started with finding the user by username and then we moved to implement the login function. And finally, we transformed the result of the login function to the corresponding webparts.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/releases/tag/v0.13&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
 </description>
