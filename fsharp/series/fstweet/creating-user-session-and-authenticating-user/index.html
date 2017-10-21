@@ -232,25 +232,13 @@
 
 <p>In the <a href="/fsharp/series/fstweet/handling-login-request/" target="_blank">previous blog post</a>, we have implemented the backend logic to verify the login credentials of a user. Upon successful verification of the provided credentials, we just responded with a username.</p>
 
-<pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
-// ...
-module Suave =
-  // ...
-  open User
-  // ...
-  // User -&gt; WebPart
-  let onLoginSuccess (user : User) = 
-    Successful.OK user.Username.Value
-  // ...
-</code></pre>
-
 <p>In this blog post, we are going to replace this placeholder with the actual implementation.</p>
 
 <h2 id="creating-session-cookie">Creating Session Cookie</h2>
 
-<p>As HTTP is <a href="https://stackoverflow.com/questions/13200152/why-say-that-http-is-a-stateless-protocol" target="_blank">a stateless protocol</a>, we need to create a unique session id for every successful login verification and a <a href="https://en.wikipedia.org/wiki/HTTP_cookie" target="_blank">HTTP cookie</a> to holds this session id.</p>
+<p>As HTTP is <a href="https://stackoverflow.com/questions/13200152/why-say-that-http-is-a-stateless-protocol" target="_blank">a stateless protocol</a>, we need to create a unique session id for every successful login verification and an <a href="https://en.wikipedia.org/wiki/HTTP_cookie" target="_blank">HTTP cookie</a> to holds this session id.</p>
 
-<p>This session cookie, will be present in all the subsequent requests from the user and we can use it to authenticate the user instead of prompting the username and the password for each requests.</p>
+<p>This session cookie will be present in all the subsequent requests from the user and we can use it to authenticate the user instead of prompting the username and the password for each request.</p>
 
 <p>To create this session id and the cookie, we are going to leverage the <a href="https://suave.io/Suave.html#def:val Suave.Authentication.authenticated" target="_blank">authenticated</a> function from Suave.</p>
 
@@ -259,7 +247,7 @@ module Suave =
 <pre><code class="language-fsharp">CookieLife -&gt; bool -&gt; Webpart
 </code></pre>
 
-<p>The <code>CookieLife</code> defines the lifespan of a cookie in the user&rsquo;s browser and the <code>bool</code> parameter is to specify the presence of the cookie in <code>HTTPS</code> alone.</p>
+<p>The <code>CookieLife</code> defines the lifespan of a cookie in the user&rsquo;s browser, and the <code>bool</code> parameter is to specify the presence of the cookie in <code>HTTPS</code> alone.</p>
 
 <pre><code class="language-diff">module Suave = 
 + open Suave.Authentication
@@ -273,12 +261,12 @@ module Suave =
   // ...
 </code></pre>
 
-<p>The <code>CookieLife.Session</code> defines that the cookie will be present til the user he quits the browser. There is an another option <code>MaxAge of TimeSpan</code> to define the lifespan of cookie using TimeSpan. And as we are not using HTTPS, we need to set the second parameter as <code>false</code>.</p>
+<p>The <code>CookieLife.Session</code> defines that the cookie will be present till the user he quits the browser. There is another option <code>MaxAge of TimeSpan</code> to specify the lifespan of the cookie using TimeSpan. And as we are not going to use HTTPS, we are setting the second parameter as <code>false</code>.</p>
 
 <p>The session id in the cookie doesn&rsquo;t personally identify the user. So, we need to store the associated user information in some other place.</p>
 
 <pre><code class="language-bash">+------------------+--------------------+
-|     SessionId    |       UserId       |
+|     SessionId    |        User        |
 |                  |                    |
 +---------------------------------------+
 |                  |                    |
@@ -289,18 +277,18 @@ module Suave =
 <p>There are multiple ways we can achieve it.</p>
 
 <ol>
-<li><p>Adding a new table in the database and persist the relationship.</p></li>
+<li><p>Adding a new table in the database and persist this relationship.</p></li>
 
 <li><p>We can even use a NoSQL datastore to store this key-value data</p></li>
 
 <li><p>We can store it an in-memory cache in the server.</p></li>
 
-<li><p>We can make use of an another HTTP cookie.</p></li>
+<li><p>We can make use of another HTTP cookie.</p></li>
 </ol>
 
-<p>Every approach has its own pros and cons and we need to pick the opt one.</p>
+<p>Every approach has its pros and cons, and we need to pick the opt one.</p>
 
-<p>Suave library has an absraction to deal with this state management.</p>
+<p>The Suave library has an abstraction to deal with this state management.</p>
 
 <blockquote>
 <p><a href="https://github.com/SuaveIO/suave/blob/master/src/Suave/State.fs" target="_blank">https://github.com/SuaveIO/suave/blob/master/src/Suave/State.fs</a></p>
@@ -313,7 +301,7 @@ module Suave =
 </code></pre>
 </blockquote>
 
-<p>It also provides two out of the box implementations of this abstraction, <code>MemoryCacheStateStore</code> and <code>CookieStateStore</code> that corresponds to the third and fourth ways defined above respectively.</p>
+<p>It also provides two out of the box implementations of this abstraction, <code>MemoryCacheStateStore</code>, and <code>CookieStateStore</code> that corresponds to the third and fourth ways defined above respectively.</p>
 
 <p>In our case, We are going to use <code>CookieStateStore</code>.</p>
 
@@ -341,20 +329,20 @@ module Suave =
   // ...
 </code></pre>
 
-<p>The <code>statefulForSession</code> function, a WebPart from Suave, intializes the <code>state</code> in the <code>HttpContext</code> with <code>CookieStateStore</code>.</p>
+<p>The <code>statefulForSession</code> function, a WebPart from Suave, initializes the <code>state</code> in the <code>HttpContext</code> with <code>CookieStateStore</code>.</p>
 
-<p>The <code>setState</code> function takes a key and a value, along with a <code>HttpContext</code>. If there is a state store present in the <code>HttpContext</code>, it stores the key and the value pair. In the absense of a state store it does nothing and we are making the <code>never</code> WebPart from Suave to denote it.</p>
+<p>The <code>setState</code> function takes a key and value, along with a <code>HttpContext</code>. If there is a state store present in the <code>HttpContext</code>, it stores the key and the value pair. In the absence of a state store, it does nothing, and we are making the <code>never</code> WebPart from Suave to denote it.</p>
 
 <p>An important thing that we need to notice here is <code>setState</code> function doesn&rsquo;t know what is the underlying <code>StateStore</code> that we are using.</p>
 
 <p>In the <code>createUserSession</code> function, we are initializing the <code>StateStore</code> to use <code>CookieStateStore</code> by calling the <code>statefulForSession</code> function and then calling the <code>setState</code> to store the user information in the state cookie.</p>
 
-<p>We are making use of the <code>context</code> function (aka combinator) while calling the <code>setState</code>. The <code>context</code> function from the Suave library which is having the following signature</p>
+<p>We are making use of the <code>context</code> function (aka combinator) while calling the <code>setState</code>. The <code>context</code> function from the Suave library is having the following signature.</p>
 
 <pre><code class="language-fsharp">(HttpContext -&gt; WebPart) -&gt; WebPart
 </code></pre>
 
-<p>The final step in calling this <code>createUserSession</code> function from the <code>onLoginSuccess</code> function and redirects the user to his/her home page.</p>
+<p>The final step in calling this <code>createUserSession</code> function from the <code>onLoginSuccess</code> function and redirects the user to his/her wall page.</p>
 
 <pre><code class="language-fsharp">let onLoginSuccess (user : User) = 
   authenticated CookieLife.Session false 
@@ -364,7 +352,7 @@ module Suave =
 
 <h2 id="rending-the-wall-page-with-a-placeholder">Rending The Wall Page With A Placeholder</h2>
 
-<p>In the previous section, upon successful login, we are redirecting to the wall page (<code>/wall</code>). This is currently not exist. So, let&rsquo;s add it with a placeholder and we will revisit in an another blog post.</p>
+<p>In the previous section, upon successful login, we are redirecting to the wall page (<code>/wall</code>) which is currently not exists. So, let&rsquo;s add it with a placeholder and we will revisit in another blog post.</p>
 
 <p>Let&rsquo;s get started by creating a new fsharp file <em>Wall.fs</em> and move it above <em>FsTweet.Web.fs</em></p>
 
@@ -390,7 +378,7 @@ module Suave =
     path &quot;/wall&quot; &gt;=&gt; renderWall
 </code></pre>
 
-<p>And finally call this <code>webpart</code> function from the <code>main</code> function</p>
+<p>And finally, call this <code>webpart</code> function from the <code>main</code> function</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -404,17 +392,17 @@ let main argv =
   // ...
 </code></pre>
 
-<p>Now if we run the application and login using a registered account, we will be redirected to the wall page and we can find the cookies for <code>auth</code> and <code>state</code> in the browser.</p>
+<p>Now if we run the application and log in using a registered account, we will be redirected to the wall page, and we can find the cookies for <code>auth</code> and <code>state</code> in the browser.</p>
 
 <p><img src="/img/fsharp/series/fstweet/wall-page-with-cookies.png" alt="Wall Page With Cookies" /></p>
 
-<p>The values of these cookies are encrypted using a randomly generated key in the server side by Suave. We can either provide this key or let the suave to generate one.</p>
+<p>The values of these cookies are encrypted using a randomly generated key on the server side by Suave. We can either provide this key or let the suave to create one.</p>
 
-<p>The downside of letting suave to generate the key is, it will generate a new key whenever the server restarts. And also if we run multiple instances of <code>FsTweet.Web</code> behind a load balancer, each instance will have its own server key.</p>
+<p>The downside of letting suave to generate the key is, it will create a new key whenever the server restarts. And also if we run multiple instances of <code>FsTweet.Web</code> behind a load balancer, each instance will have a different server key.</p>
 
 <p>So, the ideal thing would be explicitly providing the server key.</p>
 
-<p>As mentioned in the <em>Server Keys</em> section of the <a href="https://suave.io/sessions.html" target="_blank">official documentation</a>, To generate a key let&rsquo;s create a script file <em>script.fsx</em> and add the provided code snippet to generate the key.</p>
+<p>As mentioned in the <em>Server Keys</em> section of the <a href="https://suave.io/sessions.html" target="_blank">official documentation</a>, To generate a key let&rsquo;s create a script file <em>script.fsx</em> and add the provided code snippet to create the key.</p>
 
 <pre><code class="language-fsharp">// script.fsx
 #r &quot;./packages/Suave/lib/net40/Suave.dll&quot;
@@ -429,7 +417,7 @@ Crypto.generateKey Crypto.KeyLength
 
 <p>When we run this script, it will be print a key.</p>
 
-<p>The next step is passing this a key as an environment variable to the application and configuring the suave web server to use this key</p>
+<p>The next step is passing this a key as an environment variable to the application and configuring the suave web server to use this key.</p>
 
 <pre><code class="language-diff">// FsTweet.Web/FsTweet.Web.fs
 
@@ -447,9 +435,9 @@ let main argv =
 
 <h2 id="protecting-webparts">Protecting WebParts</h2>
 
-<p>Currently, the Wall page can be accessed even with out login as we are not protecting it.</p>
+<p>Currently, the Wall page can be accessed even without login as we are not protecting it.</p>
 
-<p>To protect it, we need to do the following things</p>
+<p>To protect it, we need to do the following things.</p>
 
 <ol>
 <li>Validate the Auth Token present in the cookie</li>
@@ -460,7 +448,7 @@ let main argv =
 
 <p>For validating the auth token present in the cookie, <code>Suave.Authentication</code> module has a function called <code>authenticate</code>.</p>
 
-<p>This <code>authenticate</code> function takes five parameters</p>
+<p>The <code>authenticate</code> function has five parameters.</p>
 
 <ol>
 <li><p><em>relativeExpiry</em> (<code>CookieLife</code>) - How long does the authentication cookie last?</p></li>
@@ -490,9 +478,9 @@ module Suave =
   // ...
 </code></pre>
 
-<p>For both <code>missingCookie</code> and <code>decryptionFailure</code>, we are redirecting the user to the login page and for a valid a auth session cookie, we need to give some thoughts.</p>
+<p>For both <code>missingCookie</code> and <code>decryptionFailure</code>, we are redirecting the user to the login page, and for a valid auth session cookie, we need to give some thoughts.</p>
 
-<p>We need to retrieve the <code>User</code> value that we persisted in the cookie upon successful login and then we have to call the provided <code>fSuccess</code>. If there is any error while retrieving the user from cookie, we need to redirect to the login page.</p>
+<p>We first have to retrieve the <code>User</code> value from the state cookie, and then we have to call the provided <code>fSuccess</code>. If there is an error while retrieving the user from the cookie, we need to redirect to the login page.</p>
 
 <pre><code class="language-fsharp">module Suave = 
   // ...
@@ -526,11 +514,11 @@ module Suave =
   // ...
 </code></pre>
 
-<p>In the <code>userSession</code> function, we are initializing the user state from the <code>CookieStateStore</code> by calling the <code>statefulForSession</code> function and then we retrive the logged in user from the state cookie.</p>
+<p>In the <code>userSession</code> function, we are initializing the user state from the <code>CookieStateStore</code> by calling the <code>statefulForSession</code> function, and then we retrieve the logged in user from the state cookie.</p>
 
 <p>With the help of the <code>requiresAuth</code> function, now we can define a WebPart that can be accessed only by the authenticated user.</p>
 
-<p>Going back to <code>renderWall</code> function that we created in <em>Wall.fs</em>, we can now make it accesible only for the authenticated user by doing the following changes.</p>
+<p>Going back to <code>renderWall</code> function in the <em>Wall.fs</em>, we can now make it accessible only to the authenticated user by doing the following changes.</p>
 
 <pre><code class="language-diff">// FsTweet.Web/Wall.fs
 module Suave =
@@ -549,15 +537,15 @@ module Suave =
 +   path &quot;/wall&quot; &gt;=&gt; requiresAuth renderWall
 </code></pre>
 
-<p>Instead of displaying a plain text, <code>TODO</code>, we have replaced it with the username of the loggedin user. We will be revisiting this <code>renderWall</code> function in the later blog posts.</p>
+<p>Instead of displaying a plain text, <code>TODO</code>, we have replaced it with the username of the logged in user. We will be revisiting this <code>renderWall</code> function in the later blog posts.</p>
 
 <h2 id="handling-optional-authentication">Handling Optional Authentication</h2>
 
-<p>Say if the user is already logged in and if he/she visits <code>/login</code> page, right now we are rendering the login page and prompting the user to login again.</p>
+<p>Say if the user is already logged in and if he/she visits <code>/login</code> page, right now we are rendering the login page and prompting the user to log in again.</p>
 
 <p>But better user experience would be redirecting the user to the wall page.</p>
 
-<p>To acheive it, let&rsquo;s create new function <code>mayRequiresAuth</code>.</p>
+<p>To achieve it, let&rsquo;s create new function <code>mayRequiresAuth</code>.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/Auth.fs
 module Suave = 
@@ -578,9 +566,9 @@ module Suave =
   // ...
 </code></pre>
 
-<p>The <code>mayRequiresAuth</code> function is similar to <code>requiresAuth</code> except that it calls the <code>fSuccess</code> function with a <code>User option</code> type instead of redirecting to login page if the user didn&rsquo;t login.</p>
+<p>The <code>mayRequiresAuth</code> function is similar to <code>requiresAuth</code> except that it calls the <code>fSuccess</code> function with a <code>User option</code> type instead of redirecting to login page if the user didn&rsquo;t log in.</p>
 
-<p>The next step is changing the <code>renderLoginPage</code> function to accomodate this new requirement.</p>
+<p>The next step is changing the <code>renderLoginPage</code> function to accommodate this new requirement.</p>
 
 <pre><code class="language-diff">// FsTweet.Web/Auth.fs
 
@@ -622,7 +610,7 @@ module Suave =
 <h2 id="exercises">Exercises</h2>
 
 <ol>
-<li><p>Instead of stroing the user information in a cookie, store and retrieve it from a new table in the PostgreSQL database. You can get the session id from the auth cookie by using the <code>HttpContext.sessionId</code> function in the <code>Suave.Authentication</code> module.</p></li>
+<li><p>Instead of storing the user information in a cookie, store and retrieve it from a new table in the PostgreSQL database. You can get the session id from the auth cookie by using the <code>HttpContext.sessionId</code> function in the <code>Suave.Authentication</code> module.</p></li>
 
 <li><p>Suave supports cookies with sliding expiry. Replace the <code>CookieLife.Session</code> with <code>CookieLife.MaxAge</code> and implement sliding expiry.</p></li>
 </ol>

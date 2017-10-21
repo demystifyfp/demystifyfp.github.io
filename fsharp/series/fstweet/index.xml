@@ -1479,25 +1479,13 @@ let inline deserialize&amp;lt; ^a when (^a or FromJsonDefaults)
 
 &lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have implemented the backend logic to verify the login credentials of a user. Upon successful verification of the provided credentials, we just responded with a username.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
-// ...
-module Suave =
-  // ...
-  open User
-  // ...
-  // User -&amp;gt; WebPart
-  let onLoginSuccess (user : User) = 
-    Successful.OK user.Username.Value
-  // ...
-&lt;/code&gt;&lt;/pre&gt;
-
 &lt;p&gt;In this blog post, we are going to replace this placeholder with the actual implementation.&lt;/p&gt;
 
 &lt;h2 id=&#34;creating-session-cookie&#34;&gt;Creating Session Cookie&lt;/h2&gt;
 
-&lt;p&gt;As HTTP is &lt;a href=&#34;https://stackoverflow.com/questions/13200152/why-say-that-http-is-a-stateless-protocol&#34; target=&#34;_blank&#34;&gt;a stateless protocol&lt;/a&gt;, we need to create a unique session id for every successful login verification and a &lt;a href=&#34;https://en.wikipedia.org/wiki/HTTP_cookie&#34; target=&#34;_blank&#34;&gt;HTTP cookie&lt;/a&gt; to holds this session id.&lt;/p&gt;
+&lt;p&gt;As HTTP is &lt;a href=&#34;https://stackoverflow.com/questions/13200152/why-say-that-http-is-a-stateless-protocol&#34; target=&#34;_blank&#34;&gt;a stateless protocol&lt;/a&gt;, we need to create a unique session id for every successful login verification and an &lt;a href=&#34;https://en.wikipedia.org/wiki/HTTP_cookie&#34; target=&#34;_blank&#34;&gt;HTTP cookie&lt;/a&gt; to holds this session id.&lt;/p&gt;
 
-&lt;p&gt;This session cookie, will be present in all the subsequent requests from the user and we can use it to authenticate the user instead of prompting the username and the password for each requests.&lt;/p&gt;
+&lt;p&gt;This session cookie will be present in all the subsequent requests from the user and we can use it to authenticate the user instead of prompting the username and the password for each request.&lt;/p&gt;
 
 &lt;p&gt;To create this session id and the cookie, we are going to leverage the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Authentication.authenticated&#34; target=&#34;_blank&#34;&gt;authenticated&lt;/a&gt; function from Suave.&lt;/p&gt;
 
@@ -1506,7 +1494,7 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;CookieLife -&amp;gt; bool -&amp;gt; Webpart
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;CookieLife&lt;/code&gt; defines the lifespan of a cookie in the user&amp;rsquo;s browser and the &lt;code&gt;bool&lt;/code&gt; parameter is to specify the presence of the cookie in &lt;code&gt;HTTPS&lt;/code&gt; alone.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;CookieLife&lt;/code&gt; defines the lifespan of a cookie in the user&amp;rsquo;s browser, and the &lt;code&gt;bool&lt;/code&gt; parameter is to specify the presence of the cookie in &lt;code&gt;HTTPS&lt;/code&gt; alone.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Suave = 
 + open Suave.Authentication
@@ -1520,12 +1508,12 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;CookieLife.Session&lt;/code&gt; defines that the cookie will be present til the user he quits the browser. There is an another option &lt;code&gt;MaxAge of TimeSpan&lt;/code&gt; to define the lifespan of cookie using TimeSpan. And as we are not using HTTPS, we need to set the second parameter as &lt;code&gt;false&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;CookieLife.Session&lt;/code&gt; defines that the cookie will be present till the user he quits the browser. There is another option &lt;code&gt;MaxAge of TimeSpan&lt;/code&gt; to specify the lifespan of the cookie using TimeSpan. And as we are not going to use HTTPS, we are setting the second parameter as &lt;code&gt;false&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;The session id in the cookie doesn&amp;rsquo;t personally identify the user. So, we need to store the associated user information in some other place.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;+------------------+--------------------+
-|     SessionId    |       UserId       |
+|     SessionId    |        User        |
 |                  |                    |
 +---------------------------------------+
 |                  |                    |
@@ -1536,18 +1524,18 @@ module Suave =
 &lt;p&gt;There are multiple ways we can achieve it.&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Adding a new table in the database and persist the relationship.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Adding a new table in the database and persist this relationship.&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;We can even use a NoSQL datastore to store this key-value data&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;We can store it an in-memory cache in the server.&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;We can make use of an another HTTP cookie.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;We can make use of another HTTP cookie.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;Every approach has its own pros and cons and we need to pick the opt one.&lt;/p&gt;
+&lt;p&gt;Every approach has its pros and cons, and we need to pick the opt one.&lt;/p&gt;
 
-&lt;p&gt;Suave library has an absraction to deal with this state management.&lt;/p&gt;
+&lt;p&gt;The Suave library has an abstraction to deal with this state management.&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&lt;a href=&#34;https://github.com/SuaveIO/suave/blob/master/src/Suave/State.fs&#34; target=&#34;_blank&#34;&gt;https://github.com/SuaveIO/suave/blob/master/src/Suave/State.fs&lt;/a&gt;&lt;/p&gt;
@@ -1560,7 +1548,7 @@ module Suave =
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;It also provides two out of the box implementations of this abstraction, &lt;code&gt;MemoryCacheStateStore&lt;/code&gt; and &lt;code&gt;CookieStateStore&lt;/code&gt; that corresponds to the third and fourth ways defined above respectively.&lt;/p&gt;
+&lt;p&gt;It also provides two out of the box implementations of this abstraction, &lt;code&gt;MemoryCacheStateStore&lt;/code&gt;, and &lt;code&gt;CookieStateStore&lt;/code&gt; that corresponds to the third and fourth ways defined above respectively.&lt;/p&gt;
 
 &lt;p&gt;In our case, We are going to use &lt;code&gt;CookieStateStore&lt;/code&gt;.&lt;/p&gt;
 
@@ -1588,20 +1576,20 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;statefulForSession&lt;/code&gt; function, a WebPart from Suave, intializes the &lt;code&gt;state&lt;/code&gt; in the &lt;code&gt;HttpContext&lt;/code&gt; with &lt;code&gt;CookieStateStore&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;statefulForSession&lt;/code&gt; function, a WebPart from Suave, initializes the &lt;code&gt;state&lt;/code&gt; in the &lt;code&gt;HttpContext&lt;/code&gt; with &lt;code&gt;CookieStateStore&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;setState&lt;/code&gt; function takes a key and a value, along with a &lt;code&gt;HttpContext&lt;/code&gt;. If there is a state store present in the &lt;code&gt;HttpContext&lt;/code&gt;, it stores the key and the value pair. In the absense of a state store it does nothing and we are making the &lt;code&gt;never&lt;/code&gt; WebPart from Suave to denote it.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;setState&lt;/code&gt; function takes a key and value, along with a &lt;code&gt;HttpContext&lt;/code&gt;. If there is a state store present in the &lt;code&gt;HttpContext&lt;/code&gt;, it stores the key and the value pair. In the absence of a state store, it does nothing, and we are making the &lt;code&gt;never&lt;/code&gt; WebPart from Suave to denote it.&lt;/p&gt;
 
 &lt;p&gt;An important thing that we need to notice here is &lt;code&gt;setState&lt;/code&gt; function doesn&amp;rsquo;t know what is the underlying &lt;code&gt;StateStore&lt;/code&gt; that we are using.&lt;/p&gt;
 
 &lt;p&gt;In the &lt;code&gt;createUserSession&lt;/code&gt; function, we are initializing the &lt;code&gt;StateStore&lt;/code&gt; to use &lt;code&gt;CookieStateStore&lt;/code&gt; by calling the &lt;code&gt;statefulForSession&lt;/code&gt; function and then calling the &lt;code&gt;setState&lt;/code&gt; to store the user information in the state cookie.&lt;/p&gt;
 
-&lt;p&gt;We are making use of the &lt;code&gt;context&lt;/code&gt; function (aka combinator) while calling the &lt;code&gt;setState&lt;/code&gt;. The &lt;code&gt;context&lt;/code&gt; function from the Suave library which is having the following signature&lt;/p&gt;
+&lt;p&gt;We are making use of the &lt;code&gt;context&lt;/code&gt; function (aka combinator) while calling the &lt;code&gt;setState&lt;/code&gt;. The &lt;code&gt;context&lt;/code&gt; function from the Suave library is having the following signature.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;(HttpContext -&amp;gt; WebPart) -&amp;gt; WebPart
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The final step in calling this &lt;code&gt;createUserSession&lt;/code&gt; function from the &lt;code&gt;onLoginSuccess&lt;/code&gt; function and redirects the user to his/her home page.&lt;/p&gt;
+&lt;p&gt;The final step in calling this &lt;code&gt;createUserSession&lt;/code&gt; function from the &lt;code&gt;onLoginSuccess&lt;/code&gt; function and redirects the user to his/her wall page.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let onLoginSuccess (user : User) = 
   authenticated CookieLife.Session false 
@@ -1611,7 +1599,7 @@ module Suave =
 
 &lt;h2 id=&#34;rending-the-wall-page-with-a-placeholder&#34;&gt;Rending The Wall Page With A Placeholder&lt;/h2&gt;
 
-&lt;p&gt;In the previous section, upon successful login, we are redirecting to the wall page (&lt;code&gt;/wall&lt;/code&gt;). This is currently not exist. So, let&amp;rsquo;s add it with a placeholder and we will revisit in an another blog post.&lt;/p&gt;
+&lt;p&gt;In the previous section, upon successful login, we are redirecting to the wall page (&lt;code&gt;/wall&lt;/code&gt;) which is currently not exists. So, let&amp;rsquo;s add it with a placeholder and we will revisit in another blog post.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s get started by creating a new fsharp file &lt;em&gt;Wall.fs&lt;/em&gt; and move it above &lt;em&gt;FsTweet.Web.fs&lt;/em&gt;&lt;/p&gt;
 
@@ -1637,7 +1625,7 @@ module Suave =
     path &amp;quot;/wall&amp;quot; &amp;gt;=&amp;gt; renderWall
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;And finally call this &lt;code&gt;webpart&lt;/code&gt; function from the &lt;code&gt;main&lt;/code&gt; function&lt;/p&gt;
+&lt;p&gt;And finally, call this &lt;code&gt;webpart&lt;/code&gt; function from the &lt;code&gt;main&lt;/code&gt; function&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -1651,17 +1639,17 @@ let main argv =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now if we run the application and login using a registered account, we will be redirected to the wall page and we can find the cookies for &lt;code&gt;auth&lt;/code&gt; and &lt;code&gt;state&lt;/code&gt; in the browser.&lt;/p&gt;
+&lt;p&gt;Now if we run the application and log in using a registered account, we will be redirected to the wall page, and we can find the cookies for &lt;code&gt;auth&lt;/code&gt; and &lt;code&gt;state&lt;/code&gt; in the browser.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/wall-page-with-cookies.png&#34; alt=&#34;Wall Page With Cookies&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;The values of these cookies are encrypted using a randomly generated key in the server side by Suave. We can either provide this key or let the suave to generate one.&lt;/p&gt;
+&lt;p&gt;The values of these cookies are encrypted using a randomly generated key on the server side by Suave. We can either provide this key or let the suave to create one.&lt;/p&gt;
 
-&lt;p&gt;The downside of letting suave to generate the key is, it will generate a new key whenever the server restarts. And also if we run multiple instances of &lt;code&gt;FsTweet.Web&lt;/code&gt; behind a load balancer, each instance will have its own server key.&lt;/p&gt;
+&lt;p&gt;The downside of letting suave to generate the key is, it will create a new key whenever the server restarts. And also if we run multiple instances of &lt;code&gt;FsTweet.Web&lt;/code&gt; behind a load balancer, each instance will have a different server key.&lt;/p&gt;
 
 &lt;p&gt;So, the ideal thing would be explicitly providing the server key.&lt;/p&gt;
 
-&lt;p&gt;As mentioned in the &lt;em&gt;Server Keys&lt;/em&gt; section of the &lt;a href=&#34;https://suave.io/sessions.html&#34; target=&#34;_blank&#34;&gt;official documentation&lt;/a&gt;, To generate a key let&amp;rsquo;s create a script file &lt;em&gt;script.fsx&lt;/em&gt; and add the provided code snippet to generate the key.&lt;/p&gt;
+&lt;p&gt;As mentioned in the &lt;em&gt;Server Keys&lt;/em&gt; section of the &lt;a href=&#34;https://suave.io/sessions.html&#34; target=&#34;_blank&#34;&gt;official documentation&lt;/a&gt;, To generate a key let&amp;rsquo;s create a script file &lt;em&gt;script.fsx&lt;/em&gt; and add the provided code snippet to create the key.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// script.fsx
 #r &amp;quot;./packages/Suave/lib/net40/Suave.dll&amp;quot;
@@ -1676,7 +1664,7 @@ Crypto.generateKey Crypto.KeyLength
 
 &lt;p&gt;When we run this script, it will be print a key.&lt;/p&gt;
 
-&lt;p&gt;The next step is passing this a key as an environment variable to the application and configuring the suave web server to use this key&lt;/p&gt;
+&lt;p&gt;The next step is passing this a key as an environment variable to the application and configuring the suave web server to use this key.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
 
@@ -1694,9 +1682,9 @@ let main argv =
 
 &lt;h2 id=&#34;protecting-webparts&#34;&gt;Protecting WebParts&lt;/h2&gt;
 
-&lt;p&gt;Currently, the Wall page can be accessed even with out login as we are not protecting it.&lt;/p&gt;
+&lt;p&gt;Currently, the Wall page can be accessed even without login as we are not protecting it.&lt;/p&gt;
 
-&lt;p&gt;To protect it, we need to do the following things&lt;/p&gt;
+&lt;p&gt;To protect it, we need to do the following things.&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;Validate the Auth Token present in the cookie&lt;/li&gt;
@@ -1707,7 +1695,7 @@ let main argv =
 
 &lt;p&gt;For validating the auth token present in the cookie, &lt;code&gt;Suave.Authentication&lt;/code&gt; module has a function called &lt;code&gt;authenticate&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;This &lt;code&gt;authenticate&lt;/code&gt; function takes five parameters&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;authenticate&lt;/code&gt; function has five parameters.&lt;/p&gt;
 
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;&lt;em&gt;relativeExpiry&lt;/em&gt; (&lt;code&gt;CookieLife&lt;/code&gt;) - How long does the authentication cookie last?&lt;/p&gt;&lt;/li&gt;
@@ -1737,9 +1725,9 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;For both &lt;code&gt;missingCookie&lt;/code&gt; and &lt;code&gt;decryptionFailure&lt;/code&gt;, we are redirecting the user to the login page and for a valid a auth session cookie, we need to give some thoughts.&lt;/p&gt;
+&lt;p&gt;For both &lt;code&gt;missingCookie&lt;/code&gt; and &lt;code&gt;decryptionFailure&lt;/code&gt;, we are redirecting the user to the login page, and for a valid auth session cookie, we need to give some thoughts.&lt;/p&gt;
 
-&lt;p&gt;We need to retrieve the &lt;code&gt;User&lt;/code&gt; value that we persisted in the cookie upon successful login and then we have to call the provided &lt;code&gt;fSuccess&lt;/code&gt;. If there is any error while retrieving the user from cookie, we need to redirect to the login page.&lt;/p&gt;
+&lt;p&gt;We first have to retrieve the &lt;code&gt;User&lt;/code&gt; value from the state cookie, and then we have to call the provided &lt;code&gt;fSuccess&lt;/code&gt;. If there is an error while retrieving the user from the cookie, we need to redirect to the login page.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave = 
   // ...
@@ -1773,11 +1761,11 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;In the &lt;code&gt;userSession&lt;/code&gt; function, we are initializing the user state from the &lt;code&gt;CookieStateStore&lt;/code&gt; by calling the &lt;code&gt;statefulForSession&lt;/code&gt; function and then we retrive the logged in user from the state cookie.&lt;/p&gt;
+&lt;p&gt;In the &lt;code&gt;userSession&lt;/code&gt; function, we are initializing the user state from the &lt;code&gt;CookieStateStore&lt;/code&gt; by calling the &lt;code&gt;statefulForSession&lt;/code&gt; function, and then we retrieve the logged in user from the state cookie.&lt;/p&gt;
 
 &lt;p&gt;With the help of the &lt;code&gt;requiresAuth&lt;/code&gt; function, now we can define a WebPart that can be accessed only by the authenticated user.&lt;/p&gt;
 
-&lt;p&gt;Going back to &lt;code&gt;renderWall&lt;/code&gt; function that we created in &lt;em&gt;Wall.fs&lt;/em&gt;, we can now make it accesible only for the authenticated user by doing the following changes.&lt;/p&gt;
+&lt;p&gt;Going back to &lt;code&gt;renderWall&lt;/code&gt; function in the &lt;em&gt;Wall.fs&lt;/em&gt;, we can now make it accessible only to the authenticated user by doing the following changes.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Wall.fs
 module Suave =
@@ -1796,15 +1784,15 @@ module Suave =
 +   path &amp;quot;/wall&amp;quot; &amp;gt;=&amp;gt; requiresAuth renderWall
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Instead of displaying a plain text, &lt;code&gt;TODO&lt;/code&gt;, we have replaced it with the username of the loggedin user. We will be revisiting this &lt;code&gt;renderWall&lt;/code&gt; function in the later blog posts.&lt;/p&gt;
+&lt;p&gt;Instead of displaying a plain text, &lt;code&gt;TODO&lt;/code&gt;, we have replaced it with the username of the logged in user. We will be revisiting this &lt;code&gt;renderWall&lt;/code&gt; function in the later blog posts.&lt;/p&gt;
 
 &lt;h2 id=&#34;handling-optional-authentication&#34;&gt;Handling Optional Authentication&lt;/h2&gt;
 
-&lt;p&gt;Say if the user is already logged in and if he/she visits &lt;code&gt;/login&lt;/code&gt; page, right now we are rendering the login page and prompting the user to login again.&lt;/p&gt;
+&lt;p&gt;Say if the user is already logged in and if he/she visits &lt;code&gt;/login&lt;/code&gt; page, right now we are rendering the login page and prompting the user to log in again.&lt;/p&gt;
 
 &lt;p&gt;But better user experience would be redirecting the user to the wall page.&lt;/p&gt;
 
-&lt;p&gt;To acheive it, let&amp;rsquo;s create new function &lt;code&gt;mayRequiresAuth&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;To achieve it, let&amp;rsquo;s create new function &lt;code&gt;mayRequiresAuth&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Auth.fs
 module Suave = 
@@ -1825,9 +1813,9 @@ module Suave =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;mayRequiresAuth&lt;/code&gt; function is similar to &lt;code&gt;requiresAuth&lt;/code&gt; except that it calls the &lt;code&gt;fSuccess&lt;/code&gt; function with a &lt;code&gt;User option&lt;/code&gt; type instead of redirecting to login page if the user didn&amp;rsquo;t login.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;mayRequiresAuth&lt;/code&gt; function is similar to &lt;code&gt;requiresAuth&lt;/code&gt; except that it calls the &lt;code&gt;fSuccess&lt;/code&gt; function with a &lt;code&gt;User option&lt;/code&gt; type instead of redirecting to login page if the user didn&amp;rsquo;t log in.&lt;/p&gt;
 
-&lt;p&gt;The next step is changing the &lt;code&gt;renderLoginPage&lt;/code&gt; function to accomodate this new requirement.&lt;/p&gt;
+&lt;p&gt;The next step is changing the &lt;code&gt;renderLoginPage&lt;/code&gt; function to accommodate this new requirement.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/Auth.fs
 
@@ -1869,7 +1857,7 @@ module Suave =
 &lt;h2 id=&#34;exercises&#34;&gt;Exercises&lt;/h2&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;Instead of stroing the user information in a cookie, store and retrieve it from a new table in the PostgreSQL database. You can get the session id from the auth cookie by using the &lt;code&gt;HttpContext.sessionId&lt;/code&gt; function in the &lt;code&gt;Suave.Authentication&lt;/code&gt; module.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Instead of storing the user information in a cookie, store and retrieve it from a new table in the PostgreSQL database. You can get the session id from the auth cookie by using the &lt;code&gt;HttpContext.sessionId&lt;/code&gt; function in the &lt;code&gt;Suave.Authentication&lt;/code&gt; module.&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Suave supports cookies with sliding expiry. Replace the &lt;code&gt;CookieLife.Session&lt;/code&gt; with &lt;code&gt;CookieLife.MaxAge&lt;/code&gt; and implement sliding expiry.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;

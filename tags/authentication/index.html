@@ -164,7 +164,8 @@
       Hi!
 Welcome back to the fifteenth part of Creating a Twitter Clone in F# using Suave blog post series.
 In the previous blog post, we have implemented the backend logic to verify the login credentials of a user. Upon successful verification of the provided credentials, we just responded with a username.
-// FsTweet.Web/Auth.fs // &hellip; module Suave = // &hellip; open User // &hellip; // User -&gt; WebPart let onLoginSuccess (user : User) = Successful.
+In this blog post, we are going to replace this placeholder with the actual implementation.
+Creating Session Cookie As HTTP is a stateless protocol, we need to create a unique session id for every successful login verification and an HTTP cookie to holds this session id.
       
     </div>
   </div>
