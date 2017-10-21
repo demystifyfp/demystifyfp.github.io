@@ -230,7 +230,7 @@
 
 <p>Welcome back to the thirteenth part of <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
 
-<p>In this blog post we are going to start the implementation of a new feature, enabling users to login to FsTweet.</p>
+<p>In this blog post, we are going to start the implementation of a new feature, enabling users to log in to FsTweet.</p>
 
 <p>Let&rsquo;s get started by creating a new file <em>Auth.fs</em> in the <code>web</code> project and move it above <em>FsTweet.Web.fs</em></p>
 
@@ -254,7 +254,7 @@ module Suave =
   }
 </code></pre>
 
-<p>As we seen in the <code>UserSignupViewModel</code>, we need a empty view model while rendering the login page for the first time.</p>
+<p>As we seen in the <code>UserSignupViewModel</code>, we need an empty view model while rendering the login page for the first time.</p>
 
 <pre><code class="language-fsharp">module Suave =
   // ...
@@ -265,7 +265,9 @@ module Suave =
   }
 </code></pre>
 
-<p>Then we need to create a liquid template for the login page. Let&rsquo;s create a new file <code>user/login.liquid</code> in the <em>views</em> directory</p>
+<p>Then we need to create a liquid template for the login page.</p>
+
+<p>Let&rsquo;s create a new file <code>user/login.liquid</code> in the <em>views</em> directory</p>
 
 <pre><code class="language-html">&lt;!-- FsTweet.Web/views/user/login.liquid --&gt;
 {% extends &quot;master_page.liquid&quot; %}
@@ -397,7 +399,7 @@ let webpart () =
 
 <h2 id="validating-the-login-request">Validating the Login Request</h2>
 
-<p>The <code>username</code> and the <code>password</code> fields of the <code>LoginViewModel</code> are of types <code>string</code>. But what we want to carry out the login operation is their correponding domain models <code>Username</code> and <code>Password</code>.</p>
+<p>The <code>username</code> and the <code>password</code> fields of the <code>LoginViewModel</code> are of types <code>string</code>. But what we want to carry out the login operation is their corresponding domain models <code>Username</code> and <code>Password</code>.</p>
 
 <p>Let&rsquo;s define a new module <code>Domain</code> in <em>Auth.fs</em> above <code>Suave</code> and define a domain type for the login request.</p>
 
@@ -434,7 +436,7 @@ module Suave =
         }
 </code></pre>
 
-<p>Then in <code>handleUserLogin</code> function, we can make use of this function to validate the <code>LoginViewModel</code>.</p>
+<p>Then in the <code>handleUserLogin</code> function, we can make use of this function to validate the <code>LoginViewModel</code>.</p>
 
 <pre><code class="language-fsharp">module Suave =
   open Chessie
@@ -458,13 +460,13 @@ module Suave =
 
 <p>If there is any error, we populate the view model with the error message and rerender the login page.</p>
 
-<p>For a valid login request, we need to do implement the actual behaviour. Let&rsquo;s leave this as a <code>TODO</code> and revisit it in the next blog post.</p>
+<p>For a valid login request, we need to implement the actual behavior. Let&rsquo;s leave this as a <code>TODO</code> and revisit it in the next blog post.</p>
 
 <h2 id="summary">Summary</h2>
 
 <p>In this blog post, we added implementations for rending the login page. Then we added functions to handle and validate the login request from the user.</p>
 
-<p>The source code can be found in the <a href="https://github.com/demystifyfp/FsTweet/tree/v0.12" target="_blank">GitHub repository</a></p>
+<p>The source code is available in the <a href="https://github.com/demystifyfp/FsTweet/tree/v0.12" target="_blank">GitHub repository</a></p>
 
     </div>
 

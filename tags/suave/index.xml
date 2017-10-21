@@ -2494,7 +2494,7 @@ module Suave =
 
 &lt;p&gt;Welcome back to the thirteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In this blog post we are going to start the implementation of a new feature, enabling users to login to FsTweet.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to start the implementation of a new feature, enabling users to log in to FsTweet.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s get started by creating a new file &lt;em&gt;Auth.fs&lt;/em&gt; in the &lt;code&gt;web&lt;/code&gt; project and move it above &lt;em&gt;FsTweet.Web.fs&lt;/em&gt;&lt;/p&gt;
 
@@ -2518,7 +2518,7 @@ module Suave =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we seen in the &lt;code&gt;UserSignupViewModel&lt;/code&gt;, we need a empty view model while rendering the login page for the first time.&lt;/p&gt;
+&lt;p&gt;As we seen in the &lt;code&gt;UserSignupViewModel&lt;/code&gt;, we need an empty view model while rendering the login page for the first time.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
   // ...
@@ -2529,7 +2529,9 @@ module Suave =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then we need to create a liquid template for the login page. Let&amp;rsquo;s create a new file &lt;code&gt;user/login.liquid&lt;/code&gt; in the &lt;em&gt;views&lt;/em&gt; directory&lt;/p&gt;
+&lt;p&gt;Then we need to create a liquid template for the login page.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a new file &lt;code&gt;user/login.liquid&lt;/code&gt; in the &lt;em&gt;views&lt;/em&gt; directory&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- FsTweet.Web/views/user/login.liquid --&amp;gt;
 {% extends &amp;quot;master_page.liquid&amp;quot; %}
@@ -2661,7 +2663,7 @@ let webpart () =
 
 &lt;h2 id=&#34;validating-the-login-request&#34;&gt;Validating the Login Request&lt;/h2&gt;
 
-&lt;p&gt;The &lt;code&gt;username&lt;/code&gt; and the &lt;code&gt;password&lt;/code&gt; fields of the &lt;code&gt;LoginViewModel&lt;/code&gt; are of types &lt;code&gt;string&lt;/code&gt;. But what we want to carry out the login operation is their correponding domain models &lt;code&gt;Username&lt;/code&gt; and &lt;code&gt;Password&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;username&lt;/code&gt; and the &lt;code&gt;password&lt;/code&gt; fields of the &lt;code&gt;LoginViewModel&lt;/code&gt; are of types &lt;code&gt;string&lt;/code&gt;. But what we want to carry out the login operation is their corresponding domain models &lt;code&gt;Username&lt;/code&gt; and &lt;code&gt;Password&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s define a new module &lt;code&gt;Domain&lt;/code&gt; in &lt;em&gt;Auth.fs&lt;/em&gt; above &lt;code&gt;Suave&lt;/code&gt; and define a domain type for the login request.&lt;/p&gt;
 
@@ -2698,7 +2700,7 @@ module Suave =
         }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then in &lt;code&gt;handleUserLogin&lt;/code&gt; function, we can make use of this function to validate the &lt;code&gt;LoginViewModel&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Then in the &lt;code&gt;handleUserLogin&lt;/code&gt; function, we can make use of this function to validate the &lt;code&gt;LoginViewModel&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
   open Chessie
@@ -2722,13 +2724,13 @@ module Suave =
 
 &lt;p&gt;If there is any error, we populate the view model with the error message and rerender the login page.&lt;/p&gt;
 
-&lt;p&gt;For a valid login request, we need to do implement the actual behaviour. Let&amp;rsquo;s leave this as a &lt;code&gt;TODO&lt;/code&gt; and revisit it in the next blog post.&lt;/p&gt;
+&lt;p&gt;For a valid login request, we need to implement the actual behavior. Let&amp;rsquo;s leave this as a &lt;code&gt;TODO&lt;/code&gt; and revisit it in the next blog post.&lt;/p&gt;
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;In this blog post, we added implementations for rending the login page. Then we added functions to handle and validate the login request from the user.&lt;/p&gt;
 
-&lt;p&gt;The source code can be found in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.12&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The source code is available in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.12&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
