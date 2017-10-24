@@ -7,13 +7,13 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Sat, 14 Oct 2017 08:19:14 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 17 Oct 2017 08:19:14 +0530</lastBuildDate>
     <atom:link href="/tags/suave/" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Adding User Feed</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</link>
-      <pubDate>Sat, 14 Oct 2017 08:19:14 +0530</pubDate>
+      <pubDate>Tue, 17 Oct 2017 08:19:14 +0530</pubDate>
       
       <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</guid>
       <description>
