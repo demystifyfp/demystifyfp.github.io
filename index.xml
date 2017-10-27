@@ -11,6 +11,512 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Adding User Profile Page</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/</link>
+      <pubDate>Tue, 24 Oct 2017 20:18:33 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/</guid>
+      <description>
+
+&lt;p&gt;Hi there!&lt;/p&gt;
+
+&lt;p&gt;Welcome back to the eighteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;We are on the verge of completing the initial version of FsTweet. To say FsTweet as a Twitter clone, we should be able to follow other users and view their tweets in our wall page. To do it, we first need to have a user profile page where we can go and follow the user.&lt;/p&gt;
+
+&lt;p&gt;In this blog post, we are going to create the user profile page.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-user-profile-page&#34;&gt;The User Profile Page&lt;/h2&gt;
+
+&lt;p&gt;We are going to consider the username of the user as the twitter handle in the user profile page and it will be served in the url &lt;code&gt;/{username}&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The user profile page will be having the following UI Components.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;A Gravatar image of the user along with the username.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;List of tweets tweeted by the given user&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;List of users that he/she following&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;List of his/her followers.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The components three and four will be addressed in the later blog posts.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In addition to it, we also have to address the following three sceanrios in the profile page.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Anyone should be able to view a profile of anybody else without logging in to the application. The anonymous user can only view the page.
+&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_guest.png&#34; alt=&#34;User Profile Guest&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If a logged in user visits an another user profile page, he/she should be able to follow him/her
+&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_other.png&#34; alt=&#34;User Profile Other&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If a logged in user visits his/her profile page, there should not be any provision to follow himself/herself.
+&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_self.png&#34; alt=&#34;User Profile Self&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let&amp;rsquo;s dive in and implement the user profile page.&lt;/p&gt;
+
+&lt;p&gt;To start with we are going to implement the first UI Component, the gravatar image along with the username and we will also be addressing the above three scenarios.&lt;/p&gt;
+
+&lt;h3 id=&#34;user-profile-liquid-template&#34;&gt;User Profile Liquid Template&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by creating the a new liquid template &lt;em&gt;profile.liqud&lt;/em&gt; for the user profile page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/FsTweet.Web/views/user/profile.liquid
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then update it as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;{% extends &amp;quot;master_page.liquid&amp;quot; %}
+
+{% block head %}
+  &amp;lt;title&amp;gt; {{model.Username}} - FsTweet &amp;lt;/title&amp;gt;
+{% endblock %}
+
+{% block content %}
+&amp;lt;div&amp;gt;
+  &amp;lt;img src=&amp;quot;{{model.GravatarUrl}}&amp;quot; alt=&amp;quot;&amp;quot; class=&amp;quot;gravatar&amp;quot; /&amp;gt;
+  &amp;lt;p class=&amp;quot;gravatar_name&amp;quot;&amp;gt;@{{model.Username}}&amp;lt;/p&amp;gt;
+  {% if model.IsLoggedIn %}
+    {% unless model.IsSelf %}
+      &amp;lt;a href=&amp;quot;#&amp;quot; id=&amp;quot;follow&amp;quot; data-username=&amp;quot;{{model.username}}&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
+    {% endunless %}
+    &amp;lt;a href=&amp;quot;/logout&amp;quot;&amp;gt;Logout&amp;lt;/a&amp;gt;
+  {% endif %}
+&amp;lt;/div&amp;gt;
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Styles are ignored for brevity.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We are using two boolean properties &lt;code&gt;IsLoggedIn&lt;/code&gt; and &lt;code&gt;IsSelf&lt;/code&gt; to show/hide the UI elements that we saw above.&lt;/p&gt;
+
+&lt;p&gt;The next step is adding the server side logic to render this template.&lt;/p&gt;
+
+&lt;h2 id=&#34;rendering-user-profile-template&#34;&gt;Rendering User Profile Template&lt;/h2&gt;
+
+&lt;p&gt;Create a new fsharp file &lt;em&gt;UserProfile.fs&lt;/em&gt; and move it above &lt;em&gt;FsTweet.Web.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/UserProfile
+
+&amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/UserProfile.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As a first step, let&amp;rsquo;s define a domain model for user profile&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
+namespace UserProfile
+
+module Domain = 
+  open User
+  
+  type UserProfile = {
+    User : User
+    GravatarUrl : string
+    IsSelf : bool
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add the &lt;code&gt;gravatarUrl&lt;/code&gt; function that creates the gravatar URL from the user&amp;rsquo;s email address.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...
+  open System.Security.Cryptography
+  
+  // ...
+  
+  let gravatarUrl (emailAddress : UserEmailAddress) =
+    use md5 = MD5.Create()
+    emailAddress.Value 
+    |&amp;gt; System.Text.Encoding.Default.GetBytes
+    |&amp;gt; md5.ComputeHash
+    |&amp;gt; Array.map (fun b -&amp;gt; b.ToString(&amp;quot;x2&amp;quot;))
+    |&amp;gt; String.concat &amp;quot;&amp;quot;
+    |&amp;gt; sprintf &amp;quot;http://www.gravatar.com/avatar/%s?s=200&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;code&gt;gravatarUrl&lt;/code&gt; function uses &lt;a href=&#34;https://en.gravatar.com/site/implement/images/&#34; target=&#34;_blank&#34;&gt;this logic&lt;/a&gt; to generate the URL.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To simplify the creating a value of &lt;code&gt;UserProfile&lt;/code&gt;, let&amp;rsquo;s add a function &lt;code&gt;newUserProfile&lt;/code&gt; to create &lt;code&gt;UserProfile&lt;/code&gt; from &lt;code&gt;User&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// User -&amp;gt; UserProfile
+let newProfile user = { 
+  User = user
+  GravatarUrl = gravatarUrl user.EmailAddress
+  IsSelf = false
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add the &lt;code&gt;findUserProfile&lt;/code&gt; function, which finds the user profile by username&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...
+  open Chessie.ErrorHandling
+  
+  // ...
+
+  type FindUserProfile = 
+    Username -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
+
+  // FindUser -&amp;gt; Username -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
+  let findUserProfile (findUser : FindUser) username = asyncTrial {
+    let! userMayBe = findUser username
+    return Option.map newProfile userMayBe
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are making use of the &lt;code&gt;findUser&lt;/code&gt; function that we created while &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;handling user login request&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The next step is using this function to get the &lt;code&gt;UserProfile&lt;/code&gt; if the user didn&amp;rsquo;t login or the logged in user is looking to find an another user&amp;rsquo;s profile.&lt;/p&gt;
+
+&lt;p&gt;If the &lt;code&gt;Username&lt;/code&gt; of the logged in user matches with the &lt;code&gt;Username&lt;/code&gt; that we are looking to find, we don&amp;rsquo;t need call the &lt;code&gt;findUserProfile&lt;/code&gt;. Instead we can use the &lt;code&gt;newProfile&lt;/code&gt; function to get the profile from the &lt;code&gt;User&lt;/code&gt; and modify its &lt;code&gt;IsSelf&lt;/code&gt; property to &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;
+type HandleUserProfile = 
+    Username -&amp;gt; User option 
+      -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
+      
+// FindUserProfile -&amp;gt; Username -&amp;gt; User option 
+//    -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
+let handleUserProfile 
+      findUserProfile (username : Username) loggedInUserMayBe  = asyncTrial {
+
+    match loggedInUserMayBe with
+    | None -&amp;gt; 
+      return! findUserProfile username
+    | Some (user : User) -&amp;gt; 
+      if user.Username = username then
+        let userProfile =
+          {newProfile user with IsSelf = true}
+        return Some userProfile
+      else  
+        return! findUserProfile username
+
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we have the domain logic for finding user profile in place and let&amp;rsquo;s turn our attention to the presentation logic!&lt;/p&gt;
+
+&lt;p&gt;As we did for other pages, create a new module &lt;code&gt;Suave&lt;/code&gt; and define a view model for the profile page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
+namespace UserProfile
+//...
+
+module Suave =
+  type UserProfileViewModel = {
+    Username : string
+    GravatarUrl : string
+    IsLoggedIn : bool
+    IsSelf : bool
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add a function &lt;code&gt;newUserProfileViewModel&lt;/code&gt; which creates &lt;code&gt;UserProfileViewModel&lt;/code&gt; from &lt;code&gt;UserProfile&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  open Domain
+  // ...
+
+  // UserProfile -&amp;gt; UserProfileViewModel
+  let newUserProfileViewModel (userProfile : UserProfile) = {
+    Username = userProfile.User.Username.Value
+    GravatarUrl = userProfile.GravatarUrl
+    IsLoggedIn = false
+    IsSelf = userProfile.IsSelf
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is transforming the return type (&lt;code&gt;AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;&lt;/code&gt;) of the &lt;code&gt;handleUserProfile&lt;/code&gt; to &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;. To do it we first need to define what we will be doing on success and on failure.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
+// ...
+module Suave =
+  // ...
+  open Suave.DotLiquid
+  open Chessie
+  open System
+  // ...
+
+  let renderUserProfilePage (vm : UserProfileViewModel) = 
+    page &amp;quot;user/profile.liquid&amp;quot; vm
+  let renderProfileNotFound =
+    page &amp;quot;not_found.liquid&amp;quot; &amp;quot;user not found&amp;quot;
+
+  // bool -&amp;gt; UserProfile option -&amp;gt; WebPart
+  let onHandleUserProfileSuccess isLoggedIn userProfileMayBe = 
+    match userProfileMayBe with
+    | Some (userProfile : UserProfile) -&amp;gt; 
+      let vm = { newUserProfileViewModel userProfile with
+                  IsLoggedIn = isLoggedIn }
+      renderUserProfilePage vm
+    | None -&amp;gt; 
+      renderProfileNotFound
+
+  // System.Exception -&amp;gt; WebPart
+  let onHandleUserProfileFailure (ex : Exception) =
+    printfn &amp;quot;%A&amp;quot; ex
+    page &amp;quot;server_error.liquid&amp;quot; &amp;quot;something went wrong&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then wire these functions up with the actual request handler.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// HandleUserProfile -&amp;gt; string -&amp;gt; User option -&amp;gt; WebPart
+let renderUserProfile handleUserProfile username loggedInUser ctx = async {
+  match Username.TryCreate username with
+  | Success validatedUsername -&amp;gt; 
+    let isLoggedIn = 
+      Option.isSome loggedInUser
+    let onSuccess = 
+      onHandleUserProfileSuccess isLoggedIn
+    let! webpart = 
+      handleUserProfile validatedUsername loggedInUser
+      |&amp;gt; AR.either onSuccess onHandleUserProfileFailure
+    return! webpart ctx
+  | Failure _ -&amp;gt; 
+    return! renderProfileNotFound ctx
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final step is exposing this function and adding a HTTP route.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
+// ...
+module Suave =
+  // ...
+  open Database
+  open Suave.Filters
+  open Auth.Suave
+  // ...
+
+  let webpart (getDataCtx : GetDataContext) = 
+    let findUserProfile = findUserProfile (Persistence.findUser getDataCtx)
+    let handleUserProfile = handleUserProfile findUserProfile
+    let renderUserProfile = renderUserProfile handleUserProfile
+    pathScan &amp;quot;/%s&amp;quot; (fun username -&amp;gt; mayRequiresAuth (renderUserProfile username))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
++     UserProfile.Suave.webPart getDataCtx
+    ]
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We need to make sure that this webpart should be the last item in the &lt;code&gt;choose&lt;/code&gt; list as the path &lt;code&gt;/%s&lt;/code&gt; matches every path that has this pattern.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To test drive this new feature, run the application and view the user profile as an anonymous user. Then singup some new users (make sure you verify their email id) and then login and view other users profile.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We haven&amp;rsquo;t added logout yet. So, to login as a new user either clear the cookies in the brower or restart your browser.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;adding-user-feed&#34;&gt;Adding User Feed&lt;/h3&gt;
+
+&lt;p&gt;The next UI Component that we need to implement is the tweet feed of the user. Unlike the user feed that we implement in the pevious post, here we are just going to fetch his/her tweets and going to show as a history.&lt;/p&gt;
+
+&lt;p&gt;To enable it we have to pass the GetStream.io&amp;rsquo;s configuration and user details to the client side. Let&amp;rsquo;s add them as properties in the &lt;code&gt;UserProfileViewModel&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
+// ...
+module Suave =
+  // ...
+  type UserProfileViewModel = {
+    // ...
+    UserId : int
+    UserFeedToken : string
+    ApiKey : string
+    AppId : string
+  }
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add the &lt;code&gt;getStreamClient&lt;/code&gt; parameter to the &lt;code&gt;newUserProfileViewModel&lt;/code&gt; function and populate the newly added properties.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let newUserProfileViewModel (userProfile : UserProfile) = {
+-    Username = userProfile.User.Username.Value
+-    GravatarUrl = userProfile.GravatarUrl
+-    IsLoggedIn = false
+-    IsSelf = userProfile.IsSelf
+-  }
+
++  let newUserProfileViewModel 
++       (getStreamClient : GetStream.Client) (userProfile : UserProfile) = 
++
++    let (UserId userId) = userProfile.User.UserId
++    let userFeed = GetStream.userFeed getStreamClient userId
++    {
++      Username = userProfile.User.Username.Value
++      GravatarUrl = userProfile.GravatarUrl
++      IsLoggedIn = false
++      IsSelf = userProfile.IsSelf
++      UserId = userId
++      UserFeedToken = userFeed.ReadOnlyToken
++      ApiKey = getStreamClient.Config.ApiKey
++      AppId = getStreamClient.Config.AppId
++    }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now you will be getting compiler errors as the &lt;code&gt;onHandleUserProfileSuccess&lt;/code&gt; function was directly calling the &lt;code&gt;newUserProfileViewModel&lt;/code&gt; function and it doesn&amp;rsquo;t have &lt;code&gt;getStreamClient&lt;/code&gt; to pass the argument.&lt;/p&gt;
+
+&lt;p&gt;Instead of passing the value of &lt;code&gt;GetStream.Client&lt;/code&gt; around, we can partially apply it in the &lt;code&gt;webpart&lt;/code&gt; function and pass the partially applied &lt;code&gt;onHandleUserProfileSuccess&lt;/code&gt; function as argument to the &lt;code&gt;renderUserProfile&lt;/code&gt; function and eventually to the &lt;code&gt;onHandleUserProfileSuccess&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let webpart (getDataCtx : GetDataContext) = 
++  let webpart  (getDataCtx : GetDataContext) getStreamClient = 
+     ...
+-    let renderUserProfile = renderUserProfile handleUserProfile
++    let newUserProfileViewModel = newUserProfileViewModel getStreamClient
++    let renderUserProfile = renderUserProfile newUserProfileViewModel handleUserProfile
+     ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let renderUserProfile handleUserProfile username loggedInUser  ctx = async {
++  let renderUserProfile 
++       newUserProfileViewModel handleUserProfile username loggedInUser  ctx = async {
+
+     match Username.TryCreate username with
+     | Success validatedUsername -&amp;gt; 
+       let isLoggedIn = Option.isSome loggedInUser
+       let onSuccess = 
+-        onHandleUserProfileSuccess isLoggedIn
++        onHandleUserProfileSuccess newUserProfileViewModel isLoggedIn
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let onHandleUserProfileSuccess isLoggedIn userProfileMayBe = 
++  let onHandleUserProfileSuccess newUserProfileViewModel isLoggedIn userProfileMayBe = 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final step is passing the &lt;code&gt;getStreamClient&lt;/code&gt; from the application&amp;rsquo;s main function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
+-     UserProfile.Suave.webPart getDataCtx
++     UserProfile.Suave.webPart getDataCtx getStreamClient
+    ]
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this we are done with the server side changes for showing a user feed in the user profile page.&lt;/p&gt;
+
+&lt;p&gt;The next change that we need to do is on the liquid template &lt;em&gt;profile.liquid&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;First, add a placeholder for showing the user feed&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- user/profile.liquid --&amp;gt;
+&amp;lt;!-- ... --&amp;gt;
+{% block content %}
+&amp;lt;div&amp;gt;
+  &amp;lt;!-- ... --&amp;gt;
+  &amp;lt;div id=&amp;quot;tweets&amp;quot; /&amp;gt;
+&amp;lt;/div&amp;gt;
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then as we did in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/#initializing-getstream-io-js-library&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, define a &lt;code&gt;scripts&lt;/code&gt; block and pass the GetStream.io&amp;rsquo;s initialization values to the client side.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- user/profile.liquid --&amp;gt;
+&amp;lt;!-- ... --&amp;gt;
+
+{% block scripts %}
+&amp;lt;script src=&amp;quot;/assets/js/lib/getstream.js&amp;quot;&amp;gt; &amp;lt;/script&amp;gt;
+
+&amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;
+  window.fsTweet = {
+    user : {
+      id : &amp;quot;{{model.UserId}}&amp;quot;,
+      name : &amp;quot;{{model.Username}}&amp;quot;,
+      feedToken : &amp;quot;{{model.UserFeedToken}}&amp;quot;
+    },
+    stream : {
+      appId : &amp;quot;{{model.AppId}}&amp;quot;,
+      apiKey : &amp;quot;{{model.ApiKey}}&amp;quot;
+    }
+  }  
+&amp;lt;/script&amp;gt;
+
+&amp;lt;script src=&amp;quot;/assets/js/tweet.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+&amp;lt;script src=&amp;quot;/assets/js/profile.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
+{% endblock %}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;em&gt;profile.js&lt;/em&gt; that we are referring here is not added yet. So, let&amp;rsquo;s add it&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;// assets/js/profile.js
+$(function(){
+  let client = 
+    stream.connect(fsTweet.stream.apiKey, null, fsTweet.stream.appId);
+  let userFeed = 
+    client.feed(&amp;quot;user&amp;quot;, fsTweet.user.id, fsTweet.user.feedToken);
+
+  userFeed.get({
+    limit: 25
+  }).then(function(body) {
+    $(body.results.reverse()).each(function(index, tweet){
+      renderTweet($(&amp;quot;#tweets&amp;quot;), tweet);
+    });
+  })
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The code is straight-forward, we are initializing the GetStream.io&amp;rsquo;s client and the user feed. And then we are retreving the last 25 tweets of the user.&lt;/p&gt;
+
+&lt;p&gt;Awesome!.&lt;/p&gt;
+
+&lt;p&gt;Now if we run the app and visits a user profile, we can see his/her tweets!&lt;/p&gt;
+
+&lt;h2 id=&#34;adding-logout&#34;&gt;Adding Logout&lt;/h2&gt;
+
+&lt;p&gt;Adding the logout functionality in very simple. Thanks to the &lt;code&gt;deauthenticate&lt;/code&gt; WebPart from the &lt;code&gt;Suave.Authentication&lt;/code&gt; module which clears both the authentication and the state cookie.&lt;/p&gt;
+
+&lt;p&gt;Post logout we just need to redirect the user to the login page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Suave =
+   ...
+
+   let webpart getDataCtx =
+     let findUser = Persistence.findUser getDataCtx
+-    path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
+-      GET &amp;gt;=&amp;gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
+-      POST &amp;gt;=&amp;gt; handleUserLogin findUser
++    choose [
++      path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
++        GET &amp;gt;=&amp;gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
++        POST &amp;gt;=&amp;gt; handleUserLogin findUser
++      ]
++      path &amp;quot;/logout&amp;quot; &amp;gt;=&amp;gt; deauthenticate &amp;gt;=&amp;gt; redirectToLoginPage
+     ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we implemented the user profile page with the help of the abstractions that we built earlier. Then we added the logout functionality.&lt;/p&gt;
+
+&lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.17&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Adding User Feed</title>
       <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</link>
       <pubDate>Tue, 17 Oct 2017 08:19:14 +0530</pubDate>
@@ -6154,150 +6660,6 @@ module Suave =
 &lt;p&gt;In this blog post, We started with rendering the signup form, and then we learned how to do view model binding using the &lt;code&gt;Suave.Experimental&lt;/code&gt; library.&lt;/p&gt;
 
 &lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.3&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Serving Static Asset Files</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/static-assets/</link>
-      <pubDate>Sat, 19 Aug 2017 07:36:20 +0530</pubDate>
-      
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/static-assets/</guid>
-      <description>
-
-&lt;p&gt;Hi,&lt;/p&gt;
-
-&lt;p&gt;Welcome to the third part of the &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
-
-&lt;p&gt;In this post, we will be changing the guest homepage from displaying &lt;code&gt;Hello, World!&lt;/code&gt; to a production ready landing page!&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/guest-home-page.png&#34; alt=&#34;Guest Home Page&#34; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;preparing-static-asset-files&#34;&gt;Preparing Static Asset Files&lt;/h2&gt;
-
-&lt;p&gt;As a first step let&amp;rsquo;s create an assets directory in &lt;em&gt;FsTweet.Web&lt;/em&gt; and place our static asset files. The asset files can be downloaded from the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.2/src/FsTweet.Web/assets&#34; target=&#34;_blank&#34;&gt;repository&lt;/a&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;└── FsTweet.Web
-    ├── FsTweet.Web.fs
-    ├── FsTweet.Web.fsproj
-    ├── assets
-    │   ├── css
-    │   │   └── styles.css
-    │   └── images
-    │       ├── FsTweetLogo.png
-    │       └── favicon.ico
-    ├── ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;modifying-master-page-and-guest-home-templates&#34;&gt;Modifying Master Page and Guest Home Templates&lt;/h2&gt;
-
-&lt;p&gt;Then we need to change our liquid templates to use these assets&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- view/master_page.liquid --&amp;gt;
-&amp;lt;head&amp;gt;
-  &amp;lt;!-- ... --&amp;gt;
-  &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;assets/css/styles.css&amp;quot;&amp;gt;
-&amp;lt;/head&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- view/guest/home.liquid --&amp;gt;
-&amp;lt;!-- ... --&amp;gt;
-{% block content %}
-&amp;lt;!-- ... --&amp;gt;
-&amp;lt;div class=&amp;quot;jumbotron&amp;quot;&amp;gt;
-   &amp;lt;img src=&amp;quot;assets/images/FsTweetLogo.png&amp;quot; width=&amp;quot;400px&amp;quot;/&amp;gt;
-   &amp;lt;p class=&amp;quot;lead&amp;quot;&amp;gt;Communicate with the world in a different way!&amp;lt;/p&amp;gt;
-   &amp;lt;!-- ... --&amp;gt;
-&amp;lt;/div&amp;gt;
-{% endblock %}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;For simplicity, I am leaving the other static content that is modified in the templates, and you can find all the changes in &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/commit/ae233c5407900b32af682407d902621e0a17bd38#diff-62ccd7caf19fda6d153b1958919d1f9d&#34; target=&#34;_blank&#34;&gt;this diff&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;updating-build-script-to-copy-assets-directory&#34;&gt;Updating Build Script To Copy Assets Directory&lt;/h2&gt;
-
-&lt;p&gt;As we seen during the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/#updating-build-script-to-copy-views-directory&#34; target=&#34;_blank&#34;&gt;dot liquid setup&lt;/a&gt;, we need to add an another Target &lt;code&gt;Assets&lt;/code&gt; to copy the &lt;em&gt;assets&lt;/em&gt; directory to the &lt;em&gt;build&lt;/em&gt; directory&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let copyToBuildDir srcDir targetDirName =
-  let targetDir = combinePaths buildDir targetDirName
-  CopyDir targetDir srcDir noFilter
-
-Target &amp;quot;Assets&amp;quot; (fun _ -&amp;gt;
-  copyToBuildDir &amp;quot;./src/FsTweet.Web/assets&amp;quot; &amp;quot;assets&amp;quot;
-)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then modify the build order to run this Target before the &lt;code&gt;Run&lt;/code&gt; Target.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Build order
-&amp;quot;Clean&amp;quot;
-==&amp;gt; &amp;quot;Build&amp;quot;
-==&amp;gt; &amp;quot;Views&amp;quot;
-==&amp;gt; &amp;quot;Assets&amp;quot;
-==&amp;gt; &amp;quot;Run&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;serving-asset-files&#34;&gt;Serving Asset Files&lt;/h2&gt;
-
-&lt;p&gt;Now we have the assets available in the build directory. The next step is serving them Suave in response to the request from the browser.&lt;/p&gt;
-
-&lt;p&gt;Suave has a lot of &lt;a href=&#34;https://suave.io/Suave.html#def:module Suave.Files&#34; target=&#34;_blank&#34;&gt;useful functions&lt;/a&gt; to handle files, and in our case, we are going to make use of the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Files.browseHome&#34; target=&#34;_blank&#34;&gt;browseHome&lt;/a&gt; function to serve the assets&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&amp;lsquo;browse&amp;rsquo; the file in the sense that the contents of the file are sent based on the request&amp;rsquo;s Url property. Will serve from the current as configured in directory. Suave&amp;rsquo;s runtime. - Suave Documentation&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The current directory in our case is the directory in which the &lt;em&gt;FsTweet.Web.exe&lt;/em&gt; exists. i.e &lt;em&gt;build&lt;/em&gt; directory.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
-// ...
-open Suave.Files
-
-// ...
-let serveAssets =
-  pathRegex &amp;quot;/assets/*&amp;quot; &amp;gt;=&amp;gt; browseHome
-
-[&amp;lt;EntryPoint&amp;gt;]
-let main argv =
-  // ...
-  let app = 
-    choose [
-      serveAssets
-      path &amp;quot;/&amp;quot; &amp;gt;=&amp;gt; page &amp;quot;guest/home.liquid&amp;quot; &amp;quot;&amp;quot;
-    ]
-    
-  startWebServer defaultConfig app
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We have made two changes here.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;The &lt;code&gt;serveAssets&lt;/code&gt; defines a new &lt;a href=&#34;https://theimowski.gitbooks.io/suave-music-store/content/en/webpart.html&#34; target=&#34;_blank&#34;&gt;WebPart&lt;/a&gt; using the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Filters.pathRegex&#34; target=&#34;_blank&#34;&gt;pathRegex&lt;/a&gt;. It matches all the requests for the assets and serves the corresponding files using the &lt;code&gt;browseHome&lt;/code&gt; function.&lt;/p&gt;&lt;/li&gt;
-
-&lt;li&gt;&lt;p&gt;As we are handling more than one requests now, we need to change our &lt;code&gt;app&lt;/code&gt; to handle all of them. Using the &lt;a href=&#34;https://suave.io/composing.html&#34; target=&#34;_blank&#34;&gt;choose&lt;/a&gt; function, we are defining the &lt;code&gt;app&lt;/code&gt; to combine both &lt;code&gt;serveAssets&lt;/code&gt; webpart and the one that we already had for serving the guest home page.&lt;/p&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&#34;serving-favicon-ico&#34;&gt;Serving favicon.ico&lt;/h2&gt;
-
-&lt;p&gt;While serving our &lt;em&gt;FsTweet&lt;/em&gt; application, the browser automatically makes a request for &lt;a href=&#34;https://en.wikipedia.org/wiki/Favicon&#34; target=&#34;_blank&#34;&gt;favicon&lt;/a&gt;. As the URL path for this request is &lt;code&gt;/favicon.ico&lt;/code&gt; our &lt;code&gt;serveAssets&lt;/code&gt; webpart cannot match this.&lt;/p&gt;
-
-&lt;p&gt;To serve it we need to use an another specific path filter and use the &lt;a href=&#34;https://suave.io/Suave.html#def:val Suave.Files.file&#34; target=&#34;_blank&#34;&gt;file&lt;/a&gt; function to get the job done.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
-// ...
-let serveAssets =
-  let faviconPath = 
-    Path.Combine(currentPath, &amp;quot;assets&amp;quot;, &amp;quot;images&amp;quot;, &amp;quot;favicon.ico&amp;quot;)
-  choose [
-    pathRegex &amp;quot;/assets/*&amp;quot; &amp;gt;=&amp;gt; browseHome
-    path &amp;quot;/favicon.ico&amp;quot; &amp;gt;=&amp;gt; file faviconPath
-  ]
-//...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-
-&lt;p&gt;In this blog post, we learned how to serve static asset files in Suave. The source code can be found in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.2&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
