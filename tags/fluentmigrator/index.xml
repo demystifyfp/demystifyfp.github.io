@@ -140,6 +140,12 @@ module Suave =
   onAuthenticate fSuccess (RequestErrors.UNAUTHORIZED &amp;quot;???&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;blockquote&gt;
+&lt;p&gt;There are only two hard things in Computer Science: cache invalidation and naming things. &amp;ndash; Phil Karlton&lt;/p&gt;
+
+&lt;p&gt;To be honest, I&amp;rsquo;m not in favor of naming this function as &lt;code&gt;requiresAuth2&lt;/code&gt;. But I couldn&amp;rsquo;t be able to come up a with a better name.&lt;/p&gt;
+&lt;/blockquote&gt;
+
 &lt;p&gt;The &lt;code&gt;RequestErrors.UNAUTHORIZED&lt;/code&gt; function from Suave, takes a &lt;code&gt;string&lt;/code&gt; to populate the request body and return a &lt;code&gt;WebPart&lt;/code&gt;. To send JSON string as a response body, we need to do few more work!&lt;/p&gt;
 
 &lt;h3 id=&#34;sending-json-response&#34;&gt;Sending JSON Response&lt;/h3&gt;

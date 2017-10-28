@@ -165,7 +165,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    10 min read
+    9 min read
   </span>
   
 
@@ -292,7 +292,7 @@
   &lt;p class=&quot;gravatar_name&quot;&gt;@{{model.Username}}&lt;/p&gt;
   {% if model.IsLoggedIn %}
     {% unless model.IsSelf %}
-      &lt;a href=&quot;#&quot; id=&quot;follow&quot; data-username=&quot;{{model.username}}&quot;&gt;Follow&lt;/a&gt;
+      &lt;a href=&quot;#&quot; id=&quot;follow&quot;&gt;Follow&lt;/a&gt;
     {% endunless %}
     &lt;a href=&quot;/logout&quot;&gt;Logout&lt;/a&gt;
   {% endif %}
@@ -314,7 +314,7 @@
 
 <pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/UserProfile
 
-&gt; repeat 2 forge moveUp web -n src/FsTweet.Web/UserProfile.fs
+&gt; forge moveUp web -n src/FsTweet.Web/UserProfile.fs
 </code></pre>
 
 <p>As a first step, let&rsquo;s define a domain model for user profile</p>
@@ -692,29 +692,6 @@ $(function(){
 <p>Awesome!.</p>
 
 <p>Now if we run the app and visits a user profile, we can see his/her tweets!</p>
-
-<h2 id="adding-logout">Adding Logout</h2>
-
-<p>Adding the logout functionality in very simple. Thanks to the <code>deauthenticate</code> WebPart from the <code>Suave.Authentication</code> module which clears both the authentication and the state cookie.</p>
-
-<p>Post logout we just need to redirect the user to the login page.</p>
-
-<pre><code class="language-diff">module Suave =
-   ...
-
-   let webpart getDataCtx =
-     let findUser = Persistence.findUser getDataCtx
--    path &quot;/login&quot; &gt;=&gt; choose [
--      GET &gt;=&gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
--      POST &gt;=&gt; handleUserLogin findUser
-+    choose [
-+      path &quot;/login&quot; &gt;=&gt; choose [
-+        GET &gt;=&gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
-+        POST &gt;=&gt; handleUserLogin findUser
-+      ]
-+      path &quot;/logout&quot; &gt;=&gt; deauthenticate &gt;=&gt; redirectToLoginPage
-     ]
-</code></pre>
 
 <h2 id="summary">Summary</h2>
 

@@ -84,7 +84,7 @@
   &amp;lt;p class=&amp;quot;gravatar_name&amp;quot;&amp;gt;@{{model.Username}}&amp;lt;/p&amp;gt;
   {% if model.IsLoggedIn %}
     {% unless model.IsSelf %}
-      &amp;lt;a href=&amp;quot;#&amp;quot; id=&amp;quot;follow&amp;quot; data-username=&amp;quot;{{model.username}}&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
+      &amp;lt;a href=&amp;quot;#&amp;quot; id=&amp;quot;follow&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
     {% endunless %}
     &amp;lt;a href=&amp;quot;/logout&amp;quot;&amp;gt;Logout&amp;lt;/a&amp;gt;
   {% endif %}
@@ -106,7 +106,7 @@
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/UserProfile
 
-&amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/UserProfile.fs
+&amp;gt; forge moveUp web -n src/FsTweet.Web/UserProfile.fs
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;As a first step, let&amp;rsquo;s define a domain model for user profile&lt;/p&gt;
@@ -485,29 +485,6 @@ $(function(){
 
 &lt;p&gt;Now if we run the app and visits a user profile, we can see his/her tweets!&lt;/p&gt;
 
-&lt;h2 id=&#34;adding-logout&#34;&gt;Adding Logout&lt;/h2&gt;
-
-&lt;p&gt;Adding the logout functionality in very simple. Thanks to the &lt;code&gt;deauthenticate&lt;/code&gt; WebPart from the &lt;code&gt;Suave.Authentication&lt;/code&gt; module which clears both the authentication and the state cookie.&lt;/p&gt;
-
-&lt;p&gt;Post logout we just need to redirect the user to the login page.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Suave =
-   ...
-
-   let webpart getDataCtx =
-     let findUser = Persistence.findUser getDataCtx
--    path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
--      GET &amp;gt;=&amp;gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
--      POST &amp;gt;=&amp;gt; handleUserLogin findUser
-+    choose [
-+      path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
-+        GET &amp;gt;=&amp;gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
-+        POST &amp;gt;=&amp;gt; handleUserLogin findUser
-+      ]
-+      path &amp;quot;/logout&amp;quot; &amp;gt;=&amp;gt; deauthenticate &amp;gt;=&amp;gt; redirectToLoginPage
-     ]
-&lt;/code&gt;&lt;/pre&gt;
-
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;In this blog post, we implemented the user profile page with the help of the abstractions that we built earlier. Then we added the logout functionality.&lt;/p&gt;
@@ -645,6 +622,12 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let requiresAuth2 fSuccess =
   onAuthenticate fSuccess (RequestErrors.UNAUTHORIZED &amp;quot;???&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;There are only two hard things in Computer Science: cache invalidation and naming things. &amp;ndash; Phil Karlton&lt;/p&gt;
+
+&lt;p&gt;To be honest, I&amp;rsquo;m not in favor of naming this function as &lt;code&gt;requiresAuth2&lt;/code&gt;. But I couldn&amp;rsquo;t be able to come up a with a better name.&lt;/p&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;The &lt;code&gt;RequestErrors.UNAUTHORIZED&lt;/code&gt; function from Suave, takes a &lt;code&gt;string&lt;/code&gt; to populate the request body and return a &lt;code&gt;WebPart&lt;/code&gt;. To send JSON string as a response body, we need to do few more work!&lt;/p&gt;
 

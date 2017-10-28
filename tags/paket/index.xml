@@ -148,6 +148,10 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge run
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;blockquote&gt;
+&lt;p&gt;From here on, the term &lt;em&gt;run/test drive the application&lt;/em&gt; in the following blog posts implies running this &lt;code&gt;forge run&lt;/code&gt; command.&lt;/p&gt;
+&lt;/blockquote&gt;
+
 &lt;h1 id=&#34;summary&#34;&gt;Summary&lt;/h1&gt;
 
 &lt;p&gt;In this part, we have learned how to bootstrap a project from scratch and configure it to use Paket and FAKE.&lt;/p&gt;
