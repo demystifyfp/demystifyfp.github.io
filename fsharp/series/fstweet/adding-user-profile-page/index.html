@@ -364,53 +364,39 @@ let newProfile user = {
 }
 </code></pre>
 
-<p>Then add the <code>findUserProfile</code> function, which finds the user profile by username</p>
-
-<pre><code class="language-fsharp">module Domain =
-  // ...
-  open Chessie.ErrorHandling
-  
-  // ...
-
-  type FindUserProfile = 
-    Username -&gt; AsyncResult&lt;UserProfile option, Exception&gt;
-
-  // FindUser -&gt; Username -&gt; AsyncResult&lt;UserProfile option, Exception&gt;
-  let findUserProfile (findUser : FindUser) username = asyncTrial {
-    let! userMayBe = findUser username
-    return Option.map newProfile userMayBe
-  }
-</code></pre>
-
-<p>We are making use of the <code>findUser</code> function that we created while <a href="/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username" target="_blank">handling user login request</a></p>
-
-<p>The next step is using this function to get the <code>UserProfile</code> if the user didn&rsquo;t login or the logged in user is looking to find an another user&rsquo;s profile.</p>
+<p>The next step is adding the <code>findUserProfile</code> function, which finds the user profile by username.</p>
 
 <p>If the <code>Username</code> of the logged in user matches with the <code>Username</code> that we are looking to find, we don&rsquo;t need call the <code>findUserProfile</code>. Instead we can use the <code>newProfile</code> function to get the profile from the <code>User</code> and modify its <code>IsSelf</code> property to <code>true</code>.</p>
 
 <pre><code class="language-fsharp">
-type HandleUserProfile = 
+type FindUserProfile = 
     Username -&gt; User option 
       -&gt; AsyncResult&lt;UserProfile option, Exception&gt;
       
-// FindUserProfile -&gt; Username -&gt; User option 
+// FindUser -&gt; Username -&gt; User option 
 //    -&gt; AsyncResult&lt;UserProfile option, Exception&gt;
-let handleUserProfile 
-      findUserProfile (username : Username) loggedInUserMayBe  = asyncTrial {
+let findUserProfile 
+      (findUser : FindUser) (username : Username) loggedInUser  = asyncTrial {
 
-    match loggedInUserMayBe with
+    match loggedInUser with
     | None -&gt; 
-      return! findUserProfile username
+      let! userMayBe = findUser username
+      return Option.map newProfile userMayBe
     | Some (user : User) -&gt; 
       if user.Username = username then
         let userProfile =
           {newProfile user with IsSelf = true}
         return Some userProfile
       else  
-        return! findUserProfile username
+        let! userMayBe = findUser username
+        return Option.map newProfile userMayBe
 
   }
 </code></pre>
+
+<p>We are making use of the <code>findUser</code> function that we created while <a href="/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username" target="_blank">handling user login request</a>.</p>
+
+<p>The <code>FindUserProfile</code> type represents the function signature of the <code>findUserProfile</code> function with its depencies partially applied.</p>
 
 <p>Now we have the domain logic for finding user profile in place and let&rsquo;s turn our attention to the presentation logic!</p>
 
@@ -444,7 +430,7 @@ module Suave =
   }
 </code></pre>
 
-<p>The next step is transforming the return type (<code>AsyncResult&lt;UserProfile option, Exception&gt;</code>) of the <code>handleUserProfile</code> to <code>Async&lt;WebPart&gt;</code>. To do it we first need to define what we will be doing on success and on failure.</p>
+<p>The next step is transforming the return type (<code>AsyncResult&lt;UserProfile option, Exception&gt;</code>) of the <code>findUserProfile</code> function to <code>Async&lt;WebPart&gt;</code>. To do it we first need to define what we will be doing on success and on failure.</p>
 
 <pre><code class="language-fsharp">// src/FsTweet.Web/UserProfile.fs
 // ...
@@ -461,7 +447,7 @@ module Suave =
     page &quot;not_found.liquid&quot; &quot;user not found&quot;
 
   // bool -&gt; UserProfile option -&gt; WebPart
-  let onHandleUserProfileSuccess isLoggedIn userProfileMayBe = 
+  let onFindUserProfileSuccess isLoggedIn userProfileMayBe = 
     match userProfileMayBe with
     | Some (userProfile : UserProfile) -&gt; 
       let vm = { newUserProfileViewModel userProfile with
@@ -471,15 +457,15 @@ module Suave =
       renderProfileNotFound
 
   // System.Exception -&gt; WebPart
-  let onHandleUserProfileFailure (ex : Exception) =
+  let onFindUserProfileFailure (ex : Exception) =
     printfn &quot;%A&quot; ex
     page &quot;server_error.liquid&quot; &quot;something went wrong&quot;
 </code></pre>
 
 <p>Then wire these functions up with the actual request handler.</p>
 
-<pre><code class="language-fsharp">// HandleUserProfile -&gt; string -&gt; User option -&gt; WebPart
-let renderUserProfile handleUserProfile username loggedInUser ctx = async {
+<pre><code class="language-fsharp">// FindUserProfile -&gt; string -&gt; User option -&gt; WebPart
+let renderUserProfile (findUserProfile : FindUserProfile) username loggedInUser ctx = async {
   match Username.TryCreate username with
   | Success validatedUsername -&gt; 
     let isLoggedIn = 
@@ -487,7 +473,7 @@ let renderUserProfile handleUserProfile username loggedInUser ctx = async {
     let onSuccess = 
       onHandleUserProfileSuccess isLoggedIn
     let! webpart = 
-      handleUserProfile validatedUsername loggedInUser
+      findUserProfile validatedUsername loggedInUser
       |&gt; AR.either onSuccess onHandleUserProfileFailure
     return! webpart ctx
   | Failure _ -&gt; 
@@ -507,9 +493,9 @@ module Suave =
   // ...
 
   let webpart (getDataCtx : GetDataContext) = 
-    let findUserProfile = findUserProfile (Persistence.findUser getDataCtx)
-    let handleUserProfile = handleUserProfile findUserProfile
-    let renderUserProfile = renderUserProfile handleUserProfile
+    let findUser = Persistence.findUser getDataCtx
+    let findUserProfile = findUserProfile findUser
+    let renderUserProfile = renderUserProfile findUserProfile
     pathScan &quot;/%s&quot; (fun username -&gt; mayRequiresAuth (renderUserProfile username))
 </code></pre>
 
@@ -588,26 +574,26 @@ module Suave =
 <pre><code class="language-diff">-  let webpart (getDataCtx : GetDataContext) = 
 +  let webpart  (getDataCtx : GetDataContext) getStreamClient = 
      ...
--    let renderUserProfile = renderUserProfile handleUserProfile
+-    let renderUserProfile = renderUserProfile findUserProfile
 +    let newUserProfileViewModel = newUserProfileViewModel getStreamClient
-+    let renderUserProfile = renderUserProfile newUserProfileViewModel handleUserProfile
++    let renderUserProfile = renderUserProfile newUserProfileViewModel findUserProfile
      ...
 </code></pre>
 
-<pre><code class="language-diff">-  let renderUserProfile handleUserProfile username loggedInUser  ctx = async {
+<pre><code class="language-diff">-  let renderUserProfile findUserProfile username loggedInUser  ctx = async {
 +  let renderUserProfile 
-+       newUserProfileViewModel handleUserProfile username loggedInUser  ctx = async {
++       newUserProfileViewModel findUserProfile username loggedInUser  ctx = async {
 
      match Username.TryCreate username with
      | Success validatedUsername -&gt; 
        let isLoggedIn = Option.isSome loggedInUser
        let onSuccess = 
--        onHandleUserProfileSuccess isLoggedIn
-+        onHandleUserProfileSuccess newUserProfileViewModel isLoggedIn
+-        onFindUserProfileSuccess isLoggedIn
++        onFindUserProfileSuccess newUserProfileViewModel isLoggedIn
 </code></pre>
 
-<pre><code class="language-diff">-  let onHandleUserProfileSuccess isLoggedIn userProfileMayBe = 
-+  let onHandleUserProfileSuccess newUserProfileViewModel isLoggedIn userProfileMayBe = 
+<pre><code class="language-diff">-  let onFindUserProfileSuccess isLoggedIn userProfileMayBe = 
++  let onFindUserProfileSuccess newUserProfileViewModel isLoggedIn userProfileMayBe = 
 </code></pre>
 
 <p>The final step is passing the <code>getStreamClient</code> from the application&rsquo;s main function.</p>

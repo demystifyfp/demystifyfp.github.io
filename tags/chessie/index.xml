@@ -156,53 +156,39 @@ let newProfile user = {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then add the &lt;code&gt;findUserProfile&lt;/code&gt; function, which finds the user profile by username&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
-  // ...
-  open Chessie.ErrorHandling
-  
-  // ...
-
-  type FindUserProfile = 
-    Username -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
-
-  // FindUser -&amp;gt; Username -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
-  let findUserProfile (findUser : FindUser) username = asyncTrial {
-    let! userMayBe = findUser username
-    return Option.map newProfile userMayBe
-  }
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We are making use of the &lt;code&gt;findUser&lt;/code&gt; function that we created while &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;handling user login request&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;The next step is using this function to get the &lt;code&gt;UserProfile&lt;/code&gt; if the user didn&amp;rsquo;t login or the logged in user is looking to find an another user&amp;rsquo;s profile.&lt;/p&gt;
+&lt;p&gt;The next step is adding the &lt;code&gt;findUserProfile&lt;/code&gt; function, which finds the user profile by username.&lt;/p&gt;
 
 &lt;p&gt;If the &lt;code&gt;Username&lt;/code&gt; of the logged in user matches with the &lt;code&gt;Username&lt;/code&gt; that we are looking to find, we don&amp;rsquo;t need call the &lt;code&gt;findUserProfile&lt;/code&gt;. Instead we can use the &lt;code&gt;newProfile&lt;/code&gt; function to get the profile from the &lt;code&gt;User&lt;/code&gt; and modify its &lt;code&gt;IsSelf&lt;/code&gt; property to &lt;code&gt;true&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;
-type HandleUserProfile = 
+type FindUserProfile = 
     Username -&amp;gt; User option 
       -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
       
-// FindUserProfile -&amp;gt; Username -&amp;gt; User option 
+// FindUser -&amp;gt; Username -&amp;gt; User option 
 //    -&amp;gt; AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;
-let handleUserProfile 
-      findUserProfile (username : Username) loggedInUserMayBe  = asyncTrial {
+let findUserProfile 
+      (findUser : FindUser) (username : Username) loggedInUser  = asyncTrial {
 
-    match loggedInUserMayBe with
+    match loggedInUser with
     | None -&amp;gt; 
-      return! findUserProfile username
+      let! userMayBe = findUser username
+      return Option.map newProfile userMayBe
     | Some (user : User) -&amp;gt; 
       if user.Username = username then
         let userProfile =
           {newProfile user with IsSelf = true}
         return Some userProfile
       else  
-        return! findUserProfile username
+        let! userMayBe = findUser username
+        return Option.map newProfile userMayBe
 
   }
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are making use of the &lt;code&gt;findUser&lt;/code&gt; function that we created while &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;handling user login request&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;FindUserProfile&lt;/code&gt; type represents the function signature of the &lt;code&gt;findUserProfile&lt;/code&gt; function with its depencies partially applied.&lt;/p&gt;
 
 &lt;p&gt;Now we have the domain logic for finding user profile in place and let&amp;rsquo;s turn our attention to the presentation logic!&lt;/p&gt;
 
@@ -236,7 +222,7 @@ module Suave =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The next step is transforming the return type (&lt;code&gt;AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;&lt;/code&gt;) of the &lt;code&gt;handleUserProfile&lt;/code&gt; to &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;. To do it we first need to define what we will be doing on success and on failure.&lt;/p&gt;
+&lt;p&gt;The next step is transforming the return type (&lt;code&gt;AsyncResult&amp;lt;UserProfile option, Exception&amp;gt;&lt;/code&gt;) of the &lt;code&gt;findUserProfile&lt;/code&gt; function to &lt;code&gt;Async&amp;lt;WebPart&amp;gt;&lt;/code&gt;. To do it we first need to define what we will be doing on success and on failure.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
 // ...
@@ -253,7 +239,7 @@ module Suave =
     page &amp;quot;not_found.liquid&amp;quot; &amp;quot;user not found&amp;quot;
 
   // bool -&amp;gt; UserProfile option -&amp;gt; WebPart
-  let onHandleUserProfileSuccess isLoggedIn userProfileMayBe = 
+  let onFindUserProfileSuccess isLoggedIn userProfileMayBe = 
     match userProfileMayBe with
     | Some (userProfile : UserProfile) -&amp;gt; 
       let vm = { newUserProfileViewModel userProfile with
@@ -263,15 +249,15 @@ module Suave =
       renderProfileNotFound
 
   // System.Exception -&amp;gt; WebPart
-  let onHandleUserProfileFailure (ex : Exception) =
+  let onFindUserProfileFailure (ex : Exception) =
     printfn &amp;quot;%A&amp;quot; ex
     page &amp;quot;server_error.liquid&amp;quot; &amp;quot;something went wrong&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Then wire these functions up with the actual request handler.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// HandleUserProfile -&amp;gt; string -&amp;gt; User option -&amp;gt; WebPart
-let renderUserProfile handleUserProfile username loggedInUser ctx = async {
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FindUserProfile -&amp;gt; string -&amp;gt; User option -&amp;gt; WebPart
+let renderUserProfile (findUserProfile : FindUserProfile) username loggedInUser ctx = async {
   match Username.TryCreate username with
   | Success validatedUsername -&amp;gt; 
     let isLoggedIn = 
@@ -279,7 +265,7 @@ let renderUserProfile handleUserProfile username loggedInUser ctx = async {
     let onSuccess = 
       onHandleUserProfileSuccess isLoggedIn
     let! webpart = 
-      handleUserProfile validatedUsername loggedInUser
+      findUserProfile validatedUsername loggedInUser
       |&amp;gt; AR.either onSuccess onHandleUserProfileFailure
     return! webpart ctx
   | Failure _ -&amp;gt; 
@@ -299,9 +285,9 @@ module Suave =
   // ...
 
   let webpart (getDataCtx : GetDataContext) = 
-    let findUserProfile = findUserProfile (Persistence.findUser getDataCtx)
-    let handleUserProfile = handleUserProfile findUserProfile
-    let renderUserProfile = renderUserProfile handleUserProfile
+    let findUser = Persistence.findUser getDataCtx
+    let findUserProfile = findUserProfile findUser
+    let renderUserProfile = renderUserProfile findUserProfile
     pathScan &amp;quot;/%s&amp;quot; (fun username -&amp;gt; mayRequiresAuth (renderUserProfile username))
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -380,26 +366,26 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let webpart (getDataCtx : GetDataContext) = 
 +  let webpart  (getDataCtx : GetDataContext) getStreamClient = 
      ...
--    let renderUserProfile = renderUserProfile handleUserProfile
+-    let renderUserProfile = renderUserProfile findUserProfile
 +    let newUserProfileViewModel = newUserProfileViewModel getStreamClient
-+    let renderUserProfile = renderUserProfile newUserProfileViewModel handleUserProfile
++    let renderUserProfile = renderUserProfile newUserProfileViewModel findUserProfile
      ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let renderUserProfile handleUserProfile username loggedInUser  ctx = async {
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let renderUserProfile findUserProfile username loggedInUser  ctx = async {
 +  let renderUserProfile 
-+       newUserProfileViewModel handleUserProfile username loggedInUser  ctx = async {
++       newUserProfileViewModel findUserProfile username loggedInUser  ctx = async {
 
      match Username.TryCreate username with
      | Success validatedUsername -&amp;gt; 
        let isLoggedIn = Option.isSome loggedInUser
        let onSuccess = 
--        onHandleUserProfileSuccess isLoggedIn
-+        onHandleUserProfileSuccess newUserProfileViewModel isLoggedIn
+-        onFindUserProfileSuccess isLoggedIn
++        onFindUserProfileSuccess newUserProfileViewModel isLoggedIn
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let onHandleUserProfileSuccess isLoggedIn userProfileMayBe = 
-+  let onHandleUserProfileSuccess newUserProfileViewModel isLoggedIn userProfileMayBe = 
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  let onFindUserProfileSuccess isLoggedIn userProfileMayBe = 
++  let onFindUserProfileSuccess newUserProfileViewModel isLoggedIn userProfileMayBe = 
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;The final step is passing the &lt;code&gt;getStreamClient&lt;/code&gt; from the application&amp;rsquo;s main function.&lt;/p&gt;
@@ -543,7 +529,7 @@ module Domain =
 
 &lt;p&gt;The &lt;code&gt;NotifyTweet&lt;/code&gt; typifies a notify tweet function that takes &lt;code&gt;Tweet&lt;/code&gt; and returns either &lt;code&gt;unit&lt;/code&gt; or &lt;code&gt;Exception&lt;/code&gt; asynchronously.&lt;/p&gt;
 
-&lt;p&gt;Then create a new type &lt;code&gt;PublishTweet&lt;/code&gt; to represent the signature of the orchestration function.&lt;/p&gt;
+&lt;p&gt;Then create a new type &lt;code&gt;PublishTweet&lt;/code&gt; to represent the signature of the orchestration function with its dependencies partially applied.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
   // ...
@@ -551,14 +537,9 @@ module Domain =
 
   // ...
 
-  type PublishTweet =
-      CreateTweet -&amp;gt; NotifyTweet -&amp;gt; 
-        User -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;TweetId, PublishTweetError&amp;gt;
+  type PublishTweet = 
+    User -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;TweetId, PublishTweetError&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;This &lt;code&gt;PublishTweet&lt;/code&gt; type represents a function that takes two higher-order functions, &lt;code&gt;CreateTweet&lt;/code&gt; to create the tweet in the database and &lt;code&gt;NotifyTweet&lt;/code&gt; to notify that the user has posted a tweet, the &lt;code&gt;User&lt;/code&gt; who posts the tweet and the tweet &lt;code&gt;Post&lt;/code&gt; itself.&lt;/p&gt;
-
-&lt;p&gt;It returns either &lt;code&gt;TweetId&lt;/code&gt; or &lt;code&gt;PublishTweetError&lt;/code&gt; asynchronously.&lt;/p&gt;
 
 &lt;p&gt;We don&amp;rsquo;t have the &lt;code&gt;PublishTweetError&lt;/code&gt; type defined yet. So, let&amp;rsquo;s add it first.&lt;/p&gt;
 
