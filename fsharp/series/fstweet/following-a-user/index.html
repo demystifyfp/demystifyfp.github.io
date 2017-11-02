@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.30.2" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+
+
+  
+
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  
+  <link rel="alternate" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="http://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+
+  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/">
+
+  
+
+  <title>Following a User | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Books
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="http://products.tamizhvendan.in/fsharp-applied">
+                
+                <span>F# Applied</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Tutorials
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/fsharp/series/fstweet">
+                
+                <span>Twitter Clone in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <h1 itemprop="name">Following a User</h1>
+    
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2017-10-28 05:06:53 &#43;0530 IST" itemprop="datePublished">
+      Sat, Oct 28, 2017
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    14 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Following%20a%20User&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ffollowing-a-user%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ffollowing-a-user%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ffollowing-a-user%2f&amp;title=Following%20a%20User"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ffollowing-a-user%2f&amp;title=Following%20a%20User"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Following%20a%20User&amp;body=http%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2ffollowing-a-user%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+    <div class="article-style" itemprop="articleBody">
+      
+
+<p>Hello!</p>
+
+<p>We are on our way to complete the blog post series on <a href="TODO" target="_blank">Creating a Twitter Clone in F# using Suave</a>.</p>
+
+<p>In this nineteenth part, we are going to implement the core feature of Twitter, Following other users and viewing their tweets on his/her wall page.</p>
+
+<h2 id="adding-log-out">Adding Log out</h2>
+
+<p>To test drive the implementation of following a user in FsTweet, we may need to log out and log in as a different user. But we haven&rsquo;t added the logout functionality yet.</p>
+
+<p>So, as part of this feature implementation, let&rsquo;s get started with implementing log out.</p>
+
+<p>The log out functionality is more straightforward to implement. Thanks to the <code>deauthenticate</code> WebPart from the <code>Suave.Authentication</code> module which clears both the authentication and the state cookie. After removing the cookies, we just need to redirect the user to the login page.</p>
+
+<p>Let&rsquo;s add a new path <code>/logout</code> in <em>Auth.fs</em> and handle the logout request as mentioned.</p>
+
+<pre><code class="language-diff">// src/FsTweet.Web/Auth.fs
+...
+module Suave =
+   ...
+
+   let webpart getDataCtx =
+     let findUser = Persistence.findUser getDataCtx
+-    path &quot;/login&quot; &gt;=&gt; choose [
+-      GET &gt;=&gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
+-      POST &gt;=&gt; handleUserLogin findUser
++    choose [
++      path &quot;/login&quot; &gt;=&gt; choose [
++        GET &gt;=&gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
++        POST &gt;=&gt; handleUserLogin findUser
++      ]
++      path &quot;/logout&quot; &gt;=&gt; deauthenticate &gt;=&gt; redirectToLoginPage
+     ]
+</code></pre>
+
+<h2 id="following-a-user">Following A User</h2>
+
+<p>Let&rsquo;s get started by creating a new file <em>Social.fs</em> in the <em>FsTweet.Web</em> project and move it above <em>UserProfile.fs</em></p>
+
+<pre><code class="language-bash">&gt; forge newFs web -n src/FsTweet.Web/Social
+
+&gt; repeat 2 forge moveUp web -n src/FsTweet.Web/Social.fs
+</code></pre>
+
+<p>The backend implementation of following a user involves two things.</p>
+
+<ol>
+<li><p>Persisting the social connection (following &amp; follower) in the database.</p></li>
+
+<li><p>Subscribing to the other user&rsquo;s twitter feed.</p></li>
+</ol>
+
+<p>As we did for the other features, let&rsquo;s add a <code>Domain</code> module and orchestrate this functionality.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Social.fs
+namespace Social
+
+module Domain = 
+  open System
+  open Chessie.ErrorHandling
+  open User
+
+  type CreateFollowing = User -&gt; UserId -&gt; AsyncResult&lt;unit, Exception&gt;
+  type Subscribe = User -&gt; UserId -&gt; AsyncResult&lt;unit, Exception&gt;
+  type FollowUser = User -&gt; UserId -&gt; AsyncResult&lt;unit, Exception&gt;
+
+  // Subscribe -&gt; CreateFollowing -&gt; 
+  //  User -&gt; UserId -&gt; AsyncResult&lt;unit, Exception&gt;
+  let followUser 
+    (subscribe : Subscribe) (createFollowing : CreateFollowing) 
+    user userId = asyncTrial {
+
+    do! subscribe user userId
+    do! createFollowing user userId
+  } 
+</code></pre>
+
+<p>The <code>CreateFollowing</code> and the <code>Subscribe</code> types represent the function signatures of the two tasks that we need to do while following a user.</p>
+
+<p>The next step is defining functions which implement these two functionalities.</p>
+
+<h3 id="persisting-the-social-connection">Persisting the social connection</h3>
+
+<p>To persist the social connection, we need to have a new table. So, As a first step, let&rsquo;s add a migration (script) to create this new table.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Db.Migrations/FsTweet.Db.Migrations.fs
+// ...
+
+[&lt;Migration(201710280554L, &quot;Creating Social Table&quot;)&gt;]
+type CreateSocialTable()=
+  inherit Migration()
+
+  override this.Up() =
+    base.Create.Table(&quot;Social&quot;)
+      .WithColumn(&quot;Id&quot;).AsGuid().PrimaryKey().Identity()
+      .WithColumn(&quot;FollowerUserId&quot;).AsInt32().ForeignKey(&quot;Users&quot;, &quot;Id&quot;).NotNullable()
+      .WithColumn(&quot;FollowingUserId&quot;).AsInt32().ForeignKey(&quot;Users&quot;, &quot;Id&quot;).NotNullable()
+    |&gt; ignore
+
+    base.Create.UniqueConstraint(&quot;SocialRelationship&quot;)
+      .OnTable(&quot;Social&quot;)
+      .Columns(&quot;FollowerUserId&quot;, &quot;FollowingUserId&quot;) |&gt; ignore
+  
+  override this.Down() = 
+    base.Delete.Table(&quot;Tweets&quot;) |&gt; ignore
+</code></pre>
+
+<p>Then run the application, and the fluent migrator creates this table in the database.</p>
+
+<p>Make sure to verify the underlying schema using <em>psql</em>.</p>
+
+<p><img src="/img/fsharp/series/fstweet/social_table_schema.png" alt="Social Table" /></p>
+
+<p>The next step is defining the function which persists the social connection in this table.</p>
+
+<p>Create a new module <code>Persistence</code> in the <em>Social.fs</em> file and define the <code>createFollowing</code> function as below</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Social.fs
+// ...
+module Persistence =
+  open Database
+  open User
+
+  // GetDataContext -&gt; User -&gt; UserId -&gt; AsyncResult&lt;unit, Exception&gt;
+  let createFollowing (getDataCtx : GetDataContext) (user : User) (UserId userId) = 
+     
+     let ctx = getDataCtx ()
+     let social = ctx.Public.Social.Create()
+     let (UserId followerUserId) = user.UserId
+      
+     social.FollowerUserId &lt;- followerUserId
+     social.FollowingUserId &lt;- userId
+
+     submitUpdates ctx
+</code></pre>
+
+<p>We are using the term <code>follower</code> to represent the current logged in user and the <code>following user</code> to represent the user that the logged in user about to follow.</p>
+
+<h3 id="subscribing-to-the-user-feed">Subscribing to the User Feed</h3>
+
+<p>The second task is subscribing to the user feed so that the follower will be getting the tweets from the users he/she is following.</p>
+
+<p>As we did for <a href="/fsharp/series/fstweet/adding-user-feed/#notifying-new-tweet" target="_blank">notifying a new tweet</a>, let&rsquo;s create a new module <code>GetStream</code> and add the <code>subscribe</code> function.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Social.fs
+// ...
+module GetStream =
+  open User
+  open Chessie
+
+  // GetStream.Client -&gt; User -&gt; UserId -&gt; AsyncResult&lt;unit, Exception&gt;
+  let subscribe (getStreamClient : GetStream.Client) (user : User) (UserId userId) = 
+    let (UserId followerUserId) = user.UserId
+
+    let timelineFeed = 
+      GetStream.timeLineFeed getStreamClient followerUserId
+    let userFeed =
+      GetStream.userFeed getStreamClient userId
+
+    timelineFeed.FollowFeed(userFeed) // Task
+    |&gt; Async.AwaitTask // Async&lt;uint&gt;
+    |&gt; AR.catch // AsyncResult&lt;unit, Exception&gt;
+</code></pre>
+
+<p>In <em>GetStream.io</em>&rsquo;s <a href="https://getstream.io/get_started/#follow" target="_blank">vocabulary</a>, following a user means, getting the <strong>timeline feed</strong> of the follower and <a href="https://getstream.io/docs/#following" target="_blank">follow the other user</a> using this timeline feed.</p>
+
+<h3 id="the-presentation-layer-on-server-side">The Presentation Layer on Server Side</h3>
+
+<p>In the last three sections, we built the internal pieces that are required to follow a user. The final step is wiring the parts together with the presentation layer and expose an HTTP endpoint to carry out the functionality.</p>
+
+<p>Let&rsquo;s start with defining the sample JSON that the <em>follow user</em> endpoint should support.</p>
+
+<pre><code class="language-json">{
+  &quot;userId&quot; : 123
+}
+</code></pre>
+
+<p>Then add a server-side type to represent this JSON request body.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Social.fs
+// ...
+module Suave =
+  open Chiron
+
+  type FollowUserRequest = FollowUserRequest of int with 
+    static member FromJson (_ : FollowUserRequest) = json {
+        let! userId = Json.read &quot;userId&quot;
+        return FollowUserRequest userId 
+      }
+
+</code></pre>
+
+<p>If following a user operation is successful, we need to return <em>204 No Content</em>, and if it is a failure, we have to print the actual exception details to the console and return <em>500 Internal Server Error</em>.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Social.fs
+// ...
+module Suave =
+  // ...
+  open Suave
+  // ...
+
+  let onFollowUserSuccess () =
+    Successful.NO_CONTENT
+
+  let onFollowUserFailure (ex : System.Exception) =
+    printfn &quot;%A&quot; ex
+    JSON.internalError
+</code></pre>
+
+<p>Then we have to define the request handler which handles the request to follow the user.</p>
+
+<pre><code class="language-fsharp">module Suave =
+  // ...
+  open Domain
+  open User
+  open Chessie
+  // ...
+
+  // FollowUser -&gt; User -&gt; WebPart
+  let handleFollowUser (followUser : FollowUser) (user : User) ctx = async {
+    match JSON.deserialize ctx.request with
+    | Success (FollowUserRequest userId) -&gt; 
+      let! webpart =
+        followUser user (UserId userId)
+        |&gt; AR.either onFollowUserSuccess onFollowUserFailure
+      return! webpart ctx
+    | Failure _ -&gt; 
+      return! JSON.badRequest &quot;invalid user follow request&quot; ctx
+  }
+</code></pre>
+
+<p>The <code>handleFollowUser</code> function deserializes the request to <code>FollowUserRequest</code> using the <code>deserialize</code> function that we defined earlier in the <em>Json.fs</em> file. If deserialization fails, we are returning bad request. For a valid request,  we are calling the <code>followUser</code> function and maps its success and failure results to <code>WebPart</code>.</p>
+
+<p>The last piece is wiring this handler with the <code>/follow</code> endpoint.</p>
+
+<pre><code class="language-fsharp">// FsTweet.Web/Social.fs
+// ...
+module Suave =
+  // ...
+  open Suave.Filters
+  open Persistence
+  open Domain
+  open Suave.Operators
+  open Auth.Suave
+
+  // ...
+
+  let webpart getDataCtx getStreamClient =
+    
+    let createFollowing = createFollowing getDataCtx
+    let subscribe = GetStream.subscribe getStreamClient
+    let followUser = followUser subscribe createFollowing
+
+    let handleFollowUser = handleFollowUser followUser
+    POST &gt;=&gt; path &quot;/follow&quot; &gt;=&gt; requiresAuth2 handleFollowUser
+</code></pre>
+
+<pre><code class="language-diff">// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
++      Social.Suave.webpart getDataCtx getStreamClient
+       UserProfile.Suave.webPart getDataCtx getStreamClient
+    ]
+  // ...
+</code></pre>
+
+<h3 id="the-presentation-layer-on-client-side">The Presentation Layer on Client Side</h3>
+
+<p>Now the backend is capable of handling the request to follow a user, and we have to update our front-end code to release this new feature.</p>
+
+<p>To follow a user, we need his/her user id. To retrieve it on the client-side, let&rsquo;s add a <a href="https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes" target="_blank">data attribute</a> to the <code>follow</code> button in the <em>profile.liquid</em> template.</p>
+
+<pre><code class="language-diff">// views/user/profile.liquid
+
+- &lt;a id=&quot;follow&quot;&gt;Follow&lt;/a&gt;
++ &lt;a id=&quot;follow&quot; data-user-id=&quot;{{model.UserId}}&quot;&gt;Follow&lt;/a&gt;
+</code></pre>
+
+<blockquote>
+<p>We are already having the user id of the profile being viewed as a global variable <code>fsTweet.user.id</code> in the JS side. This approach is to demonstrate another method to share data between client and server.</p>
+</blockquote>
+
+<p>Then add a new javascript file <em>social.js</em> which handles the client side activities for following a user.</p>
+
+<pre><code class="language-bash">&gt; touch src/FsTweet.Web/assets/js/social.js
+</code></pre>
+
+<pre><code class="language-js">// assets/js/social.js
+$(function(){
+  $(&quot;#follow&quot;).on('click', function(){
+    var $this = $(this);
+    var userId = $this.data('user-id');
+    $this.prop('disabled', true);
+    $.ajax({
+      url : &quot;/follow&quot;,
+      type: &quot;post&quot;,
+      data: JSON.stringify({userId : userId}),
+      contentType: &quot;application/json&quot;
+    }).done(function(){
+      alert(&quot;successfully followed&quot;);
+      $this.prop('disabled', false);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.log({
+        jqXHR : jqXHR, 
+        textStatus : textStatus, 
+        errorThrown: errorThrown});
+      alert(&quot;something went wrong!&quot;)
+    });
+  });
+});
+</code></pre>
+
+<p>This javascript snippet fires an AJAX Post request with the user id using jQuery upon clicking the follow button and it shows an alert for both success and failure cases of the response.</p>
+
+<p>That&rsquo;s it! We can follow a user, by clicking the follow button in his/her profile page.</p>
+
+<h3 id="revisiting-user-wall">Revisiting User Wall</h3>
+
+<p>In the current implementation, the user&rsquo;s wall page has subscribed only to the logged in user&rsquo;s feed. This subscription will populate just if the user posts a tweet. So, the Wall page will be empty most of the cases.</p>
+
+<p>Ideally, it should display the user&rsquo;s timeline where he/she can see the tweets from his/her followers. And also, we need a real-time update when the timeline receives a new tweet from the follower.</p>
+
+<p><em>GetStream.io</em>&rsquo;s javascript client library already supports these features. So, we just have to enable it.</p>
+
+<p>As a first step, in addition to passing the user feed token, we have to share the timeline token.</p>
+
+<p>Let&rsquo;s add a new function in <em>Stream.fs</em> to get an user&rsquo;s timeline feed.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Stream.fs
+let timeLineFeed getStreamClient (userId : int) =
+  getStreamClient.StreamClient.Feed(&quot;timeline&quot;, userId.ToString())
+</code></pre>
+
+<p>Then update the view model of the Wall page with a new property <code>TimelineToken</code> and update this property with the read-only token of the user&rsquo;s timeline feed.</p>
+
+<pre><code class="language-diff">// src/FsTweet.Web/Wall.fs
+
+...
+
+   type WallViewModel = {
+    ...
++   TimelineToken : string
+    ...}		  
+
+...
+
++
++    let timeLineFeed =
++      GetStream.timeLineFeed getStreamClient userId 
+
+  let vm = {
+    ...
++   TimelineToken = timeLineFeed.ReadOnlyToken
+    ...}
+</code></pre>
+
+<p>To pass this <code>Timeline</code> token with the javascript code, add a new property <code>timelineToken</code> in the <code>fsTweet.user</code> object in the <em>wall.liquid</em> template.</p>
+
+<pre><code class="language-diff">&lt;!-- views/user/wall.liquid --&gt;
+
+&lt;script type=&quot;text/javascript&quot;&gt;
+  window.fsTweet = {
+    user : {
+      ...
++     timelineToken : &quot;{{model.TimelineToken}}&quot;
+    },
+    stream : {...}
+  }
+</code></pre>
+
+<p>The last step is initializing a timeline feed using this token and subscribe to it.</p>
+
+<pre><code class="language-js">// assets/js/wall.js
+$(function(){
+  // ...
+  let timelineFeed = 
+    client.feed(&quot;timeline&quot;, fsTweet.user.id, fsTweet.user.timelineToken);
+
+  timelineFeed.subscribe(function(data){
+    renderTweet($(&quot;#wall&quot;),data.new[0]);
+  });
+});
+</code></pre>
+
+<p>This would update the wall page when the timeline feed receives a new tweet.</p>
+
+<p>To have the wall page with a populate timeline, we need to fetch the tweets from the timeline feed just like what we did for getting the user&rsquo;s tweet on the user profile page.</p>
+
+<pre><code class="language-js">// assets/js/wall.js
+$(function(){
+  // ...
+  timelineFeed.get({
+    limit: 25
+  }).then(function(body) {
+    $(body.results.reverse()).each(function(index, tweet){
+      renderTweet($(&quot;#wall&quot;), tweet);
+    });
+  });
+});
+</code></pre>
+
+<p>In <em>GetStream.io</em>, the timeline feed of a user will not have the user&rsquo;s tweets. So, the populated wall page here will not have user&rsquo;s tweet. To show both the user&rsquo;s tweets and his/her timeline tweets, we can fetch the user&rsquo;s tweets as well and merge both the feeds and then sort with time.</p>
+
+<p>To do it, replace the above snippet with the below one</p>
+
+<pre><code class="language-js">// assets/js/wall.js
+$(function(){
+  // ...
+  timelineFeed.get({
+    limit: 25
+  }).then(function(body) {
+    var timelineTweets = body.results
+    userFeed.get({
+      limit : 25
+    }).then(function(body){
+      var userTweets = body.results
+      var allTweets = $.merge(timelineTweets, userTweets)
+      allTweets.sort(function(t1, t2){
+        return new Date(t2.time) - new Date(t1.time);
+      })
+      $(allTweets.reverse()).each(function(index, tweet){
+        renderTweet($(&quot;#wall&quot;), tweet);
+      });
+    })
+  })
+});
+</code></pre>
+
+<p>Cool!</p>
+
+<p>Now run the app, open two browser windows, log in as two different users and follow the other user.<br />
+<img src="/img/fsharp/series/fstweet/following_a_user.gif" alt="User Wall With Live Update" /></p>
+
+<p>After following the other user, you can get the live updates.</p>
+
+<p><img src="/img/fsharp/series/fstweet/user_wall_live_update.gif" alt="User Wall With Live Update" /></p>
+
+<p>We made it!</p>
+
+<h2 id="showing-following-in-user-profile">Showing Following In User Profile</h2>
+
+<p>Currently, In the user profile page, we are always showing <em>Follow</em> button, even if the logged in user already following the given user.</p>
+
+<p>As we have added support for following a user, while rendering the user profile page, we can now check whether the logged in user follows the given user or not and show either the <em>follow</em> button or <em>following</em> button accordingly.</p>
+
+<p>To enable this, let&rsquo;s get add a new type <code>UserProfileType</code> to represent all the three possible cases while serving the user profile page.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/UserProfile.fs
+// ...
+type UserProfileType =
+| Self
+| OtherNotFollowing
+| OtherFollowing
+
+// ...
+</code></pre>
+
+<p>Then we need to use this type in the place of the <code>IsSelf</code> property.</p>
+
+<pre><code class="language-diff">type UserProfile = {
+   User : User
+   GravatarUrl : string
+-  IsSelf : bool
++  UserProfileType : UserProfileType
+}
+</code></pre>
+
+<p>Now we are getting a set of compiler warnings, showing us the directions of the places where we have to go and fix this property change.</p>
+
+<p>The first place that we need to fix is the <code>newProfile</code> function. Let&rsquo;s change it to accept a one more parameter <code>userProfileType</code> and use it to set <code>UserProfileType</code> of the new user profile.</p>
+
+<pre><code class="language-diff">- let newProfile user = {
++ let newProfile userProfileType user = { 
+    User = user
+    GravatarUrl = gravatarUrl user.EmailAddress
+-   IsSelf = false
++   UserProfileType = userProfileType
+  }
+</code></pre>
+
+<p>Then in the places where we are calling this <code>newProfile</code> function, pass the appropriate user profile type.</p>
+
+<pre><code class="language-diff">  match loggedInUser with
+  | None -&gt; 
+     let! userMayBe = findUser username
+-    return Option.map newProfile userMayBe
++    return Option.map (newProfile OtherNotFollowing) userMayBe
+  | Some (user : User) -&gt; 
+    if user.Username = username then
+      let userProfile = 
+-       {newProfile user with IsSelf = true}
++       newProfile Self user
+      return Some userProfile
+    else  
+      let! userMayBe = findUser username
+-     return Option.map newProfile userMayBe
++     return Option.map (newProfile OtherNotFollowing) userMayBe
+</code></pre>
+
+<p>For an anonymous user, the user profile will always be other whom he/she is not following. But for a logged in user who is viewing an another user&rsquo;s profile, we need to check the <code>Social</code> table and set the type to either <code>OtherNotFollowing</code> or <code>OtherFollowing</code>.</p>
+
+<p>Let&rsquo;s keep it as <code>OtherNotFollowing</code> for the time being and we&rsquo;ll implement this check shortly.</p>
+
+<p>The next place that we need to fix is where we are populating the <code>UserProfileViewModel</code>. To do it, we first have to add a new property <code>IsFollowing</code> in the view model.</p>
+
+<pre><code class="language-fsharp">type UserProfileViewModel = {
+  // ...
+  IsFollowing : bool
+}
+</code></pre>
+
+<p>And then in the <code>newUserProfileViewModel</code> function, populate this and the <code>IsSelf</code> property from the <code>UserProfileType</code>.</p>
+
+<pre><code class="language-fsharp">let newUserProfileViewModel ... =
+  // ...
+  let isSelf, isFollowing = 
+    match userProfile.UserProfileType with
+    | Self -&gt; true, false
+    | OtherFollowing -&gt; false, true
+    | OtherNotFollowing -&gt; false, false
+  
+  {
+    // ...
+    IsSelf = isSelf
+    IsFollowing = isFollowing
+  }
+</code></pre>
+
+<p>Now we are right except the <em>following</em> check. The last piece that we need to change before implementing this check is updating the <em>profile.liquid</em> show either follow or following link based on the <code>IsFollowing</code> property.</p>
+
+<pre><code class="language-diff">&lt;!-- views/user/profile.liquid --&gt;
+&lt;!-- ... --&gt;
+
+{% unless model.IsSelf %}
+-  &lt;a href=&quot;#&quot; id=&quot;follow&quot;&gt;Follow&lt;/a&gt;
++  {% if model.IsFollowing %}
++    &lt;a href=&quot;#&quot; id=&quot;unfollow&quot;&gt;Following&lt;/a&gt;
++  {% else %}
++    &lt;a href=&quot;#&quot; id=&quot;follow&quot; data-user-id=&quot;{{model.UserId}}&quot;&gt;Follow&lt;/a&gt;
++  {% endif %}
+{% endunless %}
+
+</code></pre>
+
+<p>Great! Now it&rsquo;s time to implement the <code>isFollowing</code> check.</p>
+
+<h3 id="implementing-the-isfollowing-check">Implementing The IsFollowing Check</h3>
+
+<p>Let&rsquo;s get started by defining a type for this check in the <em>Social.fs</em>&rsquo;s <code>Domain</code> module.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Social.fs
+module Domain =
+  // ...
+  type IsFollowing = 
+    User -&gt; UserId -&gt; AsyncResult&lt;bool, Exception&gt;
+// ...
+</code></pre>
+
+<p>With this type in place, we can now change the <code>findUserProfile</code> to accept a new parameter <code>isFollowing</code> of this type and use it to figure out the actual <code>UserProfileType</code>.</p>
+
+<pre><code class="language-fsharp">module Domain =
+  // ...
+  open Social.Domain
+  // ...
+
+  let findUserProfile 
+    ... (isFollowing : IsFollowing) ...  = asyncTrial {
+    match loggedInUser with
+    | None -&gt; // ...
+    | Some (user : User) -&gt; 
+      // ...
+      else  
+        // ...
+        match userMayBe with
+        | Some otherUser -&gt; 
+          let! isFollowingOtherUser = 
+            isFollowing user otherUser.UserId
+          let userProfileType =
+            if isFollowingOtherUser then
+              OtherFollowing
+            else OtherNotFollowing 
+          let userProfile = 
+            newProfile userProfileType otherUser
+          return Some userProfile
+        | None -&gt; return None
+  }
+</code></pre>
+
+<p>Then add the implementation function <code>isFollowing</code> in the <code>Persistence</code> module</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Social.fs
+// ...
+module Persistence =
+  // ...
+  open Chessie.ErrorHandling
+  open FSharp.Data.Sql
+  open Chessie
+  // ...
+
+  let isFollowing (getDataCtx : GetDataContext) 
+        (user : User) (UserId userId) = asyncTrial {
+
+    let ctx = getDataCtx ()
+    let (UserId followerUserId) = user.UserId
+
+    let! connection = 
+      query {
+        for s in ctx.Public.Social do
+          where (s.FollowerUserId = followerUserId &amp;&amp; 
+                  s.FollowingUserId = userId)
+      } |&gt; Seq.tryHeadAsync |&gt; AR.catch
+
+    return connection.IsSome
+  }
+// ...
+</code></pre>
+
+<p>The logic is straight-forward, we retrieve the social connection by providing both the follower user id and following user&rsquo;s user id. If the relationship exists we return <code>true</code>, else we return <code>false</code>.</p>
+
+<p>Then we need to pass this function after partially applied the first parameter (<code>getDataCtx</code>) to the <code>findUserProfile</code> function.</p>
+
+<pre><code class="language-diff">let webpart (getDataCtx : GetDataContext) getStreamClient = 
+  let findUser = Persistence.findUser getDataCtx
+- let findUserProfile = findUserProfile findUser
++ let isFollowing = Persistence.isFollowing getDataCtx
++ let findUserProfile = findUserProfile findUser isFollowing
+  // ...
+</code></pre>
+
+<p>That&rsquo;s it. Now if we run the application and views a profile that we are following, we will be seeing the <em>following</em> button instead of the <em>follow</em> button.</p>
+
+<p><img src="/img/fsharp/series/fstweet/following_user.png" alt="User Profile V3" /></p>
+
+<h2 id="summary">Summary</h2>
+
+<p>We covered a lot of ground in this blog post. We started with adding log out and then we moved to adding support for following the user. Then we updated the wall page to show the timeline, and finally we revisited the user profile page to reflect the social connection status.</p>
+
+<p>The source code of this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.18" target="_blank">GitHub</a></p>
+
+<h2 id="exercise">Exercise</h2>
+
+<ul>
+<li><p>It&rsquo;d be great if we can get an email notification when someone follows us in FsTweet.</p></li>
+
+<li><p>How about adding the support for unfollowing a user?</p></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+    <div class="article-tags">
+      
+      <a class="btn btn-primary btn-outline" href="/tags/suave">suave</a>
+      
+      <a class="btn btn-primary btn-outline" href="/tags/sqlprovider">SQLProvider</a>
+      
+      <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+      
+      <a class="btn btn-primary btn-outline" href="/tags/chessie">chessie</a>
+      
+      <a class="btn btn-primary btn-outline" href="/tags/getstream">getstream</a>
+      
+    </div>
+    
+    
+
+  </div>
+
+</article>
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/series/fstweet/adding-user-profile-page/">Adding User Profile Page</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/adding-user-feed/">Adding User Feed</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/posting-new-tweet/">Posting New Tweet</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/handling-login-request/">Handling Login Request</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/adding-login/">Adding Login Page</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

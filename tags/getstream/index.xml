@@ -7,8 +7,669 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Tue, 24 Oct 2017 20:18:33 +0530</lastBuildDate>
+    <lastBuildDate>Sat, 28 Oct 2017 05:06:53 +0530</lastBuildDate>
     <atom:link href="/tags/getstream/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Following a User</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/</link>
+      <pubDate>Sat, 28 Oct 2017 05:06:53 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/</guid>
+      <description>
+
+&lt;p&gt;Hello!&lt;/p&gt;
+
+&lt;p&gt;We are on our way to complete the blog post series on &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;In this nineteenth part, we are going to implement the core feature of Twitter, Following other users and viewing their tweets on his/her wall page.&lt;/p&gt;
+
+&lt;h2 id=&#34;adding-log-out&#34;&gt;Adding Log out&lt;/h2&gt;
+
+&lt;p&gt;To test drive the implementation of following a user in FsTweet, we may need to log out and log in as a different user. But we haven&amp;rsquo;t added the logout functionality yet.&lt;/p&gt;
+
+&lt;p&gt;So, as part of this feature implementation, let&amp;rsquo;s get started with implementing log out.&lt;/p&gt;
+
+&lt;p&gt;The log out functionality is more straightforward to implement. Thanks to the &lt;code&gt;deauthenticate&lt;/code&gt; WebPart from the &lt;code&gt;Suave.Authentication&lt;/code&gt; module which clears both the authentication and the state cookie. After removing the cookies, we just need to redirect the user to the login page.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add a new path &lt;code&gt;/logout&lt;/code&gt; in &lt;em&gt;Auth.fs&lt;/em&gt; and handle the logout request as mentioned.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// src/FsTweet.Web/Auth.fs
+...
+module Suave =
+   ...
+
+   let webpart getDataCtx =
+     let findUser = Persistence.findUser getDataCtx
+-    path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
+-      GET &amp;gt;=&amp;gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
+-      POST &amp;gt;=&amp;gt; handleUserLogin findUser
++    choose [
++      path &amp;quot;/login&amp;quot; &amp;gt;=&amp;gt; choose [
++        GET &amp;gt;=&amp;gt; mayRequiresAuth (renderLoginPage emptyLoginViewModel)
++        POST &amp;gt;=&amp;gt; handleUserLogin findUser
++      ]
++      path &amp;quot;/logout&amp;quot; &amp;gt;=&amp;gt; deauthenticate &amp;gt;=&amp;gt; redirectToLoginPage
+     ]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;following-a-user&#34;&gt;Following A User&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by creating a new file &lt;em&gt;Social.fs&lt;/em&gt; in the &lt;em&gt;FsTweet.Web&lt;/em&gt; project and move it above &lt;em&gt;UserProfile.fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge newFs web -n src/FsTweet.Web/Social
+
+&amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/Social.fs
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The backend implementation of following a user involves two things.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Persisting the social connection (following &amp;amp; follower) in the database.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Subscribing to the other user&amp;rsquo;s twitter feed.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;As we did for the other features, let&amp;rsquo;s add a &lt;code&gt;Domain&lt;/code&gt; module and orchestrate this functionality.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
+namespace Social
+
+module Domain = 
+  open System
+  open Chessie.ErrorHandling
+  open User
+
+  type CreateFollowing = User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+  type Subscribe = User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+  type FollowUser = User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+
+  // Subscribe -&amp;gt; CreateFollowing -&amp;gt; 
+  //  User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+  let followUser 
+    (subscribe : Subscribe) (createFollowing : CreateFollowing) 
+    user userId = asyncTrial {
+
+    do! subscribe user userId
+    do! createFollowing user userId
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;CreateFollowing&lt;/code&gt; and the &lt;code&gt;Subscribe&lt;/code&gt; types represent the function signatures of the two tasks that we need to do while following a user.&lt;/p&gt;
+
+&lt;p&gt;The next step is defining functions which implement these two functionalities.&lt;/p&gt;
+
+&lt;h3 id=&#34;persisting-the-social-connection&#34;&gt;Persisting the social connection&lt;/h3&gt;
+
+&lt;p&gt;To persist the social connection, we need to have a new table. So, As a first step, let&amp;rsquo;s add a migration (script) to create this new table.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Db.Migrations/FsTweet.Db.Migrations.fs
+// ...
+
+[&amp;lt;Migration(201710280554L, &amp;quot;Creating Social Table&amp;quot;)&amp;gt;]
+type CreateSocialTable()=
+  inherit Migration()
+
+  override this.Up() =
+    base.Create.Table(&amp;quot;Social&amp;quot;)
+      .WithColumn(&amp;quot;Id&amp;quot;).AsGuid().PrimaryKey().Identity()
+      .WithColumn(&amp;quot;FollowerUserId&amp;quot;).AsInt32().ForeignKey(&amp;quot;Users&amp;quot;, &amp;quot;Id&amp;quot;).NotNullable()
+      .WithColumn(&amp;quot;FollowingUserId&amp;quot;).AsInt32().ForeignKey(&amp;quot;Users&amp;quot;, &amp;quot;Id&amp;quot;).NotNullable()
+    |&amp;gt; ignore
+
+    base.Create.UniqueConstraint(&amp;quot;SocialRelationship&amp;quot;)
+      .OnTable(&amp;quot;Social&amp;quot;)
+      .Columns(&amp;quot;FollowerUserId&amp;quot;, &amp;quot;FollowingUserId&amp;quot;) |&amp;gt; ignore
+  
+  override this.Down() = 
+    base.Delete.Table(&amp;quot;Tweets&amp;quot;) |&amp;gt; ignore
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then run the application, and the fluent migrator creates this table in the database.&lt;/p&gt;
+
+&lt;p&gt;Make sure to verify the underlying schema using &lt;em&gt;psql&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/social_table_schema.png&#34; alt=&#34;Social Table&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The next step is defining the function which persists the social connection in this table.&lt;/p&gt;
+
+&lt;p&gt;Create a new module &lt;code&gt;Persistence&lt;/code&gt; in the &lt;em&gt;Social.fs&lt;/em&gt; file and define the &lt;code&gt;createFollowing&lt;/code&gt; function as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
+// ...
+module Persistence =
+  open Database
+  open User
+
+  // GetDataContext -&amp;gt; User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+  let createFollowing (getDataCtx : GetDataContext) (user : User) (UserId userId) = 
+     
+     let ctx = getDataCtx ()
+     let social = ctx.Public.Social.Create()
+     let (UserId followerUserId) = user.UserId
+      
+     social.FollowerUserId &amp;lt;- followerUserId
+     social.FollowingUserId &amp;lt;- userId
+
+     submitUpdates ctx
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are using the term &lt;code&gt;follower&lt;/code&gt; to represent the current logged in user and the &lt;code&gt;following user&lt;/code&gt; to represent the user that the logged in user about to follow.&lt;/p&gt;
+
+&lt;h3 id=&#34;subscribing-to-the-user-feed&#34;&gt;Subscribing to the User Feed&lt;/h3&gt;
+
+&lt;p&gt;The second task is subscribing to the user feed so that the follower will be getting the tweets from the users he/she is following.&lt;/p&gt;
+
+&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/#notifying-new-tweet&#34; target=&#34;_blank&#34;&gt;notifying a new tweet&lt;/a&gt;, let&amp;rsquo;s create a new module &lt;code&gt;GetStream&lt;/code&gt; and add the &lt;code&gt;subscribe&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
+// ...
+module GetStream =
+  open User
+  open Chessie
+
+  // GetStream.Client -&amp;gt; User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;unit, Exception&amp;gt;
+  let subscribe (getStreamClient : GetStream.Client) (user : User) (UserId userId) = 
+    let (UserId followerUserId) = user.UserId
+
+    let timelineFeed = 
+      GetStream.timeLineFeed getStreamClient followerUserId
+    let userFeed =
+      GetStream.userFeed getStreamClient userId
+
+    timelineFeed.FollowFeed(userFeed) // Task
+    |&amp;gt; Async.AwaitTask // Async&amp;lt;uint&amp;gt;
+    |&amp;gt; AR.catch // AsyncResult&amp;lt;unit, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In &lt;em&gt;GetStream.io&lt;/em&gt;&amp;rsquo;s &lt;a href=&#34;https://getstream.io/get_started/#follow&#34; target=&#34;_blank&#34;&gt;vocabulary&lt;/a&gt;, following a user means, getting the &lt;strong&gt;timeline feed&lt;/strong&gt; of the follower and &lt;a href=&#34;https://getstream.io/docs/#following&#34; target=&#34;_blank&#34;&gt;follow the other user&lt;/a&gt; using this timeline feed.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-presentation-layer-on-server-side&#34;&gt;The Presentation Layer on Server Side&lt;/h3&gt;
+
+&lt;p&gt;In the last three sections, we built the internal pieces that are required to follow a user. The final step is wiring the parts together with the presentation layer and expose an HTTP endpoint to carry out the functionality.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start with defining the sample JSON that the &lt;em&gt;follow user&lt;/em&gt; endpoint should support.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;userId&amp;quot; : 123
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add a server-side type to represent this JSON request body.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
+// ...
+module Suave =
+  open Chiron
+
+  type FollowUserRequest = FollowUserRequest of int with 
+    static member FromJson (_ : FollowUserRequest) = json {
+        let! userId = Json.read &amp;quot;userId&amp;quot;
+        return FollowUserRequest userId 
+      }
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If following a user operation is successful, we need to return &lt;em&gt;204 No Content&lt;/em&gt;, and if it is a failure, we have to print the actual exception details to the console and return &lt;em&gt;500 Internal Server Error&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
+// ...
+module Suave =
+  // ...
+  open Suave
+  // ...
+
+  let onFollowUserSuccess () =
+    Successful.NO_CONTENT
+
+  let onFollowUserFailure (ex : System.Exception) =
+    printfn &amp;quot;%A&amp;quot; ex
+    JSON.internalError
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we have to define the request handler which handles the request to follow the user.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+  open Domain
+  open User
+  open Chessie
+  // ...
+
+  // FollowUser -&amp;gt; User -&amp;gt; WebPart
+  let handleFollowUser (followUser : FollowUser) (user : User) ctx = async {
+    match JSON.deserialize ctx.request with
+    | Success (FollowUserRequest userId) -&amp;gt; 
+      let! webpart =
+        followUser user (UserId userId)
+        |&amp;gt; AR.either onFollowUserSuccess onFollowUserFailure
+      return! webpart ctx
+    | Failure _ -&amp;gt; 
+      return! JSON.badRequest &amp;quot;invalid user follow request&amp;quot; ctx
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;handleFollowUser&lt;/code&gt; function deserializes the request to &lt;code&gt;FollowUserRequest&lt;/code&gt; using the &lt;code&gt;deserialize&lt;/code&gt; function that we defined earlier in the &lt;em&gt;Json.fs&lt;/em&gt; file. If deserialization fails, we are returning bad request. For a valid request,  we are calling the &lt;code&gt;followUser&lt;/code&gt; function and maps its success and failure results to &lt;code&gt;WebPart&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The last piece is wiring this handler with the &lt;code&gt;/follow&lt;/code&gt; endpoint.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
+// ...
+module Suave =
+  // ...
+  open Suave.Filters
+  open Persistence
+  open Domain
+  open Suave.Operators
+  open Auth.Suave
+
+  // ...
+
+  let webpart getDataCtx getStreamClient =
+    
+    let createFollowing = createFollowing getDataCtx
+    let subscribe = GetStream.subscribe getStreamClient
+    let followUser = followUser subscribe createFollowing
+
+    let handleFollowUser = handleFollowUser followUser
+    POST &amp;gt;=&amp;gt; path &amp;quot;/follow&amp;quot; &amp;gt;=&amp;gt; requiresAuth2 handleFollowUser
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// FsTweet.Web/FsTweet.Web.fs
+// ...
+let main argv =
+  // ...
+  let app = 
+    choose [
+      // ...
++      Social.Suave.webpart getDataCtx getStreamClient
+       UserProfile.Suave.webPart getDataCtx getStreamClient
+    ]
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;the-presentation-layer-on-client-side&#34;&gt;The Presentation Layer on Client Side&lt;/h3&gt;
+
+&lt;p&gt;Now the backend is capable of handling the request to follow a user, and we have to update our front-end code to release this new feature.&lt;/p&gt;
+
+&lt;p&gt;To follow a user, we need his/her user id. To retrieve it on the client-side, let&amp;rsquo;s add a &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Learn/HTML/Howto/Use_data_attributes&#34; target=&#34;_blank&#34;&gt;data attribute&lt;/a&gt; to the &lt;code&gt;follow&lt;/code&gt; button in the &lt;em&gt;profile.liquid&lt;/em&gt; template.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// views/user/profile.liquid
+
+- &amp;lt;a id=&amp;quot;follow&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
++ &amp;lt;a id=&amp;quot;follow&amp;quot; data-user-id=&amp;quot;{{model.UserId}}&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are already having the user id of the profile being viewed as a global variable &lt;code&gt;fsTweet.user.id&lt;/code&gt; in the JS side. This approach is to demonstrate another method to share data between client and server.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Then add a new javascript file &lt;em&gt;social.js&lt;/em&gt; which handles the client side activities for following a user.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/FsTweet.Web/assets/js/social.js
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;// assets/js/social.js
+$(function(){
+  $(&amp;quot;#follow&amp;quot;).on(&#39;click&#39;, function(){
+    var $this = $(this);
+    var userId = $this.data(&#39;user-id&#39;);
+    $this.prop(&#39;disabled&#39;, true);
+    $.ajax({
+      url : &amp;quot;/follow&amp;quot;,
+      type: &amp;quot;post&amp;quot;,
+      data: JSON.stringify({userId : userId}),
+      contentType: &amp;quot;application/json&amp;quot;
+    }).done(function(){
+      alert(&amp;quot;successfully followed&amp;quot;);
+      $this.prop(&#39;disabled&#39;, false);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      console.log({
+        jqXHR : jqXHR, 
+        textStatus : textStatus, 
+        errorThrown: errorThrown});
+      alert(&amp;quot;something went wrong!&amp;quot;)
+    });
+  });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This javascript snippet fires an AJAX Post request with the user id using jQuery upon clicking the follow button and it shows an alert for both success and failure cases of the response.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it! We can follow a user, by clicking the follow button in his/her profile page.&lt;/p&gt;
+
+&lt;h3 id=&#34;revisiting-user-wall&#34;&gt;Revisiting User Wall&lt;/h3&gt;
+
+&lt;p&gt;In the current implementation, the user&amp;rsquo;s wall page has subscribed only to the logged in user&amp;rsquo;s feed. This subscription will populate just if the user posts a tweet. So, the Wall page will be empty most of the cases.&lt;/p&gt;
+
+&lt;p&gt;Ideally, it should display the user&amp;rsquo;s timeline where he/she can see the tweets from his/her followers. And also, we need a real-time update when the timeline receives a new tweet from the follower.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;GetStream.io&lt;/em&gt;&amp;rsquo;s javascript client library already supports these features. So, we just have to enable it.&lt;/p&gt;
+
+&lt;p&gt;As a first step, in addition to passing the user feed token, we have to share the timeline token.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add a new function in &lt;em&gt;Stream.fs&lt;/em&gt; to get an user&amp;rsquo;s timeline feed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Stream.fs
+let timeLineFeed getStreamClient (userId : int) =
+  getStreamClient.StreamClient.Feed(&amp;quot;timeline&amp;quot;, userId.ToString())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then update the view model of the Wall page with a new property &lt;code&gt;TimelineToken&lt;/code&gt; and update this property with the read-only token of the user&amp;rsquo;s timeline feed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// src/FsTweet.Web/Wall.fs
+
+...
+
+   type WallViewModel = {
+    ...
++   TimelineToken : string
+    ...}		  
+
+...
+
++
++    let timeLineFeed =
++      GetStream.timeLineFeed getStreamClient userId 
+
+  let vm = {
+    ...
++   TimelineToken = timeLineFeed.ReadOnlyToken
+    ...}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To pass this &lt;code&gt;Timeline&lt;/code&gt; token with the javascript code, add a new property &lt;code&gt;timelineToken&lt;/code&gt; in the &lt;code&gt;fsTweet.user&lt;/code&gt; object in the &lt;em&gt;wall.liquid&lt;/em&gt; template.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;&amp;lt;!-- views/user/wall.liquid --&amp;gt;
+
+&amp;lt;script type=&amp;quot;text/javascript&amp;quot;&amp;gt;
+  window.fsTweet = {
+    user : {
+      ...
++     timelineToken : &amp;quot;{{model.TimelineToken}}&amp;quot;
+    },
+    stream : {...}
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last step is initializing a timeline feed using this token and subscribe to it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;// assets/js/wall.js
+$(function(){
+  // ...
+  let timelineFeed = 
+    client.feed(&amp;quot;timeline&amp;quot;, fsTweet.user.id, fsTweet.user.timelineToken);
+
+  timelineFeed.subscribe(function(data){
+    renderTweet($(&amp;quot;#wall&amp;quot;),data.new[0]);
+  });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This would update the wall page when the timeline feed receives a new tweet.&lt;/p&gt;
+
+&lt;p&gt;To have the wall page with a populate timeline, we need to fetch the tweets from the timeline feed just like what we did for getting the user&amp;rsquo;s tweet on the user profile page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;// assets/js/wall.js
+$(function(){
+  // ...
+  timelineFeed.get({
+    limit: 25
+  }).then(function(body) {
+    $(body.results.reverse()).each(function(index, tweet){
+      renderTweet($(&amp;quot;#wall&amp;quot;), tweet);
+    });
+  });
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In &lt;em&gt;GetStream.io&lt;/em&gt;, the timeline feed of a user will not have the user&amp;rsquo;s tweets. So, the populated wall page here will not have user&amp;rsquo;s tweet. To show both the user&amp;rsquo;s tweets and his/her timeline tweets, we can fetch the user&amp;rsquo;s tweets as well and merge both the feeds and then sort with time.&lt;/p&gt;
+
+&lt;p&gt;To do it, replace the above snippet with the below one&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;// assets/js/wall.js
+$(function(){
+  // ...
+  timelineFeed.get({
+    limit: 25
+  }).then(function(body) {
+    var timelineTweets = body.results
+    userFeed.get({
+      limit : 25
+    }).then(function(body){
+      var userTweets = body.results
+      var allTweets = $.merge(timelineTweets, userTweets)
+      allTweets.sort(function(t1, t2){
+        return new Date(t2.time) - new Date(t1.time);
+      })
+      $(allTweets.reverse()).each(function(index, tweet){
+        renderTweet($(&amp;quot;#wall&amp;quot;), tweet);
+      });
+    })
+  })
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Cool!&lt;/p&gt;
+
+&lt;p&gt;Now run the app, open two browser windows, log in as two different users and follow the other user.&lt;br /&gt;
+&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_a_user.gif&#34; alt=&#34;User Wall With Live Update&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After following the other user, you can get the live updates.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_wall_live_update.gif&#34; alt=&#34;User Wall With Live Update&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We made it!&lt;/p&gt;
+
+&lt;h2 id=&#34;showing-following-in-user-profile&#34;&gt;Showing Following In User Profile&lt;/h2&gt;
+
+&lt;p&gt;Currently, In the user profile page, we are always showing &lt;em&gt;Follow&lt;/em&gt; button, even if the logged in user already following the given user.&lt;/p&gt;
+
+&lt;p&gt;As we have added support for following a user, while rendering the user profile page, we can now check whether the logged in user follows the given user or not and show either the &lt;em&gt;follow&lt;/em&gt; button or &lt;em&gt;following&lt;/em&gt; button accordingly.&lt;/p&gt;
+
+&lt;p&gt;To enable this, let&amp;rsquo;s get add a new type &lt;code&gt;UserProfileType&lt;/code&gt; to represent all the three possible cases while serving the user profile page.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/UserProfile.fs
+// ...
+type UserProfileType =
+| Self
+| OtherNotFollowing
+| OtherFollowing
+
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we need to use this type in the place of the &lt;code&gt;IsSelf&lt;/code&gt; property.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;type UserProfile = {
+   User : User
+   GravatarUrl : string
+-  IsSelf : bool
++  UserProfileType : UserProfileType
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we are getting a set of compiler warnings, showing us the directions of the places where we have to go and fix this property change.&lt;/p&gt;
+
+&lt;p&gt;The first place that we need to fix is the &lt;code&gt;newProfile&lt;/code&gt; function. Let&amp;rsquo;s change it to accept a one more parameter &lt;code&gt;userProfileType&lt;/code&gt; and use it to set &lt;code&gt;UserProfileType&lt;/code&gt; of the new user profile.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;- let newProfile user = {
++ let newProfile userProfileType user = { 
+    User = user
+    GravatarUrl = gravatarUrl user.EmailAddress
+-   IsSelf = false
++   UserProfileType = userProfileType
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in the places where we are calling this &lt;code&gt;newProfile&lt;/code&gt; function, pass the appropriate user profile type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;  match loggedInUser with
+  | None -&amp;gt; 
+     let! userMayBe = findUser username
+-    return Option.map newProfile userMayBe
++    return Option.map (newProfile OtherNotFollowing) userMayBe
+  | Some (user : User) -&amp;gt; 
+    if user.Username = username then
+      let userProfile = 
+-       {newProfile user with IsSelf = true}
++       newProfile Self user
+      return Some userProfile
+    else  
+      let! userMayBe = findUser username
+-     return Option.map newProfile userMayBe
++     return Option.map (newProfile OtherNotFollowing) userMayBe
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For an anonymous user, the user profile will always be other whom he/she is not following. But for a logged in user who is viewing an another user&amp;rsquo;s profile, we need to check the &lt;code&gt;Social&lt;/code&gt; table and set the type to either &lt;code&gt;OtherNotFollowing&lt;/code&gt; or &lt;code&gt;OtherFollowing&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s keep it as &lt;code&gt;OtherNotFollowing&lt;/code&gt; for the time being and we&amp;rsquo;ll implement this check shortly.&lt;/p&gt;
+
+&lt;p&gt;The next place that we need to fix is where we are populating the &lt;code&gt;UserProfileViewModel&lt;/code&gt;. To do it, we first have to add a new property &lt;code&gt;IsFollowing&lt;/code&gt; in the view model.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type UserProfileViewModel = {
+  // ...
+  IsFollowing : bool
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then in the &lt;code&gt;newUserProfileViewModel&lt;/code&gt; function, populate this and the &lt;code&gt;IsSelf&lt;/code&gt; property from the &lt;code&gt;UserProfileType&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let newUserProfileViewModel ... =
+  // ...
+  let isSelf, isFollowing = 
+    match userProfile.UserProfileType with
+    | Self -&amp;gt; true, false
+    | OtherFollowing -&amp;gt; false, true
+    | OtherNotFollowing -&amp;gt; false, false
+  
+  {
+    // ...
+    IsSelf = isSelf
+    IsFollowing = isFollowing
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we are right except the &lt;em&gt;following&lt;/em&gt; check. The last piece that we need to change before implementing this check is updating the &lt;em&gt;profile.liquid&lt;/em&gt; show either follow or following link based on the &lt;code&gt;IsFollowing&lt;/code&gt; property.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;&amp;lt;!-- views/user/profile.liquid --&amp;gt;
+&amp;lt;!-- ... --&amp;gt;
+
+{% unless model.IsSelf %}
+-  &amp;lt;a href=&amp;quot;#&amp;quot; id=&amp;quot;follow&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
++  {% if model.IsFollowing %}
++    &amp;lt;a href=&amp;quot;#&amp;quot; id=&amp;quot;unfollow&amp;quot;&amp;gt;Following&amp;lt;/a&amp;gt;
++  {% else %}
++    &amp;lt;a href=&amp;quot;#&amp;quot; id=&amp;quot;follow&amp;quot; data-user-id=&amp;quot;{{model.UserId}}&amp;quot;&amp;gt;Follow&amp;lt;/a&amp;gt;
++  {% endif %}
+{% endunless %}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Great! Now it&amp;rsquo;s time to implement the &lt;code&gt;isFollowing&lt;/code&gt; check.&lt;/p&gt;
+
+&lt;h3 id=&#34;implementing-the-isfollowing-check&#34;&gt;Implementing The IsFollowing Check&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by defining a type for this check in the &lt;em&gt;Social.fs&lt;/em&gt;&amp;rsquo;s &lt;code&gt;Domain&lt;/code&gt; module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Social.fs
+module Domain =
+  // ...
+  type IsFollowing = 
+    User -&amp;gt; UserId -&amp;gt; AsyncResult&amp;lt;bool, Exception&amp;gt;
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this type in place, we can now change the &lt;code&gt;findUserProfile&lt;/code&gt; to accept a new parameter &lt;code&gt;isFollowing&lt;/code&gt; of this type and use it to figure out the actual &lt;code&gt;UserProfileType&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
+  // ...
+  open Social.Domain
+  // ...
+
+  let findUserProfile 
+    ... (isFollowing : IsFollowing) ...  = asyncTrial {
+    match loggedInUser with
+    | None -&amp;gt; // ...
+    | Some (user : User) -&amp;gt; 
+      // ...
+      else  
+        // ...
+        match userMayBe with
+        | Some otherUser -&amp;gt; 
+          let! isFollowingOtherUser = 
+            isFollowing user otherUser.UserId
+          let userProfileType =
+            if isFollowingOtherUser then
+              OtherFollowing
+            else OtherNotFollowing 
+          let userProfile = 
+            newProfile userProfileType otherUser
+          return Some userProfile
+        | None -&amp;gt; return None
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add the implementation function &lt;code&gt;isFollowing&lt;/code&gt; in the &lt;code&gt;Persistence&lt;/code&gt; module&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Social.fs
+// ...
+module Persistence =
+  // ...
+  open Chessie.ErrorHandling
+  open FSharp.Data.Sql
+  open Chessie
+  // ...
+
+  let isFollowing (getDataCtx : GetDataContext) 
+        (user : User) (UserId userId) = asyncTrial {
+
+    let ctx = getDataCtx ()
+    let (UserId followerUserId) = user.UserId
+
+    let! connection = 
+      query {
+        for s in ctx.Public.Social do
+          where (s.FollowerUserId = followerUserId &amp;amp;&amp;amp; 
+                  s.FollowingUserId = userId)
+      } |&amp;gt; Seq.tryHeadAsync |&amp;gt; AR.catch
+
+    return connection.IsSome
+  }
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The logic is straight-forward, we retrieve the social connection by providing both the follower user id and following user&amp;rsquo;s user id. If the relationship exists we return &lt;code&gt;true&lt;/code&gt;, else we return &lt;code&gt;false&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then we need to pass this function after partially applied the first parameter (&lt;code&gt;getDataCtx&lt;/code&gt;) to the &lt;code&gt;findUserProfile&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;let webpart (getDataCtx : GetDataContext) getStreamClient = 
+  let findUser = Persistence.findUser getDataCtx
+- let findUserProfile = findUserProfile findUser
++ let isFollowing = Persistence.isFollowing getDataCtx
++ let findUserProfile = findUserProfile findUser isFollowing
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&amp;rsquo;s it. Now if we run the application and views a profile that we are following, we will be seeing the &lt;em&gt;following&lt;/em&gt; button instead of the &lt;em&gt;follow&lt;/em&gt; button.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_user.png&#34; alt=&#34;User Profile V3&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;We covered a lot of ground in this blog post. We started with adding log out and then we moved to adding support for following the user. Then we updated the wall page to show the timeline, and finally we revisited the user profile page to reflect the social connection status.&lt;/p&gt;
+
+&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.18&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;exercise&#34;&gt;Exercise&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;It&amp;rsquo;d be great if we can get an email notification when someone follows us in FsTweet.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;How about adding the support for unfollowing a user?&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>Adding User Profile Page</title>
