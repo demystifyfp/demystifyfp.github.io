@@ -399,7 +399,7 @@ module Suave =
 
 &lt;h3 id=&#34;initializing-getstream-io-js-library&#34;&gt;Initializing GetStream.io JS Library&lt;/h3&gt;
 
-&lt;p&gt;To initialize the &lt;code&gt;GetStream.io&lt;/code&gt; javascript client, we need &lt;em&gt;GetStream.io&amp;rsquo;s&lt;/em&gt; API key and App ID. We are already have it on the server side, So, we just need to pass it.&lt;/p&gt;
+&lt;p&gt;To initialize the &lt;code&gt;GetStream.io&lt;/code&gt; javascript client, we need &lt;em&gt;GetStream.io&amp;rsquo;s&lt;/em&gt; API key and App ID. We already have it on the server side, So, we just need to pass it.&lt;/p&gt;
 
 &lt;p&gt;There are two ways we can do it,&lt;/p&gt;
 
