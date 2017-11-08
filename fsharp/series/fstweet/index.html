@@ -158,6 +158,18 @@
   
   
   <div>
+    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/">Fetching Followers and Following Users</a></h2>
+    <div class="article-style">
+      
+      Hi,
+Welcome back to the twentieth part of Creating a Twitter Clone in F# using Suave blog post series.
+In this blog post, we are going to expose two HTTP JSON endpoints to fetch the list of followers and following users. Then we will be updating the user profile page front-end to consume these APIs and populate the Following and Followers Tabs.
+Adding Followers API Let&rsquo;s get started with the implementation of followers API.
+      
+    </div>
+  </div>
+  
+  <div>
     <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/">Following a User</a></h2>
     <div class="article-style">
       
@@ -264,19 +276,6 @@ In the previous blog post, we added support for sending verification email using
 In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link that we sent in the email.
 A Type For The Verify User Function. Let&rsquo;s get started by defining a type for the function which verifies the user.
 type VerifyUser = string -&gt; AsyncResult&lt;Username option, System.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/">Sending Verification Email</a></h2>
-    <div class="article-style">
-      
-      Hi there!
-Welcome to the tenth part of Creating a Twitter Clone in F# using Suave blog post series.
-In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we faked earlier.
-Setting Up Postmark To send email, we are going to use Postmark, a transactional email service provider for web applications.
-There are three prerequisites that we need to do before we use it in our application.
       
     </div>
   </div>

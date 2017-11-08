@@ -7,8 +7,392 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Sat, 28 Oct 2017 05:06:53 +0530</lastBuildDate>
+    <lastBuildDate>Wed, 01 Nov 2017 06:59:48 +0530</lastBuildDate>
     <atom:link href="/tags/chessie/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Fetching Followers and Following Users</title>
+      <link>http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</link>
+      <pubDate>Wed, 01 Nov 2017 06:59:48 +0530</pubDate>
+      
+      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;Welcome back to the twentieth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+
+&lt;p&gt;In this blog post, we are going to expose two HTTP JSON endpoints to fetch the list of followers and following users. Then we will be updating the user profile page front-end to consume these APIs and populate the &lt;em&gt;Following&lt;/em&gt; and &lt;em&gt;Followers&lt;/em&gt; Tabs.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_users.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/followers.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;adding-followers-api&#34;&gt;Adding Followers API&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started with the implementation of followers API.&lt;/p&gt;
+
+&lt;p&gt;As we did for other persistence logic, let&amp;rsquo;s define a new type to represent the find followers persistence logic.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Social.fs
+module Domain =
+  // ...
+  type FindFollowers = 
+    UserId -&amp;gt; AsyncResult&amp;lt;User list, Exception&amp;gt;
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The implementation function of this type will be leveraging the &lt;a href=&#34;http://fsprojects.github.io/SQLProvider/core/composable.html&#34; target=&#34;_blank&#34;&gt;composable queries&lt;/a&gt; concept to find the given user id&amp;rsquo;s followers&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Social.fs
+// ...
+module Persistence =
+  // ...
+  open System.Linq
+  // ...
+
+  // GetDataContext -&amp;gt; userId -&amp;gt; 
+  //   AsyncResult&amp;lt;DataContext.``public.UsersEntity`` seq, Exception&amp;gt;
+  let findFollowers (getDataCtx : GetDataContext) (UserId userId) = asyncTrial {
+    let ctx = getDataCtx()
+
+    let selectFollowersQuery = query {
+        for s in ctx.Public.Social do
+        where (s.FollowingUserId = userId)
+        select s.FollowerUserId
+    }
+
+    let! followers = 
+      query {
+        for u in ctx.Public.Users do
+        where (selectFollowersQuery.Contains(u.Id))
+        select u
+      } |&amp;gt; Seq.executeQueryAsync |&amp;gt; AR.catch
+      
+    return! followers
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Using the &lt;code&gt;selectFollowersQuery&lt;/code&gt;, we are first getting the list of followers user ids. Then we are using these identifiers to the get corresponding user details.&lt;/p&gt;
+
+&lt;p&gt;One thing to notice here is, we are returning a sequence of &lt;code&gt;DataContext.public.UsersEntity&lt;/code&gt; on success. But what we want to return is its domain representation, a list of &lt;code&gt;User&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Like what we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;finding the user by username&lt;/a&gt;, we need to map the all the user entities in the sequence to their respective domain model.&lt;/p&gt;
+
+&lt;p&gt;To do it, we first need to extract the mapping functionality from the &lt;code&gt;mapUser&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// 
+// ...
+module Persistence =
+  // ...
+  open System
+
+  // DataContext.``public.UsersEntity`` -&amp;gt; Result&amp;lt;User, Exception&amp;gt;
+  let mapUserEntityToUser (user : DataContext.``public.UsersEntity``) = 
+    let userResult = trial {
+      let! username = Username.TryCreate user.Username
+      let! passwordHash = PasswordHash.TryCreate user.PasswordHash
+      let! email = EmailAddress.TryCreate user.Email
+      let userEmailAddress =
+        match user.IsEmailVerified with
+        | true -&amp;gt; Verified email
+        | _ -&amp;gt; NotVerified email
+      return {
+        UserId = UserId user.Id
+        Username = username
+        PasswordHash = passwordHash
+        EmailAddress = userEmailAddress
+      } 
+    }
+    userResult
+    |&amp;gt; mapFailure Exception
+
+  //...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This extracted method returns &lt;code&gt;Result&amp;lt;User, Exception&amp;gt;&lt;/code&gt; and then modify the &lt;code&gt;mapUser&lt;/code&gt; function to use this function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Persistence =
+  // ...
+  let mapUserEntityToUser ... = ...
+  
+  // DataContext.``public.UsersEntity`` -&amp;gt; AsyncResult&amp;lt;User, Exception&amp;gt;
+  let mapUser (user : DataContext.``public.UsersEntity``) = 
+    mapUserEntityToUser user
+    |&amp;gt; Async.singleton
+    |&amp;gt; AR
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I just noticed that the name &lt;code&gt;mapUser&lt;/code&gt; misleading. So, rename it to &lt;code&gt;mapUserEntity&lt;/code&gt; to communicate what it does.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Persistence =
+  ...
+- let mapUser (user : DataContext.``public.UsersEntity``) =   
++ let mapUserEntity (user : DataContext.``public.UsersEntity``) =   
+  ...
+
+  let findUser ... = asyncTrial {
+    ...
+-     let! user = mapUser user 
++     let! user = mapUserEntity user
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is transforming a sequence of &lt;code&gt;DataContext.&lt;/code&gt;&lt;code&gt;public.UsersEntity&lt;/code&gt; to a list of &lt;code&gt;User&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapUserEntities (users : DataContext.``public.UsersEntity`` seq) =
+  users // DataContext.``public.UsersEntity`` seq
+  |&amp;gt; Seq.map mapUserEntityToUser // Result&amp;lt;User, Exception&amp;gt; seq
+  // TODO
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is to transform &lt;code&gt;Result&amp;lt;User, Exception&amp;gt; seq&lt;/code&gt; to &lt;code&gt;Result&amp;lt;User list, Exception&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;As &lt;em&gt;Chessie&lt;/em&gt; library already supports the failure side of the &lt;code&gt;Result&lt;/code&gt; as a list, we don&amp;rsquo;t specify the failure side as &lt;code&gt;Exception list&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To do this transformation, Chessie library provides a function called &lt;code&gt;collect&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let mapUserEntities (users : DataContext.``public.UsersEntity`` seq) =
+  users // DataContext.``public.UsersEntity`` seq
+  |&amp;gt; Seq.map mapUserEntityToUser // Result&amp;lt;User, Exception&amp;gt; seq
+  |&amp;gt; collect // Result&amp;lt;User list, Exception&amp;gt;
+  // TODO
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are not done yet as the failure side is still a list of Exception but what we want is single Exception. .NET already supports this through &lt;a href=&#34;https://msdn.microsoft.com/en-us/library/system.aggregateexception(v=vs.110).aspx&#34; target=&#34;_blank&#34;&gt;AggregateException&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// DataContext.``public.UsersEntity`` seq -&amp;gt; 
+//  AsyncResult&amp;lt;User list, Exception&amp;gt;
+let mapUserEntities (users : DataContext.``public.UsersEntity`` seq) =
+  users // DataContext.``public.UsersEntity`` seq
+  |&amp;gt; Seq.map mapUserEntityToUser // Result&amp;lt;User, Exception&amp;gt; seq
+  |&amp;gt; collect // Result&amp;lt;User list, Exception&amp;gt;
+  |&amp;gt; mapFailure 
+      (fun errs -&amp;gt; new AggregateException(errs) :&amp;gt; Exception)
+      // Result&amp;lt;User list, Exception&amp;gt;
+  |&amp;gt; Async.singleton // Async&amp;lt;Result&amp;lt;User list, Exception&amp;gt;&amp;gt;
+  |&amp;gt; AR // AsyncResult&amp;lt;User list, Exception&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Using the &lt;code&gt;mapFailure&lt;/code&gt; function from Chessie, we are transforming the list of exceptions into an &lt;code&gt;AggregateException&lt;/code&gt;, and then we are mapping it to &lt;code&gt;AsyncResult&amp;lt;User list, Exception&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;With this &lt;code&gt;mapUserEntities&lt;/code&gt; function in place, we can now return a &lt;code&gt;User list&lt;/code&gt; in the &lt;code&gt;findFollowers&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;module Persistence =
+  ...
++ open User.Persistence
+  ...
+
+  let findFollowers ... = asyncTrail {
+    ...
+-   return! followers  
++   return! mapUserEntities followers
+  } 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we have the persistence layer ready.&lt;/p&gt;
+
+&lt;p&gt;The JSON response that we are going to send will have the following structure&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;users&amp;quot;: [
+    {
+      &amp;quot;username&amp;quot;: &amp;quot;tamizhvendan&amp;quot;
+    }
+  ]
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;To keep it simple, we are just returning the username of the users.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To model the corresponding server-side representation of this JSON object, let&amp;rsquo;s add some types along with the static member function &lt;code&gt;ToJson&lt;/code&gt; which is required by the Chiron library to serialize the type to JSON.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Social.fs
+// ...
+module Suave =
+  // ...
+
+  type UserDto = {
+    Username : string
+  } with
+   static member ToJson (u:UserDto) = 
+      json { 
+          do! Json.write &amp;quot;username&amp;quot; u.Username
+      }
+
+  type UserDtoList = UserDtoList of (UserDto list) with
+    static member ToJson (UserDtoList userDtos) = 
+      let usersJson = 
+        userDtos
+        |&amp;gt; List.map (Json.serializeWith UserDto.ToJson)
+      json {
+        do! Json.write &amp;quot;users&amp;quot; usersJson
+      }
+
+  let mapUsersToUserDtoList (users : User list) =
+    users
+    |&amp;gt; List.map (fun user -&amp;gt; {Username = user.Username.Value})
+    |&amp;gt; UserDtoList
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To expose the &lt;code&gt;findFollowers&lt;/code&gt; function as an HTTP API, we first need to specify what we need to do for both success and failure.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+  let onFindUsersFailure (ex : System.Exception) =
+    printfn &amp;quot;%A&amp;quot; ex
+    JSON.internalError
+
+  let onFindUsersSuccess (users : User list) =
+    mapUsersToUserDtoList users
+    |&amp;gt; Json.serialize
+    |&amp;gt; JSON.ok
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add a new function which handles the request for fetching user&amp;rsquo;s followers&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FindFollowers -&amp;gt; int -&amp;gt; WebPart
+let fetchFollowers (findFollowers: FindFollowers) userId ctx = async {
+  let! webpart =
+    findFollowers (UserId userId)
+    |&amp;gt; AR.either onFindUsersSuccess onFindUsersFailure
+  return! webpart ctx
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, add the route for the HTTP endpoint.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;  let webpart getDataCtx getStreamClient =
+    ...
+-   POST &amp;gt;=&amp;gt; path &amp;quot;/follow&amp;quot; &amp;gt;=&amp;gt; requiresAuth2 handleFollowUser
++   let findFollowers = findFollowers getDataCtx
++   choose [
++     GET &amp;gt;=&amp;gt; pathScan &amp;quot;/%d/followers&amp;quot; (fetchFollowers findFollowers)
++     POST &amp;gt;=&amp;gt; path &amp;quot;/follow&amp;quot; &amp;gt;=&amp;gt; requiresAuth2 handleFollowUser
++   ] 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;adding-following-users-api&#34;&gt;Adding Following Users API&lt;/h2&gt;
+
+&lt;p&gt;The API to serve the list of users being followed by the given user follows the similar structure except for the actual backend query&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Social.fs
+module Domain = 
+  // ...
+  type FindFollowingUsers = UserId -&amp;gt; AsyncResult&amp;lt;User list, Exception&amp;gt;
+
+module Persistence =
+  // ...
+  let findFollowingUsers (getDataCtx : GetDataContext) (UserId userId) = asyncTrial {
+    let ctx = getDataCtx()
+
+    let selectFollowingUsersQuery = query {
+        for s in ctx.Public.Social do
+        where (s.FollowerUserId = userId)
+        select s.FollowingUserId
+    }
+
+    let! followingUsers = 
+      query {
+        for u in ctx.Public.Users do
+        where (selectFollowingUsersQuery.Contains(u.Id))
+        select u
+      } |&amp;gt; Seq.executeQueryAsync |&amp;gt; AR.catch
+
+    return! mapUserEntities followingUsers
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In the &lt;code&gt;selectFollowingUsersQuery&lt;/code&gt;, we are selecting the list of user ids that are being followed by the provided user id.&lt;/p&gt;
+
+&lt;p&gt;Like &lt;code&gt;fetchFollowers&lt;/code&gt;, we just have to add &lt;code&gt;fetchFollowingUsers&lt;/code&gt; function and expose it to a new HTTP route&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Suave =
+  // ...
+
+  // FindFollowingUsers -&amp;gt; int -&amp;gt; FindFollowingUsers
+  let fetchFollowingUsers (findFollowingUsers: FindFollowingUsers) userId ctx = async {
+    let! webpart =
+      findFollowingUsers (UserId userId)
+      |&amp;gt; AR.either onFindUsersSuccess onFindUsersFailure
+    return! webpart ctx
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;  let webpart getDataCtx getStreamClient =
+    ...
+    let findFollowers = findFollowers getDataCtx
++   let findFollowingUsers = findFollowingUsers getDataCtx    
+    choose [
+      GET &amp;gt;=&amp;gt; pathScan &amp;quot;/%d/followers&amp;quot; (fetchFollowers findFollowers)
++     GET &amp;gt;=&amp;gt; pathScan &amp;quot;/%d/following&amp;quot; (fetchFollowingUsers findFollowingUsers)
+      POST &amp;gt;=&amp;gt; path &amp;quot;/follow&amp;quot; &amp;gt;=&amp;gt; requiresAuth2 handleFollowUser
+    ] 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we both the endpoints are up and running.&lt;/p&gt;
+
+&lt;h2 id=&#34;updating-ui&#34;&gt;Updating UI&lt;/h2&gt;
+
+&lt;p&gt;To consume these two APIs and to render it on the client side, we need to update the &lt;em&gt;social.js&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-js&#34;&gt;// src/FsTweet.Web/assets/js/social.js
+$(function(){
+  // ...
+  var usersTemplate = `
+    {{#users}}
+      &amp;lt;div class=&amp;quot;well user-card&amp;quot;&amp;gt;
+        &amp;lt;a href=&amp;quot;/{{username}}&amp;quot;&amp;gt;@{{username}}&amp;lt;/a&amp;gt;
+      &amp;lt;/div&amp;gt;
+    {{/users}}`;
+
+  
+  function renderUsers(data, $body, $count) {
+    var htmlOutput = Mustache.render(usersTemplate, data);
+    $body.html(htmlOutput);
+    $count.html(data.users.length);
+  }
+
+  (function loadFollowers () {
+    var url = &amp;quot;/&amp;quot; + fsTweet.user.id  + &amp;quot;/followers&amp;quot;
+    $.getJSON(url, function(data){
+      renderUsers(data, $(&amp;quot;#followers&amp;quot;), $(&amp;quot;#followersCount&amp;quot;))
+    })
+  })();
+
+  (function loadFollowingUsers() {
+    var url = &amp;quot;/&amp;quot; + fsTweet.user.id  + &amp;quot;/following&amp;quot;
+    $.getJSON(url, function(data){
+      renderUsers(data, $(&amp;quot;#following&amp;quot;), $(&amp;quot;#followingCount&amp;quot;))
+    })
+  })();
+});
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Using jQuery&amp;rsquo;s &lt;a href=&#34;http://api.jquery.com/jquery.getjson/&#34; target=&#34;_blank&#34;&gt;getJSON&lt;/a&gt; function, we are fetching the JSON object and then rendering it using &lt;a href=&#34;https://mustache.github.io/#demo&#34; target=&#34;_blank&#34;&gt;Mustache&lt;/a&gt; template.&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we have exposed two HTTP APIs to retrieve the list of followers and following users.&lt;/p&gt;
+
+&lt;p&gt;As we saw in other posts, we are just doing transformations to achieve what we want. In the process, we are creating some useful abstractions (like what we did here for &lt;code&gt;mapUserEntityToUser&lt;/code&gt; function) which in turn helps us to deliver the features faster (like the &lt;code&gt;AR.either&lt;/code&gt; function).&lt;/p&gt;
+
+&lt;p&gt;With this, we are done with all the features that will be part of this initial version of FsTweet. In the upcoming posts, we are going to add support for logging and learn how to deploy it to Azure.&lt;/p&gt;
+
+&lt;p&gt;As usual, the source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.19&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Following a User</title>
