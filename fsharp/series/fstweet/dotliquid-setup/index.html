@@ -289,7 +289,7 @@ Suave.DotLiquid
 <pre><code class="language-bash">&gt; mkdir src/FsTweet.Web/views
 </code></pre>
 
-<p>The add a new function called <code>initDotLiquid</code>, which invokes the required helper functions to initialize DotLiquid to use this <code>views</code> directory for templates and <code>CSharpNamingConvention</code></p>
+<p>The add a new function called <code>initDotLiquid</code>, which invokes the required helper functions to initialize DotLiquid to use this <code>views</code> directory for templates.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web.fs
 // ...
@@ -301,15 +301,19 @@ let currentPath =
   Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
 
 let initDotLiquid () =
-  setCSharpNamingConvention ()
   let templatesDir = Path.Combine(currentPath, &quot;views&quot;)
   setTemplatesDir templatesDir
 
 [&lt;EntryPoint&gt;]
 let main argv =
   initDotLiquid ()
+  setCSharpNamingConvention ()
   // ...
 </code></pre>
+
+<p>By default, DotLiquid uses Ruby Naming Convention to refer the view model properties in the liquid template. For example, if you are passing a record type having a property <code>UserId</code> as a view model while using it in the liquid template, we have to use <code>user_id</code> instead of <code>UserId</code> to access the value.</p>
+
+<p>We are overriding this default convention by calling the <code>setCSharpNamingConvention</code> function from the <code>Suave.DotLiquid</code> library.</p>
 
 <h2 id="updating-build-script-to-copy-views-directory">Updating Build Script To Copy Views Directory</h2>
 

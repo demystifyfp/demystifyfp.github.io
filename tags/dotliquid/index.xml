@@ -553,7 +553,7 @@ Suave.DotLiquid
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/FsTweet.Web/views
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The add a new function called &lt;code&gt;initDotLiquid&lt;/code&gt;, which invokes the required helper functions to initialize DotLiquid to use this &lt;code&gt;views&lt;/code&gt; directory for templates and &lt;code&gt;CSharpNamingConvention&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The add a new function called &lt;code&gt;initDotLiquid&lt;/code&gt;, which invokes the required helper functions to initialize DotLiquid to use this &lt;code&gt;views&lt;/code&gt; directory for templates.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web.fs
 // ...
@@ -565,15 +565,19 @@ let currentPath =
   Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
 
 let initDotLiquid () =
-  setCSharpNamingConvention ()
   let templatesDir = Path.Combine(currentPath, &amp;quot;views&amp;quot;)
   setTemplatesDir templatesDir
 
 [&amp;lt;EntryPoint&amp;gt;]
 let main argv =
   initDotLiquid ()
+  setCSharpNamingConvention ()
   // ...
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By default, DotLiquid uses Ruby Naming Convention to refer the view model properties in the liquid template. For example, if you are passing a record type having a property &lt;code&gt;UserId&lt;/code&gt; as a view model while using it in the liquid template, we have to use &lt;code&gt;user_id&lt;/code&gt; instead of &lt;code&gt;UserId&lt;/code&gt; to access the value.&lt;/p&gt;
+
+&lt;p&gt;We are overriding this default convention by calling the &lt;code&gt;setCSharpNamingConvention&lt;/code&gt; function from the &lt;code&gt;Suave.DotLiquid&lt;/code&gt; library.&lt;/p&gt;
 
 &lt;h2 id=&#34;updating-build-script-to-copy-views-directory&#34;&gt;Updating Build Script To Copy Views Directory&lt;/h2&gt;
 
