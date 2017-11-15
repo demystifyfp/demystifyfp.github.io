@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Postmark on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/postmark/</link>
+    <link>https://www.demystifyfp.com/tags/postmark/</link>
     <description>Recent content in Postmark on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,17 +12,17 @@
     
     <item>
       <title>Sending Verification Email</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</link>
       <pubDate>Sat, 09 Sep 2017 22:46:00 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;Welcome to the tenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome to the tenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email&#34; target=&#34;_blank&#34;&gt;faked earlier&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email&#34; target=&#34;_blank&#34;&gt;faked earlier&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;setting-up-postmark&#34;&gt;Setting Up Postmark&lt;/h2&gt;
 

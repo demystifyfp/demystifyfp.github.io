@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Chiron on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/chiron/</link>
+    <link>https://www.demystifyfp.com/tags/chiron/</link>
     <description>Recent content in Chiron on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,21 +12,21 @@
     
     <item>
       <title>Fetching Followers and Following Users</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</link>
       <pubDate>Wed, 01 Nov 2017 06:59:48 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the twentieth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the twentieth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to expose two HTTP JSON endpoints to fetch the list of followers and following users. Then we will be updating the user profile page front-end to consume these APIs and populate the &lt;em&gt;Following&lt;/em&gt; and &lt;em&gt;Followers&lt;/em&gt; Tabs.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_users.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/following_users.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/followers.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/followers.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;adding-followers-api&#34;&gt;Adding Followers API&lt;/h2&gt;
 
@@ -77,7 +77,7 @@ module Persistence =
 
 &lt;p&gt;One thing to notice here is, we are returning a sequence of &lt;code&gt;DataContext.public.UsersEntity&lt;/code&gt; on success. But what we want to return is its domain representation, a list of &lt;code&gt;User&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Like what we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;finding the user by username&lt;/a&gt;, we need to map the all the user entities in the sequence to their respective domain model.&lt;/p&gt;
+&lt;p&gt;Like what we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;finding the user by username&lt;/a&gt;, we need to map the all the user entities in the sequence to their respective domain model.&lt;/p&gt;
 
 &lt;p&gt;To do it, we first need to extract the mapping functionality from the &lt;code&gt;mapUser&lt;/code&gt; function.&lt;/p&gt;
 
@@ -396,21 +396,21 @@ $(function(){
     
     <item>
       <title>Posting New Tweet</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</link>
       <pubDate>Mon, 09 Oct 2017 19:51:48 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;In this sixteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to implement core feature of Twitter, posting a tweet.&lt;/p&gt;
+&lt;p&gt;In this sixteenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to implement core feature of Twitter, posting a tweet.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s dive in!&lt;/p&gt;
 
 &lt;h2 id=&#34;rendering-the-wall-page&#34;&gt;Rendering The Wall Page&lt;/h2&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/#rending-the-wall-page-with-a-placeholder&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have left the user&amp;rsquo;s wall page with a placeholder. So, As a first step, let&amp;rsquo;s replace this with an actual page to enable the user to post tweets.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/#rending-the-wall-page-with-a-placeholder&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have left the user&amp;rsquo;s wall page with a placeholder. So, As a first step, let&amp;rsquo;s replace this with an actual page to enable the user to post tweets.&lt;/p&gt;
 
 &lt;p&gt;This initial version of user&amp;rsquo;s wall page will display a &lt;code&gt;textarea&lt;/code&gt; to capture the tweet.&lt;/p&gt;
 
@@ -471,7 +471,7 @@ module Suave =
 
 &lt;p&gt;Now, if you run the application, you will be able to see the updated wall page after login.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/wall_v0.png&#34; alt=&#34;user wall v0.1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/wall_v0.png&#34; alt=&#34;user wall v0.1&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;full-page-refresh&#34;&gt;Full Page Refresh&lt;/h2&gt;
 
@@ -786,7 +786,7 @@ module Suave =
 &amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/Tweet.fs
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain model of the tweet post.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain model of the tweet post.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
 namespace Tweet
@@ -1063,11 +1063,11 @@ module Suave =
 
 &lt;p&gt;Let&amp;rsquo;s run the application and do a test drive to verify this new feature.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_post.png&#34; alt=&#34;First Tweet Post&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_post.png&#34; alt=&#34;First Tweet Post&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We can also verify it in the database&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_query.png&#34; alt=&#34;First Tweet Query&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_query.png&#34; alt=&#34;First Tweet Query&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Awesome! We made it!!&lt;/p&gt;
 

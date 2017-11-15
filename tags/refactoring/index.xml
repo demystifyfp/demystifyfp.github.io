@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Refactoring on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/refactoring/</link>
+    <link>https://www.demystifyfp.com/tags/refactoring/</link>
     <description>Recent content in Refactoring on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,15 +12,15 @@
     
     <item>
       <title>Reorganising Code and Refactoring</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</link>
       <pubDate>Thu, 21 Sep 2017 04:55:36 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;Welcome to the twelfth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome to the twelfth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;We have come a long way so far, and we have lot more things to do!&lt;/p&gt;
 
@@ -44,7 +44,7 @@
 
 &lt;h2 id=&#34;moving-mapfailure-function&#34;&gt;Moving mapFailure Function&lt;/h2&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, while implementing the static member function &lt;code&gt;TryCreateAsync&lt;/code&gt; in the &lt;code&gt;Username&lt;/code&gt; type, we moved the &lt;code&gt;mapFailure&lt;/code&gt; from its earlier place to above the &lt;code&gt;Username&lt;/code&gt; type to use it in the &lt;code&gt;TryCreateAsync&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, while implementing the static member function &lt;code&gt;TryCreateAsync&lt;/code&gt; in the &lt;code&gt;Username&lt;/code&gt; type, we moved the &lt;code&gt;mapFailure&lt;/code&gt; from its earlier place to above the &lt;code&gt;Username&lt;/code&gt; type to use it in the &lt;code&gt;TryCreateAsync&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;p&gt;It is a cue for us to reconsider the placement of the &lt;code&gt;mapFailure&lt;/code&gt; function. If we want to use it in an another function, we may need to move it to somewhere else.&lt;/p&gt;
 

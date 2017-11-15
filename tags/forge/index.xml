@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Forge on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/forge/</link>
+    <link>https://www.demystifyfp.com/tags/forge/</link>
     <description>Recent content in Forge on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,15 +12,15 @@
     
     <item>
       <title>Handling User signup Form</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/user-signup/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/user-signup/</link>
       <pubDate>Sat, 19 Aug 2017 16:37:26 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/user-signup/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/user-signup/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/static-assets/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we added a cool landing page for &lt;em&gt;FsTweet&lt;/em&gt; to increase the user signups. But the signup form and its backend are not ready yet!&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/static-assets/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we added a cool landing page for &lt;em&gt;FsTweet&lt;/em&gt; to increase the user signups. But the signup form and its backend are not ready yet!&lt;/p&gt;
 
 &lt;p&gt;In this fourth part, we will be extending &lt;em&gt;FsTweet&lt;/em&gt; to serve the signup page and implement its backend scaffolding&lt;/p&gt;
 
@@ -45,7 +45,7 @@
 
 &lt;p&gt;Forge has &lt;a href=&#34;https://github.com/fsharp-editing/Forge/wiki/aliases#alias-definition&#34; target=&#34;_blank&#34;&gt;an advanced feature called alias&lt;/a&gt; using which we can get rid of the boilerplate to a large extent.&lt;/p&gt;
 
-&lt;p&gt;As we did for the forge &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/&#34; target=&#34;_blank&#34;&gt;Run alias&lt;/a&gt; during the project setup, let&amp;rsquo;s add few three more alias&lt;/p&gt;
+&lt;p&gt;As we did for the forge &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/project-setup/&#34; target=&#34;_blank&#34;&gt;Run alias&lt;/a&gt; during the project setup, let&amp;rsquo;s add few three more alias&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-toml&#34;&gt;# ...
   web=&#39;-p src/FsTweet.Web/FsTweet.Web.fsproj&#39;
@@ -66,6 +66,10 @@
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;forge {operation-alias} {project-alias} {other-arguments}
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We are going to use Forge to learn how to develop and manage F# projects agonistic of any editors.&lt;/p&gt;
+
+&lt;p&gt;If you feel some of the things like, adding a new file, moving the file up/down, etc., are better using your favorite IDE/editor, you can ignore those steps and use the equivalent options provided by it.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h2 id=&#34;serving-user-signup-page&#34;&gt;Serving User Signup Page&lt;/h2&gt;
@@ -172,7 +176,7 @@ let main argv =
 
 &lt;p&gt;If we run the application and hit &lt;code&gt;http://localhost:8080/signup&lt;/code&gt; in the browser, we can see the signup page&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/signup-form.png&#34; alt=&#34;User Signup Form&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/signup-form.png&#34; alt=&#34;User Signup Form&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;handling-signup-form-post-request&#34;&gt;Handling Signup Form POST request&lt;/h2&gt;
 
@@ -288,15 +292,15 @@ module Suave =
     
     <item>
       <title>Setting Up Server Side Rendering using DotLiquid</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</link>
       <pubDate>Wed, 16 Aug 2017 20:34:02 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Welcome to the second part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; series.&lt;/p&gt;
+&lt;p&gt;Welcome to the second part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; series.&lt;/p&gt;
 
 &lt;p&gt;In this post, we are going to extend our &lt;code&gt;FsTweet&lt;/code&gt; app to render &lt;code&gt;Hello, World!&lt;/code&gt; as HTML document from the server side using &lt;a href=&#34;http://dotliquidmarkup.org/&#34; target=&#34;_blank&#34;&gt;DotLiquid&lt;/a&gt;&lt;/p&gt;
 
@@ -506,15 +510,15 @@ let main argv =
     
     <item>
       <title>Setting Up FsTweet Project</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</link>
       <pubDate>Tue, 15 Aug 2017 20:02:30 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/project-setup/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;In this first part of the series on &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;, we will be starting the project from scratch and configuring it to use &lt;a href=&#34;https://fake.build/&#34; target=&#34;_blank&#34;&gt;FAKE&lt;/a&gt; and &lt;a href=&#34;https://fsprojects.github.io/Paket/&#34; target=&#34;_blank&#34;&gt;Paket&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In this first part of the series on &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;, we will be starting the project from scratch and configuring it to use &lt;a href=&#34;https://fake.build/&#34; target=&#34;_blank&#34;&gt;FAKE&lt;/a&gt; and &lt;a href=&#34;https://fsprojects.github.io/Paket/&#34; target=&#34;_blank&#34;&gt;Paket&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s get started by creating an empty directory with the name &lt;em&gt;FsTweet&lt;/em&gt;&lt;/p&gt;
 
@@ -541,7 +545,7 @@ let main argv =
 
 &lt;p&gt;To &lt;a href=&#34;https://fsprojects.github.io/Paket/dependencies-file.html#Framework-restrictions&#34; target=&#34;_blank&#34;&gt;restrict paket&lt;/a&gt; to use the .NET Framework 4.6.1 version, we need to add, &lt;code&gt;framework: net461&lt;/code&gt; in a new line in the &lt;em&gt;paket.dependencies&lt;/em&gt; file.&lt;/p&gt;
 
-&lt;p&gt;If you prefer to do this from your bash, you can achieve it using the following command&lt;/p&gt;
+&lt;p&gt;If you prefer to do this from your command line interface, you can achieve it using the following command&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;&amp;gt; echo &#39;framework: net461&#39; &amp;gt;&amp;gt; paket.dependencies
 &lt;/code&gt;&lt;/pre&gt;
@@ -588,7 +592,8 @@ let main argv =
 
 &lt;p&gt;It will start the Suave standalone web server on port &lt;code&gt;8080&lt;/code&gt;.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;[21:42:45 INF] Smooth! Suave listener started in 138.226 with binding 127.0.0.1:8080
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;...
+[21:42:45 INF] Smooth! Suave listener started in 138.226 with binding 127.0.0.1:8080
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;You will be seeing &lt;code&gt;Hello World!&lt;/code&gt;, when you curl the application&amp;rsquo;s root endpoint&lt;/p&gt;

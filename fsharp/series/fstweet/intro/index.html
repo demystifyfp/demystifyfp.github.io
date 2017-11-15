@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
@@ -11,6 +9,15 @@
   <meta name="generator" content="Hugo 0.30.2" />
   
   <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/series/fstweet/intro/">
+
+  
+  
+
+
+  
 
   
   
@@ -30,10 +37,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
   
   
-
-
   
-
+  
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
   
   <link rel="stylesheet" href="/styles.css">
@@ -44,21 +49,38 @@
   
 
   
-  <link rel="alternate" href="http://www.demystifyfp.com/fsharp/series/fstweet/index.xml" type="application/rss+xml" title="Demystify FP">
-  <link rel="feed" href="http://www.demystifyfp.com/fsharp/series/fstweet/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
   
 
+  <link rel="manifest" href="/site.webmanifest">
   <link rel="icon" type="image/png" href="/img/icon.png">
-  <link rel="apple-touch-icon" type="image/png" href="/img/apple-touch-icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="http://www.demystifyfp.com/fsharp/series/fstweet/">
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/series/fstweet/intro/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/series/fstweet/intro/">
+  <meta property="og:title" content="Creating a Twitter Clone in F# using Suave | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2017-08-15T08:14:37&#43;05:30">
+  
+  <meta property="article:modified_time" content="2017-08-15T08:14:37&#43;05:30">
+  
 
   
 
   <title>Creating a Twitter Clone in F# using Suave | Demystify FP</title>
 
 </head>
-<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71">
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
 
 <nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
   <div class="container">
@@ -146,44 +168,160 @@
 </nav>
 
 
-
-
-
-<div class="universal-wrapper">
-
-  <h1>Creating a Twitter Clone in F# using Suave</h1>
+<article class="article" itemscope itemtype="http://schema.org/Article">
 
   
 
-  
-  
-  <div>
-    <h2><a href="http://www.demystifyfp.com/fsharp/series/fstweet/project-setup/">Setting Up FsTweet Project</a></h2>
-    <div class="article-style">
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Creating a Twitter Clone in F# using Suave</h1>
+
       
-      Hi,
-In this first part of the series on Creating a Twitter Clone in F# using Suave, we will be starting the project from scratch and configuring it to use FAKE and Paket
-Let&rsquo;s get started by creating an empty directory with the name FsTweet
-&gt; mkdir FsTweet  We are going to use Forge, a command line tool that provides tasks for creating and managing F# projects.
-This series uses Forge version 1.
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2017-08-15 08:14:37 &#43;0530 IST" itemprop="datePublished">
+      Tue, Aug 15, 2017
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    1 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/series/fstweet/intro/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Creating%20a%20Twitter%20Clone%20in%20F%23%20using%20Suave&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fintro%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fintro%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fintro%2f&amp;title=Creating%20a%20Twitter%20Clone%20in%20F%23%20using%20Suave"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fintro%2f&amp;title=Creating%20a%20Twitter%20Clone%20in%20F%23%20using%20Suave"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Creating%20a%20Twitter%20Clone%20in%20F%23%20using%20Suave&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fintro%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+      <div class="article-style" itemprop="articleBody">
+        <p>Hi!</p>
+
+<p>I&rsquo;m really excited to share with you the new blog post series, Creating a Twitter Clone in F# using Suave.</p>
+
+<p>The core objective of this series is answering the one question.</p>
+
+<p>How can I create a <strong>production-ready real-world business application end to end</strong> in F# using functional programming principles?</p>
+
+<p>I believe F# is one of the elegant programming language that can help developers to deliver robust softwares and add value to the businesses.</p>
+
+<p>It kindles a new thought process, a better perspective for developing software products.</p>
+
+<p>In this series we will be starting from the scratch (right from creating an empty directory for the project) and incrementantly add business features one at a time and wrap up with deploying to Azure.</p>
+
+<p>Overall, It&rsquo;s going to be lot of fun! Let&rsquo;s start our journey.</p>
+
+      </div>
+
       
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/suave">suave</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fake">FAKE</a>
+  
+</div>
+
+
+
     </div>
   </div>
-  
 
-  
-<nav>
-  <ul class="pager">
-    
-    <li><a href="/fsharp/series/fstweet/page/2/">&lt;</a></li>
-    
-    
-  </ul>
-</nav>
+</article>
 
+
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
 
 
 </div>
+
 <footer class="site-footer">
   <div class="container">
     <p class="powered-by">
@@ -274,6 +412,4 @@ This series uses Forge version 1.
 
   </body>
 </html>
-
-
 

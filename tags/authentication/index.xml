@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Authentication on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/authentication/</link>
+    <link>https://www.demystifyfp.com/tags/authentication/</link>
     <description>Recent content in Authentication on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,17 +12,17 @@
     
     <item>
       <title>Creating User Session and Authenticating User</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/</link>
       <pubDate>Mon, 02 Oct 2017 13:48:35 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/</guid>
       <description>
 
 &lt;p&gt;Hi!&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the fifteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the fifteenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have implemented the backend logic to verify the login credentials of a user. Upon successful verification of the provided credentials, we just responded with a username.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have implemented the backend logic to verify the login credentials of a user. Upon successful verification of the provided credentials, we just responded with a username.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to replace this placeholder with the actual implementation.&lt;/p&gt;
 
@@ -186,7 +186,7 @@ let main argv =
 
 &lt;p&gt;Now if we run the application and log in using a registered account, we will be redirected to the wall page, and we can find the cookies for &lt;code&gt;auth&lt;/code&gt; and &lt;code&gt;state&lt;/code&gt; in the browser.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/wall-page-with-cookies.png&#34; alt=&#34;Wall Page With Cookies&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/wall-page-with-cookies.png&#34; alt=&#34;Wall Page With Cookies&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The values of these cookies are encrypted using a randomly generated key on the server side by Suave. We can either provide this key or let the suave to create one.&lt;/p&gt;
 

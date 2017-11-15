@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Chessie on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/chessie/</link>
+    <link>https://www.demystifyfp.com/tags/chessie/</link>
     <description>Recent content in Chessie on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,21 +12,21 @@
     
     <item>
       <title>Fetching Followers and Following Users</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</link>
       <pubDate>Wed, 01 Nov 2017 06:59:48 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the twentieth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the twentieth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to expose two HTTP JSON endpoints to fetch the list of followers and following users. Then we will be updating the user profile page front-end to consume these APIs and populate the &lt;em&gt;Following&lt;/em&gt; and &lt;em&gt;Followers&lt;/em&gt; Tabs.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_users.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/following_users.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/followers.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/followers.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;adding-followers-api&#34;&gt;Adding Followers API&lt;/h2&gt;
 
@@ -77,7 +77,7 @@ module Persistence =
 
 &lt;p&gt;One thing to notice here is, we are returning a sequence of &lt;code&gt;DataContext.public.UsersEntity&lt;/code&gt; on success. But what we want to return is its domain representation, a list of &lt;code&gt;User&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;Like what we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;finding the user by username&lt;/a&gt;, we need to map the all the user entities in the sequence to their respective domain model.&lt;/p&gt;
+&lt;p&gt;Like what we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;finding the user by username&lt;/a&gt;, we need to map the all the user entities in the sequence to their respective domain model.&lt;/p&gt;
 
 &lt;p&gt;To do it, we first need to extract the mapping functionality from the &lt;code&gt;mapUser&lt;/code&gt; function.&lt;/p&gt;
 
@@ -396,15 +396,15 @@ $(function(){
     
     <item>
       <title>Following a User</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/</link>
       <pubDate>Sat, 28 Oct 2017 05:06:53 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/</guid>
       <description>
 
 &lt;p&gt;Hello!&lt;/p&gt;
 
-&lt;p&gt;We are on our way to complete the blog post series on &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We are on our way to complete the blog post series on &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;In this nineteenth part, we are going to implement the core feature of Twitter, Following other users and viewing their tweets on his/her wall page.&lt;/p&gt;
 
@@ -513,7 +513,7 @@ type CreateSocialTable()=
 
 &lt;p&gt;Make sure to verify the underlying schema using &lt;em&gt;psql&lt;/em&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/social_table_schema.png&#34; alt=&#34;Social Table&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/social_table_schema.png&#34; alt=&#34;Social Table&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The next step is defining the function which persists the social connection in this table.&lt;/p&gt;
 
@@ -544,7 +544,7 @@ module Persistence =
 
 &lt;p&gt;The second task is subscribing to the user feed so that the follower will be getting the tweets from the users he/she is following.&lt;/p&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/#notifying-new-tweet&#34; target=&#34;_blank&#34;&gt;notifying a new tweet&lt;/a&gt;, let&amp;rsquo;s create a new module &lt;code&gt;GetStream&lt;/code&gt; and add the &lt;code&gt;subscribe&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/#notifying-new-tweet&#34; target=&#34;_blank&#34;&gt;notifying a new tweet&lt;/a&gt;, let&amp;rsquo;s create a new module &lt;code&gt;GetStream&lt;/code&gt; and add the &lt;code&gt;subscribe&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Social.fs
 // ...
@@ -837,11 +837,11 @@ $(function(){
 &lt;p&gt;Cool!&lt;/p&gt;
 
 &lt;p&gt;Now run the app, open two browser windows, log in as two different users and follow the other user.&lt;br /&gt;
-&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_a_user.gif&#34; alt=&#34;User Wall With Live Update&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/following_a_user.gif&#34; alt=&#34;User Wall With Live Update&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;After following the other user, you can get the live updates.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_wall_live_update.gif&#34; alt=&#34;User Wall With Live Update&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_wall_live_update.gif&#34; alt=&#34;User Wall With Live Update&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We made it!&lt;/p&gt;
 
@@ -1037,7 +1037,7 @@ module Persistence =
 
 &lt;p&gt;That&amp;rsquo;s it. Now if we run the application and views a profile that we are following, we will be seeing the &lt;em&gt;following&lt;/em&gt; button instead of the &lt;em&gt;follow&lt;/em&gt; button.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/following_user.png&#34; alt=&#34;User Profile V3&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/following_user.png&#34; alt=&#34;User Profile V3&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
@@ -1057,15 +1057,15 @@ module Persistence =
     
     <item>
       <title>Adding User Profile Page</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/</link>
       <pubDate>Tue, 24 Oct 2017 20:18:33 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the eighteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the eighteenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;We are on the verge of completing the initial version of FsTweet. To say FsTweet as a Twitter clone, we should be able to follow other users and view their tweets in our wall page. To do it, we first need to have a user profile page where we can go and follow the user.&lt;/p&gt;
 
@@ -1095,13 +1095,13 @@ module Persistence =
 
 &lt;ol&gt;
 &lt;li&gt;&lt;p&gt;Anyone should be able to view a profile of anybody else without logging in to the application. The anonymous user can only view the page.
-&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_guest.png&#34; alt=&#34;User Profile Guest&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_guest.png&#34; alt=&#34;User Profile Guest&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;If a logged in user visits another user profile page, he/she should be able to follow him/her
-&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_other.png&#34; alt=&#34;User Profile Other&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_other.png&#34; alt=&#34;User Profile Other&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;If a logged in user visits his/her profile page, there should not be any provision to follow himself/herself.
-&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_self.png&#34; alt=&#34;User Profile Self&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_profile_self.png&#34; alt=&#34;User Profile Self&#34; /&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;Let&amp;rsquo;s dive in and implement the user profile page.&lt;/p&gt;
@@ -1231,7 +1231,7 @@ let findUserProfile
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;We are making use of the &lt;code&gt;findUser&lt;/code&gt; function that we created while &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;handling user login request&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We are making use of the &lt;code&gt;findUser&lt;/code&gt; function that we created while &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/#finding-the-user-by-username&#34; target=&#34;_blank&#34;&gt;handling user login request&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;The &lt;code&gt;FindUserProfile&lt;/code&gt; type represents the function signature of the &lt;code&gt;findUserProfile&lt;/code&gt; function with its dependencies partially applied.&lt;/p&gt;
 
@@ -1467,7 +1467,7 @@ let main argv =
 {% endblock %}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then as we did in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/#initializing-getstream-io-js-library&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, define a &lt;code&gt;scripts&lt;/code&gt; block and pass the GetStream.io&amp;rsquo;s initialization values to the client side.&lt;/p&gt;
+&lt;p&gt;Then as we did in the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/#initializing-getstream-io-js-library&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, define a &lt;code&gt;scripts&lt;/code&gt; block and pass the GetStream.io&amp;rsquo;s initialization values to the client side.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-html&#34;&gt;&amp;lt;!-- user/profile.liquid --&amp;gt;
 &amp;lt;!-- ... --&amp;gt;
@@ -1529,17 +1529,17 @@ $(function(){
     
     <item>
       <title>Adding User Feed</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</link>
       <pubDate>Tue, 17 Oct 2017 08:19:14 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the seventeenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the seventeenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we saw to how to persist a new tweet from the user. But after persisting the tweet, we haven&amp;rsquo;t do anything. In real twitter, we have a user feed, which shows a timeline with tweets from him/her and from others whom he/she follows.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we saw to how to persist a new tweet from the user. But after persisting the tweet, we haven&amp;rsquo;t do anything. In real twitter, we have a user feed, which shows a timeline with tweets from him/her and from others whom he/she follows.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to address the first part of user&amp;rsquo;s timeline, viewing his/her tweets on the Wall page.&lt;/p&gt;
 
@@ -1547,7 +1547,7 @@ $(function(){
 
 &lt;p&gt;Earlier, we just created a new tweet in the database when the user submitted a tweet. To add support for user feeds and timeline, we need to notify an external system after persisting the new tweet.&lt;/p&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#defining-the-signupuser-function-signature&#34; target=&#34;_blank&#34;&gt;orchestrating the user signup&lt;/a&gt;, we need to define a new function which carries out both of the mentioned operations.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#defining-the-signupuser-function-signature&#34; target=&#34;_blank&#34;&gt;orchestrating the user signup&lt;/a&gt;, we need to define a new function which carries out both of the mentioned operations.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s get started by defining a new type to represent a Tweet!&lt;/p&gt;
 
@@ -1631,7 +1631,7 @@ module Domain =
 &lt;p&gt;The &lt;code&gt;publishTweet&lt;/code&gt; function is making use of the abstractions that we built earlier and implements the publish tweet logic.&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We are mapping the possible failure of each operation to its corresponding union case of the &lt;code&gt;PublishTweetError&lt;/code&gt; type using the &lt;code&gt;AR.mapFailure&lt;/code&gt; function that we &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/#revisiting-the-mapasyncfailure-function&#34; target=&#34;_blank&#34;&gt;defined earlier&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We are mapping the possible failure of each operation to its corresponding union case of the &lt;code&gt;PublishTweetError&lt;/code&gt; type using the &lt;code&gt;AR.mapFailure&lt;/code&gt; function that we &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/#revisiting-the-mapasyncfailure-function&#34; target=&#34;_blank&#34;&gt;defined earlier&lt;/a&gt;.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;There is no function implementing the &lt;code&gt;NotifyTweet&lt;/code&gt; type yet in our application, and our next step is adding it.&lt;/p&gt;
@@ -1648,7 +1648,7 @@ module Domain =
 
 &lt;p&gt;After completing this documentation (roughly take 10-15 minutes), if you navigate to the dashboard, you can find the following UI component&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/get_stream_dashbord.png&#34; alt=&#34;Get Stream Dashboard&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/get_stream_dashbord.png&#34; alt=&#34;Get Stream Dashboard&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Keep an of note the App Id, Key, and Secret. We will be using it shortly while integrating it.&lt;/p&gt;
 
@@ -2058,7 +2058,7 @@ $(function(){
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now if you post a tweet, you will get a console log of the new tweet.
-&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_tweet_console_log.png&#34; alt=&#34;Console Log of New Tweet&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_tweet_console_log.png&#34; alt=&#34;Console Log of New Tweet&#34; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;adding-user-wall&#34;&gt;Adding User Wall&lt;/h3&gt;
 
@@ -2141,7 +2141,7 @@ $(function(){
 
 &lt;p&gt;Now if we tweet, we can see the wall is being populated with the new tweet.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_feed_v1.png&#34; alt=&#34;User Wall V1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_feed_v1.png&#34; alt=&#34;User Wall V1&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We made it!!&lt;/p&gt;
 
@@ -2155,21 +2155,21 @@ $(function(){
     
     <item>
       <title>Posting New Tweet</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</link>
       <pubDate>Mon, 09 Oct 2017 19:51:48 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;In this sixteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to implement core feature of Twitter, posting a tweet.&lt;/p&gt;
+&lt;p&gt;In this sixteenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to implement core feature of Twitter, posting a tweet.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s dive in!&lt;/p&gt;
 
 &lt;h2 id=&#34;rendering-the-wall-page&#34;&gt;Rendering The Wall Page&lt;/h2&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/#rending-the-wall-page-with-a-placeholder&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have left the user&amp;rsquo;s wall page with a placeholder. So, As a first step, let&amp;rsquo;s replace this with an actual page to enable the user to post tweets.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/#rending-the-wall-page-with-a-placeholder&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have left the user&amp;rsquo;s wall page with a placeholder. So, As a first step, let&amp;rsquo;s replace this with an actual page to enable the user to post tweets.&lt;/p&gt;
 
 &lt;p&gt;This initial version of user&amp;rsquo;s wall page will display a &lt;code&gt;textarea&lt;/code&gt; to capture the tweet.&lt;/p&gt;
 
@@ -2230,7 +2230,7 @@ module Suave =
 
 &lt;p&gt;Now, if you run the application, you will be able to see the updated wall page after login.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/wall_v0.png&#34; alt=&#34;user wall v0.1&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/wall_v0.png&#34; alt=&#34;user wall v0.1&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;full-page-refresh&#34;&gt;Full Page Refresh&lt;/h2&gt;
 
@@ -2545,7 +2545,7 @@ module Suave =
 &amp;gt; repeat 2 forge moveUp web -n src/FsTweet.Web/Tweet.fs
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain model of the tweet post.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;making illegal states unrepresentable&lt;/a&gt; in user signup, let&amp;rsquo;s create a new type &lt;code&gt;Post&lt;/code&gt;, a domain model of the tweet post.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// FsTweet.Web/Tweet.fs
 namespace Tweet
@@ -2822,11 +2822,11 @@ module Suave =
 
 &lt;p&gt;Let&amp;rsquo;s run the application and do a test drive to verify this new feature.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_post.png&#34; alt=&#34;First Tweet Post&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_post.png&#34; alt=&#34;First Tweet Post&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We can also verify it in the database&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_query.png&#34; alt=&#34;First Tweet Query&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/first_tweet_query.png&#34; alt=&#34;First Tweet Query&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Awesome! We made it!!&lt;/p&gt;
 
@@ -2984,15 +2984,15 @@ let inline deserialize&amp;lt; ^a when (^a or FromJsonDefaults)
     
     <item>
       <title>Handling Login Request</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/</link>
       <pubDate>Thu, 28 Sep 2017 07:37:43 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have validated the login request from the user and mapped it to a domain type &lt;code&gt;LoginRequest&lt;/code&gt;. The next step is authenticating the user to login to the application.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-login/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we have validated the login request from the user and mapped it to a domain type &lt;code&gt;LoginRequest&lt;/code&gt;. The next step is authenticating the user to login to the application.&lt;/p&gt;
 
 &lt;p&gt;It involves following steps.&lt;/p&gt;
 
@@ -3593,10 +3593,10 @@ module Suave =
     
     <item>
       <title>Adding Login Page</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/adding-login/</link>
       <pubDate>Sat, 23 Sep 2017 15:47:03 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/adding-login/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/adding-login/</guid>
       <description>
 
 &lt;p&gt;Hi!&lt;/p&gt;
@@ -3716,7 +3716,7 @@ let main argv =
 
 &lt;p&gt;If we run the application now, you can see a beautiful login page&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/login.png&#34; alt=&#34;Login Page&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/login.png&#34; alt=&#34;Login Page&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;handling-the-login-request&#34;&gt;Handling the Login Request&lt;/h2&gt;
 
@@ -3829,7 +3829,7 @@ module Suave =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The Success and Failure active pattern that &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/#pattern-matching-on-result-type&#34; target=&#34;_blank&#34;&gt;we defined in the previous post&lt;/a&gt; made our job easier here to pattern match on the &lt;code&gt;Result&amp;lt;LoginRequest,string&amp;gt;&lt;/code&gt; type.&lt;/p&gt;
+&lt;p&gt;The Success and Failure active pattern that &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/#pattern-matching-on-result-type&#34; target=&#34;_blank&#34;&gt;we defined in the previous post&lt;/a&gt; made our job easier here to pattern match on the &lt;code&gt;Result&amp;lt;LoginRequest,string&amp;gt;&lt;/code&gt; type.&lt;/p&gt;
 
 &lt;p&gt;If there is any error, we populate the view model with the error message and rerender the login page.&lt;/p&gt;
 
@@ -3845,15 +3845,15 @@ module Suave =
     
     <item>
       <title>Reorganising Code and Refactoring</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</link>
       <pubDate>Thu, 21 Sep 2017 04:55:36 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;Welcome to the twelfth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome to the twelfth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;We have come a long way so far, and we have lot more things to do!&lt;/p&gt;
 
@@ -3877,7 +3877,7 @@ module Suave =
 
 &lt;h2 id=&#34;moving-mapfailure-function&#34;&gt;Moving mapFailure Function&lt;/h2&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, while implementing the static member function &lt;code&gt;TryCreateAsync&lt;/code&gt; in the &lt;code&gt;Username&lt;/code&gt; type, we moved the &lt;code&gt;mapFailure&lt;/code&gt; from its earlier place to above the &lt;code&gt;Username&lt;/code&gt; type to use it in the &lt;code&gt;TryCreateAsync&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, while implementing the static member function &lt;code&gt;TryCreateAsync&lt;/code&gt; in the &lt;code&gt;Username&lt;/code&gt; type, we moved the &lt;code&gt;mapFailure&lt;/code&gt; from its earlier place to above the &lt;code&gt;Username&lt;/code&gt; type to use it in the &lt;code&gt;TryCreateAsync&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;p&gt;It is a cue for us to reconsider the placement of the &lt;code&gt;mapFailure&lt;/code&gt; function. If we want to use it in an another function, we may need to move it to somewhere else.&lt;/p&gt;
 
@@ -4269,15 +4269,15 @@ module Suave =
     
     <item>
       <title>Verifying User Email</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/</link>
       <pubDate>Sun, 17 Sep 2017 13:27:49 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;In the previous blog post, we added support for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/&#34; target=&#34;_blank&#34;&gt;sending verification email&lt;/a&gt; using &lt;a href=&#34;https://postmarkapp.com/&#34; target=&#34;_blank&#34;&gt;Postmark&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In the previous blog post, we added support for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/&#34; target=&#34;_blank&#34;&gt;sending verification email&lt;/a&gt; using &lt;a href=&#34;https://postmarkapp.com/&#34; target=&#34;_blank&#34;&gt;Postmark&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link that we sent in the email.&lt;/p&gt;
 
@@ -4307,7 +4307,7 @@ module Persistence =
   } 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The first parameter &lt;code&gt;getDataCtx&lt;/code&gt; represents the factory function to get the SQLProvider&amp;rsquo;s datacontext that &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request&#34; target=&#34;_blank&#34;&gt;we implemented&lt;/a&gt; while persisting a new user. When we partially applying this argument alone, we will get a function of type &lt;code&gt;VerifyUser&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The first parameter &lt;code&gt;getDataCtx&lt;/code&gt; represents the factory function to get the SQLProvider&amp;rsquo;s datacontext that &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#datacontext-one-per-request&#34; target=&#34;_blank&#34;&gt;we implemented&lt;/a&gt; while persisting a new user. When we partially applying this argument alone, we will get a function of type &lt;code&gt;VerifyUser&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;We first need to query the &lt;code&gt;Users&lt;/code&gt; table to get the user associated with the verification code provided.&lt;/p&gt;
 
@@ -4356,7 +4356,7 @@ let toAsyncResult queryable =
   |&amp;gt; AR // AsyncResult&amp;lt;&#39;a, Exception&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;This implementation to very similar to what we did in the implementation of the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result&#34; target=&#34;_blank&#34;&gt;submitUpdates&lt;/a&gt; function.&lt;/p&gt;
+&lt;p&gt;This implementation to very similar to what we did in the implementation of the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/#async-exception-to-async-result&#34; target=&#34;_blank&#34;&gt;submitUpdates&lt;/a&gt; function.&lt;/p&gt;
 
 &lt;p&gt;Now, with the help of this &lt;code&gt;toAsyncResult&lt;/code&gt; function, we can now do the exception handling in the &lt;code&gt;verifyUser&lt;/code&gt; function.&lt;/p&gt;
 
@@ -4643,17 +4643,17 @@ module Suave =
     
     <item>
       <title>Sending Verification Email</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</link>
       <pubDate>Sat, 09 Sep 2017 22:46:00 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;Welcome to the tenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome to the tenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email&#34; target=&#34;_blank&#34;&gt;faked earlier&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to add support for sending an email to verify the email address of a new signup, which we &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email&#34; target=&#34;_blank&#34;&gt;faked earlier&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;setting-up-postmark&#34;&gt;Setting Up Postmark&lt;/h2&gt;
 
@@ -4961,17 +4961,17 @@ let main argv =
     
     <item>
       <title>Persisting New User</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/</link>
       <pubDate>Thu, 31 Aug 2017 06:55:16 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/</guid>
       <description>
 
 &lt;p&gt;Hi!&lt;/p&gt;
 
 &lt;p&gt;Welcome back.&lt;/p&gt;
 
-&lt;p&gt;We are on track to complete the user signup feature. In this blog post, we are going to implement the persistence layer for creating a user which &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email&#34; target=&#34;_blank&#34;&gt;we faked&lt;/a&gt; in the last blog post.&lt;/p&gt;
+&lt;p&gt;We are on track to complete the user signup feature. In this blog post, we are going to implement the persistence layer for creating a user which &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-fake-implementations-for-persistence-and-email&#34; target=&#34;_blank&#34;&gt;we faked&lt;/a&gt; in the last blog post.&lt;/p&gt;
 
 &lt;h2 id=&#34;initializing-sqlprovider&#34;&gt;Initializing SQLProvider&lt;/h2&gt;
 
@@ -4997,7 +4997,7 @@ let main argv =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We are making use of the &lt;em&gt;Forge alias&lt;/em&gt; that we set in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup/#a-new-file-for-user-signup&#34; target=&#34;_blank&#34;&gt;fourth part&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;We are making use of the &lt;em&gt;Forge alias&lt;/em&gt; that we set in the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup/#a-new-file-for-user-signup&#34; target=&#34;_blank&#34;&gt;fourth part&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;The next step is initializing the SQLProvider with all the required parameters&lt;/p&gt;
@@ -5213,7 +5213,7 @@ module Persistence =
 
 &lt;p&gt;We want a value of type &lt;code&gt;CreateUserError&lt;/code&gt; to represent the errors!&lt;/p&gt;
 
-&lt;p&gt;As we did for transforming the &lt;code&gt;UserSignupResult&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt; in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#transforming-usersignupresult-to-webpart&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we need to transform &lt;code&gt;AsyncResult&amp;lt;UserId, &#39;a&amp;gt;&lt;/code&gt; to &lt;code&gt;AsyncResult&amp;lt;UserId, CreateUserError&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;As we did for transforming the &lt;code&gt;UserSignupResult&lt;/code&gt; to &lt;code&gt;WebPart&lt;/code&gt; in the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#transforming-usersignupresult-to-webpart&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we need to transform &lt;code&gt;AsyncResult&amp;lt;UserId, &#39;a&amp;gt;&lt;/code&gt; to &lt;code&gt;AsyncResult&amp;lt;UserId, CreateUserError&amp;gt;&lt;/code&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;async-exception-to-async-result&#34;&gt;Async Exception to Async Result&lt;/h3&gt;
 
@@ -5255,7 +5255,7 @@ let submitChanges (ctx : DataContext) =
   // TODO
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The final step is transforming it to &lt;code&gt;AsyncResult&lt;/code&gt; by using the &lt;code&gt;AR&lt;/code&gt; union case as we did while &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping the Failure type of AsyncResult&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The final step is transforming it to &lt;code&gt;AsyncResult&lt;/code&gt; by using the &lt;code&gt;AR&lt;/code&gt; union case as we did while &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping the Failure type of AsyncResult&lt;/a&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// DataContext -&amp;gt; AsyncResult&amp;lt;unit, System.Exception&amp;gt;
 let submitChanges (ctx : DataContext) = 
@@ -5281,7 +5281,7 @@ let submitChanges (ctx : DataContext) =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;AsyncResult&amp;lt;unit, CreateUserError&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As this very similar to what we did while &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping the Failure type of AsyncResult&lt;/a&gt; in the previous parts, let&amp;rsquo;s jump in directly.&lt;/p&gt;
+&lt;p&gt;As this very similar to what we did while &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping the Failure type of AsyncResult&lt;/a&gt; in the previous parts, let&amp;rsquo;s jump in directly.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/FsTweet.Web.fs
 //...
@@ -5459,15 +5459,15 @@ let (|UniqueViolation|_|) constraintName (ex : Exception) =
     
     <item>
       <title>Transforming Async Result to Webpart</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/</link>
       <pubDate>Wed, 30 Aug 2017 04:43:18 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/</guid>
       <description>
 
 &lt;p&gt;Hi there!&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;last post&lt;/a&gt;, using the Chessie library, we orchestrated the user signup process.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;last post&lt;/a&gt;, using the Chessie library, we orchestrated the user signup process.&lt;/p&gt;
 
 &lt;p&gt;There are three more things that we need to do wrap up the user signup workflow.&lt;/p&gt;
 
@@ -5543,7 +5543,7 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;Async&amp;lt;WebPart&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we did for &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping Async Failure&lt;/a&gt; in the previous post, We make use of the &lt;code&gt;map&lt;/code&gt; function on the Async module to carry out this transformation.&lt;/p&gt;
+&lt;p&gt;As we did for &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#mapping-asyncresult-failure-type&#34; target=&#34;_blank&#34;&gt;mapping Async Failure&lt;/a&gt; in the previous post, We make use of the &lt;code&gt;map&lt;/code&gt; function on the Async module to carry out this transformation.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s assume that we have a method &lt;code&gt;handleUserSignupResult&lt;/code&gt; which maps a &lt;code&gt;Result&lt;/code&gt; type to &lt;code&gt;WebPart&lt;/code&gt;&lt;/p&gt;
 
@@ -5584,7 +5584,7 @@ module Suave =
 
 &lt;p&gt;We are leaving the second parameter as &lt;code&gt;_&lt;/code&gt;, as we are not interested in the result of the successful user signup (&lt;code&gt;UserId&lt;/code&gt;) here.&lt;/p&gt;
 
-&lt;p&gt;We will be handing the path &lt;code&gt;/signup/success/{username}&lt;/code&gt; &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-signup-success-page&#34; target=&#34;_blank&#34;&gt;later in this blog post&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;We will be handing the path &lt;code&gt;/signup/success/{username}&lt;/code&gt; &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/#adding-signup-success-page&#34; target=&#34;_blank&#34;&gt;later in this blog post&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;In case of failure, we need to account for two kinds of error&lt;/p&gt;
 
@@ -5682,7 +5682,7 @@ module Suave =
 
 &lt;p&gt;The next work is wiring up this presentation component with the function which handles the user signup &lt;code&gt;POST&lt;/code&gt; request.&lt;/p&gt;
 
-&lt;p&gt;As a recap, here is a skeleton of the request handler function that we already defined in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#showing-validation-error&#34; target=&#34;_blank&#34;&gt;fifth part&lt;/a&gt; of this blog series.&lt;/p&gt;
+&lt;p&gt;As a recap, here is a skeleton of the request handler function that we already defined in the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#showing-validation-error&#34; target=&#34;_blank&#34;&gt;fifth part&lt;/a&gt; of this blog series.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserSignup ctx = async {
   match bindEmptyForm ctx.request with
@@ -5840,7 +5840,7 @@ Email {Username = Username &amp;quot;demystifyfp&amp;quot;;
 
 &lt;p&gt;and in the browser, we will get an empty page&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/signup-sucess-not-found.png&#34; alt=&#34;Signup Success Page Not Found&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/signup-sucess-not-found.png&#34; alt=&#34;Signup Success Page Not Found&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;adding-signup-success-page&#34;&gt;Adding Signup Success Page&lt;/h2&gt;
 
@@ -5891,7 +5891,7 @@ module Suave =
 
 &lt;p&gt;Now if we run the application, we will get the following page upon receiving a valid user signup request.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/singup-sucess.png&#34; alt=&#34;Signup sucess&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/singup-sucess.png&#34; alt=&#34;Signup sucess&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;That&amp;rsquo;s it :)&lt;/p&gt;
 
@@ -5907,15 +5907,15 @@ module Suave =
     
     <item>
       <title>Orchestrating User Signup</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/</link>
       <pubDate>Mon, 28 Aug 2017 09:38:55 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the seventh part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the seventh part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;In this part, we will be orchestrating the user signup use case.&lt;/p&gt;
 
@@ -5924,7 +5924,7 @@ module Suave =
 &lt;p&gt;Before diving into the implementation, let&amp;rsquo;s spend some time to jot down the requirements of the user sign up.&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;If the user submitted invalid details, we should let him/her know about the error (which we already implemented in the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/&#34; target=&#34;_blank&#34;&gt;fifth&lt;/a&gt; part)&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;If the user submitted invalid details, we should let him/her know about the error (which we already implemented in the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/&#34; target=&#34;_blank&#34;&gt;fifth&lt;/a&gt; part)&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;We also need to check the whether the username or the email provided by the user has been already used by someone else and report it if we found it is not available.&lt;/p&gt;&lt;/li&gt;
 
@@ -5966,7 +5966,7 @@ module Domain =
       |&amp;gt; PasswordHash
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;we did&lt;/a&gt; for the other Domain types, &lt;code&gt;PasswordHash&lt;/code&gt; has a private constructor function to prevent it from creating from outside.&lt;/p&gt;
+&lt;p&gt;As &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;we did&lt;/a&gt; for the other Domain types, &lt;code&gt;PasswordHash&lt;/code&gt; has a private constructor function to prevent it from creating from outside.&lt;/p&gt;
 
 &lt;p&gt;The static function &lt;code&gt;Create&lt;/code&gt; takes care of creating the password hash from the provided password using the &lt;code&gt;Bcrypt&lt;/code&gt; library.&lt;/p&gt;
 
@@ -6180,7 +6180,7 @@ module Domain =
   }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Like the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;trial&lt;/a&gt; computation that we used to do the user signup form validation, the &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-asynctrial-asynctrialbuilder.html&#34; target=&#34;_blank&#34;&gt;asyncTrail&lt;/a&gt; computation expression is going to help us here to do the error handling in asynchronous operations.&lt;/p&gt;
+&lt;p&gt;Like the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/#making-the-illegal-states-unrepresentable&#34; target=&#34;_blank&#34;&gt;trial&lt;/a&gt; computation that we used to do the user signup form validation, the &lt;a href=&#34;https://fsprojects.github.io/Chessie/reference/chessie-errorhandling-asynctrial-asynctrialbuilder.html&#34; target=&#34;_blank&#34;&gt;asyncTrail&lt;/a&gt; computation expression is going to help us here to do the error handling in asynchronous operations.&lt;/p&gt;
 
 &lt;p&gt;The first step is creating a value of type &lt;code&gt;CreateUserRequest&lt;/code&gt; from &lt;code&gt;UserSignupRequest&lt;/code&gt;&lt;/p&gt;
 
@@ -6229,7 +6229,7 @@ module Domain =
 
 &lt;p&gt;Now you would be getting a compiler error&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/bind-error.png&#34; alt=&#34;Bind Error&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/bind-error.png&#34; alt=&#34;Bind Error&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Would you be able to find why are we getting this compiler error?&lt;/p&gt;
 
@@ -6278,11 +6278,11 @@ string -&amp;gt; Result&amp;lt;EmailAddress, string&amp;gt;
 
 &lt;p&gt;In this case, the types that are representing the failure are of different type. That&amp;rsquo;s thing that we need to fix!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/asynctrail-bind-shape.png&#34; alt=&#34;Async Trail Output Mismatch&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/asynctrail-bind-shape.png&#34; alt=&#34;Async Trail Output Mismatch&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If we transform (or map) the failure type to &lt;code&gt;UserSignupError&lt;/code&gt;, then things would be fine!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/user_signup_map_failure.png&#34; alt=&#34;Map Failure&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/user_signup_map_failure.png&#34; alt=&#34;Map Failure&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;mapping-asyncresult-failure-type&#34;&gt;Mapping AsyncResult Failure Type&lt;/h2&gt;
 
@@ -6378,7 +6378,7 @@ module Domain =
 
 &lt;p&gt;The easier way to understand is to think &lt;code&gt;Async&lt;/code&gt; as a box. All mapping function does is takes the value out of the &lt;code&gt;Async&lt;/code&gt; box, perform the mapping using the provided function, then put it to back to a new &lt;code&gt;Async&lt;/code&gt; box and return it.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/async-map.png&#34; alt=&#34;Async Map&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/async-map.png&#34; alt=&#34;Async Map&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;But what is the function that we need to give to the &lt;code&gt;map&lt;/code&gt; function to do the mapping&lt;/p&gt;
 
@@ -6394,7 +6394,7 @@ module Domain =
 
 &lt;p&gt;We need to have an another map function which maps the failure part of the &lt;code&gt;Result&lt;/code&gt; type&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/result-map-failure.png&#34; alt=&#34;Result Map Failure&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/result-map-failure.png&#34; alt=&#34;Result Map Failure&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s assume that we have &lt;code&gt;mapFailure&lt;/code&gt; function which takes a function &lt;code&gt;f&lt;/code&gt; to do this failure type mapping on the &lt;code&gt;Result&lt;/code&gt; type.&lt;/p&gt;
 
@@ -6481,17 +6481,17 @@ module Domain =
     
     <item>
       <title>Validating New User Signup Form</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/</link>
       <pubDate>Fri, 25 Aug 2017 08:34:25 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Welcome to the fifth part of the &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome to the fifth part of the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we created the server side representation of the user submitted details. The next step is validating this view model against a set of constraints before persisting them in a data store.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup/&#34; target=&#34;_blank&#34;&gt;previous blog post&lt;/a&gt;, we created the server side representation of the user submitted details. The next step is validating this view model against a set of constraints before persisting them in a data store.&lt;/p&gt;
 
 &lt;h2 id=&#34;transforming-view-model-to-domain-model&#34;&gt;Transforming View Model To Domain Model&lt;/h2&gt;
 
@@ -6509,17 +6509,17 @@ module Domain =
 
 &lt;p&gt;Let&amp;rsquo;s assume that we have a function &lt;code&gt;tryCreate&lt;/code&gt; that takes &lt;code&gt;UserSignupViewModel&lt;/code&gt; as its input, performs the validations based on the requirements and returns either a domain model &lt;code&gt;UserSignupRequest&lt;/code&gt; or a validation error of type &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/vm_to_dm.png&#34; alt=&#34;View Model to Domain Model&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/vm_to_dm.png&#34; alt=&#34;View Model to Domain Model&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The subsequent domain actions will take &lt;code&gt;UserSignupRequest&lt;/code&gt; as its input without bothering about the validness of the input!&lt;/p&gt;
 
 &lt;p&gt;If we zoom into the &lt;code&gt;tryCreate&lt;/code&gt; function, it will have three &lt;code&gt;tryCreate&lt;/code&gt; function being called sequentially. Each of these functions takes care of validating the individual properties and transforming them into their corresponding domain type.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/happy_path.png&#34; alt=&#34;Happy Path&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/happy_path.png&#34; alt=&#34;Happy Path&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;If we encounter a validation error in any of these internal functions, we can short circuit and return the error that we found.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/error_path.png&#34; alt=&#34;Error Path&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/error_path.png&#34; alt=&#34;Error Path&#34; /&gt;&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;In some cases, we may need to capture all the errors instead of short circuiting and returning the first error that we encountered. We can see that approach in an another blog post&lt;/p&gt;

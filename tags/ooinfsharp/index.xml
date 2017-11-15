@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Ooinfsharp on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/ooinfsharp/</link>
+    <link>https://www.demystifyfp.com/tags/ooinfsharp/</link>
     <description>Recent content in Ooinfsharp on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,21 +12,21 @@
     
     <item>
       <title>Setting Up Database Migration</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/</link>
       <pubDate>Sat, 26 Aug 2017 18:47:29 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/</guid>
       <description>
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we validated the signup details submitted by the user and transformed it into a domain model.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we validated the signup details submitted by the user and transformed it into a domain model.&lt;/p&gt;
 
 &lt;p&gt;The next step is persisting it in a database. We are going to use &lt;a href=&#34;https://www.postgresql.org&#34; target=&#34;_blank&#34;&gt;PostgreSQL&lt;/a&gt; to achieve it.&lt;/p&gt;
 
 &lt;p&gt;In this sixth part of the &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series, we are going to learn how to setup PostgreSQL database migrations in fsharp using &lt;a href=&#34;https://github.com/fluentmigrator/fluentmigrator&#34; target=&#34;_blank&#34;&gt;Fluent Migrator&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;In the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;following blog post&lt;/a&gt;, we will be orchastrating the user signup.&lt;/p&gt;
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;following blog post&lt;/a&gt;, we will be orchastrating the user signup.&lt;/p&gt;
 
 &lt;h2 id=&#34;creating-a-database-migrations-project&#34;&gt;Creating a Database Migrations Project&lt;/h2&gt;
 

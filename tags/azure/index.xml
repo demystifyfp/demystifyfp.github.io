@@ -2,7 +2,7 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Azure on Demystify FP</title>
-    <link>http://www.demystifyfp.com/tags/azure/</link>
+    <link>https://www.demystifyfp.com/tags/azure/</link>
     <description>Recent content in Azure on Demystify FP</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
@@ -12,15 +12,15 @@
     
     <item>
       <title>Deploying to Azure App Service</title>
-      <link>http://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/</link>
+      <link>https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/</link>
       <pubDate>Wed, 08 Nov 2017 07:11:34 +0530</pubDate>
       
-      <guid>http://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/</guid>
+      <guid>https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/</guid>
       <description>
 
 &lt;p&gt;Hi There!&lt;/p&gt;
 
-&lt;p&gt;It&amp;rsquo;s great to see you back in the twenty first part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s great to see you back in the twenty first part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to prepare our code for deployment and we&amp;rsquo;ll be deploying our FsTweet Application in Azure using &lt;a href=&#34;https://azure.microsoft.com/en-in/services/app-service/&#34; target=&#34;_blank&#34;&gt;Azure App Service&lt;/a&gt;&lt;/p&gt;
 
@@ -425,7 +425,7 @@ command = build.cmd Deploy
 
 &lt;p&gt;Create a new free database instance in ElephantSQL and note down its credentails to pass it as a connection string to our application.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/elephant_sql_credentials.png&#34; alt=&#34;ElephantSQL credentials&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/elephant_sql_credentials.png&#34; alt=&#34;ElephantSQL credentials&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;getstream-io-setup&#34;&gt;GetStream.io Setup&lt;/h2&gt;
 
@@ -433,23 +433,23 @@ command = build.cmd Deploy
 
 &lt;p&gt;Create a new app called &lt;em&gt;fstweet&lt;/em&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_new_app.png&#34; alt=&#34;GetStream New App Creation&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_new_app.png&#34; alt=&#34;GetStream New App Creation&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;And create two &lt;em&gt;flat feed&lt;/em&gt; groups, &lt;code&gt;user&lt;/code&gt; and &lt;code&gt;timeline&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_new_feed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_new_feed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_feeds.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_feeds.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;After creation keep a note of the App Id, Key and Secret&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_key_and_secret.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_key_and_secret.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;postmark-setup&#34;&gt;Postmark Setup&lt;/h2&gt;
 
 &lt;p&gt;Regarding Postmark, we don&amp;rsquo;t need to create a &lt;a href=&#34;https://account.postmarkapp.com/servers&#34; target=&#34;_blank&#34;&gt;new server&lt;/a&gt; account as we are not using it in development environment.&lt;/p&gt;
 
-&lt;p&gt;However, we have to modify the &lt;a href=&#34;http://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/#configuring-signup-email-template&#34; target=&#34;_blank&#34;&gt;signup email template&lt;/a&gt; to the use the URL of the deployed application instead of the localhost URL.&lt;/p&gt;
+&lt;p&gt;However, we have to modify the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/#configuring-signup-email-template&#34; target=&#34;_blank&#34;&gt;signup email template&lt;/a&gt; to the use the URL of the deployed application instead of the localhost URL.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;-  http://localhost:8080/signup/verify/{{ verification_code }}
 +  http://fstweet.azurewebsites.net/signup/verify/{{ verification_code }}
@@ -576,7 +576,7 @@ To sign in, use a web browser to open the page https://aka.ms/devicelogin and
 
 &lt;p&gt;We’ve created an empty web app, with git deployment enabled. If you visit the &lt;a href=&#34;http://fstweet.azurewebsites.net/&#34; target=&#34;_blank&#34;&gt;http://fstweet.azurewebsites.net/&lt;/a&gt; site now, we can see an empty web app page.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/azure_empty_app.png&#34; alt=&#34;Empty Web App Page&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_empty_app.png&#34; alt=&#34;Empty Web App Page&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We are just two commands away from deploying our application in Azure.&lt;/p&gt;
 
@@ -584,11 +584,11 @@ To sign in, use a web browser to open the page https://aka.ms/devicelogin and
 
 &lt;p&gt;Open the &lt;a href=&#34;http://portal.azure.com&#34; target=&#34;_blank&#34;&gt;Azure Portal&lt;/a&gt;, Click &lt;em&gt;App Services&lt;/em&gt; on the left and then click &lt;em&gt;fstweet&lt;/em&gt; from the list.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/azure_portal_app_services.png&#34; alt=&#34;Azure App Service&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_portal_app_services.png&#34; alt=&#34;Azure App Service&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;In the &lt;em&gt;fstweet&lt;/em&gt; app service dashboard, click on &lt;em&gt;Applciation Settings&lt;/em&gt; and enter all the required configuration parameters and don&amp;rsquo;t forget to click the &lt;em&gt;Save&lt;/em&gt; button!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/app_services_app_settings.png&#34; alt=&#34;App Settings&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/app_services_app_settings.png&#34; alt=&#34;App Settings&#34; /&gt;&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;We can do this using &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/webapp/config/appsettings?view=azure-cli-latest#az_webapp_config_appsettings_set&#34; target=&#34;_blank&#34;&gt;Azure CLI appsettings&lt;/a&gt; command as well.&lt;/p&gt;
@@ -654,7 +654,7 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 
 &lt;p&gt;Now if you browse the site, we can see the beautiful landing page :)&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://www.demystifyfp.com/img/fsharp/series/fstweet/azure_deplyed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_deplyed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;After the deployment, if we want make any change, just do a git commit after making the changes and push it to the remote as we did now!&lt;/p&gt;
 
