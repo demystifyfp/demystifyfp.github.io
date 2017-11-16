@@ -325,6 +325,10 @@ let main argv =
 &lt;p&gt;With the help of the abstractions and design that we created in the earlier blog posts, we can add support for sending an email with ease in the blog post.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.9&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;Verifying User Email&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

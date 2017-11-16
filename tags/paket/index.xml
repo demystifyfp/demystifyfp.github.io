@@ -160,6 +160,10 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 &lt;p&gt;Using Forge, we orchestrated the project setup, and the cherry on the cake is the alias to build and run our project with a single command!&lt;/p&gt;
 
 &lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.0&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up Server Side Rendering using DotLiquid&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

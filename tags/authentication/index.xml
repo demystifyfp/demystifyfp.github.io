@@ -406,6 +406,10 @@ module Suave =
 
 &lt;li&gt;&lt;p&gt;Suave supports cookies with sliding expiry. Replace the &lt;code&gt;CookieLife.Session&lt;/code&gt; with &lt;code&gt;CookieLife.MaxAge&lt;/code&gt; and implement sliding expiry.&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/&#34; target=&#34;_blank&#34;&gt;Posting New Tweet&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

@@ -262,6 +262,10 @@ let connString =
 &lt;p&gt;In this blog post, we learned how to set up database migration using Fluent Migrator in fsharp and leverage FAKE to run the migrations while running the build script.&lt;/p&gt;
 
 &lt;p&gt;The source code for this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.5&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;Orchestrating User Signup&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

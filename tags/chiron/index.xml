@@ -391,6 +391,10 @@ $(function(){
 &lt;p&gt;With this, we are done with all the features that will be part of this initial version of FsTweet. In the upcoming posts, we are going to add support for logging and learn how to deploy it to Azure.&lt;/p&gt;
 
 &lt;p&gt;As usual, the source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.19&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/&#34; target=&#34;_blank&#34;&gt;Deploying to Azure App Service&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1220,6 +1224,10 @@ let inline deserialize&amp;lt; ^a when (^a or FromJsonDefaults)
 &lt;p&gt;In this blog post, we saw how to expose JSON HTTP endpoints in Suave and also learned how to use the Chiron library to deal with JSON.&lt;/p&gt;
 
 &lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.15&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/&#34; target=&#34;_blank&#34;&gt;Adding User Feed&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

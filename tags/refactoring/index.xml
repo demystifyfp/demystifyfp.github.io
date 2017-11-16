@@ -431,6 +431,8 @@ module Suave =
 &lt;p&gt;In this blog post, we learned how to create adapter functions and override a functionality provided by a library to fit our requirements. The key to this refactoring is the understanding of the function signatures.&lt;/p&gt;
 
 &lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.11&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
 </description>
     </item>
     

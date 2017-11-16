@@ -391,6 +391,10 @@ $(function(){
 &lt;p&gt;With this, we are done with all the features that will be part of this initial version of FsTweet. In the upcoming posts, we are going to add support for logging and learn how to deploy it to Azure.&lt;/p&gt;
 
 &lt;p&gt;As usual, the source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.19&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/&#34; target=&#34;_blank&#34;&gt;Deploying to Azure App Service&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1052,6 +1056,10 @@ module Persistence =
 
 &lt;li&gt;&lt;p&gt;How about adding the support for unfollowing a user?&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/&#34; target=&#34;_blank&#34;&gt;Fetching Followers and Following Users&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1524,6 +1532,10 @@ $(function(){
 &lt;p&gt;In this blog post, we implemented the user profile page with the help of the abstractions that we built earlier. Then we added the logout functionality.&lt;/p&gt;
 
 &lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.17&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/&#34; target=&#34;_blank&#34;&gt;Following a User&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -2150,6 +2162,10 @@ $(function(){
 &lt;p&gt;In this blog post, we learned how to integrate &lt;em&gt;GetStream.io&lt;/em&gt; in FsTweet to notify the new tweets and also added the initial version of user wall.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.16&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/&#34; target=&#34;_blank&#34;&gt;Adding User Profile Page&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -2979,6 +2995,10 @@ let inline deserialize&amp;lt; ^a when (^a or FromJsonDefaults)
 &lt;p&gt;In this blog post, we saw how to expose JSON HTTP endpoints in Suave and also learned how to use the Chiron library to deal with JSON.&lt;/p&gt;
 
 &lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.15&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/&#34; target=&#34;_blank&#34;&gt;Adding User Feed&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -3588,6 +3608,10 @@ module Suave =
 &lt;p&gt;We covered a lot of ground in this blog post. We started with finding the user by username and then we moved to implement the login function. And finally, we transformed the result of the login function to the corresponding webparts.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/releases/tag/v0.13&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/&#34; target=&#34;_blank&#34;&gt;Creating User Session and Authenticating User&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -3601,7 +3625,7 @@ module Suave =
 
 &lt;p&gt;Hi!&lt;/p&gt;
 
-&lt;p&gt;Welcome back to the thirteenth part of &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;Welcome back to the thirteenth part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
 &lt;p&gt;In this blog post, we are going to start the implementation of a new feature, enabling users to log in to FsTweet.&lt;/p&gt;
 
@@ -3840,6 +3864,10 @@ module Suave =
 &lt;p&gt;In this blog post, we added implementations for rending the login page. Then we added functions to handle and validate the login request from the user.&lt;/p&gt;
 
 &lt;p&gt;The source code is available in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.12&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/&#34; target=&#34;_blank&#34;&gt;Handling Login Request&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -4264,6 +4292,8 @@ module Suave =
 &lt;p&gt;In this blog post, we learned how to create adapter functions and override a functionality provided by a library to fit our requirements. The key to this refactoring is the understanding of the function signatures.&lt;/p&gt;
 
 &lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.11&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
 </description>
     </item>
     
@@ -4635,6 +4665,10 @@ module Suave =
 
 &lt;p&gt;The source code of this part can be found on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.10&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/&#34; target=&#34;_blank&#34;&gt;Reorganising Code and Refactoring&lt;/a&gt;&lt;/p&gt;
+
 &lt;h2 id=&#34;exercise&#34;&gt;Exercise&lt;/h2&gt;
 
 &lt;p&gt;How about sending a welcome email to the user upon successful verification of his/her email?&lt;/p&gt;
@@ -4956,6 +4990,10 @@ let main argv =
 &lt;p&gt;With the help of the abstractions and design that we created in the earlier blog posts, we can add support for sending an email with ease in the blog post.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.9&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;Verifying User Email&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -5454,6 +5492,10 @@ let (|UniqueViolation|_|) constraintName (ex : Exception) =
 &lt;p&gt;Finally, we transformed the return type of SQLProvider to our custom Domain type!&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.8&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/&#34; target=&#34;_blank&#34;&gt;Sending Verification Email&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -5902,6 +5944,10 @@ module Suave =
 &lt;p&gt;The separation of concerns enables us to add a new Web RPC API or even replacing Suave with any other library/framework without touching the existing functionality.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.7&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/&#34; target=&#34;_blank&#34;&gt;Persisting New User&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -6476,6 +6522,10 @@ module Domain =
 &lt;p&gt;We also learned how to compose functions together, transforming the values using the map function to come up with a robust implementation.&lt;/p&gt;
 
 &lt;p&gt;The source code is available on the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.6&#34; target=&#34;_blank&#34;&gt;GitHub Repository&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/&#34; target=&#34;_blank&#34;&gt;Transforming Async Result to Webpart&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -6742,6 +6792,10 @@ module Domain =
 &lt;p&gt;In this part, we learned how to do validation and transform view model to a domain model using the Railway Programming technique with the help of the &lt;code&gt;Chessie&lt;/code&gt; library.&lt;/p&gt;
 
 &lt;p&gt;The source code for this part is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.4&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up Database Migration&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

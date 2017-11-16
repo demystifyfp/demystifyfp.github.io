@@ -668,6 +668,10 @@ module Persistence =
 
 &lt;li&gt;&lt;p&gt;How about adding the support for unfollowing a user?&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/&#34; target=&#34;_blank&#34;&gt;Fetching Followers and Following Users&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1140,6 +1144,10 @@ $(function(){
 &lt;p&gt;In this blog post, we implemented the user profile page with the help of the abstractions that we built earlier. Then we added the logout functionality.&lt;/p&gt;
 
 &lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.17&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/&#34; target=&#34;_blank&#34;&gt;Following a User&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1766,6 +1774,10 @@ $(function(){
 &lt;p&gt;In this blog post, we learned how to integrate &lt;em&gt;GetStream.io&lt;/em&gt; in FsTweet to notify the new tweets and also added the initial version of user wall.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.16&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/&#34; target=&#34;_blank&#34;&gt;Adding User Profile Page&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

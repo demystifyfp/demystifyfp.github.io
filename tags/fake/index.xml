@@ -667,6 +667,10 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 &lt;p&gt;We owe a lot of thanks to FAKE, which made our job easier.&lt;/p&gt;
 
 &lt;p&gt;The source code assoiciated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.20&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -922,6 +926,10 @@ let connString =
 &lt;p&gt;In this blog post, we learned how to set up database migration using Fluent Migrator in fsharp and leverage FAKE to run the migrations while running the build script.&lt;/p&gt;
 
 &lt;p&gt;The source code for this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.5&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;Orchestrating User Signup&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1066,6 +1074,10 @@ let serveAssets =
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
 &lt;p&gt;In this blog post, we learned how to serve static asset files in Suave. The source code can be found in the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.2&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup/&#34; target=&#34;_blank&#34;&gt;Handling User signup Form&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1219,6 +1231,10 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 &lt;p&gt;Using Forge, we orchestrated the project setup, and the cherry on the cake is the alias to build and run our project with a single command!&lt;/p&gt;
 
 &lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.0&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up Server Side Rendering using DotLiquid&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1243,6 +1259,36 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 &lt;p&gt;In this series we will be starting from the scratch (right from creating an empty directory for the project) and incrementantly add business features one at a time and wrap up with deploying to Azure.&lt;/p&gt;
 
 &lt;p&gt;Overall, It&amp;rsquo;s going to be lot of fun! Let&amp;rsquo;s start our journey.&lt;/p&gt;
+
+&lt;h2&gt;Table of Contents&lt;/h2&gt;
+
+
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/project-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up FsTweet Project&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/dotliquid-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up Server Side Rendering using DotLiquid&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/static-assets/&#34; target=&#34;_blank&#34;&gt;Serving Static Asset Files&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup/&#34; target=&#34;_blank&#34;&gt;Handling User signup Form&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/user-signup-validation/&#34; target=&#34;_blank&#34;&gt;Validating New User Signup Form&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/db-migration-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up Database Migration&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/&#34; target=&#34;_blank&#34;&gt;Orchestrating User Signup&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/transforming-async-result-to-webpart/&#34; target=&#34;_blank&#34;&gt;Transforming Async Result to Webpart&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/persisting-new-user/&#34; target=&#34;_blank&#34;&gt;Persisting New User&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/&#34; target=&#34;_blank&#34;&gt;Sending Verification Email&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/&#34; target=&#34;_blank&#34;&gt;Verifying User Email&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/reorganising-code-and-refactoring/&#34; target=&#34;_blank&#34;&gt;Reorganising Code and Refactoring&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-login/&#34; target=&#34;_blank&#34;&gt;Adding Login Page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/handling-login-request/&#34; target=&#34;_blank&#34;&gt;Handling Login Request&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/creating-user-session-and-authenticating-user/&#34; target=&#34;_blank&#34;&gt;Creating User Session and Authenticating User&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/posting-new-tweet/&#34; target=&#34;_blank&#34;&gt;Posting New Tweet&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-feed/&#34; target=&#34;_blank&#34;&gt;Adding User Feed&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-user-profile-page/&#34; target=&#34;_blank&#34;&gt;Adding User Profile Page&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/&#34; target=&#34;_blank&#34;&gt;Following a User&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/&#34; target=&#34;_blank&#34;&gt;Fetching Followers and Following Users&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/&#34; target=&#34;_blank&#34;&gt;Deploying to Azure App Service&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Wrapping Up&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 </description>
     </item>
     
