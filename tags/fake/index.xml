@@ -1244,7 +1244,9 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
       <pubDate>Tue, 15 Aug 2017 08:14:37 +0530</pubDate>
       
       <guid>https://www.demystifyfp.com/fsharp/series/fstweet/intro/</guid>
-      <description>&lt;p&gt;Hi!&lt;/p&gt;
+      <description>
+
+&lt;p&gt;Hi!&lt;/p&gt;
 
 &lt;p&gt;I&amp;rsquo;m really excited to share with you the new blog post series, Creating a Twitter Clone in F# using Suave.&lt;/p&gt;
 
@@ -1260,9 +1262,7 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 
 &lt;p&gt;Overall, It&amp;rsquo;s going to be lot of fun! Let&amp;rsquo;s start our journey.&lt;/p&gt;
 
-&lt;h2&gt;Table of Contents&lt;/h2&gt;
-
-
+&lt;h2 id=&#34;table-of-contents&#34;&gt;Table of Contents&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/project-setup/&#34; target=&#34;_blank&#34;&gt;Setting Up FsTweet Project&lt;/a&gt;&lt;/li&gt;
@@ -1289,6 +1289,12 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 &lt;li&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Wrapping Up&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;h2 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h2&gt;
+
+&lt;p&gt;This entire series was initially planned to be released as a video course in &lt;a href=&#34;https://fsharp.tv/&#34; target=&#34;_blank&#34;&gt;FSharp.TV&lt;/a&gt; after my &lt;a href=&#34;https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP&#34; target=&#34;_blank&#34;&gt;Build a Web Server based on Suave&lt;/a&gt; course. Due to some personal reasons, we couldn&amp;rsquo;t complete it. Thank you &lt;a href=&#34;https://twitter.com/MarkRGray&#34; target=&#34;_blank&#34;&gt;Mark&lt;/a&gt; for the courteous support to release the course as a blog series and book.&lt;/p&gt;
+
+&lt;p&gt;I&amp;rsquo;d like to thank the entire &lt;a href=&#34;http://fsharp.org/&#34; target=&#34;_blank&#34;&gt;F# Community&lt;/a&gt; for their open source contributions, support and thought provoking blog posts, articles and tutorials.&lt;/p&gt;
 </description>
     </item>
     
