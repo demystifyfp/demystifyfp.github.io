@@ -6214,6 +6214,16 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;UserSignupRequest -&amp;gt; AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;blockquote&gt;
+&lt;p&gt;It is equivalent to the &lt;code&gt;SignupUser&lt;/code&gt; type, without the dependencies&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type SignupUser = 
+    CreateUser -&amp;gt; SendSignupEmail -&amp;gt; 
+      UserSignupRequest -&amp;gt; AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;
+      
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
 &lt;p&gt;Then in the pattern matching part of the valid request, replace the placeholders (printing and redirecting) with the actual functionality&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserSignup signupUser ctx = async {
@@ -6647,7 +6657,7 @@ module Domain =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We are not going to use this &lt;code&gt;SignupUser&lt;/code&gt; type anywhere else, and it is just for illustration.&lt;/p&gt;
+&lt;p&gt;We are not going to use this &lt;code&gt;SignupUser&lt;/code&gt; type anywhere else, and it is just for illustration. In the later blog posts, we&amp;rsquo;ll see how to make use of this kind of type aliases.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h2 id=&#34;implementing-the-signupuser-function&#34;&gt;Implementing The SignupUser Function&lt;/h2&gt;

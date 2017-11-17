@@ -523,6 +523,16 @@ module Suave =
 <pre><code class="language-fsharp">UserSignupRequest -&gt; AsyncResult&lt;UserId, UserSignupError&gt;
 </code></pre>
 
+<blockquote>
+<p>It is equivalent to the <code>SignupUser</code> type, without the dependencies</p>
+
+<pre><code class="language-fsharp">type SignupUser = 
+    CreateUser -&gt; SendSignupEmail -&gt; 
+      UserSignupRequest -&gt; AsyncResult&lt;UserId, UserSignupError&gt;
+      
+</code></pre>
+</blockquote>
+
 <p>Then in the pattern matching part of the valid request, replace the placeholders (printing and redirecting) with the actual functionality</p>
 
 <pre><code class="language-fsharp">let handleUserSignup signupUser ctx = async {

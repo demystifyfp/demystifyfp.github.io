@@ -1589,7 +1589,7 @@ module Domain =
 
 &lt;p&gt;The &lt;code&gt;NotifyTweet&lt;/code&gt; typifies a notify tweet function that takes &lt;code&gt;Tweet&lt;/code&gt; and returns either &lt;code&gt;unit&lt;/code&gt; or &lt;code&gt;Exception&lt;/code&gt; asynchronously.&lt;/p&gt;
 
-&lt;p&gt;Then create a new type &lt;code&gt;PublishTweet&lt;/code&gt; to represent the signature of the orchestration function with its dependencies partially applied.&lt;/p&gt;
+&lt;p&gt;Then create a new type &lt;code&gt;PublishTweet&lt;/code&gt; to represent the signature of the orchestration function with &lt;strong&gt;its dependencies partially applied&lt;/strong&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;module Domain =
   // ...
@@ -1600,6 +1600,30 @@ module Domain =
   type PublishTweet = 
     User -&amp;gt; Post -&amp;gt; AsyncResult&amp;lt;TweetId, PublishTweetError&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The &lt;code&gt;SignupUser&lt;/code&gt; type that we defined in the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/orchestrating-user-signup/#defining-the-signupuser-function-signature&#34; target=&#34;_blank&#34;&gt;orchestrating user signup&lt;/a&gt; blog post has the signature that contains both the dependencies and the actual parameters. As mentioned there, it was for illustration, and we haven&amp;rsquo;t used it anywhere.&lt;/p&gt;
+
+&lt;p&gt;Here, we are getting rid of the dependencies and using only the parameters required to specify what we want. Later in the presentation layer, we&amp;rsquo;ll be using it explicitly like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleNewTweet (publishTweet : PublishTweet) ... = async {
+  // ...
+  let! webpart = 		          
+    publishTweet user.UserId post
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In the presentation layer of user signup, the similar function has defined like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserSignup signupUser ctx = async {
+  // ...
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;as the &lt;code&gt;SignupUser&lt;/code&gt; type has the dependencies, we can&amp;rsquo;t use it explicitly.&lt;/p&gt;
+
+&lt;p&gt;We have used both the approaches to demonstrate the differences.&lt;/p&gt;
+&lt;/blockquote&gt;
 
 &lt;p&gt;We don&amp;rsquo;t have the &lt;code&gt;PublishTweetError&lt;/code&gt; type defined yet. So, let&amp;rsquo;s add it first.&lt;/p&gt;
 
@@ -1855,7 +1879,7 @@ module Suave =
 +      JSON.internalError
 
 -  let handleNewTweet createTweet (user : User) ctx = async {
-+  let handleNewTweet publishTweet (user : User) ctx = async {
++  let handleNewTweet (publishTweet : PublishTweet) (user : User) ctx = async {
      ...
         let! webpart = 		         
 -          createTweet user.UserId post		 
@@ -5777,6 +5801,16 @@ module Suave =
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;UserSignupRequest -&amp;gt; AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;blockquote&gt;
+&lt;p&gt;It is equivalent to the &lt;code&gt;SignupUser&lt;/code&gt; type, without the dependencies&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type SignupUser = 
+    CreateUser -&amp;gt; SendSignupEmail -&amp;gt; 
+      UserSignupRequest -&amp;gt; AsyncResult&amp;lt;UserId, UserSignupError&amp;gt;
+      
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
 &lt;p&gt;Then in the pattern matching part of the valid request, replace the placeholders (printing and redirecting) with the actual functionality&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let handleUserSignup signupUser ctx = async {
@@ -6210,7 +6244,7 @@ module Domain =
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We are not going to use this &lt;code&gt;SignupUser&lt;/code&gt; type anywhere else, and it is just for illustration.&lt;/p&gt;
+&lt;p&gt;We are not going to use this &lt;code&gt;SignupUser&lt;/code&gt; type anywhere else, and it is just for illustration. In the later blog posts, we&amp;rsquo;ll see how to make use of this kind of type aliases.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h2 id=&#34;implementing-the-signupuser-function&#34;&gt;Implementing The SignupUser Function&lt;/h2&gt;

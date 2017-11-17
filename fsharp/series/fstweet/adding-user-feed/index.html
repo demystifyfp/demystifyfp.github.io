@@ -191,7 +191,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    11 min read
+    12 min read
   </span>
   
 
@@ -295,7 +295,7 @@ module Domain =
 
 <p>The <code>NotifyTweet</code> typifies a notify tweet function that takes <code>Tweet</code> and returns either <code>unit</code> or <code>Exception</code> asynchronously.</p>
 
-<p>Then create a new type <code>PublishTweet</code> to represent the signature of the orchestration function with its dependencies partially applied.</p>
+<p>Then create a new type <code>PublishTweet</code> to represent the signature of the orchestration function with <strong>its dependencies partially applied</strong>.</p>
 
 <pre><code class="language-fsharp">module Domain =
   // ...
@@ -306,6 +306,30 @@ module Domain =
   type PublishTweet = 
     User -&gt; Post -&gt; AsyncResult&lt;TweetId, PublishTweetError&gt;
 </code></pre>
+
+<blockquote>
+<p>The <code>SignupUser</code> type that we defined in the <a href="/fsharp/series/fstweet/orchestrating-user-signup/#defining-the-signupuser-function-signature" target="_blank">orchestrating user signup</a> blog post has the signature that contains both the dependencies and the actual parameters. As mentioned there, it was for illustration, and we haven&rsquo;t used it anywhere.</p>
+
+<p>Here, we are getting rid of the dependencies and using only the parameters required to specify what we want. Later in the presentation layer, we&rsquo;ll be using it explicitly like</p>
+
+<pre><code class="language-fsharp">let handleNewTweet (publishTweet : PublishTweet) ... = async {
+  // ...
+  let! webpart = 		          
+    publishTweet user.UserId post
+  // ...
+</code></pre>
+
+<p>In the presentation layer of user signup, the similar function has defined like</p>
+
+<pre><code class="language-fsharp">let handleUserSignup signupUser ctx = async {
+  // ...
+}
+</code></pre>
+
+<p>as the <code>SignupUser</code> type has the dependencies, we can&rsquo;t use it explicitly.</p>
+
+<p>We have used both the approaches to demonstrate the differences.</p>
+</blockquote>
 
 <p>We don&rsquo;t have the <code>PublishTweetError</code> type defined yet. So, let&rsquo;s add it first.</p>
 
@@ -561,7 +585,7 @@ module Suave =
 +      JSON.internalError
 
 -  let handleNewTweet createTweet (user : User) ctx = async {
-+  let handleNewTweet publishTweet (user : User) ctx = async {
++  let handleNewTweet (publishTweet : PublishTweet) (user : User) ctx = async {
      ...
         let! webpart = 		         
 -          createTweet user.UserId post		 
