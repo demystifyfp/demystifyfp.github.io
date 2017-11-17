@@ -191,7 +191,7 @@
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    7 min read
+    9 min read
   </span>
   
 
@@ -415,9 +415,9 @@ let main argv =
 
 <h2 id="handling-signup-form-post-request">Handling Signup Form POST request</h2>
 
-<p>To handle the POST request during the signup form submission, we need to have a WebPart configured.</p>
+<p>To handle the POST request during the signup form submission, we have to make some changes.</p>
 
-<p>On the same path <code>/signup</code> we need to have one WebPart for serving the signup page in response to GET request and an another for the POST request.</p>
+<p>For the GET request on the <code>/signup</code> path, we are serving the signup page. And for the POST request, we need a function to handle the POST request.</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
 module Suave =
@@ -432,7 +432,92 @@ module Suave =
       ]
 </code></pre>
 
-<p>To fill the placeholder <code>???</code>, let&rsquo;s add a new WebPart <code>handleUserSignup</code>, with a dummy implementation.</p>
+<p>The function that we are going to write to fill the placeholder <code>???</code> has to satisfy two criteria.</p>
+
+<ol>
+<li>It has to return a WebPart so that it can be composed using <code>&gt;=&gt;</code> operator (or infix function).</li>
+<li>The other requirement is its interaction with the database should be asynchronous (non-blocking) otherwise it&rsquo;d block the Suave Web Server.</li>
+</ol>
+
+<p>Let&rsquo;s have a look at the first criteria, returning a WebPart.</p>
+
+<p>In Suave, a <code>WebPart</code> is a type alias of the below function signature</p>
+
+<pre><code class="language-fsharp">HttpContext -&gt; Async&lt;HttpContext option&gt;
+</code></pre>
+
+<p>And the signature of the <code>&gt;=&gt;</code> operator is</p>
+
+<pre><code class="language-fsharp">HttpContext -&gt; Async&lt;HttpContext option&gt; -&gt;
+  HttpContext -&gt; Async&lt;HttpContext option&gt;
+</code></pre>
+
+<p>and it can be simplified using the <code>WebPart</code> type alias as</p>
+
+<pre><code class="language-fsharp">WebPart -&gt; WebPart -&gt; WebPart
+</code></pre>
+
+<p>With this knowledge, Let&rsquo;s name the function that is going to handle the user signup post request as <code>handleUserSignup</code>.</p>
+
+<pre><code class="language-fsharp">// HttpContext -&gt; Async&lt;HttpContext option&gt;
+let handleUserSignup ctx = async {
+  printfn &quot;%A&quot; ctx.request.form
+  return Some ctx
+}
+</code></pre>
+
+<p>This is a naive implementation of the <code>handleUserSignup</code> which just prints the whatever value there in the request&rsquo;s <a href="https://suave.io/Suave.html#def:member Suave.Http.HttpRequest.form" target="_blank">form type</a> in the console and return the HttpContext as it is.</p>
+
+<p>As the signature of the <code>handleUserSignup</code> is same as that of the <code>WebPart</code>, it can be combined like</p>
+
+<pre><code class="language-fsharp">POST &gt;=&gt; handleUserSignup
+</code></pre>
+
+<p>The second criteria for asynchronous are already satisfied as the <code>handleUserSignup</code> returns the <code>Async&lt;HttpContext option&gt;</code>.</p>
+
+<p>To get a feel for how we will be interacting with the database in this function, let&rsquo;s redirect the user to the signup page again instead of returning the <code>HttpContext</code> as it is.</p>
+
+<p>We can do page redirection using the <a href="https://suave.io/Suave.html#def:val Suave.Redirection.FOUND" target="_blank">FOUND</a> function in the <code>Redirection</code> module of Suave.</p>
+
+<p>The <code>FOUND</code> function takes a path (of type <code>string</code>) to redirect the browser to and returns a <code>WebPart</code></p>
+
+<pre><code class="language-fsharp">string -&gt; WebPart
+</code></pre>
+
+<p>When we expand the <code>WebPart</code> alias, it become</p>
+
+<pre><code class="language-fsharp">string -&gt; HttpContext -&gt; Async&lt;HttpContext option&gt;
+</code></pre>
+
+<p>Now we can say that this function takes a <code>string</code> and an <code>HttpContext</code> and asynchronously returns <code>HttpContext option</code>.</p>
+
+<p>If we are using this function in <code>handleUserSignup</code>, we need to wait for the asynchronous operation to complete and then take the return value of the <code>HttpContext option</code> and return it.</p>
+
+<pre><code class="language-fsharp">let handleUserSignup ctx = async {
+  
+  printfn &quot;%A&quot; ctx.request.form
+
+  // HttpContext option
+  let! redirectionResponse = 
+    Redirection.FOUND &quot;/signup&quot; ctx
+
+  return redirectionResponse
+}
+</code></pre>
+
+<p>The <a href="https://en.wikibooks.org/wiki/F_Sharp_Programming/Async_Workflows" target="_blank">async computation expression</a> takes care of waiting and returning the value from an asynchronous operation without blocking the main thread.</p>
+
+<p>We&rsquo;ll be using the similar technique to perform the database operations.</p>
+
+<p>The usage of <code>let!</code> and followed by <code>return</code> can be simplified using a syntactic sugar <code>return!</code> which does the both</p>
+
+<pre><code class="language-fsharp">let handleUserSignup ctx = async {
+  printfn &quot;%A&quot; ctx.request.form
+  return! Redirection.FOUND &quot;/signup&quot; ctx
+}
+</code></pre>
+
+<p>The final implementation would look like this</p>
 
 <pre><code class="language-fsharp">// FsTweet.Web/UserSignup.fs
 module Suave =
@@ -449,8 +534,6 @@ module Suave =
         POST &gt;=&gt; handleUserSignup
       ]
 </code></pre>
-
-<p>The placeholder implementation of the <code>handleUserSignup</code> WebPart prints the form values posted (from the <a href="https://suave.io/Suave.html#def:member Suave.Http.HttpRequest.form" target="_blank">request</a>) in the console and redirects the user again to the signup page.</p>
 
 <p>When we rerun the program with this new changes, we can find the values being posted in the console upon submitting the signup form.</p>
 
