@@ -20,9 +20,9 @@
 
 &lt;p&gt;Hi There!&lt;/p&gt;
 
-&lt;p&gt;It&amp;rsquo;s great to see you back in the twenty first part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s great to see you back in the twenty-first part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In this blog post, we are going to prepare our code for deployment and we&amp;rsquo;ll be deploying our FsTweet Application in Azure using &lt;a href=&#34;https://azure.microsoft.com/en-in/services/app-service/&#34; target=&#34;_blank&#34;&gt;Azure App Service&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to prepare our code for deployment, and we&amp;rsquo;ll be deploying our FsTweet Application in Azure using &lt;a href=&#34;https://azure.microsoft.com/en-in/services/app-service/&#34; target=&#34;_blank&#34;&gt;Azure App Service&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s dive in.&lt;/p&gt;
 
@@ -35,11 +35,11 @@ let private connString =
   &amp;quot;Server=127.0.0.1;Port=5432;Database=FsTweet;User Id=postgres;Password=test;&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The SQLProvider &lt;a href=&#34;http://fsprojects.github.io/SQLProvider/core/parameters.html&#34; target=&#34;_blank&#34;&gt;requires connection string&lt;/a&gt; should be available &lt;a href=&#34;http://fsprojects.github.io/SQLProvider/core/parameters.html&#34; target=&#34;_blank&#34;&gt;during compile time&lt;/a&gt; in order to create types from the database to which it is connected to.&lt;/p&gt;
+&lt;p&gt;The SQLProvider &lt;a href=&#34;http://fsprojects.github.io/SQLProvider/core/parameters.html&#34; target=&#34;_blank&#34;&gt;requires connection string&lt;/a&gt; to be available &lt;a href=&#34;http://fsprojects.github.io/SQLProvider/core/parameters.html&#34; target=&#34;_blank&#34;&gt;during compile time&lt;/a&gt; to create the types from the database.&lt;/p&gt;
 
 &lt;p&gt;In other words, we need a live database (with schemas defined) to compile the FsTweet.&lt;/p&gt;
 
-&lt;p&gt;In our build script, we are running the migration script to create/modify the tables before compilation of the application. So, we don&amp;rsquo;t need to worry about the database schema.&lt;/p&gt;
+&lt;p&gt;In our build script, we are running the migration script to create/modify the tables before the compilation  of the application. So, we don&amp;rsquo;t need to worry about the database schema.&lt;/p&gt;
 
 &lt;p&gt;Similarly, In runtime, we are getting the connection string from an environment variable and using it to initialize the database connection&lt;/p&gt;
 
@@ -54,31 +54,31 @@ let main argv =
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The real concern is if we are going with the current code as it is, while compiling the code on a cloud machine, that machine has to have a local postgres database which can be accessed using the above connection string literal.&lt;/p&gt;
+&lt;p&gt;The real concern is if we are going with the current code as it is while compiling the code on a cloud machine, that machine has to have a local Postgres database which can be accessed using the above connection string literal.&lt;/p&gt;
 
-&lt;p&gt;We can have a separate database (accessible from anywhere) for this purpose alone and uses that as a literal. But there are lot of drawbacks!&lt;/p&gt;
+&lt;p&gt;We can have a separate database (accessible from anywhere) for this purpose alone and uses that as a literal. But there are a lot of drawbacks!&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;Now we need to maintain two databases, one for compilation and another one for running in production&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Now we need to maintain two databases, one for compilation and another one for running in production.&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;It means our migration script has to run on both the databases.&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;We also need to makes sure that the database schema should be same in both the databases.&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;It&amp;rsquo;s lot of work(!) for an obvious task! So, this approach is not practical.&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s lot of work(!) for a simple task! So, this approach is not practical.&lt;/p&gt;
 
 &lt;p&gt;Before arriving at the solution, Let&amp;rsquo;s think about what would be an ideal scenario.&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;Provision a production ready PostgreSQL database&lt;/li&gt;
-&lt;li&gt;Set the connection string of this database as the value of environment varialbe &lt;code&gt;FSTWEET_DB_CONN_STRING&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Provision a production-ready PostgreSQL database&lt;/li&gt;
+&lt;li&gt;Set the connection string of this database as the value of environment variable &lt;code&gt;FSTWEET_DB_CONN_STRING&lt;/code&gt;&lt;/li&gt;
 &lt;li&gt;Run the migration script&lt;/li&gt;
 &lt;li&gt;Compile (Build) the application&lt;/li&gt;
 &lt;li&gt;Run the application&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;The first step is manual and the rest of the steps are already taken care by our FAKE build script.&lt;/p&gt;
+&lt;p&gt;The first step is manual, and our FAKE build script is already taking care of rest of the steps.&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;We&amp;rsquo;ll be adding a separate step in our build script to run the application on cloud.&lt;/p&gt;
@@ -135,7 +135,7 @@ let swapDbFileContent (oldValue: string) (newValue : string) =
 // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then add two targets in the build target, one to change the connection string and an another one to revert the change.&lt;/p&gt;
+&lt;p&gt;Then add two targets in the build target, one to change the connection string and another one to revert the change.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// build.fsx
 // ...
@@ -148,7 +148,7 @@ Target &amp;quot;RevertLocalDbConnStringChange&amp;quot; (fun _ -&amp;gt;
 // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As a last step, alter the build order to leverage the targets that we created just now.&lt;/p&gt;
+&lt;p&gt;As the last step, alter the build order to leverage the targets that we created just now.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;  // Build order
   &amp;quot;Clean&amp;quot;
@@ -169,7 +169,7 @@ Target &amp;quot;RevertLocalDbConnStringChange&amp;quot; (fun _ -&amp;gt;
 
 &lt;p&gt;At the time of this writing, The F# Compiler version that has been supported by Azure App Service is 4.0. But we developed the application using F# 4.1. So, we have to compile our code using F# 4.0 before deploying.&lt;/p&gt;
 
-&lt;p&gt;When we compile our application using F# 4.0 compiler, we&amp;rsquo;ll get an compiler error&lt;/p&gt;
+&lt;p&gt;When we compile our application using F# 4.0 compiler, we&amp;rsquo;ll get a compiler error&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;...\FsTweet.Web\Json.fs(17,41): 
   Unexpected identifier in type constraint. 
@@ -186,9 +186,9 @@ Expected infix operator, quote symbol or other token.
 
 &lt;p&gt;If you check out the &lt;a href=&#34;https://blogs.msdn.microsoft.com/dotnet/2017/03/07/announcing-f-4-1-and-the-visual-f-tools-for-visual-studio-2017-2/&#34; target=&#34;_blank&#34;&gt;release notes of F# 4.1&lt;/a&gt;, you can find there are some improvements made on Statically Resolved Type Parameter support to fix this error (or bug).&lt;/p&gt;
 
-&lt;p&gt;Fortunately, rest of codebase are in tact with F# 4.0 and we just need to fix this one.&lt;/p&gt;
+&lt;p&gt;Fortunately, rest of codebase is intact with F# 4.0, and we just need to fix this one.&lt;/p&gt;
 
-&lt;p&gt;As a first step, comment out the &lt;code&gt;deserialize&lt;/code&gt; function in the &lt;code&gt;JSON&lt;/code&gt; module and the add the following new implementation.&lt;/p&gt;
+&lt;p&gt;As a first step, comment out the &lt;code&gt;deserialize&lt;/code&gt; function in the &lt;code&gt;JSON&lt;/code&gt; module and then add the following new implementation.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// src/FsTweet.Web/Json.fs
 // ...
@@ -223,11 +223,11 @@ let handleNewTweet publishTweet (user : User) ctx = async {
 
 &lt;p&gt;We are currently using default HTTP bindings provided by Suave. So, when we run our application locally, the web server will be listening on the default port &lt;code&gt;8080&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;But when we are running it in Azure or in any other cloud vendor, we have to use the port providing by them.&lt;/p&gt;
+&lt;p&gt;But when we are running it on Azure or any other cloud vendor, we have to use the port providied by them.&lt;/p&gt;
 
 &lt;p&gt;In addition to that, the default HTTP binding uses the loopback address &lt;code&gt;127.0.0.1&lt;/code&gt; instead of &lt;code&gt;0.0.0.0&lt;/code&gt; which makes it &lt;a href=&#34;https://stackoverflow.com/questions/20778771/what-is-the-difference-between-0-0-0-0-127-0-0-1-and-localhost&#34; target=&#34;_blank&#34;&gt;non-accessible&lt;/a&gt; from the other hosts.&lt;/p&gt;
 
-&lt;p&gt;We have to fix both of these, in order to run our application in cloud.&lt;/p&gt;
+&lt;p&gt;We have to fix both of these, to run our application on the cloud.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;// src/FsTweet.Web/FsTweet.Web.fs
 // ...
@@ -251,15 +251,15 @@ let main argv =
 +     bindings=[httpBinding]}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;We are getting the port number to listen from the environment variable &lt;code&gt;PORT&lt;/code&gt; and modifying the &lt;code&gt;defaultConfig&lt;/code&gt; to use the custom http binding instead of the default one.&lt;/p&gt;
+&lt;p&gt;We are getting the port number to listen to from the environment variable &lt;code&gt;PORT&lt;/code&gt; and modifying the &lt;code&gt;defaultConfig&lt;/code&gt; to use the custom HTTP binding instead of the default one.&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;In Azure App Service, the port to listen is already available in the environment variable &lt;code&gt;HTTP_PLATFORM_PORT&lt;/code&gt;. But we are using &lt;code&gt;PORT&lt;/code&gt; here to avoid cloud vendor specific stuffs in the codebase. Later via configuration (outside the codebase), we will be mapping these environment variables.&lt;/p&gt;
+&lt;p&gt;In Azure App Service, the port to listen is already available in the environment variable &lt;code&gt;HTTP_PLATFORM_PORT&lt;/code&gt;. But we are using &lt;code&gt;PORT&lt;/code&gt; here to avoid cloud vendor specific stuff in the codebase. Later via configuration (outside the codebase), we will be mapping these environment variables.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;h2 id=&#34;the-web-config-file&#34;&gt;The web.config File&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://suave.io/azure-app-service.html&#34; target=&#34;_blank&#34;&gt;As mentioned&lt;/a&gt; in Suave&amp;rsquo;s documention, we need to have a web.config to instruct IIS to route the traffic to Suave.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://suave.io/azure-app-service.html&#34; target=&#34;_blank&#34;&gt;As mentioned&lt;/a&gt; in Suave&amp;rsquo;s documentation, we need to have a web.config to instruct IIS to route the traffic to Suave.&lt;/p&gt;
 
 &lt;p&gt;Create a new file &lt;em&gt;web.config&lt;/em&gt; in the root directory and update it as below&lt;/p&gt;
 
@@ -282,7 +282,7 @@ let main argv =
     &amp;lt;/handlers&amp;gt;
 
     &amp;lt;httpPlatform 
-      stdoutLogEnabled=&amp;quot;false&amp;quot;
+      stdoutLogEnabled=&amp;quot;true&amp;quot;
       startupTimeLimit=&amp;quot;20&amp;quot; 
       processPath=&amp;quot;%HOME%\site\wwwroot\FsTweet.Web.exe&amp;quot;
       &amp;gt;
@@ -296,21 +296,20 @@ let main argv =
 &amp;lt;/configuration&amp;gt;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Most of the above content was copied from the documentation and we have modified the following&lt;/p&gt;
+&lt;p&gt;Most of the above content was copied from the documentation, and we have modified the following.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;code&gt;processPath&lt;/code&gt; - specifies the location of the &lt;code&gt;FsTweet.Web&lt;/code&gt; executable.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;environmentVariables&lt;/code&gt; - creates a new envrionment variable &lt;code&gt;PORT&lt;/code&gt; with the value from the environment variable &lt;code&gt;HTTP_PLATFORM_PORT&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;stdoutLogEnabled&lt;/code&gt; - disables &lt;em&gt;stdout&lt;/em&gt; log. (We&amp;rsquo;ll revisit it the next blog post)&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;environmentVariables&lt;/code&gt; - creates a new environment variable &lt;code&gt;PORT&lt;/code&gt; with the value of the environment variable &lt;code&gt;HTTP_PLATFORM_PORT&lt;/code&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&#34;revisiting-build-script&#34;&gt;Revisiting Build Script&lt;/h2&gt;
 
-&lt;p&gt;To deploy FsTweet on Azure App Service we are going to use &lt;a href=&#34;https://github.com/projectkudu&#34; target=&#34;_blank&#34;&gt;Kudu&lt;/a&gt;. FAKE library has good support for Kudu and we can deploy our application right from our build script.&lt;/p&gt;
+&lt;p&gt;To deploy FsTweet on Azure App Service we are going to use &lt;a href=&#34;https://github.com/projectkudu&#34; target=&#34;_blank&#34;&gt;Kudu&lt;/a&gt;. The FAKE library has excellent support for Kudu, and we can deploy our application right from our build script.&lt;/p&gt;
 
-&lt;p&gt;FAKE library provides a &lt;code&gt;kuduSync&lt;/code&gt; function which copies with semantic appropriate for deploying web site files. Before calling &lt;code&gt;kuduSync&lt;/code&gt;, we need to stage the files (in a temporary directory) that has to be copied. This staging directory path can be retrieved from the FAKE Library&amp;rsquo;s &lt;code&gt;deploymentTemp&lt;/code&gt; binding. Then the &lt;code&gt;kuduSync&lt;/code&gt; function sync the files for deployment.&lt;/p&gt;
+&lt;p&gt;The FAKE library provides a &lt;code&gt;kuduSync&lt;/code&gt; function which copies with semantic appropriate for deploying website files. Before calling &lt;code&gt;kuduSync&lt;/code&gt;, we need to stage the files (in a temporary directory) that has to be copied. This staging directory path can be retrieved from the FAKE Library&amp;rsquo;s &lt;code&gt;deploymentTemp&lt;/code&gt; binding. Then the &lt;code&gt;kuduSync&lt;/code&gt; function syncs the files for deployment.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;deploymentTemp&lt;/code&gt; directory is exact replica of our local &lt;code&gt;build&lt;/code&gt; directory on the deloyment side. So, instead of staging the files explicitly, we can use this directory as build directory. An another benefit is user account which will be deploying has full access to this directory.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;deploymentTemp&lt;/code&gt; directory is the exact replica of our local &lt;code&gt;build&lt;/code&gt; directory on the delpoyment side. So, instead of staging the files explicitly, we can use this directory as the build directory. Another benefit is user account which will be deploying has full access to this directory.&lt;/p&gt;
 
 &lt;p&gt;To do the deployment from our build script, we first need to know what is the environment that we are in through the environment variable &lt;code&gt;FSTWEET_ENVIRONMENT&lt;/code&gt;.&lt;/p&gt;
 
@@ -346,7 +345,7 @@ let env = environVar &amp;quot;FSTWEET_ENVIRONMENT&amp;quot;
   )
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;For dev environment, we&amp;rsquo;ll be using &lt;code&gt;./build&lt;/code&gt; as build directory and &lt;code&gt;Kudu.deploymentTemp&lt;/code&gt; as build directory in the other environments. We&amp;rsquo;ve also removed the &lt;code&gt;deployDir&lt;/code&gt; (that was part of the auto-genrated build file) as we are not using it.&lt;/p&gt;
+&lt;p&gt;For dev environment, we&amp;rsquo;ll be using &lt;code&gt;./build&lt;/code&gt; as build directory and &lt;code&gt;Kudu.deploymentTemp&lt;/code&gt; as build directory in the other environments. We&amp;rsquo;ve also removed the &lt;code&gt;deployDir&lt;/code&gt; (that was part of the auto-generated build file) as we are not using it.&lt;/p&gt;
 
 &lt;p&gt;Then we need to two more targets&lt;/p&gt;
 
@@ -365,9 +364,9 @@ Target &amp;quot;Deploy&amp;quot; Kudu.kuduSync
 
 &lt;p&gt;The &lt;code&gt;Deploy&lt;/code&gt; just calls the &lt;code&gt;Kudu.kuduSync&lt;/code&gt; function.&lt;/p&gt;
 
-&lt;p&gt;The last thing that we need to revist in the build script is the build order.&lt;/p&gt;
+&lt;p&gt;The last thing that we need to revisit in the build script is the build order.&lt;/p&gt;
 
-&lt;p&gt;We need two build orders. One to run the application locally (which we already have) and another one to deploy. In the latter case, the we don&amp;rsquo;t need to run the application explicitly as Azure Web App takes cares of executing our application using the &lt;em&gt;web.config&lt;/em&gt; file.&lt;/p&gt;
+&lt;p&gt;We need two build orders. One to run the application locally (which we already have) and another one to deploy. In the latter case, we don&amp;rsquo;t need to run the application explicitly as Azure Web App takes cares of executing our application using the &lt;em&gt;web.config&lt;/em&gt; file.&lt;/p&gt;
 
 &lt;p&gt;To make it possible, Replace the existing build order with the below one&lt;/p&gt;
 
@@ -394,15 +393,15 @@ Target &amp;quot;Deploy&amp;quot; Kudu.kuduSync
 ==&amp;gt; &amp;quot;Deploy&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now we have two different Target execution hiearchy. Refer &lt;a href=&#34;https://fake.build/legacy-core-targets.html&#34; target=&#34;_blank&#34;&gt;this detailed documentation&lt;/a&gt; to know how the order hierarchy works in FAKE.&lt;/p&gt;
+&lt;p&gt;Now we have two different Target execution hierarchy. Refer &lt;a href=&#34;https://fake.build/legacy-core-targets.html&#34; target=&#34;_blank&#34;&gt;this detailed documentation&lt;/a&gt; to know how the order hierarchy works in FAKE.&lt;/p&gt;
 
 &lt;h2 id=&#34;invoking-build-script&#34;&gt;Invoking Build Script&lt;/h2&gt;
 
-&lt;p&gt;We have a build script that automates all the required activities to do the deployment. But, who is going to run the this script in the first place?&lt;/p&gt;
+&lt;p&gt;We have a build script that automates all the necessary activities to do the deployment. But, who is going to run this script in the first place?&lt;/p&gt;
 
-&lt;p&gt;That&amp;rsquo;s where &lt;a href=&#34;https://github.com/projectkudu/kudu/wiki/Customizing-deployments#deployment-file&#34; target=&#34;_blank&#34;&gt;.deployment file&lt;/a&gt; comes into picture.&lt;/p&gt;
+&lt;p&gt;That&amp;rsquo;s where &lt;a href=&#34;https://github.com/projectkudu/kudu/wiki/Customizing-deployments#deployment-file&#34; target=&#34;_blank&#34;&gt;.deployment file&lt;/a&gt; comes into the picture.&lt;/p&gt;
 
-&lt;p&gt;Usign this file, we can specify what command to run to deploy the application in Azure App Service.&lt;/p&gt;
+&lt;p&gt;Using this file, we can specify what command to run to deploy the application in Azure App Service.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s create this file in the application&amp;rsquo;s root directory and update it to invoke the build script.&lt;/p&gt;
 
@@ -414,16 +413,16 @@ command = build.cmd Deploy
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;The &lt;em&gt;build.cmd&lt;/em&gt; was created by Forge during project initialization.&lt;/p&gt;
+&lt;p&gt;Forge creates the &lt;em&gt;build.cmd&lt;/em&gt; file during project initialization.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;With this we are done with all the coding changes that are required to perform the deployment.&lt;/p&gt;
+&lt;p&gt;With this, we completed all the coding changes that are required to perform the deployment.&lt;/p&gt;
 
 &lt;h2 id=&#34;postgresql-database-setup&#34;&gt;PostgreSQL Database Setup&lt;/h2&gt;
 
-&lt;p&gt;To run FsTweet on cloud, we need to have a database on the cloud. We can make use of &lt;a href=&#34;https://www.elephantsql.com/&#34; target=&#34;_blank&#34;&gt;ElephantSQL&lt;/a&gt; which provides a &lt;a href=&#34;https://www.elephantsql.com/plans.html&#34; target=&#34;_blank&#34;&gt;free plan&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To run FsTweet on the cloud, we need to have a database on the cloud. We can make use of &lt;a href=&#34;https://www.elephantsql.com/&#34; target=&#34;_blank&#34;&gt;ElephantSQL&lt;/a&gt; which provides a &lt;a href=&#34;https://www.elephantsql.com/plans.html&#34; target=&#34;_blank&#34;&gt;free plan&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Create a new free database instance in ElephantSQL and note down its credentails to pass it as a connection string to our application.&lt;/p&gt;
+&lt;p&gt;Create a new free database instance in ElephantSQL and note down its credentials to pass it as a connection string to our application.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/elephant_sql_credentials.png&#34; alt=&#34;ElephantSQL credentials&#34; /&gt;&lt;/p&gt;
 
@@ -435,19 +434,19 @@ command = build.cmd Deploy
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_new_app.png&#34; alt=&#34;GetStream New App Creation&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;And create two &lt;em&gt;flat feed&lt;/em&gt; groups, &lt;code&gt;user&lt;/code&gt; and &lt;code&gt;timeline&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;And create two &lt;em&gt;flat feed&lt;/em&gt; groups, &lt;code&gt;user&lt;/code&gt;, and &lt;code&gt;timeline&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_new_feed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_feeds.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;After creation keep a note of the App Id, Key and Secret&lt;/p&gt;
+&lt;p&gt;After creation keep a note of the App Id, Key, and Secret&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/getstream_key_and_secret.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;postmark-setup&#34;&gt;Postmark Setup&lt;/h2&gt;
 
-&lt;p&gt;Regarding Postmark, we don&amp;rsquo;t need to create a &lt;a href=&#34;https://account.postmarkapp.com/servers&#34; target=&#34;_blank&#34;&gt;new server&lt;/a&gt; account as we are not using it in development environment.&lt;/p&gt;
+&lt;p&gt;Regarding Postmark, we don&amp;rsquo;t need to create a &lt;a href=&#34;https://account.postmarkapp.com/servers&#34; target=&#34;_blank&#34;&gt;new server&lt;/a&gt; account as we are not using it in the development environment.&lt;/p&gt;
 
 &lt;p&gt;However, we have to modify the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/sending-verification-email/#configuring-signup-email-template&#34; target=&#34;_blank&#34;&gt;signup email template&lt;/a&gt; to the use the URL of the deployed application instead of the localhost URL.&lt;/p&gt;
 
@@ -459,11 +458,11 @@ command = build.cmd Deploy
 
 &lt;p&gt;With all the dependent services are up, our next focus is deploying the application in azure app service.&lt;/p&gt;
 
-&lt;p&gt;To deploy the application, we are going to use &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest&#34; target=&#34;_blank&#34;&gt;Azure CLI&lt;/a&gt;. It offers an convinent way to manage azure resource easily from the command line.&lt;/p&gt;
+&lt;p&gt;To deploy the application, we are going to use &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/get-started-with-azure-cli?view=azure-cli-latest&#34; target=&#34;_blank&#34;&gt;Azure CLI&lt;/a&gt;. It offers a convenient way to manage Azure resource easily from the command line.&lt;/p&gt;
 
-&lt;p&gt;Make sure, you are having this &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest&#34; target=&#34;_blank&#34;&gt;CLI installed&lt;/a&gt; in your machine as well as &lt;a href=&#34;https://azure.microsoft.com/en-us/free/&#34; target=&#34;_blank&#34;&gt;an active Azure Subscription&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Make sure you are having this &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest&#34; target=&#34;_blank&#34;&gt;CLI installed&lt;/a&gt; in your machine as well as &lt;a href=&#34;https://azure.microsoft.com/en-us/free/&#34; target=&#34;_blank&#34;&gt;an active Azure Subscription&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;The first thing that we have to do is Log in to our azure account from Azure CLI. There are &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?view=azure-cli-latest&#34; target=&#34;_blank&#34;&gt;multiple ways&lt;/a&gt; we can log in and authenticate with the Azure CLI and here we are going to use the &lt;em&gt;Interactive log-in&lt;/em&gt; option.&lt;/p&gt;
+&lt;p&gt;The first thing that we have to do is Log in to our Azure account from Azure CLI. There are &lt;a href=&#34;https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli?view=azure-cli-latest&#34; target=&#34;_blank&#34;&gt;multiple ways&lt;/a&gt; we can log in and authenticate with the Azure CLI and here we are going to use the &lt;em&gt;Interactive log-in&lt;/em&gt; option.&lt;/p&gt;
 
 &lt;p&gt;Run the login command and then in the web browser go the given URL and enter the provided code.&lt;/p&gt;
 
@@ -474,7 +473,7 @@ To sign in, use a web browser to open the page https://aka.ms/devicelogin and
 
 &lt;p&gt;Then log in using the subscription that you wanted to use.&lt;/p&gt;
 
-&lt;p&gt;Upon successful log in, you will get a similar JSON as the output in the command prompt.&lt;/p&gt;
+&lt;p&gt;Upon successful login, you will get a similar JSON as the output in the command prompt.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;[
   {
@@ -535,7 +534,7 @@ To sign in, use a web browser to open the page https://aka.ms/devicelogin and
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;To host our application in Azure App Service we first need to have a &lt;a href=&#34;https://docs.microsoft.com/en-us/azure/app-service/azure-web-sites-web-hosting-plans-in-depth-overview&#34; target=&#34;_blank&#34;&gt;Azure App Service Plan&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;To host our application in Azure App Service, we first need to have an &lt;a href=&#34;https://docs.microsoft.com/en-us/azure/app-service/azure-web-sites-web-hosting-plans-in-depth-overview&#34; target=&#34;_blank&#34;&gt;Azure App Service Plan&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s creates an App Service plan named &lt;code&gt;fsTweetServicePlan&lt;/code&gt; in the Free pricing tier&lt;/p&gt;
 
@@ -574,19 +573,19 @@ To sign in, use a web browser to open the page https://aka.ms/devicelogin and
 &lt;p&gt;Note down the URL of the git repository as we&amp;rsquo;ll be using it shortly.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;We’ve created an empty web app, with git deployment enabled. If you visit the &lt;a href=&#34;http://fstweet.azurewebsites.net/&#34; target=&#34;_blank&#34;&gt;http://fstweet.azurewebsites.net/&lt;/a&gt; site now, we can see an empty web app page.&lt;/p&gt;
+&lt;p&gt;We’ve created an empty web app, with git deployment enabled. If you visit the &lt;a href=&#34;http://fstweet.azurewebsites.net/&#34; target=&#34;_blank&#34;&gt;http://fstweet.azurewebsites.net/&lt;/a&gt; site now, we can see a blank web app page.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_empty_app.png&#34; alt=&#34;Empty Web App Page&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We are just two commands away from deploying our application in Azure.&lt;/p&gt;
 
-&lt;p&gt;The FsTweet Application uses a set of environment variables to get the application&amp;rsquo;s configuration parameters (Connection string, GetStream secret, etc.,). To make these environment variables avilable for the application, we can leverage the App Settings.&lt;/p&gt;
+&lt;p&gt;The FsTweet Application uses a set of environment variables to get the application&amp;rsquo;s configuration parameters (Connection string, GetStream secret, etc.,). To make these environment variables available for the application, we can leverage the App Settings.&lt;/p&gt;
 
 &lt;p&gt;Open the &lt;a href=&#34;http://portal.azure.com&#34; target=&#34;_blank&#34;&gt;Azure Portal&lt;/a&gt;, Click &lt;em&gt;App Services&lt;/em&gt; on the left and then click &lt;em&gt;fstweet&lt;/em&gt; from the list.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_portal_app_services.png&#34; alt=&#34;Azure App Service&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;In the &lt;em&gt;fstweet&lt;/em&gt; app service dashboard, click on &lt;em&gt;Applciation Settings&lt;/em&gt; and enter all the required configuration parameters and don&amp;rsquo;t forget to click the &lt;em&gt;Save&lt;/em&gt; button!&lt;/p&gt;
+&lt;p&gt;In the &lt;em&gt;fstweet&lt;/em&gt; app service dashboard, click on &lt;em&gt;Application Settings&lt;/em&gt; and enter all the required configuration parameters and don&amp;rsquo;t forget to click the &lt;em&gt;Save&lt;/em&gt; button!&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/app_services_app_settings.png&#34; alt=&#34;App Settings&#34; /&gt;&lt;/p&gt;
 
@@ -656,17 +655,17 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_deplyed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;After the deployment, if we want make any change, just do a git commit after making the changes and push it to the remote as we did now!&lt;/p&gt;
+&lt;p&gt;After the deployment, if we want to make any change, just do a git commit after making the changes and push it to the remote as we did now!&lt;/p&gt;
 
-&lt;p&gt;If we don&amp;rsquo;t want to do it manually, we can &lt;a href=&#34;https://docs.microsoft.com/en-us/azure/app-service/app-service-continuous-deployment&#34; target=&#34;_blank&#34;&gt;enable contionus deployment&lt;/a&gt; from the azure portal.&lt;/p&gt;
+&lt;p&gt;If we don&amp;rsquo;t want to do it manually, we can &lt;a href=&#34;https://docs.microsoft.com/en-us/azure/app-service/app-service-continuous-deployment&#34; target=&#34;_blank&#34;&gt;enable continuous deployment&lt;/a&gt; from the Azure portal.&lt;/p&gt;
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;In this blog post, we have made changes to codebase to enable the deployment and deployed our application on Azure using Azure CLI.&lt;/p&gt;
+&lt;p&gt;In this blog post, we have made changes to the codebase to enable the deployment and deployed our application on Azure using Azure CLI.&lt;/p&gt;
 
 &lt;p&gt;We owe a lot of thanks to FAKE, which made our job easier.&lt;/p&gt;
 
-&lt;p&gt;The source code assoiciated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.20&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/FsTweet/tree/v0.20&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
 
