@@ -1247,19 +1247,21 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 
 &lt;p&gt;Hi!&lt;/p&gt;
 
-&lt;p&gt;I&amp;rsquo;m really excited to share with you the new blog post series, Creating a Twitter Clone in F# using Suave.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;m excited to share with you the new blog post series, Creating a Twitter Clone in F# using Suave.&lt;/p&gt;
 
 &lt;p&gt;The core objective of this series is answering the one question.&lt;/p&gt;
 
 &lt;p&gt;How can I create a &lt;strong&gt;production-ready real-world business application end to end&lt;/strong&gt; in F# using functional programming principles?&lt;/p&gt;
 
-&lt;p&gt;I believe F# is one of the elegant programming language that can help developers to deliver robust softwares and add value to the businesses.&lt;/p&gt;
+&lt;p&gt;I believe F# is one of the elegant programming languages that can help developers to deliver robust software and add value to the businesses.&lt;/p&gt;
 
 &lt;p&gt;It kindles a new thought process, a better perspective for developing software products.&lt;/p&gt;
 
-&lt;p&gt;In this series we will be starting from the scratch (right from creating an empty directory for the project) and incrementantly add business features one at a time and wrap up with deploying to Azure.&lt;/p&gt;
+&lt;p&gt;In this series, we will be starting from the scratch (right from creating an empty directory for the project) and incrementally add business features one at a time and wrap up with deploying to Azure.&lt;/p&gt;
 
-&lt;p&gt;Overall, It&amp;rsquo;s going to be lot of fun! Let&amp;rsquo;s start our journey.&lt;/p&gt;
+&lt;p&gt;Overall, It&amp;rsquo;s going to be a lot of fun!&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start our journey.&lt;/p&gt;
 
 &lt;h2 id=&#34;table-of-contents&#34;&gt;Table of Contents&lt;/h2&gt;
 
@@ -1291,9 +1293,9 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 
 &lt;h2 id=&#34;acknowledgement&#34;&gt;Acknowledgement&lt;/h2&gt;
 
-&lt;p&gt;This entire series was initially planned to be released as a video course in &lt;a href=&#34;https://fsharp.tv/&#34; target=&#34;_blank&#34;&gt;FSharp.TV&lt;/a&gt; after my &lt;a href=&#34;https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP&#34; target=&#34;_blank&#34;&gt;Build a Web Server based on Suave&lt;/a&gt; course. Due to some personal reasons, we couldn&amp;rsquo;t complete it. Thank you &lt;a href=&#34;https://twitter.com/MarkRGray&#34; target=&#34;_blank&#34;&gt;Mark&lt;/a&gt; for the courteous support to release the course as a blog series and book.&lt;/p&gt;
+&lt;p&gt;This entire series was initially planned to be released as a video course in &lt;a href=&#34;https://fsharp.tv/&#34; target=&#34;_blank&#34;&gt;FSharp.TV&lt;/a&gt; after my &lt;a href=&#34;https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP&#34; target=&#34;_blank&#34;&gt;Build a Web Server based on Suave&lt;/a&gt; course. Due to some personal reasons, we couldn&amp;rsquo;t complete it. Thank you, &lt;a href=&#34;https://twitter.com/MarkRGray&#34; target=&#34;_blank&#34;&gt;Mark&lt;/a&gt;, for the courteous support to release the course as a blog series and book.&lt;/p&gt;
 
-&lt;p&gt;I&amp;rsquo;d like to thank the entire &lt;a href=&#34;http://fsharp.org/&#34; target=&#34;_blank&#34;&gt;F# Community&lt;/a&gt; for their open source contributions, support and thought provoking blog posts, articles and tutorials.&lt;/p&gt;
+&lt;p&gt;I&amp;rsquo;d like to thank the entire &lt;a href=&#34;http://fsharp.org/&#34; target=&#34;_blank&#34;&gt;F# Community&lt;/a&gt; for their open source contributions, support, and thought-provoking blog posts, articles, and tutorials.&lt;/p&gt;
 </description>
     </item>
     
