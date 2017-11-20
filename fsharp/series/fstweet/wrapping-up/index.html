@@ -255,19 +255,19 @@
 
 <p>Hi,</p>
 
-<p>Thank you for joining me in the quest of developing a real world application using functional programming principles in F#. I belived it has added value to you.</p>
+<p>Thank you for joining me in the quest of developing a real-world application using functional programming principles in F#. I believe it has added value to you.</p>
 
-<p>Let&rsquo;s have a quick recap what we have done so far and discuss the journey ahead before we wrap up <a href="/fsharp/series/fstweet/intro/" target="_blank">this blog post series</a>.</p>
+<p>Let&rsquo;s have a quick recap of what we have done so far and discuss the journey ahead before we wrap up <a href="/fsharp/series/fstweet/intro/" target="_blank">this blog post series</a>.</p>
 
 <h2 id="code-organization">Code Organization</h2>
 
-<p>Here is the architectural (colourful!) diagram of our FsTweet Application.</p>
+<p>Here is the architectural (colorful!) diagram of our FsTweet Application.</p>
 
 <p><img src="/img/fsharp/series/fstweet/fstweet_10_000_ft_view.png" alt="" /></p>
 
-<p>The black ellipses represent the business use cases and the red circles at the top represent the common abstractions.</p>
+<p>The black ovals represent the business use cases and the red circles at the top represent the common abstractions.</p>
 
-<p>It is an opinionated approach based on the software development principle, <a href="https://thebojan.ninja/2015/04/08/high-cohesion-loose-coupling/" target="_blank">high cohesion and loose coupling</a>.</p>
+<p>It is an opinionated approach based on the software development principle, <a href="https://thebojan.ninja/2015/04/08/high-cohesion-loose-coupling/" target="_blank">high cohesion, and loose coupling</a>.</p>
 
 <p>Organizing the code around business use cases give us a clarity while trying to understand the system.</p>
 
@@ -289,7 +289,7 @@
 <p>A Composition Root is a (preferably) unique location in an application where modules are composed together - <a href="https://twitter.com/ploeh" target="_blank">Mark Seemann</a></p>
 </blockquote>
 
-<p>The Composition Root pattern along with <a href="https://fsharpforfunandprofit.com/posts/dependency-injection-1/" target="_blank">dependency injection through partial application</a> provided us the foundation for our application.</p>
+<p>The Composition Root pattern along with <a href="https://fsharpforfunandprofit.com/posts/dependency-injection-1/" target="_blank">dependency injection through the partial application</a> provided us the foundation for our application.</p>
 
 <p>In FsTweet, the <code>main</code> function is the composition root for the entire application</p>
 
@@ -299,19 +299,19 @@
 
 <p><img src="/img/fsharp/series/fstweet/usecase_composition_root.png" alt="" /></p>
 
-<p>There are other patterns like <a href="http://blog.ploeh.dk/2017/08/07/f-free-monad-recipe/" target="_blank">Free Monad</a> and <a href="https://www.youtube.com/watch?v=xPlsVVaMoB0" target="_blank">Reader Monad</a> to solve this in a different way. For our use case, the approach that we used helped us to get the job done without any complexties.</p>
+<p>There are other patterns like <a href="http://blog.ploeh.dk/2017/08/07/f-free-monad-recipe/" target="_blank">Free Monad</a> and <a href="https://www.youtube.com/watch?v=xPlsVVaMoB0" target="_blank">Reader Monad</a> to solve this differently. For our use case, the approach that we used helped us to get the job done without any complexities.</p>
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">The free monad series by <a href="https://twitter.com/ploeh?ref_src=twsrc%5Etfw">@ploeh</a> is excellent. Still, I think free monads, esp. in F#, are solving a non-problem in overly complicated way.</p>&mdash; Tomas Petricek (@tomaspetricek) <a href="https://twitter.com/tomaspetricek/status/892037756041523204?ref_src=twsrc%5Etfw">July 31, 2017</a></blockquote>
 <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 
-<p>Being said that, the context always wins. For the application that we took, it made sense. The Free Monad and Reader Monad approaches suit well for certain kind of problems. Hence, my recommendation would be, learn all the approaches, pick the one that suits your project and <a href="https://www.infoq.com/presentations/Simple-Made-Easy" target="_blank">keep it simple</a>.</p>
+<p>Being said this, the context always wins. For the application that we took, it made sense. The Free Monad and Reader Monad approaches suit well for particular kind of problems. Hence, my recommendation would be, learn all the approaches, pick the one that suits your project and <a href="https://www.infoq.com/presentations/Simple-Made-Easy" target="_blank">keeps it simple</a>.</p>
 
-<p>I encourage you to try Free Monad and Reader Monad apporaches with the FsTweet codebase and do let me know once you are done. It&rsquo;d be a good resource for entire fsharp community!</p>
+<p>I encourage you to try Free Monad and Reader Monad approaches with the FsTweet codebase and do let me know once you are done. It&rsquo;d be an excellent   resource for the entire fsharp community!</p>
 
 <h2 id="the-journey-ahead">The Journey Ahead</h2>
 
-<p>There are lot of ways, we can modify/extend/play with FsTweet.</p>
+<p>We can modify/extend/play the FsTweet application like</p>
 
 <ul>
 <li><p>Replacing Suave with <a href="https://freya.io/" target="_blank">Freya</a> or <a href="https://github.com/dustinmoris/Giraffe" target="_blank">Girafee</a> or <a href="https://docs.microsoft.com/en-us/aspnet/core/" target="_blank">ASP.NET Core</a></p></li>
@@ -320,10 +320,10 @@
 
 <li><p>Replacing GetStream.io with <a href="https://fsharpforfunandprofit.com/posts/concurrency-actor-model/" target="_blank">F# Agents</a> or <a href="http://getakka.net/" target="_blank">Akka.Net</a> with <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventSource" target="_blank">Event Source</a></p></li>
 
-<li><p>Features like, suggesting whom to follow (Machine Learning!), highlights, hashtag based searching, unfollow and much more. You can even change the character limit to 280 characters!</p></li>
+<li><p>Features like suggesting whom to follow (Machine Learning!), highlights, hashtag-based searching, unfollow and much more. You can even change the character limit to 280 characters!</p></li>
 </ul>
 
-<p>Do drop a note when you make any of these or something else that you found fun and meaningful</p>
+<p>Do drop a note when you make any of these or something else that you found fun and meaningful.</p>
 
 <p>Once again thanks for joining me :)</p>
 

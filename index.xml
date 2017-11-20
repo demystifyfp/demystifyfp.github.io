@@ -20,19 +20,19 @@
 
 &lt;p&gt;Hi,&lt;/p&gt;
 
-&lt;p&gt;Thank you for joining me in the quest of developing a real world application using functional programming principles in F#. I belived it has added value to you.&lt;/p&gt;
+&lt;p&gt;Thank you for joining me in the quest of developing a real-world application using functional programming principles in F#. I believe it has added value to you.&lt;/p&gt;
 
-&lt;p&gt;Let&amp;rsquo;s have a quick recap what we have done so far and discuss the journey ahead before we wrap up &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;this blog post series&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s have a quick recap of what we have done so far and discuss the journey ahead before we wrap up &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;this blog post series&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&#34;code-organization&#34;&gt;Code Organization&lt;/h2&gt;
 
-&lt;p&gt;Here is the architectural (colourful!) diagram of our FsTweet Application.&lt;/p&gt;
+&lt;p&gt;Here is the architectural (colorful!) diagram of our FsTweet Application.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/fstweet_10_000_ft_view.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;The black ellipses represent the business use cases and the red circles at the top represent the common abstractions.&lt;/p&gt;
+&lt;p&gt;The black ovals represent the business use cases and the red circles at the top represent the common abstractions.&lt;/p&gt;
 
-&lt;p&gt;It is an opinionated approach based on the software development principle, &lt;a href=&#34;https://thebojan.ninja/2015/04/08/high-cohesion-loose-coupling/&#34; target=&#34;_blank&#34;&gt;high cohesion and loose coupling&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;It is an opinionated approach based on the software development principle, &lt;a href=&#34;https://thebojan.ninja/2015/04/08/high-cohesion-loose-coupling/&#34; target=&#34;_blank&#34;&gt;high cohesion, and loose coupling&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Organizing the code around business use cases give us a clarity while trying to understand the system.&lt;/p&gt;
 
@@ -54,7 +54,7 @@
 &lt;p&gt;A Composition Root is a (preferably) unique location in an application where modules are composed together - &lt;a href=&#34;https://twitter.com/ploeh&#34; target=&#34;_blank&#34;&gt;Mark Seemann&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;The Composition Root pattern along with &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/dependency-injection-1/&#34; target=&#34;_blank&#34;&gt;dependency injection through partial application&lt;/a&gt; provided us the foundation for our application.&lt;/p&gt;
+&lt;p&gt;The Composition Root pattern along with &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/dependency-injection-1/&#34; target=&#34;_blank&#34;&gt;dependency injection through the partial application&lt;/a&gt; provided us the foundation for our application.&lt;/p&gt;
 
 &lt;p&gt;In FsTweet, the &lt;code&gt;main&lt;/code&gt; function is the composition root for the entire application&lt;/p&gt;
 
@@ -64,19 +64,19 @@
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/usecase_composition_root.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;There are other patterns like &lt;a href=&#34;http://blog.ploeh.dk/2017/08/07/f-free-monad-recipe/&#34; target=&#34;_blank&#34;&gt;Free Monad&lt;/a&gt; and &lt;a href=&#34;https://www.youtube.com/watch?v=xPlsVVaMoB0&#34; target=&#34;_blank&#34;&gt;Reader Monad&lt;/a&gt; to solve this in a different way. For our use case, the approach that we used helped us to get the job done without any complexties.&lt;/p&gt;
+&lt;p&gt;There are other patterns like &lt;a href=&#34;http://blog.ploeh.dk/2017/08/07/f-free-monad-recipe/&#34; target=&#34;_blank&#34;&gt;Free Monad&lt;/a&gt; and &lt;a href=&#34;https://www.youtube.com/watch?v=xPlsVVaMoB0&#34; target=&#34;_blank&#34;&gt;Reader Monad&lt;/a&gt; to solve this differently. For our use case, the approach that we used helped us to get the job done without any complexities.&lt;/p&gt;
 
 &lt;blockquote class=&#34;twitter-tweet&#34;&gt;&lt;p lang=&#34;en&#34; dir=&#34;ltr&#34;&gt;The free monad series by &lt;a href=&#34;https://twitter.com/ploeh?ref_src=twsrc%5Etfw&#34;&gt;@ploeh&lt;/a&gt; is excellent. Still, I think free monads, esp. in F#, are solving a non-problem in overly complicated way.&lt;/p&gt;&amp;mdash; Tomas Petricek (@tomaspetricek) &lt;a href=&#34;https://twitter.com/tomaspetricek/status/892037756041523204?ref_src=twsrc%5Etfw&#34;&gt;July 31, 2017&lt;/a&gt;&lt;/blockquote&gt;
 &lt;script async src=&#34;https://platform.twitter.com/widgets.js&#34; charset=&#34;utf-8&#34;&gt;&lt;/script&gt;
 
 
-&lt;p&gt;Being said that, the context always wins. For the application that we took, it made sense. The Free Monad and Reader Monad approaches suit well for certain kind of problems. Hence, my recommendation would be, learn all the approaches, pick the one that suits your project and &lt;a href=&#34;https://www.infoq.com/presentations/Simple-Made-Easy&#34; target=&#34;_blank&#34;&gt;keep it simple&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Being said this, the context always wins. For the application that we took, it made sense. The Free Monad and Reader Monad approaches suit well for particular kind of problems. Hence, my recommendation would be, learn all the approaches, pick the one that suits your project and &lt;a href=&#34;https://www.infoq.com/presentations/Simple-Made-Easy&#34; target=&#34;_blank&#34;&gt;keeps it simple&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;I encourage you to try Free Monad and Reader Monad apporaches with the FsTweet codebase and do let me know once you are done. It&amp;rsquo;d be a good resource for entire fsharp community!&lt;/p&gt;
+&lt;p&gt;I encourage you to try Free Monad and Reader Monad approaches with the FsTweet codebase and do let me know once you are done. It&amp;rsquo;d be an excellent   resource for the entire fsharp community!&lt;/p&gt;
 
 &lt;h2 id=&#34;the-journey-ahead&#34;&gt;The Journey Ahead&lt;/h2&gt;
 
-&lt;p&gt;There are lot of ways, we can modify/extend/play with FsTweet.&lt;/p&gt;
+&lt;p&gt;We can modify/extend/play the FsTweet application like&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;&lt;p&gt;Replacing Suave with &lt;a href=&#34;https://freya.io/&#34; target=&#34;_blank&#34;&gt;Freya&lt;/a&gt; or &lt;a href=&#34;https://github.com/dustinmoris/Giraffe&#34; target=&#34;_blank&#34;&gt;Girafee&lt;/a&gt; or &lt;a href=&#34;https://docs.microsoft.com/en-us/aspnet/core/&#34; target=&#34;_blank&#34;&gt;ASP.NET Core&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
@@ -85,10 +85,10 @@
 
 &lt;li&gt;&lt;p&gt;Replacing GetStream.io with &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/concurrency-actor-model/&#34; target=&#34;_blank&#34;&gt;F# Agents&lt;/a&gt; or &lt;a href=&#34;http://getakka.net/&#34; target=&#34;_blank&#34;&gt;Akka.Net&lt;/a&gt; with &lt;a href=&#34;https://developer.mozilla.org/en-US/docs/Web/API/EventSource&#34; target=&#34;_blank&#34;&gt;Event Source&lt;/a&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Features like, suggesting whom to follow (Machine Learning!), highlights, hashtag based searching, unfollow and much more. You can even change the character limit to 280 characters!&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Features like suggesting whom to follow (Machine Learning!), highlights, hashtag-based searching, unfollow and much more. You can even change the character limit to 280 characters!&lt;/p&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Do drop a note when you make any of these or something else that you found fun and meaningful&lt;/p&gt;
+&lt;p&gt;Do drop a note when you make any of these or something else that you found fun and meaningful.&lt;/p&gt;
 
 &lt;p&gt;Once again thanks for joining me :)&lt;/p&gt;
 
