@@ -22,7 +22,7 @@
 
 &lt;p&gt;It&amp;rsquo;s great to see you back in the twenty-first part of &lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/intro/&#34; target=&#34;_blank&#34;&gt;Creating a Twitter Clone in F# using Suave&lt;/a&gt; blog post series.&lt;/p&gt;
 
-&lt;p&gt;In this blog post, we are going to prepare our code for deployment, and we&amp;rsquo;ll be deploying our FsTweet Application in Azure using &lt;a href=&#34;https://azure.microsoft.com/en-in/services/app-service/&#34; target=&#34;_blank&#34;&gt;Azure App Service&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to prepare our code for deployment, and we&amp;rsquo;ll be deploying our FsTweet Application on Azure using &lt;a href=&#34;https://azure.microsoft.com/en-in/services/app-service/&#34; target=&#34;_blank&#34;&gt;Azure App Service&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;Let&amp;rsquo;s dive in.&lt;/p&gt;
 
@@ -81,7 +81,7 @@ let main argv =
 &lt;p&gt;The first step is manual, and our FAKE build script is already taking care of rest of the steps.&lt;/p&gt;
 
 &lt;blockquote&gt;
-&lt;p&gt;We&amp;rsquo;ll be adding a separate step in our build script to run the application on cloud.&lt;/p&gt;
+&lt;p&gt;Later in this blog post, We&amp;rsquo;ll be adding a separate step in our build script to deploy the application on cloud.&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;To make this ideal scenario work, we need an intermediate step between three and four, which takes the connection string from the environment variable and replaces the connection string literal in &lt;em&gt;Db.fs&lt;/em&gt; with this one. After successful compilation, we need to revert this change.&lt;/p&gt;
@@ -655,7 +655,7 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 
 &lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/series/fstweet/azure_deplyed.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
 
-&lt;p&gt;After the deployment, if we want to make any change, just do a git commit after making the changes and push it to the remote as we did now!&lt;/p&gt;
+&lt;p&gt;Post deployment, if we want to make any change, just do a git commit. After making the changes and push it to the remote as we did now!&lt;/p&gt;
 
 &lt;p&gt;If we don&amp;rsquo;t want to do it manually, we can &lt;a href=&#34;https://docs.microsoft.com/en-us/azure/app-service/app-service-continuous-deployment&#34; target=&#34;_blank&#34;&gt;enable continuous deployment&lt;/a&gt; from the Azure portal.&lt;/p&gt;
 
@@ -669,7 +669,7 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 
 &lt;h3 id=&#34;next-part&#34;&gt;Next Part&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1285,7 +1285,7 @@ Target &amp;quot;Run&amp;quot; (fun _ -&amp;gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/following-a-user/&#34; target=&#34;_blank&#34;&gt;Following a User&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/fetching-followers-and-following-users/&#34; target=&#34;_blank&#34;&gt;Fetching Followers and Following Users&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/&#34; target=&#34;_blank&#34;&gt;Deploying to Azure App Service&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/&#34; target=&#34;_blank&#34;&gt;Adding Logs using Logary&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;&#34; target=&#34;_blank&#34;&gt;Wrapping Up&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 

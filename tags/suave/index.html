@@ -72,7 +72,7 @@
   <meta property="og:description" content="Demystifying">
   <meta property="og:locale" content="en-us">
   
-  <meta property="og:updated_time" content="2017-11-08T07:11:34&#43;05:30">
+  <meta property="og:updated_time" content="2017-11-11T16:37:49&#43;05:30">
   
 
   
@@ -180,12 +180,25 @@
   
   
   <div>
+    <h2><a href="https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/">Adding Logs using Logary</a></h2>
+    <div class="article-style">
+      
+      Hi!
+Welcome Back!!
+In this twenty-second part of Creating a Twitter Clone in F# using Suave blog post series, we are going to improve how we are logging the exceptions in FsTweet.
+What&rsquo;s Wrong With Current Logic Can you guess what went wrong by looking at the below log of FsTweet?
+System.AggregateException: One or more errors occurred. &mdash;&gt; Stream.StreamException: Error: NameResolutionFailure at Stream.StreamException.FromResponse (RestSharp.IRestResponse response) [0x00075] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0 at Stream.
+      
+    </div>
+  </div>
+  
+  <div>
     <h2><a href="https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/">Deploying to Azure App Service</a></h2>
     <div class="article-style">
       
       Hi There!
 It&rsquo;s great to see you back in the twenty-first part of Creating a Twitter Clone in F# using Suave blog post series.
-In this blog post, we are going to prepare our code for deployment, and we&rsquo;ll be deploying our FsTweet Application in Azure using Azure App Service.
+In this blog post, we are going to prepare our code for deployment, and we&rsquo;ll be deploying our FsTweet Application on Azure using Azure App Service.
 Let&rsquo;s dive in.
 Revisiting Database Interaction The first place that we need to touch to prepare FsTweet for deployment is Db.
       
@@ -285,19 +298,6 @@ Welcome back to the thirteenth part of Creating a Twitter Clone in F# using Suav
 In this blog post, we are going to start the implementation of a new feature, enabling users to log in to FsTweet.
 Let&rsquo;s get started by creating a new file Auth.fs in the web project and move it above FsTweet.Web.fs
 &gt; forge newFs web -n src/FsTweet.Web/Auth &gt; forge moveUp web -n src/FsTweet.
-      
-    </div>
-  </div>
-  
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/series/fstweet/verifying-user-email/">Verifying User Email</a></h2>
-    <div class="article-style">
-      
-      Hi,
-In the previous blog post, we added support for sending verification email using Postmark.
-In this blog post, we are going to wrap up the user signup workflow by implementing the backend logic of the user verifcation link that we sent in the email.
-A Type For The Verify User Function. Let&rsquo;s get started by defining a type for the function which verifies the user.
-type VerifyUser = string -&gt; AsyncResult&lt;Username option, System.
       
     </div>
   </div>

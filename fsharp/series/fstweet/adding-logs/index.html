@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.30.2" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/">
+  <meta property="og:title" content="Adding Logs using Logary | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2017-11-11T16:37:49&#43;05:30">
+  
+  <meta property="article:modified_time" content="2017-11-11T16:37:49&#43;05:30">
+  
+
+  
+
+  <title>Adding Logs using Logary | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Books
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="http://products.tamizhvendan.in/fsharp-applied">
+                
+                <span>F# Applied</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Tutorials
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/fsharp/series/fstweet/intro">
+                
+                <span>Twitter Clone in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Adding Logs using Logary</h1>
+
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2017-11-11 16:37:49 &#43;0530 IST" itemprop="datePublished">
+      Sat, Nov 11, 2017
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    8 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Adding%20Logs%20using%20Logary&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fadding-logs%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fadding-logs%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fadding-logs%2f&amp;title=Adding%20Logs%20using%20Logary"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fadding-logs%2f&amp;title=Adding%20Logs%20using%20Logary"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Adding%20Logs%20using%20Logary&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fseries%2ffstweet%2fadding-logs%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>Hi!</p>
+
+<p>Welcome Back!!</p>
+
+<p>In this twenty-second part of <a href="/fsharp/series/fstweet/intro/" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series, we are going to improve how we are logging the exceptions in FsTweet.</p>
+
+<h2 id="what-s-wrong-with-current-logic">What&rsquo;s Wrong With Current Logic</h2>
+
+<p>Can you guess what went wrong by looking at the below log of FsTweet?</p>
+
+<pre><code class="language-bash">System.AggregateException: One or more errors occurred. ---&gt; Stream.StreamException: Error: NameResolutionFailure
+  at Stream.StreamException.FromResponse (RestSharp.IRestResponse response) [0x00075] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0
+  at Stream.StreamFeed+&lt;AddActivity&gt;d__22.MoveNext () [0x00139] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0
+   --- End of inner exception stack trace ---
+---&gt; (Inner Exception #0) Stream.StreamException: Error: NameResolutionFailure
+  at Stream.StreamException.FromResponse (RestSharp.IRestResponse response) [0x00075] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0
+  at Stream.StreamFeed+&lt;AddActivity&gt;d__22.MoveNext () [0x00139] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0 &lt;---
+</code></pre>
+
+<p>We&rsquo;ll get the above error if the internet connection is down when we post a tweet.</p>
+
+<p>And the code that is logging this exception looks like this</p>
+
+<pre><code class="language-fsharp">let onPublishTweetFailure (err : PublishTweetError) =
+  match err with
+  | NotifyTweetError (tweetId, ex) -&gt;
+      printfn &quot;%A&quot; ex
+      onPublishTweetSuccess tweetId
+  // ...
+</code></pre>
+
+<p>Our current apporach to logging exceptions in FsTweet is so naive, and clearly, it is not helping us to troubleshoot. Let&rsquo;s fix this before we wrap it up!</p>
+
+<h2 id="introducing-logary">Introducing Logary</h2>
+
+<p><a href="https://github.com/logary/logary" target="_blank">Logary</a> is a high-performance, semantic logging, health, and metrics library for .Net. It enables us to log what happened in the application in a meaningful way which in turn help us a lot in analyzing them.</p>
+
+<p>The <a href="https://www.nuget.org/packages/Logary/" target="_blank">Logary</a> NuGet package has a dependency on <a href="https://www.nuget.org/packages/NodaTime/" target="_blank">NodaTime</a> NuGet package.</p>
+
+<p>At the time of this writing, there is <a href="https://github.com/logary/logary/issues/239" target="_blank">an incompatibility issue</a> with NodaTime version 2.0 in Logary and the NodaTime version which works well with Logary is <code>1.3.2</code>.</p>
+
+<p>So, before adding the Logary package, we first need to add the NodaTime v1.3.2 package and then the Logary package.</p>
+
+<pre><code class="language-bash">&gt; forge paket add NodaTime -V 1.3.2 \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+&gt; forge paket add Logary \
+    -p src/FsTweet.Web/FsTweet.Web.fsproj
+</code></pre>
+
+<blockquote>
+<p>If we just added Logary, while adding, it will pull the NodaTime 2.0 version</p>
+</blockquote>
+
+<p>Now we have the Logary package added to our Application</p>
+
+<h2 id="the-logging-approach">The Logging Approach</h2>
+
+<p>There are multiple ways that we can leverage Logary in our application. One of the approaches that fit well with functional programming principles is separating the communication (of what went wrong) and action (log the error using Logary).</p>
+
+<p>In Suave&rsquo;s world, it translates to the following</p>
+
+<p><img src="/img/fsharp/series/fstweet/log_boundaries.png" alt="Log Boundaries" /></p>
+
+<p>Inside use case (User Signup, New Tweet, etc.,) boundary, we communicate what went wrong with all the required information that can be helpful to troubleshoot. At the edge of the application, we check is there any error in the request pipeline and perform the necessary action.</p>
+
+<p>To pass data between WebPart&rsquo;s in the request pipeline, Suave has a useful property called <code>userState</code> in the <code>HttpContext</code> record. The <code>userState</code> is of type <code>Map&lt;string, obj&gt;</code> and we can add custom data to it using the <code>setUserData</code> function in the <code>Writers</code> module.</p>
+
+<blockquote>
+<p>The <code>setState</code> function that we used while <a href="/fsharp/series/fstweet/creating-user-session-and-authenticating-user/#creating-session-cookie" target="_blank">persisting the logged in user</a> is to persist data in a session (across multiple requests).</p>
+
+<p>The <code>setUserData</code> function is to pass the data between WebPart&rsquo;s during a request&rsquo;s lifetime and cleared as soon the request has been served.</p>
+</blockquote>
+
+<h2 id="the-communication-side">The Communication Side</h2>
+
+<p>In this blog post, we are going to take one use case and improve the way we log.</p>
+
+<blockquote>
+<p>Rest of the use cases are left as exercises for you to play with!</p>
+</blockquote>
+
+<p>Let&rsquo;s improve the log of publishing tweet failure</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Wall.fs
+// ...
+  let onPublishTweetFailure (err : PublishTweetError) =
+    match err with
+    | NotifyTweetError (tweetId, ex) -&gt;
+      printfn &quot;%A&quot; ex
+      onPublishTweetSuccess tweetId
+    | CreateTweetError ex -&gt;
+      printfn &quot;%A&quot; ex
+      JSON.internalError
+// ...
+</code></pre>
+
+<p>The first thing that we need is, for which user this error has occurred.</p>
+
+<p>Let&rsquo;s add a new parameter <code>user</code> of type <code>User</code> in the <code>onPublishTweetFailure</code> function and the pass the user when this function get called</p>
+
+<pre><code class="language-diff">- let onPublishTweetFailure (err : PublishTweetError) =
++ let onPublishTweetFailure (user : User) (err : PublishTweetError) =
+    ...
+
+  let handleNewTweet publishTweet (user : User) ctx = async {
+    ...
+-     |&gt; AR.either onPublishTweetSuccess onPublishTweetFailure
++     |&gt; AR.either onPublishTweetSuccess (onPublishTweetFailure user)  
+    ...
+  }
+</code></pre>
+
+<p>The <a href="https://github.com/logary/logary#tutorial-and-data-model" target="_blank">Message</a> is a core data model in Logary, which is the smallest unit you can log. We can make use of this data model to communicate what went wrong.</p>
+
+<p>Let&rsquo;s rewrite the <code>onPublishTweetFailure</code> function as below</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/Wall.fs
+// ...
+module Suave = 
+  // ...
+  open Logary
+  open Suave.Writers
+  // ...
+
+  let onPublishTweetFailure (user : User) (err : PublishTweetError) =
+    let (UserId userId) = user.UserId
+    
+    let msg =
+      Message.event Error &quot;Tweet Notification Error&quot;
+      |&gt; Message.setField &quot;userId&quot; userId
+
+    match err with
+    | NotifyTweetError (tweetId, ex) -&gt;
+      let (TweetId tId) = tweetId
+      msg // Message
+      |&gt; Message.addExn ex // Message
+      |&gt; Message.setField &quot;tweetId&quot; tId // Message
+      |&gt; setUserData &quot;err&quot; // WebPart
+      &gt;=&gt; onPublishTweetSuccess tweetId // WebPart
+    | CreateTweetError ex -&gt;
+      msg
+      |&gt; Message.addExn ex // Message
+      |&gt; setUserData &quot;err&quot; // WebPart
+      &gt;=&gt; JSON.internalError // WebPart
+
+</code></pre>
+
+<p>We are creating a Logary <em>Message</em> of type <code>Event</code> with the name <code>Tweet Notification Error</code> and set the extra fields using the <code>Message.setField</code> function.</p>
+
+<p>We are also adding the actual exception to the <em>Message</em> using the <code>Message.addExn</code>. Finally, we save the <code>Message</code> using the <code>setUserData</code> function from Suave&rsquo;s Writers module.</p>
+
+<p>Now we have captured all the required information on the business side.</p>
+
+<h3 id="fixing-logary-and-chiron-type-conflict">Fixing Logary and Chiron Type Conflict</h3>
+
+<p>Both Logary and Chiron has the types <code>String</code> and <code>Object</code>. So, if we opened the <code>Logary</code> namespace after that of Chiron, F# compiler will treat these types are from the <code>Logary</code> library.</p>
+
+<pre><code class="language-fsharp">open Chiron
+// ...
+open Logary
+</code></pre>
+
+<p>So, we have to change the <code>onPublishTweetSuccess</code> function as below to let the compiler know that we are using these types from the Chiron library.</p>
+
+<pre><code class="language-diff">let onPublishTweetSuccess (TweetId id) = 
+- [&quot;id&quot;, String (id.ToString())]
++ [&quot;id&quot;, Json.String (id.ToString())]
+  |&gt; Map.ofList
+- |&gt; Object
++ |&gt; Json.Object
+  |&gt; Json.ok  
+</code></pre>
+
+<h2 id="the-action-side">The Action Side</h2>
+
+<p>The Action side of logging involves, initializing Logary&rsquo;s logger during the application bootstrap and log using it if there is an error in the request pipeline.</p>
+
+<h3 id="initializing-logary">Initializing Logary</h3>
+
+<p>A remarkable feature of Logary is its ability to support multiple targets for the log. We can configure it to write the log on Console, <a href="https://www.rabbitmq.com/" target="_blank">RabbitMQ</a>, <a href="https://www.elastic.co/products/logstash" target="_blank">LogStash</a> and <a href="https://github.com/logary/logary#overview" target="_blank">much more</a>.</p>
+
+<p>In our case, we are going to the simpler option, Console.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/FsTweet.Web.fs
+// ...
+open Logary.Configuration
+open Logary
+open Logary.Targets
+
+// ...
+
+let main argv =
+  // ...
+
+  // LogaryConf -&gt; LogaryConf
+  let target = 
+    withTarget (Console.create Console.empty &quot;console&quot;)
+
+  // LogaryConf -&gt; LogaryConf
+  let rule = 
+    withRule (Rule.createForTarget &quot;console&quot;)
+
+  // LogaryConf -&gt; LogaryConf
+  let logaryConf = 
+    target &gt;&gt; rule
+
+  // ...
+</code></pre>
+
+<ul>
+<li><p>Target specifies where to log. We are using the <code>Console.create</code> factory function from the <code>Logary.Targets</code> module to generate the Console target. The last argument <code>&quot;console&quot;</code> is the name of the target which can be any arbitrary string.</p></li>
+
+<li><p>The Rule specifies when to log. Here we are defining to log for all the cases. (We can configure it to log only Fatal or Error alone)</p></li>
+
+<li><p>The <code>logaryConf</code> composes the target and the rule into single configuration using the <a href="https://fsharpforfunandprofit.com/posts/function-composition/" target="_blank">function composition</a> operator.</p></li>
+</ul>
+
+<p>The next step is initializing the logger using this configuration.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/FsTweet.Web.fs
+// ...
+open Hopac
+
+// ...
+
+let main argv =
+  // ...
+
+  use logary =
+    withLogaryManager &quot;FsTweet.Web&quot; logaryConf |&gt; run
+
+  let logger =
+    logary.getLogger (PointName [|&quot;Suave&quot;|])
+
+  // ...
+</code></pre>
+
+<p>Logary uses <a href="https://github.com/Hopac/Hopac" target="_blank">Hopac&rsquo;s Job</a> with <a href="https://en.wikipedia.org/wiki/Actor_model" target="_blank">Actor model</a> behind the scenes to log the data in the Targets without the blocking the caller. You can think of this as a lightweight <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/threading/" target="_blank">Thread</a> running parallel along with the main program. If there is anything to log, we just need to give it this Hopac Job, and we can move on without waiting for it to complete.</p>
+
+<p>Here we are initializing the logaryManager with a name and the configuration and asking it to <code>run</code> parallel.</p>
+
+<p>Then we get a logger instance by providing the <a href="https://github.com/logary/logary#pointname" target="_blank">PointName</a>, a location where you send the log message from.</p>
+
+<h3 id="wiring-logary-with-suave">Wiring Logary With Suave</h3>
+
+<p>The final piece that we need to work on is to check is there any error in the request pipeline and log it using the logger (that we just created) if we found one.</p>
+
+<pre><code class="language-fsharp">// src/FsTweet.Web/FsTweet.Web.fs
+// ...
+
+// HttpContext -&gt; string -&gt; 'value option
+let readUserState ctx key : 'value option =
+  ctx.userState 
+  |&gt; Map.tryFind key 
+  |&gt; Option.map (fun x -&gt; x :?&gt; 'value)
+
+// Logger -&gt; WebPart
+let logIfError (logger : Logger) ctx = 
+  readUserState ctx &quot;err&quot; // Message option
+  |&gt; Option.iter logger.logSimple // unit
+  succeed // WebPart
+
+let main argv = 
+  // ...
+</code></pre>
+
+<p>In the <code>readUserState</code> function, we are trying to find an <code>obj</code> with the provided <code>key</code> in the <code>userState</code> property of <code>HttpContext</code>. If the <code>obj</code> does exist, we are <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/casting-and-conversions-%5Bfsharp%5D" target="_blank">downcasting</a> it to a generic type <code>'value</code>.</p>
+
+<p>The <code>logIfError</code> function takes an instance of <code>Logger</code> and uses <code>readUserState</code> function to find the error log Message and log it using the <code>logSimple</code> function from Logary. The <code>succeed</code> is an in-built WebPart from Suave</p>
+
+<p>The last step is wiring this <code>logIfError</code> function with the request pipeline</p>
+
+<pre><code class="language-diff">let main argv = 
+  ...
+  let logger = ...
+  ...
+  let app = ...
+  ...
+- startWebServer serverConfig app
+
++ let appWithLogger = 
++   app &gt;=&gt; context (logIfError logger)
+
++ startWebServer serverConfig appWithLogger
+</code></pre>
+
+<p>Awesome. The action to perform the actual logging is entirely de-coupled!</p>
+
+<p>Now if we run the application, and post a tweet with internet connection down, we get the following log</p>
+
+<pre><code class="language-bash">E 2017-11-11T16:57:30.7999800+00:00: Tweet Notification Error [Suave]
+  errors =&gt;
+    -
+      hResult =&gt; -2146233088
+      message =&gt; &quot;Error: NameResolutionFailure&quot;
+      source =&gt; &quot;StreamNet&quot;
+      stackTrace =&gt; &quot;  at Stream.StreamException.FromResponse (RestSharp.IRestResponse response) [0x00075] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0
+  at Stream.StreamFeed+&lt;AddActivity&gt;d__22.MoveNext () [0x00139] in &lt;5158106fb22e4063ad9c9f74906b6f9e&gt;:0 &quot;
+      targetSite =&gt; &quot;Stream.StreamException FromResponse(RestSharp.IRestResponse)&quot;
+      type =&gt; &quot;Stream.StreamException&quot;
+  tweetId =&gt; &quot;4d1243a4-9098-46c0-94c9-f780fe10bd4c&quot;
+  userId =&gt; 22
+</code></pre>
+
+<p>Better and actionable log, isn&rsquo;t it?</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>We just scratched the surface of the Logary library in this blog post, and we can make the logs even more robust by leveraging other features from the Logary&rsquo;s kitty.</p>
+
+<p>Apart from Logary, An another take away is how we separated the communication and action aspects of logging. This separation enabled us to perform the logging outside of the business domain (at the edge of the application boundary), and we didn&rsquo;t pass the logger as a dependency from the <code>main</code> function to the downstream <code>webpart</code> functions.</p>
+
+<p>The source code associated with this blog post is available on <a href="https://github.com/demystifyfp/FsTweet/tree/v0.21" target="_blank">GitHub</a></p>
+
+<h3 id="next-part">Next Part</h3>
+
+<p><a href="" target="_blank">Wrapping Up</a></p>
+
+      </div>
+
+      
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/suave">suave</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/logary">logary</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+</div>
+
+
+
+    </div>
+  </div>
+
+</article>
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/series/fstweet/deploying-to-azure-app-service/">Deploying to Azure App Service</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/fetching-followers-and-following-users/">Fetching Followers and Following Users</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/following-a-user/">Following a User</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/adding-user-profile-page/">Adding User Profile Page</a></li>
+    
+    <li><a href="/fsharp/series/fstweet/posting-new-tweet/">Posting New Tweet</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

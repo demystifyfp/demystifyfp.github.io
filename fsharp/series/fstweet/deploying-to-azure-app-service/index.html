@@ -257,7 +257,7 @@
 
 <p>It&rsquo;s great to see you back in the twenty-first part of <a href="/fsharp/series/fstweet/intro/" target="_blank">Creating a Twitter Clone in F# using Suave</a> blog post series.</p>
 
-<p>In this blog post, we are going to prepare our code for deployment, and we&rsquo;ll be deploying our FsTweet Application in Azure using <a href="https://azure.microsoft.com/en-in/services/app-service/" target="_blank">Azure App Service</a>.</p>
+<p>In this blog post, we are going to prepare our code for deployment, and we&rsquo;ll be deploying our FsTweet Application on Azure using <a href="https://azure.microsoft.com/en-in/services/app-service/" target="_blank">Azure App Service</a>.</p>
 
 <p>Let&rsquo;s dive in.</p>
 
@@ -316,7 +316,7 @@ let main argv =
 <p>The first step is manual, and our FAKE build script is already taking care of rest of the steps.</p>
 
 <blockquote>
-<p>We&rsquo;ll be adding a separate step in our build script to run the application on cloud.</p>
+<p>Later in this blog post, We&rsquo;ll be adding a separate step in our build script to deploy the application on cloud.</p>
 </blockquote>
 
 <p>To make this ideal scenario work, we need an intermediate step between three and four, which takes the connection string from the environment variable and replaces the connection string literal in <em>Db.fs</em> with this one. After successful compilation, we need to revert this change.</p>
@@ -890,7 +890,7 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 
 <p><img src="/img/fsharp/series/fstweet/azure_deplyed.png" alt="" /></p>
 
-<p>After the deployment, if we want to make any change, just do a git commit after making the changes and push it to the remote as we did now!</p>
+<p>Post deployment, if we want to make any change, just do a git commit. After making the changes and push it to the remote as we did now!</p>
 
 <p>If we don&rsquo;t want to do it manually, we can <a href="https://docs.microsoft.com/en-us/azure/app-service/app-service-continuous-deployment" target="_blank">enable continuous deployment</a> from the Azure portal.</p>
 
@@ -904,7 +904,7 @@ To https://fstweet.scm.azurewebsites.net/fstweet.git
 
 <h3 id="next-part">Next Part</h3>
 
-<p><a href="" target="_blank">Adding Logs using Logary</a></p>
+<p><a href="/fsharp/series/fstweet/adding-logs/" target="_blank">Adding Logs using Logary</a></p>
 
       </div>
 

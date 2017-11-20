@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/fsharp/series/fstweet/adding-logs/</loc>
+      <lastmod>2017-11-11T16:37:49+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/fsharp/series/fstweet/deploying-to-azure-app-service/</loc>
       <lastmod>2017-11-08T07:11:34+05:30</lastmod>
     </url>
@@ -303,7 +312,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/fsharp/</loc>
-      <lastmod>2017-11-08T07:11:34+05:30</lastmod>
+      <lastmod>2017-11-11T16:37:49+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -313,7 +322,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/fsharp/</loc>
-      <lastmod>2017-11-08T07:11:34+05:30</lastmod>
+      <lastmod>2017-11-11T16:37:49+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -324,6 +333,16 @@
     
       <loc>https://www.demystifyfp.com/tags/getstream/</loc>
       <lastmod>2017-10-28T05:06:53+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/tags/logary/</loc>
+      <lastmod>2017-11-11T16:37:49+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -402,7 +421,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/suave/</loc>
-      <lastmod>2017-11-08T07:11:34+05:30</lastmod>
+      <lastmod>2017-11-11T16:37:49+05:30</lastmod>
       <priority>0</priority>
     </url>
     
