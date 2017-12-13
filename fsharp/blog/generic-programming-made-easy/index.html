@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.30.2" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/">
+  <meta property="og:title" content="Generic Programming Made Easy | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2017-12-11T19:39:26&#43;05:30">
+  
+  <meta property="article:modified_time" content="2017-12-11T19:39:26&#43;05:30">
+  
+
+  
+
+  <title>Generic Programming Made Easy | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Books
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="http://products.tamizhvendan.in/fsharp-applied">
+                
+                <span>F# Applied</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Generic Programming Made Easy</h1>
+
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2017-12-11 19:39:26 &#43;0530 IST" itemprop="datePublished">
+      Mon, Dec 11, 2017
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    17 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Generic%20Programming%20Made%20Easy&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fgeneric-programming-made-easy%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fgeneric-programming-made-easy%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fgeneric-programming-made-easy%2f&amp;title=Generic%20Programming%20Made%20Easy"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fgeneric-programming-made-easy%2f&amp;title=Generic%20Programming%20Made%20Easy"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Generic%20Programming%20Made%20Easy&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fgeneric-programming-made-easy%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters<sup class="footnote-ref" id="fnref:1"><a rel="footnote" href="#fn:1">1</a></sup>. Generic programming was part of .NET since .NET Version 2.0 and has an <a href="https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/" target="_blank">interesting history</a> as well!</p>
+
+<p>For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming involves reflection, it become a bumpy ride. Let&rsquo;s have a look at the source code<sup class="footnote-ref" id="fnref:2"><a rel="footnote" href="#fn:2">2</a></sup> below to get a feel of what I mean here!</p>
+
+<pre><code class="language-fsharp">let rec print (value : obj) =
+  match value with
+  | null -&gt; &quot;&lt;null&gt;&quot;
+  | :? int as i -&gt; string i
+  | :? string as s -&gt; s
+  | _ -&gt;
+    let t = value.GetType()
+    let isGenTypeOf (gt : Type) =
+        t.IsGenericType &amp;&amp; gt = t.GetGenericTypeDefinition()
+    if isGenTypeOf typedefof&lt;_ option&gt; then
+        let value = t.GetProperty(&quot;Value&quot;).GetValue(value)
+        sprintf &quot;Some %s&quot; (print value)
+    elif isGenTypeOf typedefof&lt;_ * _&gt; then
+        let v1 = t.GetProperty(&quot;Item1&quot;).GetValue(value)
+        let v2 = t.GetProperty(&quot;Item2&quot;).GetValue(value)
+        sprintf &quot;(%s, %s)&quot; (print v1) (print v2)
+    else
+        value.ToString()
+</code></pre>
+
+<p>The above snippet returns the string representation of the parameter <code>value</code>. In the if-else-if expression, the above snippets unwraps the value from the <code>Option</code> type and <code>Tuple</code> type and return its underlying values by recursively calling the <code>print</code> function.</p>
+
+<pre><code class="language-bash">&gt; print (Some &quot;John&quot;);;
+val it : string = &quot;Some John&quot;
+
+&gt; print (1,(Some &quot;data&quot;));;
+val it : string = &quot;(1, Some data)&quot;
+</code></pre>
+
+<p>The hard coded strings, lack of type safety are some of the concerns in the above snippet.</p>
+
+<pre><code class="language-fsharp">let rec print (value : obj) =
+  // ...
+    if isGenTypeOf typedefof&lt;_ option&gt; then
+      let value = t.GetProperty(&quot;Value&quot;).GetValue(value)
+        // ...
+    elif isGenTypeOf typedefof&lt;_ * _&gt; then
+      let v1 = t.GetProperty(&quot;Item1&quot;).GetValue(value)
+      let v2 = t.GetProperty(&quot;Item2&quot;).GetValue(value)
+      // ...
+  // ...
+</code></pre>
+
+<p>Like this piece of code, we may need to write some more ugly and hard to maintain code, if we do some advanced reflection. F# is not known for these kind of problems. There should be a better way!</p>
+
+<p>Yes, That&rsquo;s where <a href="https://github.com/eiriktsarpalis/TypeShape" target="_blank">TypeShape</a> comes into picture.</p>
+
+<blockquote>
+<p>TypeShape is a small, extensible F# library for practical generic programming. It uses a combination of reflection, active patterns, visitor pattern and F# object expressions to minimize the amount of reflection that we need to write - Eirik Tsarpalis</p>
+</blockquote>
+
+<p>In this blog post, we are going to learn the basics of the TypeShape library by implementing an usecase from scratch. In this process, We are also going to learn how to build a reusable library in F# in an incremental fashion.</p>
+
+<blockquote>
+<p>This blog post is a part of the <a href="https://sergeytihon.com/2017/10/22/f-advent-calendar-in-english-2017/" target="_blank">F# Advent Calendar 2017</a>.</p>
+</blockquote>
+
+<h2 id="the-use-cases">The Use Cases</h2>
+
+<p>Reading a value from an environment variable and converting the readed value to a different target type (from <code>string</code> type) to consume it is a boilerplate code.</p>
+
+<pre><code class="language-fsharp">open System
+
+// unit -&gt; Result&lt;int, string&gt;
+let getPortFromEnvVar () =
+  let value =
+    Environment.GetEnvironmentVariable &quot;PORT&quot;
+  match Int32.TryParse value with
+  | true, port -&gt; Ok port
+  | _ -&gt; Error &quot;unable to get&quot;
+</code></pre>
+
+<p>How about making this logic generic and achieving the same using only one function call?</p>
+
+<pre><code class="language-fsharp">&gt; parsePrimitive&lt;int&gt; &quot;PORT&quot;;;
+
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;int&gt; = Ok 5432
+</code></pre>
+
+<p>Sounds good, isn&rsquo;t it?</p>
+
+<p>Often the applications that we develop typically reads multiple environment variables. So, How about putting them together in a record type and read all of them in a single shot?</p>
+
+<pre><code class="language-fsharp">type Config = {
+  ConnectionString : string
+  Port : int
+  EnableDebug : bool
+  Environment : string
+}
+
+&gt; parseRecord&lt;Config&gt; ();;
+
+[&lt;Struct&gt;]
+val it : Result&lt;Config,EnvVarParseError list&gt; =
+  Ok {ConnectionString = &quot;Database=foobar;Password=foobaz&quot;;
+      Port = 5432;
+      EnableDebug = true;
+      Environment = &quot;staging&quot;;}
+</code></pre>
+
+<p>It&rsquo;s even more awesome!!</p>
+
+<p>Let&rsquo;s dive in and implement these two usecases.</p>
+
+<h2 id="use-case-1-parsing-primitives">Use Case #1 - Parsing Primitives</h2>
+
+<h3 id="setting-up">Setting Up</h3>
+
+<p>As we will be implementing the use cases by exploring the TypeShape library, F# scripting would be a good fit to get it done. So, let&rsquo;s start with an empty directory and initialize <a href="https://fsprojects.github.io/Paket" target="_blank">paket</a> using <a href="https://github.com/fsharp-editing/Forge" target="_blank">Forge</a>.</p>
+
+<pre><code class="language-bash">&gt; mkdir FsEnvConfig
+&gt; cd FsEnvConfig
+&gt; forge paket init
+</code></pre>
+
+<p>The next step is adding the TypeLibrary and referencing it in the script file.</p>
+
+<p>The entire TypeShape library is available as a single file in GitHub and using Paket&rsquo;s <a href="TODO" target="_blank">GitHub File Reference</a>, we can get it for our development. To do it, first, we first need to add the reference in the <em>paket.dependencies</em> which was auto-generated during the initialization of paket.</p>
+
+<pre><code>github eiriktsarpalis/TypeShape:2.20 src/TypeShape/TypeShape.fs
+</code></pre>
+
+<p>Then download this dependency by running the paket&rsquo;s <code>install</code> command.</p>
+
+<pre><code class="language-bash">&gt; forge paket install
+</code></pre>
+
+<p>After successful execution of this command, we can find the <em>TypeShape.fs</em> file in the <em>./paket-files/eiriktsarpalis/TypeShape/src/TypeShape</em> directory.</p>
+
+<p>The last step is creating a F# script file <em>script.fsx</em> and refer this <em>TypeShape.fs</em> file</p>
+
+<pre><code class="language-fsharp">// script.fsx
+#load &quot;./paket-files/eiriktsarpalis/TypeShape/src/TypeShape/TypeShape.fs&quot;
+open TypeShape
+</code></pre>
+
+<p>With this the stage is now set for the action!</p>
+
+<h3 id="the-domain-types">The Domain Types</h3>
+
+<p>The first step is defining the types that we are going to work with</p>
+
+<pre><code class="language-fsharp">type EnvVarParseError =
+| BadValue of (string * string)
+| NotFound of string
+| NotSupported of string
+
+type EnvVarParseResult&lt;'T&gt; = Result&lt;'T, EnvVarParseError&gt;
+</code></pre>
+
+<p>The <code>EnvVarParseError</code> type models the possible errors that we may encounter while parsing environment variables. The cases are</p>
+
+<ul>
+<li><code>BadValue</code> (name , value) - Environment variable is available but casting to the target type fails<br /></li>
+<li><code>NotFound</code> name - Environment variable with the given name is not found</li>
+<li><code>NotSupported</code> message - We are not supporting the target datatype</li>
+</ul>
+
+<p>The <code>EnvVarParseResult&lt;'T&gt;</code> represents the final output of our parsing. It&rsquo;s either either success or failure with any one of the above use cases. We are making use of F# <a href="TODO" target="_blank">Result Type</a> to model this representation.</p>
+
+<h3 id="getting-started">Getting Started</h3>
+
+<p>Let&rsquo;s get started by defining the scaffolding for our <code>parsePrimitive</code> function.</p>
+
+<pre><code class="language-fsharp">// string -&gt; EnvVarParseResult&lt;'T&gt;
+let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
+  NotSupported &quot;unknown target type&quot; |&gt; Error
+</code></pre>
+
+<p>As we are not supporting any type to begin with, we are just returning the <code>NotSupported</code> error.</p>
+
+<p>The important thing to notice here is the generic type <code>&lt;'T&gt;</code> in the declaration. It is the target type to which we are going to convert the value stored in the provided environment name.</p>
+
+<p>Alright, Let&rsquo;s take the next step towards recognizing the target data type <code>&lt;'T&gt;</code>.</p>
+
+<blockquote>
+<p>Programs parameterized by shapes of datatypes - <em>Eirik Tsarpalis</em></p>
+</blockquote>
+
+<p>TypeShape library comes with a set of active patters to match shapes of the data type. Let&rsquo;s assume that we are going to consider only int, string and bool for simiplicity. We can do pattern matching with the shape of these types alone in our existing <code>parsePrimitive</code> function and handle these cases as below</p>
+
+<pre><code class="language-fsharp">let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
+  match shapeof&lt;'T&gt; with
+  | Shape.Int32 -&gt; NotSupported &quot;integer&quot; |&gt; Error
+  | Shape.String -&gt; NotSupported &quot;string&quot; |&gt; Error
+  | Shape.Bool -&gt; NotSupported &quot;bool&quot; |&gt; Error
+  | _ -&gt; NotSupported &quot;unknown target type&quot; |&gt; Error
+</code></pre>
+
+<p>The <code>shapeof&lt;'T&gt;</code> returns the <code>TypeShape</code> of the provide generic type <code>'T</code>.</p>
+
+<p>If we execute this function in F# interactive, we will be getting the following outputs</p>
+
+<pre><code class="language-bash">&gt; parsePrimitive&lt;int&gt; &quot;TEST&quot;;;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;int&gt; =
+  Error (NotSupported &quot;integer&quot;)
+
+&gt; parsePrimitive&lt;string&gt; &quot;TEST&quot;;;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;string&gt; =
+  Error (NotSupported &quot;string&quot;)
+
+&gt; parsePrimitive&lt;bool&gt; &quot;TEST&quot;;;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;bool&gt; =
+  Error (NotSupported &quot;bool&quot;)
+
+&gt; parsePrimitive&lt;double&gt; &quot;TEST&quot;;;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;double&gt; =
+  Error (NotSupported &quot;unknown target type&quot;)
+</code></pre>
+
+<h3 id="parsing-environment-variable">Parsing Environment Variable</h3>
+
+<p>The extended <code>parsePrimitive</code> function now able to recognize the shape of the data type. The next step adding logic to parse the environment variable</p>
+
+<p>The <code>Environment.GetEnvironmentVariable</code> from .NET library returns <code>null</code> if the environment variable with the given name not exists. Let&rsquo;s write a wrapper function <code>getEnvVar</code> to return is as <code>None</code> instead of <code>null</code>.</p>
+
+<pre><code class="language-fsharp">// ...
+open System
+// ...
+
+// string -&gt; string option
+let getEnvVar name =
+  let v = Environment.GetEnvironmentVariable name
+  if v = null then None else Some v
+
+let parsePrimitive&lt;'T&gt; ... = ...
+</code></pre>
+
+<p>Then write the functions which use this <code>getEnvVar</code> function and parse the value (if exists) to its specific type.</p>
+
+<pre><code class="language-fsharp">// (string -&gt; bool * 'a) -&gt; name -&gt;  EnvVarParseResult&lt;'a&gt;
+let tryParseWith tryParseFunc name = 
+  match getEnvVar name with
+  | None -&gt; NotFound name |&gt; Error
+  | Some value -&gt;
+    match tryParseFunc value with
+    | true, v -&gt; Ok v
+    | _ -&gt; BadValue (name, value) |&gt; Error
+
+
+// string -&gt; EnvVarParseResult&lt;int&gt;
+let parseInt = tryParseWith Int32.TryParse
+
+// string -&gt; EnvVarParseResult&lt;bool&gt;
+let parseBool = tryParseWith Boolean.TryParse
+
+// string -&gt; EnvVarParseResult&lt;string&gt;
+let parseString = tryParseWith (fun s -&gt; (true,s))
+</code></pre>
+
+<p>The <code>tryParseWith</code> function takes the <code>tryParseFunc</code> function of type  <code>string -&gt; bool * 'a</code> as its first parameter and the environment variable name as its second parameter. If the environment variable exists, it does the parsing using the provided <code>tryParseFunc</code> function and returns either <code>Ok</code> with the parsed value or <code>Error</code> with the corresponding <code>EnvVarParseError</code> value.</p>
+
+<p>The <code>parseInt</code>, <code>parseBool</code> and <code>parseString</code> functions makes use of this <code>tryParseWith</code> function by providing it&rsquo;s corresponding parsing functions.</p>
+
+<h3 id="implementing-parseprimitive-function">Implementing parsePrimitive function</h3>
+
+<p>Now we have functions to parse the specific types and all we need to do now is to leverage them in the <code>parsePrimitive</code> function.</p>
+
+<pre><code class="language-fsharp">// string -&gt; EnvVarParseResult&lt;'T&gt;
+let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
+  match shapeof&lt;'T&gt; with
+  | Shape.Int32 -&gt; parseInt envVarName
+  | Shape.String -&gt; parseString envVarName
+  | Shape.Bool -&gt; parseBool envVarName
+  | _ -&gt; NotSupported &quot;unknown target type&quot; |&gt; Error
+</code></pre>
+
+<p>Here comes the compiler errors!</p>
+
+<pre><code>error FS0001: Type mismatch. Expecting a
+    'EnvVarParseResult&lt;'T&gt;'
+but given a
+    'EnvVarParseResult&lt;int&gt;'
+The type ''T' does not match the type 'int'
+</code></pre>
+
+<pre><code>All branches of a pattern match expression must have the same type. 
+This expression was expected to have type ''T', but here has type 'string'.
+</code></pre>
+
+<pre><code>All branches of a pattern match expression must have the same type. 
+This expression was expected to have type ''T', but here has type 'bool'.
+</code></pre>
+
+<p>As the compiler rightly says, we are suppose to return <code>EnvVarParseResult</code> of the provided generic target type <code>'T</code>. But we are returning <code>EnvVarParseResult</code> with specific types <code>int</code> or <code>bool</code> or <code>string</code>.</p>
+
+<p>We know that these return types are right based on the pattern matching that we do on the shape of <code>'T</code> but the compiler doesn&rsquo;t know! It just doing its job based on the type signature that we provided</p>
+
+<pre><code class="language-fsharp">// string -&gt; EnvVarParseResult&lt;'T&gt;
+let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; = 
+  ...
+</code></pre>
+
+<p>What to do now?</p>
+
+<p>Well, We can solve this by introducing an another layer of abstraction<sup class="footnote-ref" id="fnref:3"><a rel="footnote" href="#fn:3">3</a></sup></p>
+
+<pre><code class="language-fsharp">let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
+
+  // (string -&gt; 'a) -&gt; EnvVarParseResult&lt;'T&gt;
+  let wrap(p : string -&gt; 'a) = 
+    envVarName
+    |&gt; unbox&lt;string -&gt; EnvVarParseResult&lt;'T&gt;&gt; p 
+
+  ... 
+</code></pre>
+
+<p>The <code>wrap</code> function introduces a new generic type <code>'a</code> and accepts a function that takes a <code>string</code> and return this new generic type <code>'a</code>. Then in its function body, it uses the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.unbox%5B't%5D-function-%5Bfsharp%5D" target="_blank">unbox function</a> from F# standard library to unwrap the passed parameter function and call this with the given <code>envVarName</code>.</p>
+
+<p>We can make of this <code>wrap</code> function to get rid of the compiler errors.</p>
+
+<p>Here is how the completed <code>parsePrimitive</code> function would look like</p>
+
+<pre><code class="language-fsharp">let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
+
+  let wrap(p : string -&gt; 'a) = 
+    envVarName
+    |&gt; unbox&lt;string -&gt; EnvVarParseResult&lt;'T&gt;&gt; p 
+    
+  match shapeof&lt;'T&gt; with
+  | Shape.Int32 -&gt; wrap parseInt
+  | Shape.String -&gt; wrap parseString
+  | Shape.Bool -&gt; wrap parseBool
+  | _ -&gt; NotSupported &quot;unknown target type&quot; |&gt; Error
+</code></pre>
+
+<p>We have solved the problem here by wrapping up the specific return types (<code>EnvVarParseResult&lt;int&gt;</code>, <code>EnvVarParseResult&lt;string&gt;</code>, <code>EnvVarParseResult&lt;bool&gt;</code>) to new generic type <code>'a</code> and then unboxing it using the already defined generic type <code>'T</code>.</p>
+
+<p>Now the compiler is happy!</p>
+
+<p>Let&rsquo;s try this in F# interactive</p>
+
+<pre><code class="language-bash">&gt; parsePrimitive&lt;int&gt; &quot;PORT&quot;;;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;int&gt; = Error(NotFound &quot;PORT&quot;)
+</code></pre>
+
+<p>As there is no environment variable with the name <code>PORT</code>, we are getting the <code>NotFound</code> error as expected.</p>
+
+<p>If we set an environment variable with the given name <code>PORT</code>, and try it again, we can see the successful parsed result!</p>
+
+<pre><code class="language-bash">&gt; Environment.SetEnvironmentVariable(&quot;PORT&quot;, &quot;5432&quot;);;
+val it : unit = ()
+
+&gt; parsePrimitive&lt;int&gt; &quot;PORT&quot;;;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;int&gt; = Ok 5432
+</code></pre>
+
+<p>Awesome! We acheived the milestone number one!!</p>
+
+<h2 id="use-case-2-parsing-record-types">Use Case #2 - Parsing Record Types</h2>
+
+<p>Like what we did for the <code>parsePrimitive</code> function, let&rsquo;s start with a scaffolding for parsing record types</p>
+
+<pre><code class="language-fsharp">// unit -&gt; EnvVarParseResult&lt;'T&gt;
+let parseRecord&lt;'T&gt; () =
+  NotSupported &quot;non record type found&quot; |&gt; Error
+</code></pre>
+
+<p>The first step towards our final outcome is matching the data type with the <code>Shape.FSharpRecord</code></p>
+
+<pre><code class="language-fsharp">let parseRecord&lt;'T&gt; () =
+  match shapeof&lt;'T&gt; with
+  | Shape.FSharpRecord (:? ShapeFSharpRecord&lt;'T&gt; as shape) -&gt;
+    NotSupported &quot;record type support just started&quot; |&gt; Error
+  | _ -&gt; NotSupported &quot;non record type found&quot; |&gt; Error
+</code></pre>
+
+<p>We are doing two things here to pattern match the record type, first we are matching whether the shape of the provided type <code>'T</code> is of shape <code>Shape.FSharpRecord</code> and whether it can be casted to TypeShape&rsquo;s F# Record representation <code>ShapeFSharpRecord&lt;'T&gt;</code>. If both these checks are through, we returning the <code>NotSupported</code> error with a friendly message.</p>
+
+<p>To verify this, Let&rsquo;s create a new record type <code>Config</code>.</p>
+
+<pre><code class="language-fsharp">type Config = {
+  ConnectionString : string
+  Port : int
+  EnableDebug : bool
+  Environment : string
+}
+</code></pre>
+
+<p>The four fields of this <code>Config</code> is going to be populated from their corresponding environment variables in the upcoming steps;</p>
+
+<p>If we try the <code>parseRecord</code> with the <code>Config</code> type, we will get the error message as expected.</p>
+
+<pre><code class="language-bash">&gt; parseRecord&lt;Config&gt; ();;
+[&lt;Struct&gt;]
+val it : EnvVarParseResult&lt;Config&gt; =
+  Error (NotSupported &quot;record type support just started&quot;)
+</code></pre>
+
+<h3 id="environment-variable-names-of-record-fields">Environment Variable Names of Record fields</h3>
+
+<p>Great, now we are able to get the recognize the record types. The next step is getting all the field names of the provided record type.</p>
+
+<p>We can get that using the <code>Fields</code> field of the <code>ShapeFSharpRecord&lt;'T&gt;</code> type.</p>
+
+<pre><code class="language-fsharp">let parseRecord&lt;'T&gt; () =
+  match shapeof&lt;'T&gt; with
+  | Shape.FSharpRecord (:? ShapeFSharpRecord&lt;'T&gt; as shape) -&gt;
+    shape.Fields |&gt; Seq.iter (fun field -&gt; printfn &quot;%s&quot; field.Label)
+    NotSupported &quot;record type support just started&quot; |&gt; Error
+  | _ -&gt; NotSupported &quot;non record type found&quot; |&gt; Error
+</code></pre>
+
+<pre><code class="language-bash">&gt; parseRecord&lt;Config&gt; ();;
+ConnectionString
+Port
+EnableDebug
+Environment
+val it : EnvVarParseError = ...
+</code></pre>
+
+<p>The next step transforming these field names to its corresponding environment variable names. A typical environment variable name convention is an upper case string with multiple words separated by underscore. For example, <code>CONNECTION_STRING</code> would be environment variable name from which we need to retrieve the value of the <code>ConnectionString</code> field of <code>Config</code> type.</p>
+
+<pre><code class="language-fsharp">// ...
+open System.Text.RegularExpressions
+// ...
+
+let envVarNameRegEx = 
+  Regex(&quot;([^A-Z]+|[A-Z][^A-Z]+|[A-Z]+)&quot;, RegexOptions.Compiled)
+
+let canonicalizeEnvVarName name =
+  let subStrings =
+    envVarNameRegEx.Matches name
+    |&gt; Seq.cast
+    |&gt; Seq.map (fun (m : Match) -&gt; m.Value.ToUpperInvariant())
+    |&gt; Seq.toArray
+  String.Join(&quot;_&quot;, subStrings)
+
+let parseRecord&lt;'T&gt; () =
+  match shapeof&lt;'T&gt; with
+  | Shape.FSharpRecord (:? ShapeFSharpRecord&lt;'T&gt; as shape) -&gt;
+    shape.Fields 
+    |&gt; Seq.iter (fun field -&gt; canonicalizeEnvVarName field.Label |&gt; printfn &quot;%s&quot;)
+    ...
+</code></pre>
+
+<p>The <code>envVarNameRegEx</code> uses three alternatives and returns substrings which statisfy any of these alternatives. You learn more about the regular expression being used by putting the regular expression <code>([^A-Z]+|[A-Z][^A-Z]+|[A-Z]+)</code> in the <em>regular expression</em> text box in the <a href="https://regex101.com/" target="_blank">Regex101</a> website.</p>
+
+<p>The <code>canonicalizeEnvVarName</code> function gets all the matched substring of <code>envVarNameRegEx</code>, then transforms each substring to its upper case format, and then joins all of them with <code>_</code> to return it as a <code>string</code>.</p>
+
+<p>Now if we try the <code>parseRecord</code> again, we can see environment variable names for all fields.</p>
+
+<pre><code class="language-bash">&gt; parseRecord&lt;Config&gt; ();;
+CONNECTION_STRING
+PORT
+ENABLE_DEBUG
+ENVIRONMENT
+val it : EnvVarParseError = ...
+</code></pre>
+
+<p>To use the <code>parsePrimitive</code> function that we created in the previous section, we need two things, the primitive type and the environment variable name. Here we have environment variable name, the next step is figuring out the primitive type of each fields in the record type!</p>
+
+<h3 id="parsing-record-fields">Parsing Record Fields</h3>
+
+<p>Let&rsquo;s start with a initial function <code>parseRecordField</code> which is going to be called for populating the individual fields of the record type and call this from the <code>parseRecord</code> function for each fields.</p>
+
+<pre><code class="language-fsharp">// parseRecordField -&gt; string
+let private parseRecordField (shape : IShapeWriteMember&lt;'RecordType&gt;) = 
+  &quot;TODO&quot;
+</code></pre>
+
+<pre><code class="language-diff">let parseRecord&lt;'T&gt; () =
+  match shapeof&lt;'T&gt; with
+  | Shape.FSharpRecord (:? ShapeFSharpRecord&lt;'T&gt; as shape) -&gt;
+    shape.Fields
+-   |&gt; Seq.iter (fun f -&gt; parseRecordField f |&gt; printfn &quot;%s&quot;)
++   |&gt; Seq.iter (fun field -&gt; canonicalizeEnvVarName field.Label |&gt; printfn &quot;%s&quot;)
+    NotSupported &quot;record type support just started&quot;
+  | _ -&gt; NotSupported &quot;non record type found&quot;
+</code></pre>
+
+<blockquote>
+<p>The <code>private</code> access modifier is required as the <code>IShapeWriteMember&lt;'T&gt;</code> is declared as <code>internal</code>. We can use <code>internal</code> instead of <code>private</code> as well.</p>
+</blockquote>
+
+<p>The next step is getting the type of the field from the shape and call the <code>parsePrimitive</code> function with the field type and the environment variable name that we obtained above.</p>
+
+<pre><code class="language-fsharp">// IShapeWriteMember&lt;'RecordType&gt; -&gt; string
+let private parseRecordField (shape : IShapeWriteMember&lt;'RecordType&gt;) = 
+  
+  let envVarName = canonicalizeEnvVarName shape.Label
+
+  shape.Accept {
+    new IWriteMemberVisitor&lt;'RecordType, string&gt; with
+      member __.Visit (shape : ShapeWriteMember&lt;'RecordType, 'FieldType&gt;) =
+        match parsePrimitive&lt;'FieldType&gt; envVarName with
+        | Ok fieldValue -&gt; 
+            sprintf &quot;%A&quot; fieldValue
+        | Error e -&gt; 
+            sprintf &quot;%A&quot; e
+    }
+</code></pre>
+
+<p>There is a lot of things going inside the <code>parseRecordField</code> function. So, let me explain one by one.</p>
+
+<p>The interface <code>IShapeWriteMember</code> has a method <code>Accept</code> with the following signature</p>
+
+<pre><code class="language-fsharp">IWriteMemberVisitor&lt;'RecordType,'T&gt; -&gt; 'T
+</code></pre>
+
+<p>Here in the <code>parseRecordField</code> function, we are partially applying the first argument (an implementation of <code>IWriteMemberVisitor&lt;'RecordType,'T&gt;</code> type) and return <code>'T</code>. The <a href="https://fsharpforfunandprofit.com/posts/object-expressions/" target="_blank">Object expression</a> which implements the <code>IWriteMemberVisitor</code> interface defines the <code>'T</code> type as <code>string</code> and hence the <code>parseRecordField</code> returns <code>string</code> in this case.</p>
+
+<p>The <code>Visit</code> method of the <code>IWriteMemberVisitor</code> takes care of figuring out the <code>FieldType</code> of the given shape for us. So, inside the <code>Visit</code> method we can call the <code>parsePrimitive</code> function with the provided <code>FieldType</code> and return the result as <code>string</code>.</p>
+
+<p>Now if we try <code>parseRecord</code> in fsharp interactive, we will get the following output.</p>
+
+<pre><code class="language-bash">&gt; parseRecord&lt;Config&gt; ();;
+NotFound &quot;CONNECTION_STRING&quot;
+NotFound &quot;PORT&quot;
+NotFound &quot;ENABLE_DEBUG&quot;
+NotFound &quot;ENVIRONMENT&quot;
+val it : EnvVarParseError = NotSupported &quot;record type support just started&quot;
+</code></pre>
+
+<p>If we set an environment variable, and try it again, we the see the success case as well!</p>
+
+<pre><code class="language-bash">&gt; Environment.SetEnvironmentVariable(&quot;PORT&quot;, &quot;5432&quot;);;
+val it : unit = ()
+
+&gt; parseRecord&lt;Config&gt; ();;
+NotFound &quot;CONNECTION_STRING&quot;
+5432
+NotFound &quot;ENABLE_DEBUG&quot;
+NotFound &quot;ENVIRONMENT&quot;
+val it : EnvVarParseError = NotSupported &quot;record type support just started&quot;
+</code></pre>
+
+<p>Alright! Our next focus in populating the record field if all the corresponding environment variables are available otherwise return the list of errors.</p>
+
+<h3 id="populating-record-fields">Populating Record Fields</h3>
+
+<p>The <code>Inject</code> method of the <code>ShapeWriteMember</code> class takes a value of record type and a value of field type and changes the record&rsquo;s field value with the provided one via reflection.</p>
+
+<p>To make use of this method, we need to have a value of the record type. As we didn&rsquo;t have it inside the <code>parseRecordField</code> function, instead of returing it as string, we can return a function a that takes a record value and call the <code>shape.Inject</code> inside it.</p>
+
+<p>For the error case, we are just passing the error.</p>
+
+<pre><code class="language-fsharp">// IShapeWriteMember&lt;'RecordType&gt; -&gt; 'RecordType -&gt; EnvVarParseResult&lt;'RecordType&gt;
+let private parseRecordField (shape : IShapeWriteMember&lt;'RecordType&gt;) = 
+  let envVarName = canonicalizeEnvVarName shape.Label
+  shape.Accept {
+    new IWriteMemberVisitor&lt;'RecordType, 
+                              'RecordType -&gt; EnvVarParseResult&lt;'RecordType&gt;&gt; with
+
+      member __.Visit (shape : ShapeWriteMember&lt;'RecordType, 'FieldType&gt;) =
+        match parsePrimitive&lt;'FieldType&gt; envVarName with
+        | Ok fieldValue -&gt;          
+          fun record -&gt; shape.Inject record fieldValue |&gt; Ok
+        | Error e -&gt; 
+          fun _ -&gt; Error e
+    }
+</code></pre>
+
+<p>Now we have the parsing logic in place for the populating individual record fields and the one last thing that we need is to prepare an initial value of the record type and call the function returned with <code>parseRecordField</code> function with the prepared record.</p>
+
+<p>In this last step, we also need to collect all the errors!</p>
+
+<pre><code class="language-fsharp">// 'RecordType -&gt; EnvVarParseError list -&gt; IShapeWriteMember&lt;'RecordType&gt; -&gt;
+//     EnvVarParseError list 
+let private foldParseRecordFieldResponse record parseRecordErrors field =
+  match parseRecordField field record with
+  | Ok _ -&gt; parseRecordErrors
+  | Error e -&gt; e :: parseRecordErrors
+    
+// unit -&gt; EnvVarParseResult&lt;'T, EnvVarParseError list&gt;
+let parseRecord&lt;'T&gt; () =
+  match shapeof&lt;'T&gt; with
+  | Shape.FSharpRecord (:? ShapeFSharpRecord&lt;'T&gt; as shape) -&gt;
+  
+    let record = shape.CreateUninitialized()
+
+    let parseRecordErrors =
+      shape.Fields
+      |&gt; Seq.fold (foldParseRecordFieldResponse record) []
+    match List.isEmpty parseRecordErrors with 
+    | true -&gt; Ok record 
+    |_  -&gt; Error parseRecordErrors
+  | _ -&gt; NotSupported &quot;non record type found&quot; |&gt; Error
+</code></pre>
+
+<p>Using the <code>CreateUninitialized</code> method of the <code>ShapeFSharpRecord</code> class, we are creating an initial value of the provided record type and using the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/seq.fold%5B't,'state%5D-function-%5Bfsharp%5D" target="_blank">fold function</a>, we are populating its individual fields using the <code>parseRecordField</code> function.</p>
+
+<p>That&rsquo;s it!</p>
+
+<p>If we run the <code>parseRecord&lt;'T&gt;</code> without setting any environment variable, we will get the following output</p>
+
+<pre><code class="language-bash">&gt; parseRecord&lt;Config&gt; ();;
+[&lt;Struct&gt;]
+val it : Result&lt;Config,EnvVarParseError list&gt; =
+  Error
+    [NotFound &quot;ENVIRONMENT&quot;; NotFound &quot;ENABLE_DEBUG&quot;; NotFound &quot;PORT&quot;;
+     NotFound &quot;CONNECTION_STRING&quot;]
+</code></pre>
+
+<p>And if we have all the environment variables in place, we will be getting the following output</p>
+
+<pre><code class="language-bash">&gt; parseRecord&lt;Config&gt; ();;
+[&lt;Struct&gt;]
+val it : Result&lt;Config,EnvVarParseError list&gt; =
+  Ok {ConnectionString = &quot;Database=foobar;Password=foobaz&quot;;
+      Port = 5432;
+      EnableDebug = true;
+      Environment = &quot;staging&quot;;}
+</code></pre>
+
+<p>Awesome! We made it!!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post we have learned how to do generic programming involving reflection in F# using the TypeShape library. We have also learned how to build reusable abstraction in F# in an incremental fashion.</p>
+
+<p>I am planning to release this as a NuGet library supporting both environment variables and application config file variables in sometime soon. Looking forward to listen to your comments to make it better.</p>
+
+<p>Wish you an advanced merry christmas 🎄  and happy new 2018 🎉</p>
+<div class="footnotes">
+
+<hr />
+
+<ol>
+<li id="fn:1">From <a href="https://en.wikipedia.org/wiki/Generic_programming" target="_blank">WikiPedia</a>
+ <a class="footnote-return" href="#fnref:1"><sup>^</sup></a></li>
+<li id="fn:2">Copied From Eirik Tsarpalis&rsquo;s <a href="http://eiriktsarpalis.github.io/typeshape/#/12" target="_blank">Slide</a>
+ <a class="footnote-return" href="#fnref:2"><sup>^</sup></a></li>
+<li id="fn:3">Fundamental theorem of software engineering - <a href="Fundamental theorem of software engineering" target="_blank">WikiPedia</a>
+ <a class="footnote-return" href="#fnref:3"><sup>^</sup></a></li>
+</ol>
+</div>
+
+      </div>
+
+      
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/reflection">reflection</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/typeshape">TypeShape</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/generics">generics</a>
+  
+</div>
+
+
+
+    </div>
+  </div>
+
+</article>
+
+
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
