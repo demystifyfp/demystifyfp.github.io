@@ -18,9 +18,9 @@
       <guid>https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/</guid>
       <description>
 
-&lt;p&gt;Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:1&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:1&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;. Generic programming was part of .NET since .NET Version 2.0 and has an &lt;a href=&#34;https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/&#34; target=&#34;_blank&#34;&gt;interesting history&lt;/a&gt; as well!&lt;/p&gt;
+&lt;p&gt;Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:1&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:1&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;. Generic programming was part of .NET since .NET Version 2.0 and has &lt;a href=&#34;https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/&#34; target=&#34;_blank&#34;&gt;a fascinating history&lt;/a&gt; as well!&lt;/p&gt;
 
-&lt;p&gt;For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming involves reflection, it become a bumpy ride. Let&amp;rsquo;s have a look at the source code&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:2&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; below to get a feel of what I mean here!&lt;/p&gt;
+&lt;p&gt;For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride. Let&amp;rsquo;s have a look at the source code&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:2&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; below to get a feel of what I mean here!&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let rec print (value : obj) =
   match value with
@@ -42,7 +42,7 @@
         value.ToString()
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The above snippet returns the string representation of the parameter &lt;code&gt;value&lt;/code&gt;. In the if-else-if expression, the above snippets unwraps the value from the &lt;code&gt;Option&lt;/code&gt; type and &lt;code&gt;Tuple&lt;/code&gt; type and return its underlying values by recursively calling the &lt;code&gt;print&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;This code snippet returns the string representation of the parameter &lt;code&gt;value&lt;/code&gt;. The if-else-if expression unwraps the value from the &lt;code&gt;Option&lt;/code&gt; type and &lt;code&gt;Tuple&lt;/code&gt; type and return its underlying values by recursively calling the &lt;code&gt;print&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; print (Some &amp;quot;John&amp;quot;);;
 val it : string = &amp;quot;Some John&amp;quot;
@@ -51,7 +51,7 @@ val it : string = &amp;quot;Some John&amp;quot;
 val it : string = &amp;quot;(1, Some data)&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The hard coded strings, lack of type safety are some of the concerns in the above snippet.&lt;/p&gt;
+&lt;p&gt;The hardcoded strings, lack of type safety are some of the concerns in the above snippet.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let rec print (value : obj) =
   // ...
@@ -65,15 +65,15 @@ val it : string = &amp;quot;(1, Some data)&amp;quot;
   // ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Like this piece of code, we may need to write some more ugly and hard to maintain code, if we do some advanced reflection. F# is not known for these kind of problems. There should be a better way!&lt;/p&gt;
+&lt;p&gt;Like this piece of code, we may need to write some more ugly and hard to maintain code, if we do some advanced reflection. F# is not known for this kind of problems. There should be a better way!&lt;/p&gt;
 
-&lt;p&gt;Yes, That&amp;rsquo;s where &lt;a href=&#34;https://github.com/eiriktsarpalis/TypeShape&#34; target=&#34;_blank&#34;&gt;TypeShape&lt;/a&gt; comes into picture.&lt;/p&gt;
+&lt;p&gt;Yes, That&amp;rsquo;s where &lt;a href=&#34;https://github.com/eiriktsarpalis/TypeShape&#34; target=&#34;_blank&#34;&gt;TypeShape&lt;/a&gt; comes into the picture.&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;TypeShape is a small, extensible F# library for practical generic programming. It uses a combination of reflection, active patterns, visitor pattern and F# object expressions to minimize the amount of reflection that we need to write - Eirik Tsarpalis&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;In this blog post, we are going to learn the basics of the TypeShape library by implementing an usecase from scratch. In this process, We are also going to learn how to build a reusable library in F# in an incremental fashion.&lt;/p&gt;
+&lt;p&gt;In this blog post, we are going to learn the basics of the TypeShape library by implementing an use case from scratch. In this process, We are also going to learn how to build a reusable library in F# in an incremental fashion.&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;This blog post is a part of the &lt;a href=&#34;https://sergeytihon.com/2017/10/22/f-advent-calendar-in-english-2017/&#34; target=&#34;_blank&#34;&gt;F# Advent Calendar 2017&lt;/a&gt;.&lt;/p&gt;
@@ -81,7 +81,7 @@ val it : string = &amp;quot;(1, Some data)&amp;quot;
 
 &lt;h2 id=&#34;the-use-cases&#34;&gt;The Use Cases&lt;/h2&gt;
 
-&lt;p&gt;Reading a value from an environment variable and converting the readed value to a different target type (from &lt;code&gt;string&lt;/code&gt; type) to consume it is a boilerplate code.&lt;/p&gt;
+&lt;p&gt;Reading a value from an environment variable and converting the read value to a different target type (from &lt;code&gt;string&lt;/code&gt; type) to consume it is a boilerplate code.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open System
 
@@ -104,7 +104,7 @@ val it : EnvVarParseResult&amp;lt;int&amp;gt; = Ok 5432
 
 &lt;p&gt;Sounds good, isn&amp;rsquo;t it?&lt;/p&gt;
 
-&lt;p&gt;Often the applications that we develop typically reads multiple environment variables. So, How about putting them together in a record type and read all of them in a single shot?&lt;/p&gt;
+&lt;p&gt;Often the applications that we develop typically read multiple environment variables. So, How about putting them together in a record type and read all of them in a single shot?&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
   ConnectionString : string
@@ -123,15 +123,15 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
       Environment = &amp;quot;staging&amp;quot;;}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;It&amp;rsquo;s even more awesome!!&lt;/p&gt;
+&lt;p&gt;It&amp;rsquo;s even more impressive!!&lt;/p&gt;
 
-&lt;p&gt;Let&amp;rsquo;s dive in and implement these two usecases.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s dive in and implement these two use cases.&lt;/p&gt;
 
 &lt;h2 id=&#34;use-case-1-parsing-primitives&#34;&gt;Use Case #1 - Parsing Primitives&lt;/h2&gt;
 
 &lt;h3 id=&#34;setting-up&#34;&gt;Setting Up&lt;/h3&gt;
 
-&lt;p&gt;As we will be implementing the use cases by exploring the TypeShape library, F# scripting would be a good fit to get it done. So, let&amp;rsquo;s start with an empty directory and initialize &lt;a href=&#34;https://fsprojects.github.io/Paket&#34; target=&#34;_blank&#34;&gt;paket&lt;/a&gt; using &lt;a href=&#34;https://github.com/fsharp-editing/Forge&#34; target=&#34;_blank&#34;&gt;Forge&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;As we will be implementing the use cases by exploring the TypeShape library, F# scripting would be a good fit to get it done. So, let&amp;rsquo;s start with an empty directory and initialise &lt;a href=&#34;https://fsprojects.github.io/Paket&#34; target=&#34;_blank&#34;&gt;paket&lt;/a&gt; using &lt;a href=&#34;https://github.com/fsharp-editing/Forge&#34; target=&#34;_blank&#34;&gt;Forge&lt;/a&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir FsEnvConfig
 &amp;gt; cd FsEnvConfig
@@ -140,7 +140,7 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
 
 &lt;p&gt;The next step is adding the TypeLibrary and referencing it in the script file.&lt;/p&gt;
 
-&lt;p&gt;The entire TypeShape library is available as a single file in GitHub and using Paket&amp;rsquo;s &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;GitHub File Reference&lt;/a&gt;, we can get it for our development. To do it, first, we first need to add the reference in the &lt;em&gt;paket.dependencies&lt;/em&gt; which was auto-generated during the initialization of paket.&lt;/p&gt;
+&lt;p&gt;The entire TypeShape library is available as a single file in GitHub, and we can get it for our development using Paket’s GitHub File Reference feature. To do it, first, we first need to add the reference in the &lt;em&gt;paket.dependencies&lt;/em&gt; which was auto-generated during the initialisation of paket.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;github eiriktsarpalis/TypeShape:2.20 src/TypeShape/TypeShape.fs
 &lt;/code&gt;&lt;/pre&gt;
@@ -159,7 +159,7 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
 open TypeShape
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;With this the stage is now set for the action!&lt;/p&gt;
+&lt;p&gt;With this, the stage is now set for the action!&lt;/p&gt;
 
 &lt;h3 id=&#34;the-domain-types&#34;&gt;The Domain Types&lt;/h3&gt;
 
@@ -176,12 +176,12 @@ type EnvVarParseResult&amp;lt;&#39;T&amp;gt; = Result&amp;lt;&#39;T, EnvVarParse
 &lt;p&gt;The &lt;code&gt;EnvVarParseError&lt;/code&gt; type models the possible errors that we may encounter while parsing environment variables. The cases are&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;code&gt;BadValue&lt;/code&gt; (name , value) - Environment variable is available but casting to the target type fails&lt;br /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;BadValue&lt;/code&gt; (name, value) - Environment variable is available but casting to the target type fails&lt;br /&gt;&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;NotFound&lt;/code&gt; name - Environment variable with the given name is not found&lt;/li&gt;
 &lt;li&gt;&lt;code&gt;NotSupported&lt;/code&gt; message - We are not supporting the target datatype&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;The &lt;code&gt;EnvVarParseResult&amp;lt;&#39;T&amp;gt;&lt;/code&gt; represents the final output of our parsing. It&amp;rsquo;s either either success or failure with any one of the above use cases. We are making use of F# &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Result Type&lt;/a&gt; to model this representation.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;EnvVarParseResult&amp;lt;&#39;T&amp;gt;&lt;/code&gt; represents the final output of our parsing. It&amp;rsquo;s either success or failure with any one of the above use cases. We are making use of F# &lt;a href=&#34;TODO&#34; target=&#34;_blank&#34;&gt;Result Type&lt;/a&gt; to model this representation.&lt;/p&gt;
 
 &lt;h3 id=&#34;getting-started&#34;&gt;Getting Started&lt;/h3&gt;
 
@@ -192,17 +192,17 @@ let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResu
   NotSupported &amp;quot;unknown target type&amp;quot; |&amp;gt; Error
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As we are not supporting any type to begin with, we are just returning the &lt;code&gt;NotSupported&lt;/code&gt; error.&lt;/p&gt;
+&lt;p&gt;As we are not supporting any type, to begin with, we are just returning the &lt;code&gt;NotSupported&lt;/code&gt; error.&lt;/p&gt;
 
-&lt;p&gt;The important thing to notice here is the generic type &lt;code&gt;&amp;lt;&#39;T&amp;gt;&lt;/code&gt; in the declaration. It is the target type to which we are going to convert the value stored in the provided environment name.&lt;/p&gt;
+&lt;p&gt;The critical thing to notice here is the generic type &lt;code&gt;&amp;lt;&#39;T&amp;gt;&lt;/code&gt; in the declaration. It is the target type to which we are going to convert the value stored in the provided environment name.&lt;/p&gt;
 
-&lt;p&gt;Alright, Let&amp;rsquo;s take the next step towards recognizing the target data type &lt;code&gt;&amp;lt;&#39;T&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Alright, Let&amp;rsquo;s take the next step towards recognising the target data type &lt;code&gt;&amp;lt;&#39;T&amp;gt;&lt;/code&gt;.&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;Programs parameterized by shapes of datatypes - &lt;em&gt;Eirik Tsarpalis&lt;/em&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;TypeShape library comes with a set of active patters to match shapes of the data type. Let&amp;rsquo;s assume that we are going to consider only int, string and bool for simiplicity. We can do pattern matching with the shape of these types alone in our existing &lt;code&gt;parsePrimitive&lt;/code&gt; function and handle these cases as below&lt;/p&gt;
+&lt;p&gt;TypeShape library comes with a set of active patterns to match shapes of the data type. Let&amp;rsquo;s assume that we are going to consider only int, string and bool for simplicity. We can do pattern matching with the shape of these types alone in our existing &lt;code&gt;parsePrimitive&lt;/code&gt; function and handle these cases as below&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResult&amp;lt;&#39;T&amp;gt; =
   match shapeof&amp;lt;&#39;T&amp;gt; with
@@ -239,9 +239,9 @@ val it : EnvVarParseResult&amp;lt;double&amp;gt; =
 
 &lt;h3 id=&#34;parsing-environment-variable&#34;&gt;Parsing Environment Variable&lt;/h3&gt;
 
-&lt;p&gt;The extended &lt;code&gt;parsePrimitive&lt;/code&gt; function now able to recognize the shape of the data type. The next step adding logic to parse the environment variable&lt;/p&gt;
+&lt;p&gt;The extended &lt;code&gt;parsePrimitive&lt;/code&gt; function now able to recognise the shape of the data type. The next step adding logic to parse the environment variable&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;Environment.GetEnvironmentVariable&lt;/code&gt; from .NET library returns &lt;code&gt;null&lt;/code&gt; if the environment variable with the given name not exists. Let&amp;rsquo;s write a wrapper function &lt;code&gt;getEnvVar&lt;/code&gt; to return is as &lt;code&gt;None&lt;/code&gt; instead of &lt;code&gt;null&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;Environment.GetEnvironmentVariable&lt;/code&gt; from .NET library returns &lt;code&gt;null&lt;/code&gt; if the environment variable with the given name not exists. Let&amp;rsquo;s write a wrapper function &lt;code&gt;getEnvVar&lt;/code&gt; to return it is as &lt;code&gt;None&lt;/code&gt; instead of &lt;code&gt;null&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// ...
 open System
@@ -255,7 +255,7 @@ let getEnvVar name =
 let parsePrimitive&amp;lt;&#39;T&amp;gt; ... = ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Then write the functions which use this &lt;code&gt;getEnvVar&lt;/code&gt; function and parse the value (if exists) to its specific type.&lt;/p&gt;
+&lt;p&gt;Then write the functions which use this &lt;code&gt;getEnvVar&lt;/code&gt; function and parse the value (if it exists) to its specific type.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// (string -&amp;gt; bool * &#39;a) -&amp;gt; name -&amp;gt;  EnvVarParseResult&amp;lt;&#39;a&amp;gt;
 let tryParseWith tryParseFunc name = 
@@ -279,11 +279,11 @@ let parseString = tryParseWith (fun s -&amp;gt; (true,s))
 
 &lt;p&gt;The &lt;code&gt;tryParseWith&lt;/code&gt; function takes the &lt;code&gt;tryParseFunc&lt;/code&gt; function of type  &lt;code&gt;string -&amp;gt; bool * &#39;a&lt;/code&gt; as its first parameter and the environment variable name as its second parameter. If the environment variable exists, it does the parsing using the provided &lt;code&gt;tryParseFunc&lt;/code&gt; function and returns either &lt;code&gt;Ok&lt;/code&gt; with the parsed value or &lt;code&gt;Error&lt;/code&gt; with the corresponding &lt;code&gt;EnvVarParseError&lt;/code&gt; value.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;parseInt&lt;/code&gt;, &lt;code&gt;parseBool&lt;/code&gt; and &lt;code&gt;parseString&lt;/code&gt; functions makes use of this &lt;code&gt;tryParseWith&lt;/code&gt; function by providing it&amp;rsquo;s corresponding parsing functions.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;parseInt&lt;/code&gt;, &lt;code&gt;parseBool&lt;/code&gt; and &lt;code&gt;parseString&lt;/code&gt; functions make use of this &lt;code&gt;tryParseWith&lt;/code&gt; function by providing it&amp;rsquo;s corresponding parsing functions.&lt;/p&gt;
 
 &lt;h3 id=&#34;implementing-parseprimitive-function&#34;&gt;Implementing parsePrimitive function&lt;/h3&gt;
 
-&lt;p&gt;Now we have functions to parse the specific types and all we need to do now is to leverage them in the &lt;code&gt;parsePrimitive&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;Now we have functions to parse the specific types, and all we need to do now is to leverage them in the &lt;code&gt;parsePrimitive&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; EnvVarParseResult&amp;lt;&#39;T&amp;gt;
 let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResult&amp;lt;&#39;T&amp;gt; =
@@ -294,7 +294,7 @@ let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResu
   | _ -&amp;gt; NotSupported &amp;quot;unknown target type&amp;quot; |&amp;gt; Error
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Here comes the compiler errors!&lt;/p&gt;
+&lt;p&gt;Here come the compiler errors!&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;error FS0001: Type mismatch. Expecting a
     &#39;EnvVarParseResult&amp;lt;&#39;T&amp;gt;&#39;
@@ -311,7 +311,7 @@ This expression was expected to have type &#39;&#39;T&#39;, but here has type &#
 This expression was expected to have type &#39;&#39;T&#39;, but here has type &#39;bool&#39;.
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As the compiler rightly says, we are suppose to return &lt;code&gt;EnvVarParseResult&lt;/code&gt; of the provided generic target type &lt;code&gt;&#39;T&lt;/code&gt;. But we are returning &lt;code&gt;EnvVarParseResult&lt;/code&gt; with specific types &lt;code&gt;int&lt;/code&gt; or &lt;code&gt;bool&lt;/code&gt; or &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;As the compiler rightly says, we are supposed to return &lt;code&gt;EnvVarParseResult&lt;/code&gt; of the provided generic target type &lt;code&gt;&#39;T&lt;/code&gt;. But we are returning &lt;code&gt;EnvVarParseResult&lt;/code&gt; with specific types &lt;code&gt;int&lt;/code&gt; or &lt;code&gt;bool&lt;/code&gt; or &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;We know that these return types are right based on the pattern matching that we do on the shape of &lt;code&gt;&#39;T&lt;/code&gt; but the compiler doesn&amp;rsquo;t know! It just doing its job based on the type signature that we provided&lt;/p&gt;
 
@@ -322,7 +322,7 @@ let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResu
 
 &lt;p&gt;What to do now?&lt;/p&gt;
 
-&lt;p&gt;Well, We can solve this by introducing an another layer of abstraction&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:3&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:3&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Well, We can solve this by introducing another layer of abstraction&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:3&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:3&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResult&amp;lt;&#39;T&amp;gt; =
 
@@ -334,7 +334,7 @@ let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResu
   ... 
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;wrap&lt;/code&gt; function introduces a new generic type &lt;code&gt;&#39;a&lt;/code&gt; and accepts a function that takes a &lt;code&gt;string&lt;/code&gt; and return this new generic type &lt;code&gt;&#39;a&lt;/code&gt;. Then in its function body, it uses the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.unbox%5B&#39;t%5D-function-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;unbox function&lt;/a&gt; from F# standard library to unwrap the passed parameter function and call this with the given &lt;code&gt;envVarName&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;wrap&lt;/code&gt; function introduces a new generic type &lt;code&gt;&#39;a&lt;/code&gt; and accepts a function that takes a &lt;code&gt;string&lt;/code&gt; and returns this new generic type &lt;code&gt;&#39;a&lt;/code&gt;. Then in its function body, it uses the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.unbox%5B&#39;t%5D-function-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;unbox function&lt;/a&gt; from F# standard library to unwrap the passed parameter function and call this with the given &lt;code&gt;envVarName&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;We can make of this &lt;code&gt;wrap&lt;/code&gt; function to get rid of the compiler errors.&lt;/p&gt;
 
@@ -366,7 +366,7 @@ val it : EnvVarParseResult&amp;lt;int&amp;gt; = Error(NotFound &amp;quot;PORT&am
 
 &lt;p&gt;As there is no environment variable with the name &lt;code&gt;PORT&lt;/code&gt;, we are getting the &lt;code&gt;NotFound&lt;/code&gt; error as expected.&lt;/p&gt;
 
-&lt;p&gt;If we set an environment variable with the given name &lt;code&gt;PORT&lt;/code&gt;, and try it again, we can see the successful parsed result!&lt;/p&gt;
+&lt;p&gt;If we set an environment variable with the given name &lt;code&gt;PORT&lt;/code&gt;, and try it again, we can see the favourable parsed result!&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; Environment.SetEnvironmentVariable(&amp;quot;PORT&amp;quot;, &amp;quot;5432&amp;quot;);;
 val it : unit = ()
@@ -376,7 +376,7 @@ val it : unit = ()
 val it : EnvVarParseResult&amp;lt;int&amp;gt; = Ok 5432
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Awesome! We acheived the milestone number one!!&lt;/p&gt;
+&lt;p&gt;Awesome! We achieved the milestone number one!!&lt;/p&gt;
 
 &lt;h2 id=&#34;use-case-2-parsing-record-types&#34;&gt;Use Case #2 - Parsing Record Types&lt;/h2&gt;
 

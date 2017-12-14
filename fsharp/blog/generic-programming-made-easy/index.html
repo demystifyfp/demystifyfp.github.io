@@ -269,9 +269,9 @@
       <div class="article-style" itemprop="articleBody">
         
 
-<p>Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters<sup class="footnote-ref" id="fnref:1"><a rel="footnote" href="#fn:1">1</a></sup>. Generic programming was part of .NET since .NET Version 2.0 and has an <a href="https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/" target="_blank">interesting history</a> as well!</p>
+<p>Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters<sup class="footnote-ref" id="fnref:1"><a rel="footnote" href="#fn:1">1</a></sup>. Generic programming was part of .NET since .NET Version 2.0 and has <a href="https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/" target="_blank">a fascinating history</a> as well!</p>
 
-<p>For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming involves reflection, it become a bumpy ride. Let&rsquo;s have a look at the source code<sup class="footnote-ref" id="fnref:2"><a rel="footnote" href="#fn:2">2</a></sup> below to get a feel of what I mean here!</p>
+<p>For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride. Let&rsquo;s have a look at the source code<sup class="footnote-ref" id="fnref:2"><a rel="footnote" href="#fn:2">2</a></sup> below to get a feel of what I mean here!</p>
 
 <pre><code class="language-fsharp">let rec print (value : obj) =
   match value with
@@ -293,7 +293,7 @@
         value.ToString()
 </code></pre>
 
-<p>The above snippet returns the string representation of the parameter <code>value</code>. In the if-else-if expression, the above snippets unwraps the value from the <code>Option</code> type and <code>Tuple</code> type and return its underlying values by recursively calling the <code>print</code> function.</p>
+<p>This code snippet returns the string representation of the parameter <code>value</code>. The if-else-if expression unwraps the value from the <code>Option</code> type and <code>Tuple</code> type and return its underlying values by recursively calling the <code>print</code> function.</p>
 
 <pre><code class="language-bash">&gt; print (Some &quot;John&quot;);;
 val it : string = &quot;Some John&quot;
@@ -302,7 +302,7 @@ val it : string = &quot;Some John&quot;
 val it : string = &quot;(1, Some data)&quot;
 </code></pre>
 
-<p>The hard coded strings, lack of type safety are some of the concerns in the above snippet.</p>
+<p>The hardcoded strings, lack of type safety are some of the concerns in the above snippet.</p>
 
 <pre><code class="language-fsharp">let rec print (value : obj) =
   // ...
@@ -316,15 +316,15 @@ val it : string = &quot;(1, Some data)&quot;
   // ...
 </code></pre>
 
-<p>Like this piece of code, we may need to write some more ugly and hard to maintain code, if we do some advanced reflection. F# is not known for these kind of problems. There should be a better way!</p>
+<p>Like this piece of code, we may need to write some more ugly and hard to maintain code, if we do some advanced reflection. F# is not known for this kind of problems. There should be a better way!</p>
 
-<p>Yes, That&rsquo;s where <a href="https://github.com/eiriktsarpalis/TypeShape" target="_blank">TypeShape</a> comes into picture.</p>
+<p>Yes, That&rsquo;s where <a href="https://github.com/eiriktsarpalis/TypeShape" target="_blank">TypeShape</a> comes into the picture.</p>
 
 <blockquote>
 <p>TypeShape is a small, extensible F# library for practical generic programming. It uses a combination of reflection, active patterns, visitor pattern and F# object expressions to minimize the amount of reflection that we need to write - Eirik Tsarpalis</p>
 </blockquote>
 
-<p>In this blog post, we are going to learn the basics of the TypeShape library by implementing an usecase from scratch. In this process, We are also going to learn how to build a reusable library in F# in an incremental fashion.</p>
+<p>In this blog post, we are going to learn the basics of the TypeShape library by implementing an use case from scratch. In this process, We are also going to learn how to build a reusable library in F# in an incremental fashion.</p>
 
 <blockquote>
 <p>This blog post is a part of the <a href="https://sergeytihon.com/2017/10/22/f-advent-calendar-in-english-2017/" target="_blank">F# Advent Calendar 2017</a>.</p>
@@ -332,7 +332,7 @@ val it : string = &quot;(1, Some data)&quot;
 
 <h2 id="the-use-cases">The Use Cases</h2>
 
-<p>Reading a value from an environment variable and converting the readed value to a different target type (from <code>string</code> type) to consume it is a boilerplate code.</p>
+<p>Reading a value from an environment variable and converting the read value to a different target type (from <code>string</code> type) to consume it is a boilerplate code.</p>
 
 <pre><code class="language-fsharp">open System
 
@@ -355,7 +355,7 @@ val it : EnvVarParseResult&lt;int&gt; = Ok 5432
 
 <p>Sounds good, isn&rsquo;t it?</p>
 
-<p>Often the applications that we develop typically reads multiple environment variables. So, How about putting them together in a record type and read all of them in a single shot?</p>
+<p>Often the applications that we develop typically read multiple environment variables. So, How about putting them together in a record type and read all of them in a single shot?</p>
 
 <pre><code class="language-fsharp">type Config = {
   ConnectionString : string
@@ -374,15 +374,15 @@ val it : Result&lt;Config,EnvVarParseError list&gt; =
       Environment = &quot;staging&quot;;}
 </code></pre>
 
-<p>It&rsquo;s even more awesome!!</p>
+<p>It&rsquo;s even more impressive!!</p>
 
-<p>Let&rsquo;s dive in and implement these two usecases.</p>
+<p>Let&rsquo;s dive in and implement these two use cases.</p>
 
 <h2 id="use-case-1-parsing-primitives">Use Case #1 - Parsing Primitives</h2>
 
 <h3 id="setting-up">Setting Up</h3>
 
-<p>As we will be implementing the use cases by exploring the TypeShape library, F# scripting would be a good fit to get it done. So, let&rsquo;s start with an empty directory and initialize <a href="https://fsprojects.github.io/Paket" target="_blank">paket</a> using <a href="https://github.com/fsharp-editing/Forge" target="_blank">Forge</a>.</p>
+<p>As we will be implementing the use cases by exploring the TypeShape library, F# scripting would be a good fit to get it done. So, let&rsquo;s start with an empty directory and initialise <a href="https://fsprojects.github.io/Paket" target="_blank">paket</a> using <a href="https://github.com/fsharp-editing/Forge" target="_blank">Forge</a>.</p>
 
 <pre><code class="language-bash">&gt; mkdir FsEnvConfig
 &gt; cd FsEnvConfig
@@ -391,7 +391,7 @@ val it : Result&lt;Config,EnvVarParseError list&gt; =
 
 <p>The next step is adding the TypeLibrary and referencing it in the script file.</p>
 
-<p>The entire TypeShape library is available as a single file in GitHub and using Paket&rsquo;s <a href="TODO" target="_blank">GitHub File Reference</a>, we can get it for our development. To do it, first, we first need to add the reference in the <em>paket.dependencies</em> which was auto-generated during the initialization of paket.</p>
+<p>The entire TypeShape library is available as a single file in GitHub, and we can get it for our development using Paket’s GitHub File Reference feature. To do it, first, we first need to add the reference in the <em>paket.dependencies</em> which was auto-generated during the initialisation of paket.</p>
 
 <pre><code>github eiriktsarpalis/TypeShape:2.20 src/TypeShape/TypeShape.fs
 </code></pre>
@@ -410,7 +410,7 @@ val it : Result&lt;Config,EnvVarParseError list&gt; =
 open TypeShape
 </code></pre>
 
-<p>With this the stage is now set for the action!</p>
+<p>With this, the stage is now set for the action!</p>
 
 <h3 id="the-domain-types">The Domain Types</h3>
 
@@ -427,12 +427,12 @@ type EnvVarParseResult&lt;'T&gt; = Result&lt;'T, EnvVarParseError&gt;
 <p>The <code>EnvVarParseError</code> type models the possible errors that we may encounter while parsing environment variables. The cases are</p>
 
 <ul>
-<li><code>BadValue</code> (name , value) - Environment variable is available but casting to the target type fails<br /></li>
+<li><code>BadValue</code> (name, value) - Environment variable is available but casting to the target type fails<br /></li>
 <li><code>NotFound</code> name - Environment variable with the given name is not found</li>
 <li><code>NotSupported</code> message - We are not supporting the target datatype</li>
 </ul>
 
-<p>The <code>EnvVarParseResult&lt;'T&gt;</code> represents the final output of our parsing. It&rsquo;s either either success or failure with any one of the above use cases. We are making use of F# <a href="TODO" target="_blank">Result Type</a> to model this representation.</p>
+<p>The <code>EnvVarParseResult&lt;'T&gt;</code> represents the final output of our parsing. It&rsquo;s either success or failure with any one of the above use cases. We are making use of F# <a href="TODO" target="_blank">Result Type</a> to model this representation.</p>
 
 <h3 id="getting-started">Getting Started</h3>
 
@@ -443,17 +443,17 @@ let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt;
   NotSupported &quot;unknown target type&quot; |&gt; Error
 </code></pre>
 
-<p>As we are not supporting any type to begin with, we are just returning the <code>NotSupported</code> error.</p>
+<p>As we are not supporting any type, to begin with, we are just returning the <code>NotSupported</code> error.</p>
 
-<p>The important thing to notice here is the generic type <code>&lt;'T&gt;</code> in the declaration. It is the target type to which we are going to convert the value stored in the provided environment name.</p>
+<p>The critical thing to notice here is the generic type <code>&lt;'T&gt;</code> in the declaration. It is the target type to which we are going to convert the value stored in the provided environment name.</p>
 
-<p>Alright, Let&rsquo;s take the next step towards recognizing the target data type <code>&lt;'T&gt;</code>.</p>
+<p>Alright, Let&rsquo;s take the next step towards recognising the target data type <code>&lt;'T&gt;</code>.</p>
 
 <blockquote>
 <p>Programs parameterized by shapes of datatypes - <em>Eirik Tsarpalis</em></p>
 </blockquote>
 
-<p>TypeShape library comes with a set of active patters to match shapes of the data type. Let&rsquo;s assume that we are going to consider only int, string and bool for simiplicity. We can do pattern matching with the shape of these types alone in our existing <code>parsePrimitive</code> function and handle these cases as below</p>
+<p>TypeShape library comes with a set of active patterns to match shapes of the data type. Let&rsquo;s assume that we are going to consider only int, string and bool for simplicity. We can do pattern matching with the shape of these types alone in our existing <code>parsePrimitive</code> function and handle these cases as below</p>
 
 <pre><code class="language-fsharp">let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
   match shapeof&lt;'T&gt; with
@@ -490,9 +490,9 @@ val it : EnvVarParseResult&lt;double&gt; =
 
 <h3 id="parsing-environment-variable">Parsing Environment Variable</h3>
 
-<p>The extended <code>parsePrimitive</code> function now able to recognize the shape of the data type. The next step adding logic to parse the environment variable</p>
+<p>The extended <code>parsePrimitive</code> function now able to recognise the shape of the data type. The next step adding logic to parse the environment variable</p>
 
-<p>The <code>Environment.GetEnvironmentVariable</code> from .NET library returns <code>null</code> if the environment variable with the given name not exists. Let&rsquo;s write a wrapper function <code>getEnvVar</code> to return is as <code>None</code> instead of <code>null</code>.</p>
+<p>The <code>Environment.GetEnvironmentVariable</code> from .NET library returns <code>null</code> if the environment variable with the given name not exists. Let&rsquo;s write a wrapper function <code>getEnvVar</code> to return it is as <code>None</code> instead of <code>null</code>.</p>
 
 <pre><code class="language-fsharp">// ...
 open System
@@ -506,7 +506,7 @@ let getEnvVar name =
 let parsePrimitive&lt;'T&gt; ... = ...
 </code></pre>
 
-<p>Then write the functions which use this <code>getEnvVar</code> function and parse the value (if exists) to its specific type.</p>
+<p>Then write the functions which use this <code>getEnvVar</code> function and parse the value (if it exists) to its specific type.</p>
 
 <pre><code class="language-fsharp">// (string -&gt; bool * 'a) -&gt; name -&gt;  EnvVarParseResult&lt;'a&gt;
 let tryParseWith tryParseFunc name = 
@@ -530,11 +530,11 @@ let parseString = tryParseWith (fun s -&gt; (true,s))
 
 <p>The <code>tryParseWith</code> function takes the <code>tryParseFunc</code> function of type  <code>string -&gt; bool * 'a</code> as its first parameter and the environment variable name as its second parameter. If the environment variable exists, it does the parsing using the provided <code>tryParseFunc</code> function and returns either <code>Ok</code> with the parsed value or <code>Error</code> with the corresponding <code>EnvVarParseError</code> value.</p>
 
-<p>The <code>parseInt</code>, <code>parseBool</code> and <code>parseString</code> functions makes use of this <code>tryParseWith</code> function by providing it&rsquo;s corresponding parsing functions.</p>
+<p>The <code>parseInt</code>, <code>parseBool</code> and <code>parseString</code> functions make use of this <code>tryParseWith</code> function by providing it&rsquo;s corresponding parsing functions.</p>
 
 <h3 id="implementing-parseprimitive-function">Implementing parsePrimitive function</h3>
 
-<p>Now we have functions to parse the specific types and all we need to do now is to leverage them in the <code>parsePrimitive</code> function.</p>
+<p>Now we have functions to parse the specific types, and all we need to do now is to leverage them in the <code>parsePrimitive</code> function.</p>
 
 <pre><code class="language-fsharp">// string -&gt; EnvVarParseResult&lt;'T&gt;
 let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
@@ -545,7 +545,7 @@ let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt;
   | _ -&gt; NotSupported &quot;unknown target type&quot; |&gt; Error
 </code></pre>
 
-<p>Here comes the compiler errors!</p>
+<p>Here come the compiler errors!</p>
 
 <pre><code>error FS0001: Type mismatch. Expecting a
     'EnvVarParseResult&lt;'T&gt;'
@@ -562,7 +562,7 @@ This expression was expected to have type ''T', but here has type 'string'.
 This expression was expected to have type ''T', but here has type 'bool'.
 </code></pre>
 
-<p>As the compiler rightly says, we are suppose to return <code>EnvVarParseResult</code> of the provided generic target type <code>'T</code>. But we are returning <code>EnvVarParseResult</code> with specific types <code>int</code> or <code>bool</code> or <code>string</code>.</p>
+<p>As the compiler rightly says, we are supposed to return <code>EnvVarParseResult</code> of the provided generic target type <code>'T</code>. But we are returning <code>EnvVarParseResult</code> with specific types <code>int</code> or <code>bool</code> or <code>string</code>.</p>
 
 <p>We know that these return types are right based on the pattern matching that we do on the shape of <code>'T</code> but the compiler doesn&rsquo;t know! It just doing its job based on the type signature that we provided</p>
 
@@ -573,7 +573,7 @@ let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt;
 
 <p>What to do now?</p>
 
-<p>Well, We can solve this by introducing an another layer of abstraction<sup class="footnote-ref" id="fnref:3"><a rel="footnote" href="#fn:3">3</a></sup></p>
+<p>Well, We can solve this by introducing another layer of abstraction<sup class="footnote-ref" id="fnref:3"><a rel="footnote" href="#fn:3">3</a></sup></p>
 
 <pre><code class="language-fsharp">let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
 
@@ -585,7 +585,7 @@ let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt;
   ... 
 </code></pre>
 
-<p>The <code>wrap</code> function introduces a new generic type <code>'a</code> and accepts a function that takes a <code>string</code> and return this new generic type <code>'a</code>. Then in its function body, it uses the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.unbox%5B't%5D-function-%5Bfsharp%5D" target="_blank">unbox function</a> from F# standard library to unwrap the passed parameter function and call this with the given <code>envVarName</code>.</p>
+<p>The <code>wrap</code> function introduces a new generic type <code>'a</code> and accepts a function that takes a <code>string</code> and returns this new generic type <code>'a</code>. Then in its function body, it uses the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.unbox%5B't%5D-function-%5Bfsharp%5D" target="_blank">unbox function</a> from F# standard library to unwrap the passed parameter function and call this with the given <code>envVarName</code>.</p>
 
 <p>We can make of this <code>wrap</code> function to get rid of the compiler errors.</p>
 
@@ -617,7 +617,7 @@ val it : EnvVarParseResult&lt;int&gt; = Error(NotFound &quot;PORT&quot;)
 
 <p>As there is no environment variable with the name <code>PORT</code>, we are getting the <code>NotFound</code> error as expected.</p>
 
-<p>If we set an environment variable with the given name <code>PORT</code>, and try it again, we can see the successful parsed result!</p>
+<p>If we set an environment variable with the given name <code>PORT</code>, and try it again, we can see the favourable parsed result!</p>
 
 <pre><code class="language-bash">&gt; Environment.SetEnvironmentVariable(&quot;PORT&quot;, &quot;5432&quot;);;
 val it : unit = ()
@@ -627,7 +627,7 @@ val it : unit = ()
 val it : EnvVarParseResult&lt;int&gt; = Ok 5432
 </code></pre>
 
-<p>Awesome! We acheived the milestone number one!!</p>
+<p>Awesome! We achieved the milestone number one!!</p>
 
 <h2 id="use-case-2-parsing-record-types">Use Case #2 - Parsing Record Types</h2>
 
