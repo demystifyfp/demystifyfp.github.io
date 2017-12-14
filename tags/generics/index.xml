@@ -380,23 +380,23 @@ val it : EnvVarParseResult&amp;lt;int&amp;gt; = Ok 5432
 
 &lt;h2 id=&#34;use-case-2-parsing-record-types&#34;&gt;Use Case #2 - Parsing Record Types&lt;/h2&gt;
 
-&lt;p&gt;Like what we did for the &lt;code&gt;parsePrimitive&lt;/code&gt; function, let&amp;rsquo;s start with a scaffolding for parsing record types&lt;/p&gt;
+&lt;p&gt;Like what we did for the &lt;code&gt;parsePrimitive&lt;/code&gt; function, let&amp;rsquo;s start with scaffolding for parsing record types&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// unit -&amp;gt; EnvVarParseResult&amp;lt;&#39;T&amp;gt;
 let parseRecord&amp;lt;&#39;T&amp;gt; () =
   NotSupported &amp;quot;non record type found&amp;quot; |&amp;gt; Error
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The first step towards our final outcome is matching the data type with the &lt;code&gt;Shape.FSharpRecord&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The first step towards our outcome is matching the data type with the &lt;code&gt;Shape.FSharpRecord&lt;/code&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let parseRecord&amp;lt;&#39;T&amp;gt; () =
   match shapeof&amp;lt;&#39;T&amp;gt; with
   | Shape.FSharpRecord (:? ShapeFSharpRecord&amp;lt;&#39;T&amp;gt; as shape) -&amp;gt;
-    NotSupported &amp;quot;record type support just started&amp;quot; |&amp;gt; Error
+    NotSupported &amp;quot;record type support is just started&amp;quot; |&amp;gt; Error
   | _ -&amp;gt; NotSupported &amp;quot;non record type found&amp;quot; |&amp;gt; Error
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;We are doing two things here to pattern match the record type, first we are matching whether the shape of the provided type &lt;code&gt;&#39;T&lt;/code&gt; is of shape &lt;code&gt;Shape.FSharpRecord&lt;/code&gt; and whether it can be casted to TypeShape&amp;rsquo;s F# Record representation &lt;code&gt;ShapeFSharpRecord&amp;lt;&#39;T&amp;gt;&lt;/code&gt;. If both these checks are through, we returning the &lt;code&gt;NotSupported&lt;/code&gt; error with a friendly message.&lt;/p&gt;
+&lt;p&gt;We are doing two things here to pattern match the record type. First, we are matching whether the shape of the provided type &lt;code&gt;&#39;T&lt;/code&gt; is of shape &lt;code&gt;Shape.FSharpRecord&lt;/code&gt; and whether it can be cast to TypeShape&amp;rsquo;s F# Record representation &lt;code&gt;ShapeFSharpRecord&amp;lt;&#39;T&amp;gt;&lt;/code&gt;. If both these checks are through, we returning the &lt;code&gt;NotSupported&lt;/code&gt; error with a friendly message.&lt;/p&gt;
 
 &lt;p&gt;To verify this, Let&amp;rsquo;s create a new record type &lt;code&gt;Config&lt;/code&gt;.&lt;/p&gt;
 
@@ -415,12 +415,12 @@ let parseRecord&amp;lt;&#39;T&amp;gt; () =
 &lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; parseRecord&amp;lt;Config&amp;gt; ();;
 [&amp;lt;Struct&amp;gt;]
 val it : EnvVarParseResult&amp;lt;Config&amp;gt; =
-  Error (NotSupported &amp;quot;record type support just started&amp;quot;)
+  Error (NotSupported &amp;quot;record type support is just started&amp;quot;)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;environment-variable-names-of-record-fields&#34;&gt;Environment Variable Names of Record fields&lt;/h3&gt;
 
-&lt;p&gt;Great, now we are able to get the recognize the record types. The next step is getting all the field names of the provided record type.&lt;/p&gt;
+&lt;p&gt;Great, now we are able to recognise the record types. The next step is getting all the field names of the provided record type.&lt;/p&gt;
 
 &lt;p&gt;We can get that using the &lt;code&gt;Fields&lt;/code&gt; field of the &lt;code&gt;ShapeFSharpRecord&amp;lt;&#39;T&amp;gt;&lt;/code&gt; type.&lt;/p&gt;
 
@@ -428,7 +428,7 @@ val it : EnvVarParseResult&amp;lt;Config&amp;gt; =
   match shapeof&amp;lt;&#39;T&amp;gt; with
   | Shape.FSharpRecord (:? ShapeFSharpRecord&amp;lt;&#39;T&amp;gt; as shape) -&amp;gt;
     shape.Fields |&amp;gt; Seq.iter (fun field -&amp;gt; printfn &amp;quot;%s&amp;quot; field.Label)
-    NotSupported &amp;quot;record type support just started&amp;quot; |&amp;gt; Error
+    NotSupported &amp;quot;record type support is just started&amp;quot; |&amp;gt; Error
   | _ -&amp;gt; NotSupported &amp;quot;non record type found&amp;quot; |&amp;gt; Error
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -440,7 +440,7 @@ Environment
 val it : EnvVarParseError = ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The next step transforming these field names to its corresponding environment variable names. A typical environment variable name convention is an upper case string with multiple words separated by underscore. For example, &lt;code&gt;CONNECTION_STRING&lt;/code&gt; would be environment variable name from which we need to retrieve the value of the &lt;code&gt;ConnectionString&lt;/code&gt; field of &lt;code&gt;Config&lt;/code&gt; type.&lt;/p&gt;
+&lt;p&gt;The next step is transforming these field names to its corresponding environment variable names. A typical environment variable name convention is an upper case string with multiple words separated by the underscore character. For example, &lt;code&gt;CONNECTION_STRING&lt;/code&gt; would be environment variable name from which we need to retrieve the value of the &lt;code&gt;ConnectionString&lt;/code&gt; field of &lt;code&gt;Config&lt;/code&gt; type.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// ...
 open System.Text.RegularExpressions
@@ -465,9 +465,9 @@ let parseRecord&amp;lt;&#39;T&amp;gt; () =
     ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The &lt;code&gt;envVarNameRegEx&lt;/code&gt; uses three alternatives and returns substrings which statisfy any of these alternatives. You learn more about the regular expression being used by putting the regular expression &lt;code&gt;([^A-Z]+|[A-Z][^A-Z]+|[A-Z]+)&lt;/code&gt; in the &lt;em&gt;regular expression&lt;/em&gt; text box in the &lt;a href=&#34;https://regex101.com/&#34; target=&#34;_blank&#34;&gt;Regex101&lt;/a&gt; website.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;envVarNameRegEx&lt;/code&gt; uses three alternatives and returns substrings which satisfy any of these alternatives. You can learn more about the regular expression being used here by inputting the &lt;code&gt;([^A-Z]+|[A-Z][^A-Z]+|[A-Z]+)&lt;/code&gt; value in the &lt;a href=&#34;https://regex101.com/&#34; target=&#34;_blank&#34;&gt;Regex101&lt;/a&gt; website.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;canonicalizeEnvVarName&lt;/code&gt; function gets all the matched substring of &lt;code&gt;envVarNameRegEx&lt;/code&gt;, then transforms each substring to its upper case format, and then joins all of them with &lt;code&gt;_&lt;/code&gt; to return it as a &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;canonicalizeEnvVarName&lt;/code&gt; function gets all the matched substring of &lt;code&gt;envVarNameRegEx&lt;/code&gt;, then transforms each substring to its uppercase format, and then joins all of them with &lt;code&gt;_&lt;/code&gt; to return it as a &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Now if we try the &lt;code&gt;parseRecord&lt;/code&gt; again, we can see environment variable names for all fields.&lt;/p&gt;
 
@@ -479,11 +479,11 @@ ENVIRONMENT
 val it : EnvVarParseError = ...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;To use the &lt;code&gt;parsePrimitive&lt;/code&gt; function that we created in the previous section, we need two things, the primitive type and the environment variable name. Here we have environment variable name, the next step is figuring out the primitive type of each fields in the record type!&lt;/p&gt;
+&lt;p&gt;To use the &lt;code&gt;parsePrimitive&lt;/code&gt; function that we created in the previous section, we need two things, the primitive type and the environment variable name. Here we have environment variable name. The next step is figuring out the primitive type of each field in the record type!&lt;/p&gt;
 
 &lt;h3 id=&#34;parsing-record-fields&#34;&gt;Parsing Record Fields&lt;/h3&gt;
 
-&lt;p&gt;Let&amp;rsquo;s start with a initial function &lt;code&gt;parseRecordField&lt;/code&gt; which is going to be called for populating the individual fields of the record type and call this from the &lt;code&gt;parseRecord&lt;/code&gt; function for each fields.&lt;/p&gt;
+&lt;p&gt;Let&amp;rsquo;s start with an initial function &lt;code&gt;parseRecordField&lt;/code&gt; which is going to be called for populating the individual fields of the record type and call this from the &lt;code&gt;parseRecord&lt;/code&gt; function for each field.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// parseRecordField -&amp;gt; string
 let private parseRecordField (shape : IShapeWriteMember&amp;lt;&#39;RecordType&amp;gt;) = 
@@ -522,7 +522,7 @@ let private parseRecordField (shape : IShapeWriteMember&amp;lt;&#39;RecordType&a
     }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;There is a lot of things going inside the &lt;code&gt;parseRecordField&lt;/code&gt; function. So, let me explain one by one.&lt;/p&gt;
+&lt;p&gt;There is a lot of things going on the &lt;code&gt;parseRecordField&lt;/code&gt; function. So, let me explain one by one.&lt;/p&gt;
 
 &lt;p&gt;The interface &lt;code&gt;IShapeWriteMember&lt;/code&gt; has a method &lt;code&gt;Accept&lt;/code&gt; with the following signature&lt;/p&gt;
 
@@ -531,7 +531,7 @@ let private parseRecordField (shape : IShapeWriteMember&amp;lt;&#39;RecordType&a
 
 &lt;p&gt;Here in the &lt;code&gt;parseRecordField&lt;/code&gt; function, we are partially applying the first argument (an implementation of &lt;code&gt;IWriteMemberVisitor&amp;lt;&#39;RecordType,&#39;T&amp;gt;&lt;/code&gt; type) and return &lt;code&gt;&#39;T&lt;/code&gt;. The &lt;a href=&#34;https://fsharpforfunandprofit.com/posts/object-expressions/&#34; target=&#34;_blank&#34;&gt;Object expression&lt;/a&gt; which implements the &lt;code&gt;IWriteMemberVisitor&lt;/code&gt; interface defines the &lt;code&gt;&#39;T&lt;/code&gt; type as &lt;code&gt;string&lt;/code&gt; and hence the &lt;code&gt;parseRecordField&lt;/code&gt; returns &lt;code&gt;string&lt;/code&gt; in this case.&lt;/p&gt;
 
-&lt;p&gt;The &lt;code&gt;Visit&lt;/code&gt; method of the &lt;code&gt;IWriteMemberVisitor&lt;/code&gt; takes care of figuring out the &lt;code&gt;FieldType&lt;/code&gt; of the given shape for us. So, inside the &lt;code&gt;Visit&lt;/code&gt; method we can call the &lt;code&gt;parsePrimitive&lt;/code&gt; function with the provided &lt;code&gt;FieldType&lt;/code&gt; and return the result as &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;Visit&lt;/code&gt; method of the &lt;code&gt;IWriteMemberVisitor&lt;/code&gt; takes care of figuring out the &lt;code&gt;FieldType&lt;/code&gt; of the given shape for us. So, inside the &lt;code&gt;Visit&lt;/code&gt; method, we can call the &lt;code&gt;parsePrimitive&lt;/code&gt; function with the provided &lt;code&gt;FieldType&lt;/code&gt; and return the result as a &lt;code&gt;string&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Now if we try &lt;code&gt;parseRecord&lt;/code&gt; in fsharp interactive, we will get the following output.&lt;/p&gt;
 
@@ -556,13 +556,13 @@ NotFound &amp;quot;ENVIRONMENT&amp;quot;
 val it : EnvVarParseError = NotSupported &amp;quot;record type support just started&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Alright! Our next focus in populating the record field if all the corresponding environment variables are available otherwise return the list of errors.&lt;/p&gt;
+&lt;p&gt;Alright! Our next focus is populating the record field if all the corresponding environment variables are available otherwise return the list of errors.&lt;/p&gt;
 
 &lt;h3 id=&#34;populating-record-fields&#34;&gt;Populating Record Fields&lt;/h3&gt;
 
 &lt;p&gt;The &lt;code&gt;Inject&lt;/code&gt; method of the &lt;code&gt;ShapeWriteMember&lt;/code&gt; class takes a value of record type and a value of field type and changes the record&amp;rsquo;s field value with the provided one via reflection.&lt;/p&gt;
 
-&lt;p&gt;To make use of this method, we need to have a value of the record type. As we didn&amp;rsquo;t have it inside the &lt;code&gt;parseRecordField&lt;/code&gt; function, instead of returing it as string, we can return a function a that takes a record value and call the &lt;code&gt;shape.Inject&lt;/code&gt; inside it.&lt;/p&gt;
+&lt;p&gt;To make use of this method, we need to have a value of the record type. As we didn&amp;rsquo;t have it inside the &lt;code&gt;parseRecordField&lt;/code&gt; function, instead of returning it as a &lt;code&gt;string&lt;/code&gt;, we can return a function a that takes a record value and call the &lt;code&gt;shape.Inject&lt;/code&gt; inside it.&lt;/p&gt;
 
 &lt;p&gt;For the error case, we are just passing the error.&lt;/p&gt;
 
@@ -582,7 +582,7 @@ let private parseRecordField (shape : IShapeWriteMember&amp;lt;&#39;RecordType&a
     }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Now we have the parsing logic in place for the populating individual record fields and the one last thing that we need is to prepare an initial value of the record type and call the function returned with &lt;code&gt;parseRecordField&lt;/code&gt; function with the prepared record.&lt;/p&gt;
+&lt;p&gt;Now we have the parsing logic in place for the populating individual record fields, and the one last thing that we need is to prepare an initial value of the record type and call the function returned with &lt;code&gt;parseRecordField&lt;/code&gt; function with the prepared record.&lt;/p&gt;
 
 &lt;p&gt;In this last step, we also need to collect all the errors!&lt;/p&gt;
 
@@ -609,7 +609,7 @@ let parseRecord&amp;lt;&#39;T&amp;gt; () =
   | _ -&amp;gt; NotSupported &amp;quot;non record type found&amp;quot; |&amp;gt; Error
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;Using the &lt;code&gt;CreateUninitialized&lt;/code&gt; method of the &lt;code&gt;ShapeFSharpRecord&lt;/code&gt; class, we are creating an initial value of the provided record type and using the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/seq.fold%5B&#39;t,&#39;state%5D-function-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;fold function&lt;/a&gt;, we are populating its individual fields using the &lt;code&gt;parseRecordField&lt;/code&gt; function.&lt;/p&gt;
+&lt;p&gt;Using the &lt;code&gt;CreateUninitialized&lt;/code&gt; method of the &lt;code&gt;ShapeFSharpRecord&lt;/code&gt; class, we are creating an initial value of the provided record type. Then using the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/seq.fold%5B&#39;t,&#39;state%5D-function-%5Bfsharp%5D&#34; target=&#34;_blank&#34;&gt;fold function&lt;/a&gt;, we are populating its fields using the &lt;code&gt;parseRecordField&lt;/code&gt; function.&lt;/p&gt;
 
 &lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
 
@@ -638,11 +638,13 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
 
 &lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;In this blog post we have learned how to do generic programming involving reflection in F# using the TypeShape library. We have also learned how to build reusable abstraction in F# in an incremental fashion.&lt;/p&gt;
+&lt;p&gt;In this blog post, we have learned how to do generic programming involving reflection in F# using the TypeShape library. We have also learned how to build reusable abstraction in F# in an incremental fashion.&lt;/p&gt;
 
-&lt;p&gt;I am planning to release this as a NuGet library supporting both environment variables and application config file variables in sometime soon. Looking forward to listen to your comments to make it better.&lt;/p&gt;
+&lt;p&gt;I am planning to release this as a NuGet library supporting both environment variables and application config file variables in sometime soon. Looking forward to listening to your comments to make it better.&lt;/p&gt;
 
-&lt;p&gt;Wish you an advanced merry christmas 🎄  and happy new 2018 🎉&lt;/p&gt;
+&lt;p&gt;The source code is available in my &lt;a href=&#34;https://github.com/tamizhvendan/FsEnvConfig&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt; repository.&lt;/p&gt;
+
+&lt;p&gt;Wish you an advanced Merry Christmas 🎄  and happy new 2018 🎉&lt;/p&gt;
 &lt;div class=&#34;footnotes&#34;&gt;
 
 &lt;hr /&gt;
