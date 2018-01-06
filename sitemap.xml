@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/categories/</loc>
       <priority>0</priority>
     </url>
@@ -24,6 +33,36 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/tags/fsharp/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/fsharp/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/tags/generics/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/publication_types/</loc>
       <priority>0</priority>
     </url>
@@ -33,7 +72,28 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/tags/reflection/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/tags/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/tags/typeshape/</loc>
+      <lastmod>2017-12-15T19:39:26+05:30</lastmod>
       <priority>0</priority>
     </url>
     
