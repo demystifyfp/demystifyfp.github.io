@@ -665,5 +665,23 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
 </description>
     </item>
     
+    <item>
+      <title>F# Applied</title>
+      <link>https://www.demystifyfp.com/book/fs-applied/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/book/fs-applied/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>F# Applied II</title>
+      <link>https://www.demystifyfp.com/book/fs-applied-ii/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/book/fs-applied-ii/</guid>
+      <description></description>
+    </item>
+    
   </channel>
 </rss>

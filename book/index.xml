@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Books on Demystify FP</title>
+    <link>https://www.demystifyfp.com/book/</link>
+    <description>Recent content in Books on Demystify FP</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Demystify FP</copyright>
+    <lastBuildDate>Wed, 27 Apr 2016 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/book/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>F# Applied</title>
+      <link>https://www.demystifyfp.com/book/fs-applied/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/book/fs-applied/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>F# Applied II</title>
+      <link>https://www.demystifyfp.com/book/fs-applied-ii/</link>
+      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/book/fs-applied-ii/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
