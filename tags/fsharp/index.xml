@@ -7,8 +7,303 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 15 Dec 2017 19:39:26 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 06 Feb 2018 19:48:26 +0530</lastBuildDate>
     <atom:link href="/tags/fsharp/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Introducing FsConfig</title>
+      <link>https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/</link>
+      <pubDate>Tue, 06 Feb 2018 19:48:26 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/</guid>
+      <description>
+
+&lt;p&gt;I am delighted to introduce a new F# library, &lt;a href=&#34;https://github.com/demystifyfp/FsConfig&#34; target=&#34;_blank&#34;&gt;FsConfig&lt;/a&gt;. FsConfig is a F# library for reading configuration data from environment variables and AppSettings with type safety&lt;/p&gt;
+
+&lt;h2 id=&#34;why-fsconfig&#34;&gt;Why FsConfig?&lt;/h2&gt;
+
+&lt;p&gt;To understand FsConfig, let&amp;rsquo;s have a look at an use case from the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet&#34; target=&#34;_blank&#34;&gt;FsTweet&lt;/a&gt; application.&lt;/p&gt;
+
+&lt;p&gt;The FsTweet application follows &lt;a href=&#34;https://12factor.net/config&#34; target=&#34;_blank&#34;&gt;The Twelve-Factor App&lt;/a&gt; guideline for managing the configuration data. During the application bootstrap, it retrieves its ten configuration parameters from their respective environment variables.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open System
+
+let main argv =
+
+  let fsTweetConnString = 
+   Environment.GetEnvironmentVariable  &amp;quot;FSTWEET_DB_CONN_STRING&amp;quot;
+
+  let serverToken =
+    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_POSTMARK_SERVER_TOKEN&amp;quot;
+
+  let senderEmailAddress =
+    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_SENDER_EMAIL_ADDRESS&amp;quot;
+
+  let env = 
+    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_ENVIRONMENT&amp;quot;
+
+  let streamConfig : GetStream.Config = {
+      ApiKey = 
+        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_KEY&amp;quot;
+      ApiSecret = 
+        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_SECRET&amp;quot;
+      AppId = 
+        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_APP_ID&amp;quot;
+  }
+
+  let serverKey = 
+    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_SERVER_KEY&amp;quot;
+
+  let port = 
+    Environment.GetEnvironmentVariable &amp;quot;PORT&amp;quot; |&amp;gt; uint16
+
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Though the code snippet does the job, there are some shortcomings.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;The code is verbose.&lt;/li&gt;
+&lt;li&gt;There is no error handling to deal with the absence of values or wrong values.&lt;/li&gt;
+&lt;li&gt;Explicit type casting&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;With the help of FsConfig, we can overcome these limitations by specifying the configuration data as a F# Record type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type StreamConfig = {
+  Key : string
+  Secret : string
+  AppId : string
+}
+
+[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;)&amp;gt;]
+type Config = {
+
+  DbConnString : string
+  PostmarkServerToken : string
+  SenderEmailAddress : string
+  ServerKey : string
+  Environment : string
+
+  [&amp;lt;CustomName(&amp;quot;PORT&amp;quot;)&amp;gt;]
+  Port : uint16
+  Stream : StreamConfig
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then read all the associated environment variables in a single function call with type safety and error handling!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let main argv =
+
+  let config = 
+    match EnvConfig.Get&amp;lt;Config&amp;gt;() with
+    | Ok config -&amp;gt; config
+    | Error error -&amp;gt; 
+      match error with
+      | NotFound envVarName -&amp;gt; 
+        failwithf &amp;quot;Environment variable %s not found&amp;quot; envVarName
+      | BadValue (envVarName, value) -&amp;gt;
+        failwithf &amp;quot;Environment variable %s has invalid value&amp;quot; envVarName value
+      | NotSupported msg -&amp;gt; 
+        failwith msg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;supported-data-types&#34;&gt;Supported Data Types&lt;/h2&gt;
+
+&lt;p&gt;FsConfig supports the following data types and leverages their respective &lt;code&gt;TryParse&lt;/code&gt; function to do the type conversion.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;Int16&lt;/code&gt;, &lt;code&gt;Int32&lt;/code&gt;, &lt;code&gt;Int64&lt;/code&gt;, &lt;code&gt;UInt16&lt;/code&gt;, &lt;code&gt;UInt32&lt;/code&gt;, &lt;code&gt;UInt64&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Byte&lt;/code&gt;, &lt;code&gt;SByte&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Single&lt;/code&gt;, &lt;code&gt;Double&lt;/code&gt;, &lt;code&gt;Decimal&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Char&lt;/code&gt;, &lt;code&gt;String&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;TimeSpan&lt;/code&gt;, &lt;code&gt;DateTimeOffset&lt;/code&gt;, &lt;code&gt;DateTime&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Guid&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Enum&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;option-type&#34;&gt;Option Type&lt;/h3&gt;
+
+&lt;p&gt;FsConfig allows us to specify optional configuration parameters using the &lt;code&gt;option&lt;/code&gt; type. In the previous example, if the configuration parameter &lt;code&gt;Port&lt;/code&gt; is optional, we can define it like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;type Config = {
+   ...
+-  Port : uint16
++  Port : uint16 option
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;list-type&#34;&gt;List Type&lt;/h3&gt;
+
+&lt;p&gt;FsConfig also supports &lt;code&gt;list&lt;/code&gt; type, and it expects comma separated individual values.&lt;/p&gt;
+
+&lt;p&gt;For example, to get mulitple ports, we can define the config as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
+  Port : uint16 list
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and then pass the value &lt;code&gt;8084,8085,8080&lt;/code&gt; using the environment variable &lt;code&gt;PORT&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;record-type&#34;&gt;Record Type&lt;/h3&gt;
+
+&lt;p&gt;As shown in the &lt;a href=&#34;#why-fsconfig&#34; target=&#34;_blank&#34;&gt;initial example&lt;/a&gt;, FsConfig allows us to group similar configuration into a record type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type AwsConfig = {
+  AccessKeyId : string
+  DefaultRegion : string
+  SecretAccessKey : string
+}
+
+type Config = {
+  Aws : AwsConfig
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;With this configuration declaration, FsConfig read the environment variables &lt;code&gt;AWS_ACCESS_KEY_ID&lt;/code&gt;, &lt;code&gt;AWS_SECRET_ACCESS_KEY&lt;/code&gt;, and &lt;code&gt;AWS_DEFAULT_REGION&lt;/code&gt; and populates the &lt;code&gt;Aws&lt;/code&gt; field of type &lt;code&gt;AwsConfig&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;environment-variable-name-convention-customization&#34;&gt;Environment Variable Name Convention &amp;amp; Customization&lt;/h2&gt;
+
+&lt;p&gt;By default, FsConfig follows Underscores with uppercase convention, as in &lt;code&gt;UPPER_CASE&lt;/code&gt;, for deriving the environment variable name.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
+  ServerKey : string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Using this configuration declaration, FsConfig read the environment variable &lt;code&gt;SERVER_KEY&lt;/code&gt; and populates the &lt;code&gt;ServerKey&lt;/code&gt; field&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To specify a custom prefix in the environment variables, we can make use of the &lt;code&gt;Convention&lt;/code&gt; attribute.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;)&amp;gt;]
+type Config = {
+  ServerKey : string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;For this configuration declaration, FsConfig read the environment variable &lt;code&gt;FSTWEET_SERVER_KEY&lt;/code&gt; and populates the &lt;code&gt;ServerKey&lt;/code&gt; field.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We can also override the separator character &lt;code&gt;_&lt;/code&gt; using the &lt;code&gt;Convention&lt;/code&gt; attribute&amp;rsquo;s optional field &lt;code&gt;Separator&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;, Separator=&amp;quot;-&amp;quot;)&amp;gt;]
+type Config = {
+  ServerKey : string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;In this case, FsConfig derives the environment variable name as &lt;code&gt;FSTWEET-SERVER-KEY&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;If an environment variable name is not following a convention, we can override the environment variable name at the field level using the &lt;code&gt;CustomName&lt;/code&gt; attribute.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
+  [&amp;lt;CustomName(&amp;quot;MY_SERVER_KEY&amp;quot;)&amp;gt;]
+  ServerKey : string
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Here, FsConfig uses the environment variable name &lt;code&gt;MY_SERVER_KEY&lt;/code&gt; to get the ServerKey.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We can also merely customise (or control) the environment variable name generation by passing an higher-order function while calling the &lt;code&gt;Get&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open FsConfig
+
+// Prefix -&amp;gt; string -&amp;gt; string
+let lowerCaseConfigNameCanonicalizer (Prefix prefix) (name : string) = 
+  let lowerCaseName = name.ToLowerInvariant()
+  if String.IsNullOrEmpty prefix then 
+    name.ToLowerInvariant()
+  else
+    sprintf &amp;quot;%s-%s&amp;quot; (prefix.ToLowerInvariant()) lowerCaseName
+
+
+[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;)&amp;gt;]
+type Config = {
+  ServerKey : string
+}
+
+let main argv =
+  let config = 
+    match EnvConfig.Get&amp;lt;Config&amp;gt; lowerCaseConfigNameCanonicalizer with
+    | Ok config -&amp;gt; config
+    | Error error -&amp;gt; failwithf &amp;quot;Error : %A&amp;quot; error
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;FsConfig computes the environment variable name as &lt;code&gt;fstweet-server-key&lt;/code&gt; in this scenario.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;getting-individual-environment-variables&#34;&gt;Getting Individual Environment Variables&lt;/h2&gt;
+
+&lt;p&gt;FsConfig also supports reading value directly by explicitly specifying the environment variable name&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;EnvConfig.Get&amp;lt;decimal&amp;gt; &amp;quot;MY_APP_INITIAL_BALANCE&amp;quot; // Result&amp;lt;decimal, ConfigParseError&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;appsettings&#34;&gt;appSettings&lt;/h2&gt;
+
+&lt;p&gt;Are you using &lt;code&gt;appSettings&lt;/code&gt; in (either &lt;code&gt;web.config&lt;/code&gt; or &lt;code&gt;App.config&lt;/code&gt;) to manage your configuration settings? FsConfig supports that too!&lt;/p&gt;
+
+&lt;p&gt;We can read the &lt;code&gt;appSettings&lt;/code&gt; values using the &lt;code&gt;AppConfig&lt;/code&gt; type instead of &lt;code&gt;EnvConfig&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;p&gt;FsConfig uses the exact name of the field to derive the &lt;code&gt;appSettings&lt;/code&gt; key name and doesn&amp;rsquo;t use any separator by default.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type AwsConfig = {
+  AccessKeyId : string
+  DefaultRegion : string
+  SecretAccessKey : string
+}
+
+type Config = {
+  Port : uint16
+  Aws : AwsConfig
+}
+
+let main argv =
+  let config = 
+    match AppConfig.Get&amp;lt;Config&amp;gt;() with
+    | Ok config -&amp;gt; config
+    | Error error -&amp;gt; failwithf &amp;quot;Error : %A&amp;quot; error
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The above code snippet looks for &lt;code&gt;appSettings&lt;/code&gt; values with the name &lt;code&gt;Port&lt;/code&gt;, &lt;code&gt;AwsAccessKeyId&lt;/code&gt;, &lt;code&gt;AwsDefaultRegion&lt;/code&gt;, &lt;code&gt;AwsSecretAccessKey&lt;/code&gt; and populates the respective fields.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;All the customisation that we have seen for &lt;code&gt;EnvConfig&lt;/code&gt; is applicable for &lt;code&gt;AppConfig&lt;/code&gt; as well.&lt;/p&gt;
+
+&lt;h2 id=&#34;how-fsconfig-works&#34;&gt;How FsConfig Works&lt;/h2&gt;
+
+&lt;p&gt;If you are curious to know how FsConfig works and its internals then you might be interested in my blog post, &lt;a href=&#34;https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/&#34; target=&#34;_blank&#34;&gt;Generic Programming Made Easy&lt;/a&gt; that deep dives into the initial implementation of FsConfig.&lt;/p&gt;
+
+&lt;p&gt;The current version of FsConfig is available on &lt;a href=&#34;https://github.com/demystifyfp/FsConfig&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;feedback&#34;&gt;Feedback&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We all need people who will give us feedback. That&amp;rsquo;s how we improve - Bill Gates.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Your suggestions/feedback are welcome!&lt;/p&gt;
+
+&lt;h2 id=&#34;acknowledgements&#34;&gt;Acknowledgements&lt;/h2&gt;
+
+&lt;p&gt;The idea of FsConfig is inspired by &lt;a href=&#34;https://twitter.com/kelseyhightower&#34; target=&#34;_blank&#34;&gt;Kelsey Hightower&lt;/a&gt;&amp;rsquo;s golang library &lt;a href=&#34;https://github.com/kelseyhightower/envconfig&#34; target=&#34;_blank&#34;&gt;envconfig&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;FsConfig uses &lt;a href=&#34;https://twitter.com/eiriktsarpalis&#34; target=&#34;_blank&#34;&gt;Eirik Tsarpalis&lt;/a&gt;&amp;rsquo;s &lt;a href=&#34;https://github.com/eiriktsarpalis/TypeShape&#34; target=&#34;_blank&#34;&gt;TypeShape&lt;/a&gt; library for generic programming.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Generic Programming Made Easy</title>
