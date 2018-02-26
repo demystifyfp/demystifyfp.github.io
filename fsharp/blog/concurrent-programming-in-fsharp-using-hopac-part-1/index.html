@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.30.2" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/">
+  <meta property="og:title" content="Concurrent Programming in fsharp using Hopac (Part-I) | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2018-02-26T19:08:32&#43;05:30">
+  
+  <meta property="article:modified_time" content="2018-02-26T19:08:32&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+  <title>Concurrent Programming in fsharp using Hopac (Part-I) | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#posts">
+            
+            <span>Posts</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Concurrent Programming in fsharp using Hopac (Part-I)</h1>
+
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-02-26 19:08:32 &#43;0530 IST" itemprop="datePublished">
+      Mon, Feb 26, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Concurrent%20Programming%20in%20fsharp%20using%20Hopac%20%28Part-I%29&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-1%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-1%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-1%2f&amp;title=Concurrent%20Programming%20in%20fsharp%20using%20Hopac%20%28Part-I%29"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-1%2f&amp;title=Concurrent%20Programming%20in%20fsharp%20using%20Hopac%20%28Part-I%29"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Concurrent%20Programming%20in%20fsharp%20using%20Hopac%20%28Part-I%29&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-1%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+      <div class="article-style" itemprop="articleBody">
+        <p>Enabling developers to write concise code in solving complex problems is one of the significant characteristics of functional programming. The conciseness is mostly due to the abstractions provided by the functional programming language.</p>
+
+<p>Can we apply these abstractions and write concurrent programs with ease?</p>
+
+<p>We are going to find the answer to this question by writing concurrent programs in fsharp using the <a href="https://github.com/Hopac/Hopac">Hopac</a> library.</p>
+
+<h2 id="what-is-hopac">What is Hopac</h2>
+
+<p>Hopac is a fsharp library that provides a programming model inspired by John Reppy's <a href="https://en.wikipedia.org/wiki/Concurrent_ML">Concurrent ML</a> language. Other languages that offer similar or related models include Racket, Clojure core.async, and Go.</p>
+
+<blockquote>
+<p>The essence of Hopac is lightweight threads, called jobs, and flexible lightweight synchronous message passing via channels (and other messaging primitives) - <a href="https://github.com/Hopac/Hopac/blob/master/Docs/Programming.md#the-hopac-programming-model">Hopac Programming model</a></p>
+</blockquote>
+
+<h2 id="development-setup">Development Setup</h2>
+
+<p>We are going to make use of fsharp script file in this blog post to explore Hopac.</p>
+
+<p>As a first step, initialise <a href="https://fsprojects.github.io/Paket/">paket</a> either <a href="https://fsprojects.github.io/Paket/getting-started.html#Manual-setup">manually</a> or using <a href="http://forge.run/">forge</a>, which automates the manual setup.</p>
+
+<pre><code class="language-bash">&gt; forge paket init
+</code></pre>
+
+<p>Then add the Hopac library using paket.</p>
+
+<pre><code class="language-bash">&gt; paket add Hopac
+</code></pre>
+
+<p>After installing, create a fsharp script file and refer the Hopac library</p>
+
+<pre><code class="language-fsharp">#r &quot;packages/Hopac/lib/net45/Hopac.Core.dll&quot;
+#r &quot;packages/Hopac/lib/net45/Hopac.Platform.dll&quot;
+#r &quot;packages/Hopac/lib/net45/Hopac.dll&quot;
+
+open Hopac
+</code></pre>
+
+<h2 id="the-hello-world-job">The &quot;Hello World&quot; Job</h2>
+
+<p>The type <a href="http://hopac.github.io/Hopac/Hopac.html#def:type%20Hopac.Job">Job</a> is the core programming model of Hopac that represents a lightweight thread of execution.</p>
+
+<p>We can create <code>Job&lt;'x&gt;</code> in Hopac by using its <a href="http://hopac.github.io/Hopac/Hopac.html#def:type%20Hopac.JobBuilder">JobBuilder</a> aka <code>job</code> computation expression.</p>
+
+<pre><code class="language-fsharp">let helloWorldJob = job {
+  printfn &quot;Hello, World!&quot;
+}
+</code></pre>
+
+<p>We can then run this job using the <a href="http://hopac.github.io/Hopac/Hopac.html#def:val%20Hopac.Hopac.run">run</a> function.</p>
+
+<pre><code class="language-fsharp">run helloWorldJob
+</code></pre>
+
+<p>Executing the above code in F# Interactive will produce the following output</p>
+
+<pre><code class="language-bash">&gt; run helloWorldJob;;
+Hello, World!
+val it : unit = ()
+</code></pre>
+
+<blockquote>
+<p>The <code>run</code> function starts running the given job and then blocks the current thread waiting for the job to either return successfully or fail. <code>run</code> is mainly provided for conveniently running Hopac code from F# Interactive and can also be used as an entry point to the Hopac runtime in console applications. - Hopac Documentation.</p>
+</blockquote>
+
+<h2 id="a-time-consuming-job">A Time Consuming Job</h2>
+
+<p>Now we know how to create and run jobs in Hopac. As a next step, let's define a <code>job</code> that takes some time for its computation.</p>
+
+<p>We are going to simulate this delay by using the <code>timeOutInMillis</code> function from Hopac that delays the computation for the provided milliseconds.</p>
+
+<pre><code class="language-fsharp">let longerHelloWorldJob = job {
+  do! timeOutMillis 2000
+  printfn &quot;Hello, World!&quot;
+}
+</code></pre>
+
+<p>If we run this new job with the F# Interactive timer on, we can see that the execution of this function takes two seconds (or 2000 milliseconds).</p>
+
+<pre><code class="language-fsharp">#time &quot;on&quot;
+run longerHelloWorldJob
+#time &quot;off&quot;
+</code></pre>
+
+<pre><code class="language-bash">--&gt; Timing now on
+
+Hello, World!
+Real: 00:00:02.003, CPU: 00:00:00.006, GC gen0: 0, gen1: 0
+val it : unit = ()
+
+
+--&gt; Timing now off
+</code></pre>
+
+<h2 id="running-concurrent-jobs">Running Concurrent Jobs</h2>
+
+<p>To run multiple jobs concurrently, we first need multiple jobs. So, let's create a new function <code>createJob</code> that takes a job id (to differentiate the jobs) and the job's computation time as its parameters and return the newly created <code>job</code>.</p>
+
+<pre><code class="language-fsharp">// int -&gt; int -&gt; Job&lt;unit&gt;
+let createJob jobId delayInMillis  = job {
+  printfn &quot;starting job:%d&quot; jobId
+  do! timeOutMillis delayInMillis
+  printfn &quot;completed job:%d&quot; jobId
+}
+</code></pre>
+
+<p>With the help of this <code>createJob</code> function, we can create multiple jobs with different computation time.</p>
+
+<pre><code class="language-fsharp">// Job&lt;unit&gt; list
+let jobs = [
+  createJob 1 4000
+  createJob 2 3000
+  createJob 3 2000
+]
+</code></pre>
+
+<p>If we run these job sequentially, it will take nine seconds (9000 milliseconds) to complete. To make it run concurrently and complete the execution in four seconds (4000 milliseconds), we can leverage the <a href="http://hopac.github.io/Hopac/Hopac.html#def:val%20Hopac.Job.conIgnore">conIgnore</a> function from Hopac</p>
+
+<blockquote>
+<p>The <code>conIgnore</code> function creates a job that runs all of the jobs as separate concurrent jobs and then waits for all of the jobs to finish. The results of the jobs are ignored.</p>
+</blockquote>
+
+<pre><code class="language-fsharp">// Job&lt;unit&gt;
+let concurrentJobs = Job.conIgnore jobs
+</code></pre>
+
+<p>Let's verify this concurrent behaviour</p>
+
+<pre><code class="language-fsharp">#time &quot;on&quot;
+run concurrentJobs
+#time &quot;off&quot;
+</code></pre>
+
+<pre><code class="language-bash">--&gt; Timing now on
+
+starting job:3
+starting job:1
+starting job:2
+completed job:3
+completed job:2
+completed job:1
+Real: 00:00:04.007, CPU: 00:00:00.013, GC gen0: 0, gen1: 0
+val it : unit = ()
+
+
+--&gt; Timing now off
+</code></pre>
+
+<p>Awesome! We just witnessed the power of Hopac for the very first time and saved five seconds in execution!</p>
+
+<h2 id="a-real-world-example">A Real World Example</h2>
+
+<p>As the last example of this blog post, let's have a look at a modified real-world use case from my previous project.</p>
+
+<p>Let's assume that we are building a home page of a product in an e-commerce portal which displays the product along with its reviews. The product details are stored in a database, and the reviews of the product are stored in an external system. The requirement is to write an API that pulls the data from the both these sources, merge it and send it back to the client.</p>
+
+<p>If we model this use case using Hopac Jobs, we would have a function to retrieve the product from the database.</p>
+
+<pre><code class="language-fsharp">type Product = { 
+  Id : int
+  Name : string
+}
+
+// int -&gt; Job&lt;Product&gt;
+let getProduct id = job {
+  
+  // Delay in the place of DB query logic for brevity
+  do! timeOutMillis 2000
+
+  return {Id = id; Name = &quot;My Awesome Product&quot;}
+}
+</code></pre>
+
+<p>Another function to retrieve the product reviews from an external system</p>
+
+<pre><code class="language-fsharp">type Review = {
+  ProductId : int
+  Author : string
+  Comment : string
+}
+
+// int -&gt; Job&lt;Review list&gt;
+let getProductReviews id = job {
+  
+  // Delay in the place of an external HTTP API call
+  do! timeOutMillis 3000
+  
+  return [
+    {ProductId = id; Author = &quot;John&quot;; Comment = &quot;It's awesome!&quot;}
+    {ProductId = id; Author = &quot;Sam&quot;; Comment = &quot;Great product&quot;}
+  ]
+}
+</code></pre>
+
+<p>The final piece is writing another function that merges the results from these two functions. Like the <code>async</code> computation expression in fsharp, in the <code>job</code> computation expression, we can use the <code>let!</code> binding to retrieve the output (or result) of a job.</p>
+
+<pre><code class="language-fsharp">type ProductWithReviews = {
+  Id : int
+  Name : string
+  Reviews : (string * string) list
+}
+
+// int -&gt; Job&lt;ProductWithReviews&gt;
+let getProductWithReviews id = job {
+  let! product = getProduct id <span class="callout">1</span>
+  let! reviews = getProductReviews id <span class="callout">2</span>
+  return {  <span class="callout">3</span>
+    Id = id
+    Name = product.Name
+    Reviews = reviews |&gt; List.map (fun r -&gt; r.Author,r.Comment)
+  }
+}
+</code></pre>
+
+<p><span class="callout">1</span> retrieves <code>Product</code> from the <code>Job&lt;Product&gt;</code></p>
+
+<p><span class="callout">2</span> retrieves <code>Review list</code> from the <code>Job&lt;Review list&gt;</code></p>
+
+<p><span class="callout">3</span> return the merged result <code>ProductWithReviews</code></p>
+
+<p>Let's execute this snippet in F# Interactive to verify the outcome</p>
+
+<pre><code class="language-fsharp">#time &quot;on&quot;
+getProductWithReviews 1 |&gt; run
+#time &quot;off&quot;
+</code></pre>
+
+<pre><code class="language-bash">--&gt; Timing now on
+
+Real: 00:00:05.008, CPU: 00:00:00.009, GC gen0: 0, gen1: 0
+
+val it : ProductWithReviews =
+  {Id = 1;
+   Name = &quot;My Awesome Product&quot;;
+   Reviews = [(&quot;John&quot;, &quot;It's awesome!&quot;); (&quot;Sam&quot;, &quot;Great product&quot;)];}
+
+
+--&gt; Timing now off
+</code></pre>
+
+<p>The output is as expected but the time it took is five seconds (two to retrieve the product and three to retrive the reviews). It is because of the sequential execution of the jobs</p>
+
+<p>Can we make it fast by running them parallelly?</p>
+
+<p>As these two function calls are independent of each other, we can run them parallelly and then merge the results.</p>
+
+<p>To do it, we are going to leverage the infix operator <code>&lt;*&gt;</code> from Hopac</p>
+
+<pre><code class="language-fsharp">val ( &lt;*&gt; ): Job&lt;'x&gt; -&gt; Job&lt;'y&gt; -&gt; Job&lt;'x * 'y&gt;
+</code></pre>
+
+<blockquote>
+<p>The infix operator <code>&lt;*&gt;</code> creates a job that runs the given jobs as two separate parallel jobs and returns a pair of their results.</p>
+</blockquote>
+
+<pre><code class="language-fsharp">open Hopac.Infixes
+
+let getProductWithReviews2 id = job {
+  let! product, reviews = 
+    getProduct id &lt;*&gt; getProductReviews id
+  return {
+    Id = id
+    Name = product.Name
+    Reviews = reviews |&gt; List.map (fun r -&gt; r.Author,r.Comment)
+  }
+}
+</code></pre>
+
+<p>If we execute this new function</p>
+
+<pre><code class="language-fsharp">#time &quot;on&quot;
+getProductWithReviews2 1 |&gt; run
+#time &quot;off&quot;
+</code></pre>
+
+<p>we will get the same output now in three seconds instead of five.</p>
+
+<pre><code class="language-bash">--&gt; Timing now on
+
+Real: 00:00:03.005, CPU: 00:00:00.008, GC gen0: 0, gen1: 0
+val it : ProductWithReviews =
+  {Id = 1;
+   Name = &quot;My Awesome Product&quot;;
+   Reviews = [(&quot;John&quot;, &quot;It's awesome!&quot;); (&quot;Sam&quot;, &quot;Great product&quot;)];}
+
+
+--&gt; Timing now off
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>One of the well-thought aspects of Hopac library is its <code>job</code> computation expression and its  similarity with the <code>async</code> computation expression makes it easier to learn and apply!</p>
+
+<p>We had only scratched the surface of the Hopac library in this blog post. Hopac library has a lot of powerful abstractions in its arsenal which we will see in action in the upcoming blog posts.</p>
+
+<p>The source code of this blog post is available on <a href="https://github.com/demystifyfp/BlogSamples/tree/0.2/fsharp/HopacSeries/Part1">GitHub</a></p>
+
+      </div>
+
+      
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/hopac">Hopac</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/concurrent-programming">concurrent-programming</a>
+  
+</div>
+
+
+
+    </div>
+  </div>
+
+</article>
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/blog/adding-meaning-to-primitive-types-in-fsharp/">Adding Meaning to Primitive Types in fsharp</a></li>
+    
+    <li><a href="/fsharp/blog/introducing-fsconfig/">Introducing FsConfig</a></li>
+    
+    <li><a href="/fsharp/blog/generic-programming-made-easy/">Generic Programming Made Easy</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
