@@ -7,8 +7,641 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Wed, 28 Feb 2018 19:47:02 +0530</lastBuildDate>
+    <lastBuildDate>Mon, 05 Mar 2018 19:16:02 +0530</lastBuildDate>
     <atom:link href="/tags/fsharp/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Implementing API Gateway Pattern in fsharp using Hopac</title>
+      <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/</link>
+      <pubDate>Mon, 05 Mar 2018 19:16:02 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/</guid>
+      <description>&lt;p&gt;Two years back, I wrote &lt;a href=&#34;http://blog.tamizhvendan.in/blog/2015/12/29/implementing-api-gateway-in-f-number-using-rx-and-suave/&#34;&gt;a blog post&lt;/a&gt; on how to implement &lt;a href=&#34;https://www.nginx.com/blog/building-microservices-using-an-api-gateway&#34;&gt;the API Gateway pattern&lt;/a&gt; using &lt;a href=&#34;http://reactivex.io/&#34;&gt;Reactive Extensions&lt;/a&gt;(Rx). In this third part of concurrent programming in fsharp using Hopac blog series, we are going to revisit that blog post and port it to use Hopac instead of Reactive Extensions.&lt;/p&gt;
+
+&lt;h2 id=&#34;rx-vs-hopac&#34;&gt;Rx vs Hopac&lt;/h2&gt;
+
+&lt;p&gt;The critical difference between Rx and Hopac is their communication model.&lt;/p&gt;
+
+&lt;p&gt;Rx is primarily a system for querying data in motion asynchronously, and systems built using Rx rely on asynchronous message-passing. Whereas Hopac&#39;s programming model uses synchronous message passing (Rendezvous Point) using channels.&lt;/p&gt;
+
+&lt;p&gt;If you are interested in knowing more about the difference, check out this Rich Hickey&#39;s talk on &lt;a href=&#34;https://www.infoq.com/presentations/clojure-core-async&#34;&gt;introducing Clojure core.async&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;the-problem-statement&#34;&gt;The Problem Statement&lt;/h2&gt;
+
+&lt;p&gt;Let&#39;s get started by spending some time on understanding the problem that we are going to solve.&lt;/p&gt;
+
+&lt;p&gt;Our objective is to write a backend which serves the data for showing a GitHub user profile like below&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/Profile.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;This profile view has three components.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;User&lt;/strong&gt; - Username and Avatar.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Popular Repos&lt;/strong&gt; - Top three public repos of the Given User (determined by the number of stars).&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Languages&lt;/strong&gt; - Programming languages used in the corresponding repos.&lt;/p&gt;
+
+&lt;p&gt;To get these data from GitHub APIs, we need to make five API calls.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/Profile_With_API_Calls.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We can use GitHub&#39;s &lt;a href=&#34;https://developer.github.com/v4/&#34;&gt;GraphQL API&lt;/a&gt; to minimise it. As the focus of this blog post is different, we are not going to consider this.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;getting-started&#34;&gt;Getting Started&lt;/h2&gt;
+
+&lt;p&gt;Let&#39;s create a fsharp script file &lt;code&gt;ApiGateway.fsx&lt;/code&gt; and add the following NuGet packages using Paket as we did in the earlier parts.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch ApiGateway.fsx
+&amp;gt; forge paket init
+&amp;gt; forge paket add Hopac
+&amp;gt; forge paket add Http.fs &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+&amp;gt; forge paket add System.Net.Http &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+&amp;gt; forge paket add FSharp.Data &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; &lt;a href=&#34;https://github.com/haf/Http.fs&#34;&gt;&lt;strong&gt;Http.Fs&lt;/strong&gt;&lt;/a&gt; - A simple, functional HTTP client library for F# using Hopac&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; &lt;a href=&#34;https://www.nuget.org/packages/System.Net.Http/&#34;&gt;&lt;strong&gt;System.Net.Http&lt;/strong&gt;&lt;/a&gt; - A dependency of &lt;em&gt;Http.Fs&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; &lt;a href=&#34;http://fsharp.github.io/FSharp.Data&#34;&gt;&lt;strong&gt;FSharp.Data&lt;/strong&gt;&lt;/a&gt; - For using &lt;a href=&#34;http://fsharp.github.io/FSharp.Data/library/JsonProvider.html&#34;&gt;JSON Type Provider&lt;/a&gt; and JSON serialization.&lt;/p&gt;
+
+&lt;p&gt;Then refer these packages in the script file&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#r &amp;quot;packages/Hopac/lib/net45/Hopac.Core.dll&amp;quot;
+#r &amp;quot;packages/Hopac/lib/net45/Hopac.Platform.dll&amp;quot;
+#r &amp;quot;packages/Hopac/lib/net45/Hopac.dll&amp;quot;
+#r &amp;quot;packages/Hopac/lib/net45/Hopac.dll&amp;quot;
+#r &amp;quot;packages/FSharp.Data/lib/net45/FSharp.Data.dll&amp;quot;
+#r &amp;quot;packages/Http.fs/lib/net461/HttpFs.dll&amp;quot;
+#r &amp;quot;packages/System.Net.Http/lib/net46/System.Net.Http.dll&amp;quot;
+
+open Hopac
+open FSharp.Data
+open HttpFs.Client
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;setting-up-github-http-get-request&#34;&gt;Setting up GitHub Http GET request&lt;/h2&gt;
+
+&lt;p&gt;According to GitHub API version 3 &lt;a href=&#34;https://developer.github.com/v3&#34;&gt;specification&lt;/a&gt;, the presence of &lt;code&gt;User-Agent&lt;/code&gt; header is &lt;a href=&#34;https://developer.github.com/v3/#user-agent-required&#34;&gt;mandatory&lt;/a&gt; for all API requests.&lt;/p&gt;
+
+&lt;p&gt;As we are going to use only HTTP GET requests, let&#39;s create a function &lt;code&gt;httpGet&lt;/code&gt; that takes care of passing &lt;code&gt;User-Agent&lt;/code&gt; header in all the HTTP Get requests&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; Job&amp;lt;string&amp;gt;
+let httpGet url =
+  Request.createUrl Get url // Request 
+  |&amp;gt; Request.setHeader (UserAgent &amp;quot;FsHopac&amp;quot;) // Request
+  |&amp;gt; getResponse // Alt&amp;lt;Response&amp;gt; &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  |&amp;gt; Job.bind Response.readBodyAsString // Job&amp;lt;string&amp;gt; &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; &lt;code&gt;getResponse&lt;/code&gt; is a function from &lt;em&gt;Http.Fs&lt;/em&gt; library that fires the HTTP request and returns the Response as &lt;code&gt;Alt&lt;/code&gt;, a subclass of Hopac&#39;s &lt;code&gt;Job&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; As the name indicates, the &lt;code&gt;readBodyAsString&lt;/code&gt; function (&lt;code&gt;Response -&amp;gt; Job&amp;lt;string&amp;gt;&lt;/code&gt;) read the response body and return its string representation.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; The &lt;code&gt;bind&lt;/code&gt; function creates a job that first runs the given job (&lt;code&gt;Job&amp;lt;Response&amp;gt;&lt;/code&gt;) and then passes the result of that job (&lt;code&gt;Response&lt;/code&gt;) to the given function (&lt;code&gt;Response -&amp;gt; Job&amp;lt;string&amp;gt;&lt;/code&gt;) to build another job which will then be run.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val bind: (&#39;x -&amp;gt; Job&amp;lt;&#39;y&amp;gt;) -&amp;gt; Job&amp;lt;&#39;x&amp;gt; -&amp;gt; Job&amp;lt;&#39;y&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;getting-user&#34;&gt;Getting User&lt;/h2&gt;
+
+&lt;p&gt;To parse the user information from GitHub, let&#39;s create the JSON Type Provider for the User.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type UserTypeProvider = JsonProvider&amp;lt;&amp;quot;https://api.github.com/users/tamizhvendan&amp;quot;&amp;gt;
+type User = UserTypeProvider.Root
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, we can make use of the &lt;code&gt;httpGet&lt;/code&gt; function that we defined earlier to get the User JSON response from GitHub and parse the response using the &lt;code&gt;UserTypeProvider&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let basePath = &amp;quot;https://api.github.com&amp;quot;
+
+// string -&amp;gt; string 
+let userUrl = sprintf &amp;quot;%s/users/%s&amp;quot; basePath
+
+// string -&amp;gt; Job&amp;lt;User&amp;gt;
+let getUser username : Job&amp;lt;User&amp;gt; =
+  userUrl username 
+  |&amp;gt; httpGet // Job&amp;lt;string&amp;gt;
+  |&amp;gt; Job.map UserTypeProvider.Parse // Job&amp;lt;User&amp;gt; &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;Job.map&lt;/code&gt; function creates a job that runs the given job (&lt;code&gt;Job&amp;lt;string&amp;gt;&lt;/code&gt;) and maps the result of the job (&lt;code&gt;string&lt;/code&gt;) with the given function (&lt;code&gt;string -&amp;gt; User&lt;/code&gt;).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val map: (&#39;x -&amp;gt; &#39;y) -&amp;gt; Job&amp;lt;&#39;x&amp;gt; -&amp;gt; Job&amp;lt;&#39;y&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can verify the &lt;code&gt;getUser&lt;/code&gt; function using the F# interactive&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; getUser &amp;quot;tamizhvendan&amp;quot; |&amp;gt; run;;
+val it : User =
+  {
+  &amp;quot;login&amp;quot;: &amp;quot;tamizhvendan&amp;quot;,
+  &amp;quot;id&amp;quot;: 1128916,
+  &amp;quot;avatar_url&amp;quot;: &amp;quot;https://avatars0.githubusercontent.com/u/1128916?v=4&amp;quot;,
+  ...
+  }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;getting-top-three-user-repo&#34;&gt;Getting Top Three User Repo&lt;/h2&gt;
+
+&lt;p&gt;Our next task is getting the top three repos of the user based on the count of stars. As we did for &lt;code&gt;User&lt;/code&gt;, let&#39;s start by defining the &lt;code&gt;Repo&lt;/code&gt; type using the JSON Type Provider.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type ReposTypeProvider = 
+  JsonProvider&amp;lt;&amp;quot;https://api.github.com/users/tamizhvendan/repos&amp;quot;&amp;gt;
+type Repo = ReposTypeProvider.Root
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, we have to add a function that returns the top three repos from the given repos.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Repo [] -&amp;gt; Repo []
+let topThreeUserRepos (repos : Repo []) =
+  let takeCount =
+    let reposCount = Array.length repos
+    if reposCount &amp;gt; 3 then 3 else reposCount
+  repos
+  |&amp;gt; Array.filter (fun repo -&amp;gt; not repo.Fork) // Repo shouldn&#39;t be a fork
+  |&amp;gt; Array.sortByDescending (fun repo -&amp;gt; repo.StargazersCount)
+  |&amp;gt; Array.take takeCount
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final step is wiring up the &lt;code&gt;getTopThreeUserRepo&lt;/code&gt; function with the help of the functions that we defined so far.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let userReposUrl = sprintf &amp;quot;%s/users/%s/repos?per_page=100&amp;quot; basePath
+
+// string -&amp;gt; Job&amp;lt;Repo []&amp;gt;
+let getTopThreeUserRepos username : Job&amp;lt;Repo []&amp;gt; =
+  userReposUrl username
+  |&amp;gt; httpGet // Job &amp;lt;string&amp;gt;
+  |&amp;gt; Job.map ReposTypeProvider.Parse // Job &amp;lt;Repo []&amp;gt;
+  |&amp;gt; Job.map topThreeUserRepos // Job &amp;lt;Repo []&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can verify this in F# interactive as well&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; getTopThreeUserRepos &amp;quot;tamizhvendan&amp;quot; |&amp;gt; run;;
+val it : Repo [] =
+  [|{
+  &amp;quot;id&amp;quot;: 12037577,
+  &amp;quot;name&amp;quot;: &amp;quot;blog-samples&amp;quot;,
+  &amp;quot;full_name&amp;quot;: &amp;quot;tamizhvendan/blog-samples&amp;quot;
+  ...]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The list user repositories GitHub API that we are using here returns a maximum of 100 repositories per page, and we need to use their &lt;a href=&#34;https://developer.github.com/v3/guides/traversing-with-pagination/&#34;&gt;pagination logic&lt;/a&gt; to fetch all the repositories.&lt;/p&gt;
+
+&lt;p&gt;We are going ahead with this underlying implementation, and we&#39;ll address pagination later in this blog post.&lt;/p&gt;
+
+&lt;h2 id=&#34;getting-repo-languages&#34;&gt;Getting Repo Languages&lt;/h2&gt;
+
+&lt;p&gt;The GitHub API for returning a repo&#39;s languages has the following JSON structure&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;F#&amp;quot;: 65237,
+  &amp;quot;JavaScript&amp;quot;: 25034,
+  &amp;quot;Shell&amp;quot;: 876,
+  &amp;quot;HTML&amp;quot;: 391,
+  &amp;quot;Batchfile&amp;quot;: 214
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;From the response, we can see that the languages API response doesn&#39;t have a fixed schema. So, to get the languages, we need to parse the JSON and pick only its keys.&lt;/p&gt;
+
+&lt;p&gt;We can make use of the &lt;code&gt;JsonValue.Parse&lt;/code&gt; function from &lt;em&gt;FSharp.Data&lt;/em&gt; library to do it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; string []
+let parseLanguagesJson languagesJson =
+  languagesJson
+  |&amp;gt; JsonValue.Parse // JsonValue 
+  |&amp;gt; JsonExtensions.Properties // (string * JsonValue) []
+  |&amp;gt; Array.map fst // string []
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we can leverage this function to get the languages of a user repo.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let languagesUrl userName repoName  = 
+  sprintf &amp;quot;%s/repos/%s/%s/languages&amp;quot; basePath userName repoName
+
+// string -&amp;gt; string -&amp;gt; Job &amp;lt;string []&amp;gt;
+let getUserRepoLanguages username repoName =
+  languagesUrl username repoName 
+  |&amp;gt; httpGet // Job&amp;lt;string&amp;gt;
+  |&amp;gt; Job.map parseLanguagesJson // // Job&amp;lt;string []&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Running this function in F# interactive will give us the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;getUserRepoLanguages &amp;quot;tamizhvendan&amp;quot; &amp;quot;CafeApp&amp;quot; |&amp;gt; run;;
+val it : string [] = [|&amp;quot;F#&amp;quot;; &amp;quot;JavaScript&amp;quot;; &amp;quot;Shell&amp;quot;; &amp;quot;HTML&amp;quot;; &amp;quot;Batchfile&amp;quot;|]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;the-climax&#34;&gt;The Climax&lt;/h2&gt;
+
+&lt;p&gt;Alright, now we have three individual functions that take care of fetching the different components.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val getUser : string -&amp;gt; Job&amp;lt;User&amp;gt;
+val getTopThreeUserRepos : string -&amp;gt; Job&amp;lt;Repo []&amp;gt;
+val getUserRepoLanguages : string -&amp;gt; string -&amp;gt; Job &amp;lt;string []&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final piece is putting all these functions together and prepare the expected response. Before getting into that region, let&#39;s define some types to represent the last answer that we want and a helper function to construct it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type RepoDto = {
+  Name : string
+  StargazersCount : int
+  Languages : string []
+}
+
+// Repo -&amp;gt; string [] -&amp;gt; RepoDto
+let repoDto (repo : Repo) languages = {
+  Name = repo.Name
+  StargazersCount = repo.StargazersCount
+  Languages = languages
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type UserDto = {
+  Name : string
+  AvatarUrl : string
+  TopThreeRepos : RepoDto []
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To construct this response, we can call these functions sequentially inside a &lt;code&gt;job&lt;/code&gt; computation expression and populate the &lt;code&gt;UserDto&lt;/code&gt; from the return values.&lt;/p&gt;
+
+&lt;p&gt;But do we need to run them sequentially in the first place? We can run them in parallel as well.&lt;/p&gt;
+
+&lt;p&gt;We can run the jobs &lt;code&gt;Job&amp;lt;User&amp;gt;&lt;/code&gt; &amp;amp; &lt;code&gt;Job&amp;lt;Repo []&amp;gt;&lt;/code&gt; parallelly. And then for each &lt;code&gt;Repo&lt;/code&gt; in the &lt;code&gt;Repo []&lt;/code&gt;, we can get their respective languages job &lt;code&gt;Job&amp;lt;string []&amp;gt;&lt;/code&gt; and run each of them parallelly. Finally, we can combine all of them and create &lt;code&gt;UserDto&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s see it in action&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac.Infixes
+
+// string -&amp;gt; Repo -&amp;gt; Job&amp;lt;RepoDto&amp;gt;
+let getRepoDto username (repo : Repo) =
+  getUserRepoLanguages username repo.Name
+  |&amp;gt; Job.map (repoDto repo) 
+
+// string -&amp;gt; Job&amp;lt;UserDto&amp;gt;
+let getUserDto username = job {
+  let! user, repos = 
+    getUser username &amp;lt;*&amp;gt; getTopThreeUserRepos username &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; 
+  let! repoDtos = 
+    repos 
+    |&amp;gt; Array.map (getRepoDto username) &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+    |&amp;gt; Job.conCollect &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+  return {
+    Name = user.Name 
+    AvatarUrl = user.AvatarUrl
+    TopThreeRepos = repoDtos.ToArray() 
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Uses the infix function &lt;code&gt;&amp;lt;*&amp;gt;&lt;/code&gt; that we saw in the part-1 to run the given two jobs parallelly and returns their results as a Tuple.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; For each &lt;code&gt;Repo&lt;/code&gt; in the &lt;code&gt;repos&lt;/code&gt; array, we are getting their respective &lt;code&gt;Job&amp;lt;RepoDto&amp;gt;&lt;/code&gt; using the &lt;code&gt;getRepoDto&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; &lt;code&gt;Job.conCollect&lt;/code&gt; creates a job that runs all of the jobs as separate concurrent jobs and returns their results as &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/collections.resizearray%5B&#39;t%5D-type-abbreviation-%5Bfsharp%5D&#34;&gt;ResizeArray&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val conCollect: seq&amp;lt;Job&amp;lt;&#39;x&amp;gt;&amp;gt; -&amp;gt; Job&amp;lt;ResizeArray&amp;lt;&#39;x&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;That&#39;s all.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s run this function in F# interactive and verify our implementation&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;getUserDto &amp;quot;tamizhvendan&amp;quot; |&amp;gt; run;;
+val it : UserDto =
+  {Name = &amp;quot;Tamizhvendan S&amp;quot;;
+   AvatarUrl = &amp;quot;https://avatars0.githubusercontent.com/u/1128916?v=4&amp;quot;;
+   TopThreeRepos =
+    [|{Name = &amp;quot;blog-samples&amp;quot;;
+       StargazersCount = 89;
+       Languages = [|&amp;quot;F#&amp;quot;; &amp;quot;HTML&amp;quot;; &amp;quot;Liquid&amp;quot;; &amp;quot;JavaScript&amp;quot;|];};
+      {Name = &amp;quot;CafeApp&amp;quot;;
+       StargazersCount = 66;
+       Languages = [|&amp;quot;F#&amp;quot;; &amp;quot;JavaScript&amp;quot;; &amp;quot;Shell&amp;quot;; &amp;quot;HTML&amp;quot;; &amp;quot;Batchfile&amp;quot;|];};
+      {Name = &amp;quot;fsharp-phonecat&amp;quot;;
+       StargazersCount = 12;
+       Languages = [|&amp;quot;JavaScript&amp;quot;; &amp;quot;F#&amp;quot;; &amp;quot;C#&amp;quot;; &amp;quot;CSS&amp;quot;; &amp;quot;Shell&amp;quot;; &amp;quot;ASP&amp;quot;|];}|];}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Hurrah, Everything is working as expected!&lt;/p&gt;
+
+&lt;h3 id=&#34;adding-pagingation-support&#34;&gt;Adding Pagingation Support&lt;/h3&gt;
+
+&lt;p&gt;As mentioned earlier, in this sub-section we are going to add the support for pagination in the get all public repositories API.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://developer.github.com/v3/#pagination&#34;&gt;pagination&lt;/a&gt; logic in GitHub APIs uses the &lt;a href=&#34;https://developer.github.com/v3/#link-header&#34;&gt;Link&lt;/a&gt; header in the HTTP response, to communicate the navigation URLs.&lt;/p&gt;
+
+&lt;p&gt;A sample value of the &lt;code&gt;Link&lt;/code&gt; header would look like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;  &amp;lt;https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=1&amp;gt;; rel=&amp;quot;prev&amp;quot;, 
+  &amp;lt;https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=3&amp;gt;; rel=&amp;quot;next&amp;quot;, 
+  &amp;lt;https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=3&amp;gt;; rel=&amp;quot;last&amp;quot;, 
+  &amp;lt;https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=1&amp;gt;; rel=&amp;quot;first&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To support pagination in our implementation, let&#39;s create a new type for representing the GitHub&#39;s response.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type GitHubResponse = {
+  Body : string
+  NextPageUrl : string option
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we need to write a function to extract the &lt;code&gt;next&lt;/code&gt; pagination URL from the value of the Link header&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; string option
+let getNextPageUrl (linkText : string) = 
+  linkText.Split([|&#39;,&#39;|])
+  |&amp;gt; Array.map (fun l -&amp;gt; l.Split([|&#39;;&#39;|])) 
+  |&amp;gt; Array.tryFind(fun l -&amp;gt; l.Length = 2 &amp;amp;&amp;amp; l.[1].Contains(&amp;quot;next&amp;quot;))
+  |&amp;gt; Option.map(fun l -&amp;gt; l.[0].Trim().TrimStart(&#39;&amp;lt;&#39;).TrimEnd(&#39;&amp;gt;&#39;))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is, from the HTTP response, we need to populate the &lt;code&gt;GitHubResponse&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Response -&amp;gt; Job&amp;lt;GitHubResponse&amp;gt;
+let gitHubResponse response = job {
+  let! body = Response.readBodyAsString response
+  let nextPageUrl =
+    match response.headers.TryFind(ResponseHeader.Link) with
+    | Some linkText -&amp;gt; getNextPageUrl linkText
+    | None -&amp;gt; None
+  return {Body = body; NextPageUrl = nextPageUrl}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The current implementation of &lt;code&gt;httpGet&lt;/code&gt; function just returns the body of the response. But to support pagination, we need a value of &lt;code&gt;GitHubResponse&lt;/code&gt;. So, let&#39;s create a new function &lt;code&gt;httpGetWithPagination&lt;/code&gt; to address this need.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; Job&amp;lt;GitHubResponse&amp;gt;
+let httpGetWithPagination url =
+  Request.createUrl Get url // Request
+  |&amp;gt; Request.setHeader (UserAgent &amp;quot;FsHopac&amp;quot;) // Request
+  |&amp;gt; getResponse // Job&amp;lt;Response&amp;gt;
+  |&amp;gt; Job.bind gitHubResponse // Job&amp;lt;GitHubResponse&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can modify the &lt;code&gt;httpGet&lt;/code&gt; function to make use this function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;let httpGet url =
+- Request.createUrl Get url 	
+- |&amp;gt; Request.setHeader (UserAgent &amp;quot;FsHopac&amp;quot;)	
+- |&amp;gt; getResponse	
+- |&amp;gt; Job.bind Response.readBodyAsString
++ httpGetWithPagination url
++ |&amp;gt; Job.map (fun r -&amp;gt; r.Body)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we have the HTTP support in place for pagination. The next step is navigating through the pagination links and get all the user repos.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; Job&amp;lt;Repo []&amp;gt;
+let getAllUserRepos username =
+  
+  // string -&amp;gt; Repo list -&amp;gt; Job&amp;lt;Repo list&amp;gt;
+  let rec getAllUserRepos&#39; url (repos : Repo list) = job {  &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+    let! gitHubResponse = httpGetWithPagination url // GitHubResponse
+    let currentPageRepos = 
+      gitHubResponse.Body // string
+      |&amp;gt; ReposTypeProvider.Parse // Repo []
+      |&amp;gt; Array.toList // Repo list
+    let reposSoFar = repos @ currentPageRepos &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+    match gitHubResponse.NextPageUrl with
+    | Some nextPageUrl -&amp;gt; &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+       return! getAllUserRepos&#39; nextPageUrl reposSoFar &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt;
+    | None -&amp;gt; return reposSoFar &lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt;
+  }
+
+  getAllUserRepos&#39; (userReposUrl username) [] // Job&amp;lt;Repo list&amp;gt; &lt;span class=&#34;callout&#34;&gt;6&lt;/span&gt;
+  |&amp;gt; Job.map (List.toArray) // Job&amp;lt;Repo []&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; - The recursive function &lt;code&gt;getAllUserRepos&#39;&lt;/code&gt; implements the page navigation logic and the outer function &lt;code&gt;getAllUserRepos&lt;/code&gt; calls this recursive one (at &lt;span class=&#34;callout&#34;&gt;6&lt;/span&gt;) with the initial URL and an empty list of &lt;code&gt;Repo&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; - After getting the &lt;code&gt;Repo list&lt;/code&gt; of the current page, the &lt;code&gt;getAllUserRepos&#39;&lt;/code&gt; function concatenates it with the repos from the initial list.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; - If the current page has the next page URL, we are calling the &lt;code&gt;getAllUserRepos&#39;&lt;/code&gt; function recursively with the next page&#39;s URL and repo lists populated so far (at &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt;).&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt; - If we reached the last page, we just return the repo lists populated so far&lt;/p&gt;
+
+&lt;p&gt;The final set of change is, calling this &lt;code&gt;getAllUserRepos&lt;/code&gt; function from the &lt;code&gt;getTopThreeUserRepos&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt; let getTopThreeUserRepos username : Job&amp;lt;Repo []&amp;gt; =	 
+-  userReposUrl username
+-  |&amp;gt; httpGet	
+-  |&amp;gt; Job.map ReposTypeProvider.Parse	
++  getUserAllRepos username
+   |&amp;gt; Job.map topThreeUserRepos
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;adding-log&#34;&gt;Adding Log&lt;/h3&gt;
+
+&lt;p&gt;If the run the current implementation in F# interactive, we just see the final output and we have no clue about what is happening behind the scenes.&lt;/p&gt;
+
+&lt;p&gt;To get this insight let&#39;s sprinkle some log statements.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let log msg x =
+  printfn &amp;quot;%s&amp;quot; msg
+  x
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;let httpGetWithPagination url =
+  Request.createUrl Get url 
+  |&amp;gt; Request.setHeader (UserAgent &amp;quot;FsHopac&amp;quot;)
++ |&amp;gt; log (&amp;quot;Request : &amp;quot; + url)
+  |&amp;gt; getResponse
+  |&amp;gt; Job.bind gitHubResponse
++ |&amp;gt; Job.map (log (&amp;quot;Response : &amp;quot; + url))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we run the &lt;code&gt;getTopThreeUserRepos&lt;/code&gt; function with the username (&lt;code&gt;haf&lt;/code&gt;) of &lt;a href=&#34;https://twitter.com/henrikfeldt&#34;&gt;Henrik Feldt&#39;s&lt;/a&gt;, co-author of &lt;a href=&#34;https://suave.io&#34;&gt;Suave&lt;/a&gt;, who is having &lt;code&gt;280&lt;/code&gt; public repositories,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
+getUserDto &amp;quot;haf&amp;quot; |&amp;gt; run
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&#39;ll get the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
+
+Request : https://api.github.com/users/haf
+Request : https://api.github.com/users/haf/repos?per_page=100
+Response : https://api.github.com/users/haf
+Response : https://api.github.com/users/haf/repos?per_page=100
+Request : https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=2
+Response : https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=2
+Request : https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=3
+Response : https://api.github.com/user/193115/repos?per_page=100&amp;amp;page=3
+Request : https://api.github.com/repos/haf/expecto/languages
+Request : https://api.github.com/repos/haf/Http.fs/languages
+Request : https://api.github.com/repos/haf/DotNetZip.Semverd/languages
+Response : https://api.github.com/repos/haf/expecto/languages
+Response : https://api.github.com/repos/haf/DotNetZip.Semverd/languages
+Response : https://api.github.com/repos/haf/Http.fs/languages
+Real: 00:00:04.179, CPU: 00:00:01.078, GC gen0: 3, gen1: 1
+val it : UserDto =
+  {Name = &amp;quot;Henrik Feldt&amp;quot;;
+   AvatarUrl = &amp;quot;https://avatars0.githubusercontent.com/u/193115?v=4&amp;quot;;
+   TopThreeRepos =
+    [|{Name = &amp;quot;expecto&amp;quot;;
+       StargazersCount = 220;
+       Languages = [|&amp;quot;F#&amp;quot;; &amp;quot;C#&amp;quot;; &amp;quot;Shell&amp;quot;; &amp;quot;Batchfile&amp;quot;|];};
+      {Name = &amp;quot;Http.fs&amp;quot;;
+       StargazersCount = 197;
+       Languages = [|&amp;quot;HTML&amp;quot;; &amp;quot;F#&amp;quot;; &amp;quot;Ruby&amp;quot;; &amp;quot;Batchfile&amp;quot;; &amp;quot;Shell&amp;quot;|];};
+      {Name = &amp;quot;DotNetZip.Semverd&amp;quot;;
+       StargazersCount = 178;
+       Languages =
+        [|&amp;quot;C#&amp;quot;; &amp;quot;HTML&amp;quot;; &amp;quot;Visual Basic&amp;quot;; &amp;quot;ASP&amp;quot;; &amp;quot;Smalltalk&amp;quot;; &amp;quot;JavaScript&amp;quot;;
+          &amp;quot;Batchfile&amp;quot;; &amp;quot;Ruby&amp;quot;; &amp;quot;PowerShell&amp;quot;; &amp;quot;C++&amp;quot;; &amp;quot;Makefile&amp;quot;; &amp;quot;PHP&amp;quot;; &amp;quot;Perl&amp;quot;|];}|];}
+
+
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;From this log, we can infer that the requests to get the user and repo&#39;s first page are parallel, then the requests for navigating each page is sequential, and finally, requests for obtaining the languages of top three repos are parallel.&lt;/p&gt;
+
+&lt;h3 id=&#34;exposing-http-endpoint&#34;&gt;Exposing HTTP endpoint&lt;/h3&gt;
+
+&lt;p&gt;The final piece of work that we need to do is exposing the &lt;code&gt;getUserDto&lt;/code&gt; function via HTTP GET API.&lt;/p&gt;
+
+&lt;p&gt;Add &lt;a href=&#34;https://suave.io&#34;&gt;Suave&lt;/a&gt; NuGet package and refer them in the script file&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;forge paket add Suave
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// ...
+#r &amp;quot;packages/Suave/lib/net40/Suave.dll&amp;quot;
+
+// ...
+open Suave
+open Suave.Successful
+open Suave.Operators
+open System.Threading
+
+// ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To serialise &lt;code&gt;UserDto&lt;/code&gt; and &lt;code&gt;RepoDto&lt;/code&gt; to JSON, let&#39;s add &lt;code&gt;ToJson&lt;/code&gt; function which transforms the DTOs to FSharp.Data&#39;s &lt;code&gt;JsonValue&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type RepoDto = {
+  // ...
+} with
+  static member ToJson(r : RepoDto) = 
+    let languages =
+      r.Languages 
+      |&amp;gt; Array.map (JsonValue.String)
+      |&amp;gt; JsonValue.Array
+    let stars =
+      r.StargazersCount |&amp;gt; decimal |&amp;gt; JsonValue.Number
+    JsonValue.Record [|
+      &amp;quot;name&amp;quot;, JsonValue.String r.Name
+      &amp;quot;stars&amp;quot;, stars
+      &amp;quot;languages&amp;quot;, languages
+    |]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type UserDto = {
+  // ...
+} with
+  static member ToJson(u : UserDto) =
+    let topThreeRepos =
+      u.TopThreeRepos
+      |&amp;gt; Array.map RepoDto.ToJson
+      |&amp;gt; JsonValue.Array
+    JsonValue.Record [|
+      &amp;quot;name&amp;quot;, JsonValue.String u.Name
+      &amp;quot;avatarUrl&amp;quot;, JsonValue.String u.AvatarUrl
+      &amp;quot;topThreeRepos&amp;quot;, topThreeRepos
+    |]
+  static member ToJsonString(u : UserDto) =
+    UserDto.ToJson(u).ToString()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;ToJsonString&lt;/code&gt; function returns the string representation of the &lt;code&gt;UserDto&lt;/code&gt;&#39;s &lt;code&gt;JsonValue&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then write the &lt;code&gt;getUserApi&lt;/code&gt; function that calls the &lt;code&gt;getUserDto&lt;/code&gt; function and transforms the return value to the corresponding HTTP response.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Suave.Operators &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+
+// string -&amp;gt; HttpContext -&amp;gt; Async&amp;lt;HttpContext option&amp;gt;
+let getUserApi username ctx = async {
+  let! userDtoResponse =
+    getUserDto username // Job&amp;lt;UserDto&amp;gt;
+    |&amp;gt; Job.catch // Job&amp;lt;Choice&amp;lt;UserDto, exn&amp;gt;&amp;gt; &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+    |&amp;gt; Job.toAsync // Async&amp;lt;Choice&amp;lt;UserDto, exn&amp;gt;&amp;gt; &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+  match userDtoResponse with
+  | Choice1Of2 userDto -&amp;gt;
+    let res =
+      userDto
+      |&amp;gt; UserDto.ToJsonString
+      |&amp;gt; OK
+      &amp;gt;=&amp;gt; Writers.setMimeType &amp;quot;application/json; charset=utf-8&amp;quot; 
+    return! res ctx
+  | Choice2Of2 ex -&amp;gt;
+    printfn &amp;quot;%A&amp;quot; ex
+    return! ServerErrors.INTERNAL_ERROR &amp;quot;something went wrong&amp;quot; ctx
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Opens the module &lt;code&gt;Suave.Operators&lt;/code&gt; here instead of at the beginning of the file as &lt;code&gt;&amp;gt;=&amp;gt;&lt;/code&gt; symbol is also defined in &lt;em&gt;Hopac.Infixes&lt;/em&gt; module&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; The &lt;code&gt;Job.catch&lt;/code&gt; function creates a job that runs the given job and results in either the result of the job or the exception raised by the job.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; The &lt;code&gt;Job.toAsync&lt;/code&gt; function creates an async operation that starts the given job and waits for it to complete&lt;/p&gt;
+
+&lt;p&gt;Finally, wire up the &lt;code&gt;getUserApi&lt;/code&gt; function with a path and start the Suave server.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let app = pathScan &amp;quot;/api/profile/%s&amp;quot; getUserApi
+
+let startServer () =
+  let cts = new CancellationTokenSource()
+  let listening, server = 
+    startWebServerAsync defaultConfig app
+  Async.Start(server, cts.Token) |&amp;gt; ignore
+  Async.RunSynchronously listening |&amp;gt; ignore
+  cts
+
+let stopServer (cts : CancellationTokenSource) =
+  cts.Cancel true
+  cts.Dispose()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; let cts = startServer ();;
+[09:45:15 INF] Smooth! Suave listener started in 1.712 with binding 127.0.0.1:8080
+val cts : CancellationTokenSource
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can then verify the API via Curl.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/api_response.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;Awesome!!&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Make sure that we stop the server using the &lt;code&gt;stopServer&lt;/code&gt; function (as we are using F# Script to run the HTTP server).&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; stopServer cts;;
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Parallelism is merely running things in parallel. Concurrency is a way to structure your program. - Rob Pike&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;It is precisely what we did in this blog post. We structured the execution of &lt;code&gt;Job&lt;/code&gt;s declaratively and get the &lt;code&gt;job&lt;/code&gt; &lt;em&gt;(pun intended)&lt;/em&gt; done with the help of Hopac.&lt;/p&gt;
+
+&lt;p&gt;We have also learned the &lt;code&gt;Job.bind&lt;/code&gt;, &lt;code&gt;Job.map&lt;/code&gt;, &lt;code&gt;Job.catch&lt;/code&gt;, &lt;code&gt;Job.toAsync&lt;/code&gt; &amp;amp; &lt;code&gt;Job.conCollect&lt;/code&gt; functions from the Hopac library on the way. The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.5/fsharp/HopacSeries/Part3&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Concurrent Programming in Fsharp Using Hopac (Part-2)</title>
