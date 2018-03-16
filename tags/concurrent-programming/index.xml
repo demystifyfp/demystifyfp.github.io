@@ -7,8 +7,312 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Mon, 05 Mar 2018 19:16:02 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 16 Mar 2018 08:46:01 +0530</lastBuildDate>
     <atom:link href="/tags/concurrent-programming/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Concurrent Programming in fsharp using Hopac - Part 4</title>
+      <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/</link>
+      <pubDate>Fri, 16 Mar 2018 08:46:01 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/</guid>
+      <description>&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;Welcome back to the fourth part of Concurrent Programming in fsharp blog post series. In &lt;a href=&#34;https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/#a-communicating-job-in-action&#34;&gt;part-2&lt;/a&gt;, we just learned that &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt; is a subclass of &lt;code&gt;Job&amp;lt;&#39;a&amp;gt;&lt;/code&gt;. In this blog post, we are doing to dive deep into this abstraction and learn what it brings to the table.&lt;/p&gt;
+
+&lt;h2 id=&#34;an-example&#34;&gt;An Example&lt;/h2&gt;
+
+&lt;p&gt;Before diving into the definition of &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt;, let&#39;s figure out why we need it in the first place.&lt;/p&gt;
+
+&lt;p&gt;Assume that we have a function &lt;code&gt;delayedPrintn&lt;/code&gt; which prints a given message after &lt;code&gt;n&lt;/code&gt; milliseconds&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac 
+
+// string -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
+let delayedPrintn msg delayInMillis =
+  timeOutMillis delayInMillis
+  |&amp;gt; Job.map (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Executing this function in F# interactive,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
+delayedPrintn &amp;quot;Hi&amp;quot; 3000 |&amp;gt; run
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;will give us the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
+Hi
+Real: 00:00:03.000, CPU: 00:00:00.002, GC gen0: 0, gen1: 0
+val it : unit = ()
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Nothing fancy and it worked as expected.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s make it little complicated by defining two more jobs to print &lt;code&gt;Hi&lt;/code&gt; and &lt;code&gt;Hello&lt;/code&gt; after waiting for &lt;code&gt;2000&lt;/code&gt; and &lt;code&gt;1000&lt;/code&gt; milliseconds respectively.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Job&amp;lt;unit&amp;gt;
+let delayedHiPrinter = delayedPrintn &amp;quot;Hi&amp;quot; 2000
+
+// Job&amp;lt;unit&amp;gt;
+let delayedHelloPrinter = delayedPrintn &amp;quot;Hello&amp;quot; 1000
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then define a function to run these two jobs in parallel using the infix operator function &lt;code&gt;&amp;lt;*&amp;gt;&lt;/code&gt; from &lt;code&gt;Hopac.Infixes&lt;/code&gt; module.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac.Infixes
+
+let runThemParallel () = 
+  delayedHiPrinter &amp;lt;*&amp;gt; delayedHelloPrinter 
+  |&amp;gt; run |&amp;gt; ignore
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we run this function in F# interactive,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
+runThemParallel ()
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can witness that the jobs were executed parallelly and print the output as expected.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
+Hello
+Hi
+Real: 00:00:02.004, CPU: 00:00:00.006, GC gen0: 0, gen1: 0
+val it : unit = ()
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And here comes the new requirement!&lt;/p&gt;
+
+&lt;p&gt;Given we have two printers like the above, if one printer completes its job, stop the other from executing it.&lt;/p&gt;
+
+&lt;p&gt;That&#39;s interesting! Let&#39;s explore how can we solve this&lt;/p&gt;
+
+&lt;h2 id=&#34;the-alt-type&#34;&gt;The Alt Type&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;Alt&lt;/code&gt; represents a first-class selective synchronous operation. The idea of alternatives is to allow one to introduce new selective synchronous operations to be used with non-determinic choice.&lt;/p&gt;
+
+&lt;p&gt;Obviously, when you have a concurrent server that responds to some protocol, you don&#39;t have to perform the protocol as a selective synchronous operation.&lt;/p&gt;
+
+&lt;p&gt;However, if you do encapsulate the protocol as a selective synchronous operation, you can then combine the operation with other selective synchronous operations. That is the essence of Hopac and CML. - &lt;a href=&#34;https://hopac.github.io/Hopac/Hopac.html#def:type%20Hopac.Alt&#34;&gt;Hopac Documentation&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The critical point that we are interested in to solve our problem is &lt;code&gt;selective&lt;/code&gt;. In other words, among the two printers, we are concerned (selective) in the one which prints first.&lt;/p&gt;
+
+&lt;p&gt;The function that can help us here is &lt;code&gt;Alt.choose&lt;/code&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;Alt.choose&lt;/code&gt; creates an alternative that is available when any one of the given alternatives is&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val choose: seq&amp;lt;#Alt&amp;lt;&#39;x&amp;gt;&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;As we are dealing with only two &lt;code&gt;Alt&lt;/code&gt;s, we are going to make use of &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; operator function which is an optimised version of calling the &lt;code&gt;choose&lt;/code&gt; function with a sequence of two items.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; creates an alternative that is available when either of the given alternatives is available. xA1 &amp;lt;|&amp;gt; xA2 is an optimized version of choose [xA1; xA2].&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val ( &amp;lt;|&amp;gt; ): Alt&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The given alternatives are processed in a left-to-right order with short-cut evaluation. In other words, given an alternative of the form first &amp;lt;|&amp;gt; second, the first alternative is first instantiated and, if it is available, is committed to and the second alternative will not be instantiated at all.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;revisting-delayedprintn-function&#34;&gt;Revisting delayedPrintn function&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code&gt;delayedPrintn&lt;/code&gt; function is returning &lt;code&gt;Job&amp;lt;unit&amp;gt;&lt;/code&gt; function now.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val delayedPrintn: string -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To apply &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; operator function, we need to modify it to return &lt;code&gt;Alt&amp;lt;unit&amp;gt;&lt;/code&gt;. The &lt;code&gt;timeOutMillis&lt;/code&gt; function is already returning &lt;code&gt;Alt&amp;lt;unit&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val timeOutMillis: int -&amp;gt; Alt&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But the &lt;code&gt;Job.map&lt;/code&gt; function transforming it to &lt;code&gt;Job&amp;lt;unit&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val map: (&#39;x -&amp;gt; &#39;y) -&amp;gt; Job&amp;lt;&#39;x&amp;gt; -&amp;gt; Job&amp;lt;&#39;y&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let delayedPrintn msg delayInMillis =
+  timeOutMillis delayInMillis // Alt&amp;lt;unit&amp;gt;
+  |&amp;gt; Job.map (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg) // Job&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Alt&amp;lt;&#39;a&amp;gt; is a subclass of Job&amp;lt;&#39;a&amp;gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To achieve what we are doing with &lt;code&gt;Job.map&lt;/code&gt;, we can make use of the &lt;code&gt;Alt.afterFun&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val afterFun: (&#39;x -&amp;gt; &#39;y) -&amp;gt; Alt&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;y&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;- // string -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
++ // string -&amp;gt; int -&amp;gt; Alt&amp;lt;unit&amp;gt;
+  let delayedPrintn msg delayInMillis =
+    timeOutMillis delayInMillis // Alt&amp;lt;unit&amp;gt;
+-   |&amp;gt; Job.map (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg) // Job&amp;lt;unit&amp;gt;
++   |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg) // Alt&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we can make use of the &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; operator function to choose between the two printers.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// unit -&amp;gt; unit
+let chooseBetweenThem () =
+  delayedHiPrinter &amp;lt;|&amp;gt; delayedHelloPrinter 
+  |&amp;gt; run
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we execute the &lt;code&gt;chooseBetweenThem&lt;/code&gt; function with the timer on in F# interactive,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
+chooseBetweenThem ()
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can verify that it only prints &lt;code&gt;Hello&lt;/code&gt; after a seconds delay&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
+Hello
+Real: 00:00:01.002, CPU: 00:00:00.004, GC gen0: 0, gen1: 0
+val it : unit = ()
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Awesome!!&lt;/p&gt;
+
+&lt;p&gt;Wait what is happening behind the scene? Was the &lt;code&gt;delayedHiPrinter&lt;/code&gt; called?&lt;/p&gt;
+
+&lt;p&gt;Yes, It is. But as soon as the &lt;code&gt;delayedHelloPrinter&lt;/code&gt; completes its execution, the &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; function stops the execution of &lt;code&gt;delayedHiPrinter&lt;/code&gt; and hence we don&#39;t see &lt;code&gt;Hi&lt;/code&gt; in the output.&lt;/p&gt;
+
+&lt;p&gt;To verify this, we can modify the &lt;code&gt;delayedPrintn&lt;/code&gt; as below, which prints a log message when printer started its execution&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; int -&amp;gt; Alt&amp;lt;unit&amp;gt;
+let delayedPrintn msg delayInMillis =
+  Alt.prepareFun &amp;lt;| fun _ -&amp;gt; 
+    printfn &amp;quot;starting [%s]&amp;quot; msg
+    timeOutMillis delayInMillis
+    |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;Alt.prepareFun&lt;/code&gt; function that we used here creates an alternative that is computed at instantiation time with the given anonymous function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val prepareFun: (unit -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;) -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we execute the function &lt;code&gt;chooseBetweenThem&lt;/code&gt; now, we&#39;ll get the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;--&amp;gt; Timing now on
+starting [Hi]
+starting [Hello]
+Hello
+Real: 00:00:01.006, CPU: 00:00:00.005, GC gen0: 0, gen1: 0
+val it : unit = ()
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;negative-acknowledgement&#34;&gt;Negative Acknowledgement&lt;/h2&gt;
+
+&lt;p&gt;In the above section, we didn&#39;t care about the &lt;code&gt;delayedHiPrinter&lt;/code&gt; and ignored it completely. But in particular real-world use cases, we can&#39;t afford an execution to be stopped abruptly. In those cases, we need to let the &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt; know about this situation.&lt;/p&gt;
+
+&lt;p&gt;To implement this kind of scenarios, Hopac offers &lt;a href=&#34;https://github.com/Hopac/Hopac/blob/master/Docs/Alternatives.md#cancellation-with-negative-acknowledgments&#34;&gt;Negative Acknowledgement&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;To implement this behaviour in our example, let&#39;s create an another function &lt;code&gt;delayedPrintnWithNack&lt;/code&gt; which wraps the &lt;code&gt;delayedPrintn&lt;/code&gt; with the negative acknowledgement support.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; int -&amp;gt; Alt&amp;lt;unit&amp;gt;
+let delayedPrintnWithNack msg delayInMillis =
+
+  // Alt&amp;lt;&#39;a&amp;gt; -&amp;gt; Alt&amp;lt;unit&amp;gt; 
+  let onNack nack =  &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+    nack
+    |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;aborting [%s]&amp;quot; msg)
+
+  Alt.withNackJob &amp;lt;| fun nack -&amp;gt; &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+    Job.start (onNack nack) &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+    |&amp;gt; Job.map (fun _ -&amp;gt; delayedPrintn msg delayInMillis) &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; // Job&amp;lt;Alt&amp;lt;unit&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;There is a lot is happening in this short code snippet. So, Let&#39;s dissect it.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; We are defining an &lt;code&gt;onNack&lt;/code&gt; function to specify what to do in the event of a negative acknowledgement. For simplicity we are just printing an abort message.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; To make any &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt; negative acknowledgement aware, Hopac provides a function called &lt;code&gt;Alt.withNackJob&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val withNackJob: (Promise&amp;lt;unit&amp;gt; -&amp;gt; Job&amp;lt;Alt&amp;lt;&#39;x&amp;gt;&amp;gt;) -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;withNackJob&lt;/code&gt; function creates an alternative that is computed at instantiation time with the given job constructed with a negative acknowledgement alternative.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;withNackJob&lt;/code&gt; allows client-server protocols that do require the server to be notified when the client aborts the transaction to be encapsulated as selective operations.&lt;/p&gt;
+
+&lt;p&gt;The negative acknowledgement alternative will be available in case some other instantiated alternative involved in the choice is committed to instead. - &lt;strong&gt;Hopac Documentation&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Promise&amp;lt;&#39;a&amp;gt;&lt;/code&gt; is a sub class of &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt;, which we&#39;ll see in detail in a later blog post&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; Using the &lt;code&gt;Job.start&lt;/code&gt; function, we are immediately starting the &lt;code&gt;onNack&lt;/code&gt; job in an another concurrent job&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val start: Job&amp;lt;unit&amp;gt; -&amp;gt; Job&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; After starting the &lt;code&gt;onNack&lt;/code&gt; job, we are calling the actual &lt;code&gt;delayedPrintn&lt;/code&gt; and return its result.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s verify this behaviour with a new set of function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let delayedHiPrinterWithNack = 
+  delayedPrintnWithNack &amp;quot;Hi&amp;quot; 2000
+
+let delayedHelloPrinterWithNack = 
+  delayedPrintnWithNack &amp;quot;Hello&amp;quot; 1000
+
+let chooseBetweenThemWithNack () =
+  delayedHiPrinterWithNack &amp;lt;|&amp;gt; delayedHelloPrinterWithNack 
+  |&amp;gt; run
+
+#time &amp;quot;on&amp;quot;
+chooseBetweenThemWithNack ()
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
+
+starting [Hi]
+starting [Hello]
+Hello
+aborting [Hi]
+Real: 00:00:01.000, CPU: 00:00:00.001, GC gen0: 0, gen1: 0
+val it : unit = ()
+
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;From the log that we can assert that we gracefully handled the negative acknowledgement.&lt;/p&gt;
+
+&lt;p&gt;Here is my best effort to show what is happening in the &lt;code&gt;delayedPrintnWithNack&lt;/code&gt; function&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/nack.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we explored how to implement selective synchronisation in Hopac using &lt;code&gt;Alt&lt;/code&gt;. It is fascinating to experience that we can write harder concurrent programs with less code.&lt;/p&gt;
+
+&lt;p&gt;Stay tuned for the upcoming blog posts. We are going to build some awesome stuff using &lt;code&gt;Alt&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.6/fsharp/HopacSeries/Part4&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Implementing API Gateway Pattern in fsharp using Hopac</title>
