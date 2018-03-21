@@ -7,8 +7,393 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 16 Mar 2018 08:46:01 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 20 Mar 2018 17:13:48 +0530</lastBuildDate>
     <atom:link href="/tags/fsharp/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Concurrent Programming in fsharp Using Hopac - Part 5</title>
+      <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/</link>
+      <pubDate>Tue, 20 Mar 2018 17:13:48 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/</guid>
+      <description>&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/&#34;&gt;last blog post&lt;/a&gt;, we learned how &lt;code&gt;Alt&lt;/code&gt; in Hopac works and its applications. In this blog post, we are going to apply what we learned so far by creating a Ticker.&lt;/p&gt;
+
+&lt;p&gt;Using ticker we can do something repeatedly at regular intervals.&lt;/p&gt;
+
+&lt;p&gt;To implement a Ticker in Hopac, we have to know one more abstraction in Hopac called &lt;code&gt;IVar&lt;/code&gt;. So, in the first section, we are going to learn &lt;code&gt;IVar&lt;/code&gt; and then we&#39;ll use it to implement Ticker.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s dive in&lt;/p&gt;
+
+&lt;h2 id=&#34;the-ivar-type&#34;&gt;The IVar type&lt;/h2&gt;
+
+&lt;p&gt;In a nutshell, &lt;code&gt;IVar&lt;/code&gt; represents a write-once variable.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Write once variables are designed for and most commonly used for getting replies from concurrent servers and asynchronous operations, but can also be useful for other purposes such as for one-shot events and for implementing incremental, but immutable, concurrent data structures.&lt;/p&gt;
+
+&lt;p&gt;Because it is common to need to be able to communicate either an expected successful result or an exceptional failure in typical use cases of write once variables, direct mechanisms are provided for both. The implementation is optimized in such a way that the ability to report an exceptional failure does not add overhead to the expected successful usage scenarios.&lt;/p&gt;
+
+&lt;p&gt;Write once variables are lightweight objects and it is typical to always just create a new write once variable when one is needed. In most cases, a write once variable will be slightly more lightweight than a channel. This is possible because write once variables do not support simple rendezvous like channels do. When simple rendezvous is necessary, a channel should be used instead. - &lt;strong&gt;Hopac Documentation&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The &lt;code&gt;IVar&amp;lt;&#39;a&amp;gt;&lt;/code&gt; type is a subclass of &lt;code&gt;Promise&amp;lt;&#39;a&amp;gt;&lt;/code&gt; which in turn a subclass of &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s see &lt;code&gt;IVar&lt;/code&gt; in action to learn it better&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac 
+
+// IVar&amp;lt;&#39;a&amp;gt; -&amp;gt; &#39;a -&amp;gt; unit
+let fillAndRead iVar value =
+  IVar.fill iVar value // Job&amp;lt;unit&amp;gt; &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  |&amp;gt; Job.bind (fun _ -&amp;gt; IVar.read iVar) // Job&amp;lt;unit&amp;gt; &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+  |&amp;gt; Job.map (printfn &amp;quot;%A&amp;quot;) // Job&amp;lt;unit&amp;gt;
+  |&amp;gt; run // unit
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As the name indicates, the &lt;code&gt;fillAndRead&lt;/code&gt; is a function fills the given write-once variable &lt;code&gt;iVar&lt;/code&gt; with the provided &lt;code&gt;value&lt;/code&gt;, and then reads the &lt;code&gt;value&lt;/code&gt; from the &lt;code&gt;iVar&lt;/code&gt;. Finally the prints the value.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;IVar.fill&lt;/code&gt; function creates a job that writes the given value to the given write-once variable.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val fill: IVar&amp;lt;&#39;x&amp;gt; -&amp;gt; &#39;x -&amp;gt; Job&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; The &lt;code&gt;IVar.read&lt;/code&gt; function creates an alternative that becomes available when the write-once variable had a value.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val read: IVar&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Executing the &lt;code&gt;fillAndRead&lt;/code&gt; function as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;fillAndRead (IVar&amp;lt;bool&amp;gt;()) true
+fillAndRead (IVar&amp;lt;bool&amp;gt;()) false
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;will give the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; fillAndRead (IVar&amp;lt;bool&amp;gt;()) true
+- fillAndRead (IVar&amp;lt;bool&amp;gt;()) false
+- ;;
+true
+false
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;IVar.fill&lt;/code&gt; function would return an exception if the &lt;code&gt;IVar&lt;/code&gt; variable were already filled.&lt;/p&gt;
+
+&lt;p&gt;We can verify this by defining a new &lt;code&gt;IVar&lt;/code&gt; value &lt;code&gt;intIVar&lt;/code&gt; and using this to call the &lt;code&gt;fillAndRead&lt;/code&gt; twice&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let intIVar = IVar&amp;lt;int&amp;gt;()
+fillAndRead intIVar 42
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Executing the above two lines will yield the below output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; let intIVar = IVar&amp;lt;int&amp;gt;()
+- fillAndRead intIVar 42
+- ;;
+42
+val intIVar : IVar&amp;lt;int&amp;gt;
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then calling &lt;code&gt;fillAndRead&lt;/code&gt; function with &lt;code&gt;intIVar&lt;/code&gt; will have the following output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; fillAndRead intIVar 10
+- ;;
+Unhandled exception: System.Exception: IVar full
+No other causes.
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we don&#39;t want any exception to be thrown while filling a &lt;code&gt;IVar&lt;/code&gt; value, we can make use of &lt;code&gt;IVar.tryFill&lt;/code&gt; function, which creates a job that tries to write the given value to the given write-once variable. No operation takes place, and no error is reported in case of the write-once variable has already been written.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val tryFill: IVar&amp;lt;&#39;x&amp;gt; -&amp;gt; &#39;x -&amp;gt; Job&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&#39;s write a another function &lt;code&gt;tryFillAndRead&lt;/code&gt; which exactly does what &lt;code&gt;fillAndRead&lt;/code&gt; function did except the usage of &lt;code&gt;IVar.fill&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let tryFillAndRead iVar value =
+  IVar.tryFill iVar value
+  |&amp;gt; Job.bind (fun _ -&amp;gt; IVar.read iVar)
+  |&amp;gt; Job.map (printfn &amp;quot;%A&amp;quot;)
+  |&amp;gt; run
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this, if we try the above example with the &lt;code&gt;tryFillAndRead&lt;/code&gt; function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let anotherIntIVar = IVar&amp;lt;int&amp;gt;()
+tryFillAndRead anotherIntIVar 42
+tryFillAndRead anotherIntIVar 10
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We won&#39;t get any error and the value that we use to fill for the second time will be silently ignored.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; let anotherIntIVar = IVar&amp;lt;int&amp;gt;()
+- tryFillAndRead anotherIntIVar 42
+- tryFillAndRead anotherIntIVar 10
+- ;;
+42
+42
+val anotherIntIVar : IVar&amp;lt;int&amp;gt;
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last thing that we need to explore before getting into the implementation of Ticker is, the return type of &lt;code&gt;IVar.read&lt;/code&gt; function is &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;So, we can use it to choose use between any other &lt;code&gt;Alt&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Say, for example, if we want a &lt;code&gt;IVar&lt;/code&gt; value to be available in a certain amount of time and do something else if it didn&#39;t become available, we can achieve it like this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac.Infixes
+
+// int -&amp;gt; IVar&amp;lt;&#39;a&amp;gt; -&amp;gt; unit
+let readOrTimeout delayInMillis iVar =
+
+  let timeOutAlt = // Alt&amp;lt;unit&amp;gt;
+    timeOutMillis delayInMillis 
+    |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;time out!&amp;quot;) &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  
+  let readAlt = // Alt&amp;lt;unit&amp;gt;
+    IVar.read iVar
+    |&amp;gt; Alt.afterFun (printfn &amp;quot;%A&amp;quot;) &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+  
+  timeOutAlt &amp;lt;|&amp;gt; readAlt &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+  |&amp;gt; run
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; &lt;code&gt;Alt&amp;lt;unit&amp;gt;&lt;/code&gt; that prints a time-out after given time delay&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; Prints the value of &lt;code&gt;iVar&lt;/code&gt; as soon as it is available&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; Chooses between &lt;code&gt;timeOutAlt&lt;/code&gt; and &lt;code&gt;readAlt&lt;/code&gt; and commits to whatever completes first&lt;/p&gt;
+
+&lt;p&gt;If we fill a &lt;code&gt;iVar&lt;/code&gt; value and run this function&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let yetAnotherIntIVar = IVar&amp;lt;int&amp;gt;()
+tryFillAndRead yetAnotherIntIVar 10
+readOrTimeout 1000 intIVar
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can see the value of &lt;code&gt;IVar&lt;/code&gt; in the output.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; let yetAnotherIntIVar = IVar&amp;lt;int&amp;gt;()
+- tryFillAndRead yetAnotherIntIVar 10
+- readOrTimeout 1000 intIVar
+- ;;
+10
+10
+val yetAnotherIntIVar : IVar&amp;lt;int&amp;gt;
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we try the &lt;code&gt;readOrTimeout&lt;/code&gt; function, with a new &lt;code&gt;IVar&lt;/code&gt; value, we will see the time-out message&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
+readOrTimeout 2000 (IVar&amp;lt;unit&amp;gt;())
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
+time out!
+Real: 00:00:02.001, CPU: 00:00:00.004, GC gen0: 0, gen1: 0
+val it : unit = ()
+--&amp;gt; Timing now off
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this, we are wrapping up our exploration on &lt;code&gt;IVar&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-ticker-type&#34;&gt;The Ticker Type&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code&gt;Ticker&lt;/code&gt; type that we are going to implement will have the following signature.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Ticker =
+  class
+    new : timeSpan:TimeSpan -&amp;gt; Ticker &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+    member Stop : unit -&amp;gt; unit &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+    member C : Ch&amp;lt;DateTimeOffset&amp;gt; &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+  end
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;Ticker&lt;/code&gt; type is a class with a constructor that takes a &lt;code&gt;TimeSpan&lt;/code&gt; to specify the interval.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; It is going to have a &lt;code&gt;Stop&lt;/code&gt; function which stops the ticker.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; The member &lt;code&gt;C&lt;/code&gt; exposes a channel which gives a &lt;code&gt;DateTimeOffset&lt;/code&gt; value at regular intervals specified by the &lt;code&gt;TimeSpan&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We are going to hide the complexity of a ticker behind this &lt;code&gt;Ticker&lt;/code&gt; type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac
+open Hopac.Infixes
+open System
+
+type Ticker (timeSpan : TimeSpan) =
+  
+  // Ch&amp;lt;DateTimeOffset&amp;gt;
+  let tickCh = Ch&amp;lt;DateTimeOffset&amp;gt;() &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  
+  // IVar&amp;lt;unit&amp;gt;
+  let cancelled = IVar() &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+
+  // unit -&amp;gt; Alt&amp;lt;unit&amp;gt;
+  let tick () = &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+    Ch.give tickCh DateTimeOffset.Now
+
+  // unit -&amp;gt; Alt&amp;lt;unit&amp;gt;
+  let rec loop () = &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt;
+    // Alt&amp;lt;unit&amp;gt;
+    let tickerLoop = 
+      timeOut timeSpan
+      |&amp;gt; Alt.afterJob tick
+      |&amp;gt; Alt.afterJob loop
+    tickerLoop &amp;lt;|&amp;gt; IVar.read cancelled
+
+  do start (loop()) &lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt;
+
+  // unit -&amp;gt; unit 
+  member __.Stop() = 
+    IVar.tryFill cancelled () |&amp;gt; start &lt;span class=&#34;callout&#34;&gt;6&lt;/span&gt;
+
+  // Ch&amp;lt;DateTimeOffset&amp;gt;
+  member __.C 
+    with get() = tickCh &lt;span class=&#34;callout&#34;&gt;7&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; A &lt;code&gt;Ticker&lt;/code&gt; channel &lt;code&gt;tickCh&lt;/code&gt; initialised as private value.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; A &lt;code&gt;IVar&lt;/code&gt; private value &lt;code&gt;cancelled&lt;/code&gt; to keep track of the Ticker&#39;s state&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; The &lt;code&gt;tick&lt;/code&gt; function defines what to do on a tick. We are getting the &lt;a href=&#34;https://msdn.microsoft.com/en-us/library/system.datetimeoffset.now.aspx&#34;&gt;current date time offset&lt;/a&gt; and give it to the outside world via the &lt;code&gt;tickCh&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; The recursive function &lt;code&gt;loop&lt;/code&gt; is the crux of our &lt;code&gt;Ticker&lt;/code&gt; implementation that defines a loop function that will keep calling the &lt;code&gt;tick&lt;/code&gt; function at the specified interval &lt;code&gt;timeSpan&lt;/code&gt; until a value available on &lt;code&gt;cancelled&lt;/code&gt; IVar.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;timeOut&lt;/code&gt; function is similar to &lt;code&gt;timeOutMillis&lt;/code&gt; function except it takes a &lt;code&gt;TimeSpan&lt;/code&gt; instead of milliseconds as an &lt;code&gt;int&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt; We are kickstarting the loop function here. It will be invoked during the execution of the constructor.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;6&lt;/span&gt; The &lt;code&gt;Stop&lt;/code&gt; method tries to fill the &lt;code&gt;IVar&lt;/code&gt; value &lt;code&gt;cancelled&lt;/code&gt;, and it starts at a new &lt;code&gt;job&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;7&lt;/span&gt; Finally, we are exposing the &lt;code&gt;tickCh&lt;/code&gt; as a getter member &lt;code&gt;C&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-ticker-type-in-action&#34;&gt;The Ticker type in action&lt;/h2&gt;
+
+&lt;h4 id=&#34;use-case-1&#34;&gt;Use Case #1&lt;/h4&gt;
+
+&lt;p&gt;Our first use case is, executing a function repeatedly at an interval of &lt;code&gt;x&lt;/code&gt; seconds for &lt;code&gt;n&lt;/code&gt; times.&lt;/p&gt;
+
+&lt;p&gt;This use case can be implemented as&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// int -&amp;gt; int -&amp;gt; (DateTimeOffset -&amp;gt; unit) -&amp;gt; unit
+let useCase1 nTimes (xSeconds : int) f =
+  let timeSpan = 
+    xSeconds |&amp;gt; float |&amp;gt; TimeSpan.FromSeconds 
+  let ticker = new Ticker(timeSpan)
+
+  ticker.C // Ch&amp;lt;DateTimeOffset&amp;gt;
+  |&amp;gt; Alt.afterFun f // Alt&amp;lt;unit&amp;gt; &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  |&amp;gt; Job.forN nTimes // Job&amp;lt;unit&amp;gt; &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+  |&amp;gt; run
+  ticker.Stop()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Upon a tick on the &lt;code&gt;Ticker&lt;/code&gt; channel, we are calling the provided function &lt;code&gt;f&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; The &lt;code&gt;Job.forN&lt;/code&gt; function creates a job that runs the given job sequentially the given number of times.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val forN: int -&amp;gt; Job&amp;lt;unit&amp;gt; -&amp;gt; Job&amp;lt;unit&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here the &lt;em&gt;given job&lt;/em&gt; is receiving value on the ticker channel and invoking the function &lt;code&gt;f&lt;/code&gt; with the received value.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s try this out in fsharp interactive to print the Ticker&#39;s tick time.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; useCase1 5 2 (printfn &amp;quot;%A&amp;quot;);;
+21-03-2018 19:24:48 +05:30
+21-03-2018 19:24:50 +05:30
+21-03-2018 19:24:52 +05:30
+21-03-2018 19:24:54 +05:30
+21-03-2018 19:24:56 +05:30
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;use-case-2&#34;&gt;Use Case #2&lt;/h2&gt;
+
+&lt;p&gt;The second use case is running two tickers at the different time interval for &lt;code&gt;x&lt;/code&gt; milliseconds overall.&lt;/p&gt;
+
+&lt;p&gt;As a first step, let&#39;s create a &lt;code&gt;ticker&lt;/code&gt; function that creates a Ticker which ticks at given &lt;code&gt;seconds&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// int -&amp;gt; Ticker
+let ticker seconds =
+  seconds
+  |&amp;gt; float 
+  |&amp;gt; TimeSpan.FromSeconds
+  |&amp;gt; Ticker
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then implement use case #2 as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// int -&amp;gt; int -&amp;gt; int -&amp;gt; unit
+let useCase2 t1Interval t2Interval xMillis =
+  let ticker1 = ticker t1Interval
+  let ticker2 = ticker t2Interval
+
+  let onTick tCh name loop = &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+    tCh 
+      |&amp;gt; Alt.afterFun (fun t -&amp;gt; printfn &amp;quot;[%s] at %A&amp;quot; name t)
+      |&amp;gt; Alt.afterJob loop
+  
+  // unit -&amp;gt; Alt&amp;lt;&#39;a&amp;gt;
+  let rec loop () = &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+    onTick ticker1.C &amp;quot;T1&amp;quot; loop &amp;lt;|&amp;gt; onTick ticker2.C &amp;quot;T2&amp;quot; loop
+
+  printfn &amp;quot;Starts at %A&amp;quot; (DateTimeOffset.Now)
+  start (loop()) &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+
+  let onTimeOut _ = &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt;
+    ticker1.Stop()
+    ticker2.Stop()
+
+  timeOutMillis xMillis &lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt;
+  |&amp;gt; Alt.afterFun onTimeOut
+  |&amp;gt; run
+  printfn &amp;quot;Ends at %A&amp;quot; (DateTimeOffset.Now)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;onTick&lt;/code&gt; function takes a channel, the ticker&#39;s name and a loop function. Upon receiving the &lt;code&gt;DateTimeOffset&lt;/code&gt; value on the ticker, it prints it along with the ticker&#39;s name and then calls the provide &lt;code&gt;loop&lt;/code&gt; function&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; The recursive function &lt;code&gt;loop&lt;/code&gt; chooses between two tickers channel and commits to the one that has a value and then calling itself via the &lt;code&gt;onTick&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; We are starting the Job returned by the &lt;code&gt;loop&lt;/code&gt; function as a separate job.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; The &lt;code&gt;onTimeOut&lt;/code&gt; function stops the tickers upon timeout.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt; Finally, we wait for the given &lt;code&gt;x&lt;/code&gt; milliseconds and call the &lt;code&gt;onTimeOut&lt;/code&gt; function after the timeout.&lt;/p&gt;
+
+&lt;p&gt;Executing this F# interactive will give us the similar output&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; useCase2 1 2 5000;;
+Starts at 21-03-2018 19:46:36 +05:30
+[T1] at 21-03-2018 19:46:37 +05:30
+[T2] at 21-03-2018 19:46:38 +05:30
+[T1] at 21-03-2018 19:46:38 +05:30
+[T1] at 21-03-2018 19:46:39 +05:30
+[T2] at 21-03-2018 19:46:40 +05:30
+[T1] at 21-03-2018 19:46:40 +05:30
+[T1] at 21-03-2018 19:46:41 +05:30
+Ends at 21-03-2018 19:46:41 +05:30
+val it : unit = ()
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we built a Ticker abstraction using the fundamental ideas provided by Hopac. And then using the ticker, we saw how to implement two different use cases.&lt;/p&gt;
+
+&lt;p&gt;Just like composing functions together here we are composing the jobs and implementing complicated stuff with less code.&lt;/p&gt;
+
+&lt;p&gt;You can find the source code associated with this blog post on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.7/fsharp/HopacSeries/Part5&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Concurrent Programming in fsharp using Hopac - Part 4</title>

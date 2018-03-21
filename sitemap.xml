@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/</loc>
+      <lastmod>2018-03-20T17:13:48+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/</loc>
       <lastmod>2018-03-16T08:46:01+05:30</lastmod>
     </url>
@@ -116,7 +125,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/concurrent-programming/</loc>
-      <lastmod>2018-03-16T08:46:01+05:30</lastmod>
+      <lastmod>2018-03-20T17:13:48+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -146,7 +155,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/fsharp/</loc>
-      <lastmod>2018-03-16T08:46:01+05:30</lastmod>
+      <lastmod>2018-03-20T17:13:48+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -156,7 +165,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/fsharp/</loc>
-      <lastmod>2018-03-16T08:46:01+05:30</lastmod>
+      <lastmod>2018-03-20T17:13:48+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -176,7 +185,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/hopac/</loc>
-      <lastmod>2018-03-16T08:46:01+05:30</lastmod>
+      <lastmod>2018-03-20T17:13:48+05:30</lastmod>
       <priority>0</priority>
     </url>
     
