@@ -7,8 +7,261 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Wed, 25 Apr 2018 21:03:26 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 12 Jun 2018 05:30:26 +0530</lastBuildDate>
     <atom:link href="/tags/fsharp/" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Concurrent Programming in Fsharp Using Hopac - Part 7</title>
+      <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/</link>
+      <pubDate>Tue, 12 Jun 2018 05:30:26 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/</guid>
+      <description>&lt;p&gt;Hello there!&lt;/p&gt;
+
+&lt;p&gt;Almost eight years back &lt;a href=&#34;https://twitter.com/tomaspetricek&#34;&gt;Tomas Petricek&lt;/a&gt; wrote a blog post introducing &lt;a href=&#34;http://tomasp.net/blog/parallel-extra-blockingagent.aspx/&#34;&gt;BlockingQueueAgent&lt;T&gt;&lt;/a&gt; and followed it up with &lt;a href=&#34;http://tomasp.net/blog/parallel-extra-image-pipeline.aspx/&#34;&gt;another blog post&lt;/a&gt; on how to apply it to solve an Image Processing problem using the pipeline concurrency pattern.&lt;/p&gt;
+
+&lt;p&gt;In this blog post, we are going to learn how to port this example using Hopac&#39;s &lt;code&gt;BoundedMb&lt;/code&gt; abstraction, aka &lt;code&gt;Bounded Mailbox&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;image-processing-pipeline&#34;&gt;Image processing pipeline&lt;/h2&gt;
+
+&lt;p&gt;As defined by Tomas in his blog post, the image processing pipeline works as depicted in the below image.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/image-processing-pipeline.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Diagram is from the &lt;a href=&#34;https://books.google.co.in/books/about/PARALLEL_PROGRAMMING_WITH_MICROSOFT_NET.html?id=dL30ygAACAAJ&#34;&gt;Parallel Programming with Microsoft
+.NET book&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The first phase reads images from the disk and stores them into a temporary buffer. The second phase takes images from the buffer, resizes them and puts them into another buffer. The third phase is similar but it adds noise to the image.&lt;/p&gt;
+
+&lt;p&gt;Finally, the fourth phase takes images from the last buffer and displays them in the user interface.&lt;/p&gt;
+
+&lt;p&gt;The intermediate buffers have only limited capacity. When a buffer is full, it will block the caller until an item is removed. Similarly, when it is empty, it will block the process that reads images until an item is added.&lt;/p&gt;
+
+&lt;p&gt;A pipeline introduces parallelism, because all phases can run in parallel. The intermediate buffers provide a good way of controlling the process, because some phases may be faster - in that case, we want to block it after it generates enough inputs for the next phase.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;- Tomas Petricek&lt;/strong&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;channel-vs-bounded-mailbox&#34;&gt;Channel V/S Bounded Mailbox&lt;/h2&gt;
+
+&lt;p&gt;We saw how to &lt;a href=&#34;https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/&#34;&gt;leverage Hopac Channels&lt;/a&gt; &lt;code&gt;Ch&amp;lt;T&amp;gt;&lt;/code&gt; in the previous blog posts to communicate between two concurrent Jobs.&lt;/p&gt;
+
+&lt;p&gt;In communication via Channels, the producer &lt;code&gt;give&lt;/code&gt; the message to the Channel (&lt;code&gt;Ch&amp;lt;T&amp;gt;&lt;/code&gt;) and &lt;strong&gt;waits until&lt;/strong&gt; a consumer &lt;code&gt;take&lt;/code&gt; it from the Channel (&lt;code&gt;Ch&amp;lt;T&amp;gt;&lt;/code&gt;)&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/hopac-ch-mechanism.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case, if the consumer is slow in taking up the message from the channel, the producer is blocked.&lt;/p&gt;
+
+&lt;p&gt;In Hopac, Bounded Mailbox is similar to Channels except that it introduces a buffer between the producer and the consumer. It also provides &lt;a href=&#34;https://ferd.ca/queues-don-t-fix-overload.html&#34;&gt;back-pressure&lt;/a&gt; in the form of blocking producers when consumers cannot keep up.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/bounded_mb_intro.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;With this understanding, let&#39;s jump in and put it in action!&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;NOTE: There is also a variant called &lt;code&gt;send&lt;/code&gt; in Channel (available via &lt;code&gt;Ch.send&lt;/code&gt;) which puts the message into the channel and &lt;strong&gt;doesn&#39;t wait&lt;/strong&gt; for the consumer to &lt;code&gt;take&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;the-image-job&#34;&gt;The Image Job&lt;/h2&gt;
+
+&lt;p&gt;Let&#39;s define two types to represent an image and an image Job&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Image = Image of string
+type ImageJob = Image -&amp;gt; Job&amp;lt;Image&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To keep it simple, we are going to simulate the image processing logic, by treating each image as a plain string. Also, each image job (scaling, filtering, etc.,) just going to append what it does to this plain string.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// int -&amp;gt; string -&amp;gt; Image -&amp;gt; Job&amp;lt;Image&amp;gt;
+let imageJob delay jobName (Image image) = job {
+  printfn &amp;quot;%s Started: %s&amp;quot; jobName image &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  do! timeOutMillis delay &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+  let newImage = sprintf &amp;quot;%s [%s]&amp;quot; image jobName &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+  printfn &amp;quot;%s Completed: %s&amp;quot; jobName newImage &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt;
+  return (Image newImage)
+}
+
+// ImageJobs ( Image -&amp;gt; Job&amp;lt;Image&amp;gt; )
+
+let scaleImage = imageJob 2000 &amp;quot;Scaling&amp;quot;
+let filterImage = imageJob 1500 &amp;quot;Filtering&amp;quot;
+let displayImage = imageJob 500 &amp;quot;Displaying&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; &amp;amp; &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; - Prints the status of the job in the console. &lt;br/&gt;
+&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; - Fakes the image processing logic using a delay. &lt;br/&gt;
+&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; - Appends the performed job name into the string and returns the new image.&lt;/p&gt;
+
+&lt;p&gt;Then using the &lt;code&gt;imageJob&lt;/code&gt; function, we define the three fake image jobs with different delays.&lt;/p&gt;
+
+&lt;p&gt;When we run these jobs, we&#39;ll get an output similar to the below one for a single image &lt;em&gt;Foo.png&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-plain&#34;&gt;Scaling Started: Foo.png
+Scaling Completed: Foo.png [Scaling]
+Filtering Started: Foo.png [Scaling]
+Filtering Completed: Foo.png [Scaling] [Filtering]
+Displaying Started: Foo.png [Scaling] [Filtering]
+Displaying Completed: Foo.png [Scaling] [Filtering] [Displaying]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;boundedmb-in-action&#34;&gt;BoundedMb In Action&lt;/h2&gt;
+
+&lt;p&gt;Let&#39;s create a new type &lt;code&gt;BoundedWorker&lt;/code&gt; to define the worker job that is going to run the Image Jobs that we described in the previous step.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type BoundedWorker (queueLength, f : ImageJob) =
+  let inMb = new BoundedMb&amp;lt;Image&amp;gt;(queueLength)
+  member __.InMb = inMb
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This &lt;code&gt;BoundedWorker&lt;/code&gt; receives its queue length and the &lt;code&gt;ImageJob&lt;/code&gt; it has to perform as its inputs and intitialize its internal mailbox &lt;code&gt;inMb&lt;/code&gt; with the provided queue length. It also exposes this &lt;code&gt;inMb&lt;/code&gt; to the outside world via the getter property &lt;code&gt;InMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Then define a new method &lt;code&gt;CreateJob&lt;/code&gt; which will create a job that retrieves a image from its input mailbox &lt;code&gt;inMb&lt;/code&gt;, runs the image job and put the result back to the output mailbox &lt;code&gt;outMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type BoundedWorker (queueLength, f : ImageJob) =
+  // ...
+  // BoundedMb&amp;lt;Image&amp;gt; -&amp;gt; Job&amp;lt;unit&amp;gt;
+  member __.CreateJob (outMb : BoundedMb&amp;lt;Image&amp;gt;) =
+    BoundedMb.take inMb
+    |&amp;gt; Alt.afterJob f
+    |&amp;gt; Alt.afterJob (BoundedMb.put outMb)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You can recognise a difference between the programming models of Hopac and &lt;a href=&#34;https://en.wikipedia.org/wiki/Actor_model&#34;&gt;Actor&lt;/a&gt; here. In the &lt;code&gt;BlockingQueueAgent&lt;/code&gt; (an implementation based on Actor model) case, the &lt;code&gt;Consumer&lt;/code&gt; has to have a reference of the &lt;code&gt;Producer&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Code Copied from http://tomasp.net/blog/parallel-extra-image-pipeline.aspx/
+
+let loadedImages = new BlockingQueueAgent&amp;lt;_&amp;gt;(queueLength)
+let scaledImages = new BlockingQueueAgent&amp;lt;_&amp;gt;(queueLength)    
+let filteredImages = new BlockingQueueAgent&amp;lt;_&amp;gt;(queueLength)
+
+let scalePipelinedImages = async {
+  while true do 
+    let! info = loadedImages.AsyncGet() 
+  // ...
+
+let displayPipelinedImages = async {
+  while true do
+  let! info = filteredImages.AsyncGet()
+  // ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In our example using Hopac, the consumer and the producer are completely decoupled through &lt;code&gt;BoundedMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The current implementation of &lt;code&gt;CreateJob&lt;/code&gt; method will work only for the first image as we are taking the image only at the beginning using &lt;code&gt;BoundedMb.take&lt;/code&gt;. To run the &lt;code&gt;Job&lt;/code&gt; for all the images in the &lt;code&gt;inMb&lt;/code&gt;, we need to make the following change.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;type BoundedWorker (queueLength, f : ImageJob) =
+  // ...
+
+- // BoundedMb&amp;lt;Image&amp;gt; -&amp;gt; Job&amp;lt;unit&amp;gt;
++ // int * BoundedMb&amp;lt;Image&amp;gt; -&amp;gt; Job&amp;lt;unit&amp;gt;
+- member __.CreateJob (outMb : BoundedMb&amp;lt;Image&amp;gt;) =
++ member __.CreateJob (imageCount: int, outMb : BoundedMb&amp;lt;Image&amp;gt;) =
+    BoundedMb.take inMb
+    |&amp;gt; Alt.afterJob f
+    |&amp;gt; Alt.afterJob (BoundedMb.put outMb)
++   |&amp;gt; Job.forN imageCount
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;Job.forN&lt;/code&gt; - Creates a job that runs the given job sequentially the given number of times.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;We also need to account for a particular case wherein the &lt;code&gt;Display Image&lt;/code&gt; stage doesn&#39;t put the processed output into &lt;code&gt;outMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s create another method to address this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type BoundedWorker (queueLength, f : ImageJob) =
+  // ...
+  // int -&amp;gt; Job&amp;lt;unit&amp;gt;
+  member __.CreateJob (imageCount: int) =
+    BoundedMb.take inMb
+    |&amp;gt; Alt.afterJob f
+    |&amp;gt; Alt.afterJob (fun _ -&amp;gt; ())
+    |&amp;gt; Job.forN imageCount
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;loading-image&#34;&gt;Loading Image&lt;/h2&gt;
+
+&lt;p&gt;Let&#39;s turn our attention to load the images and put them into a &lt;code&gt;BoundedMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// BoundedMb&amp;lt;&#39;a&amp;gt; -&amp;gt; &#39;a list -&amp;gt; Alt&amp;lt;unit&amp;gt;
+let rec loadImages inMb inputs =
+  match inputs with
+  | [] -&amp;gt; Alt.always ()
+  | x :: xs -&amp;gt;
+    BoundedMb.put inMb x
+    |&amp;gt; Alt.afterJob (fun _ -&amp;gt; loadImages inMb xs)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;loadImages&lt;/code&gt; function recursively iterates the given list and &lt;code&gt;put&lt;/code&gt; each element into the given bounded mailbox &lt;code&gt;inMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-pipeline&#34;&gt;The Pipeline&lt;/h2&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/pipeline_domino.jpg&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we have all the essential things; it is time to line them up and get the job done!&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Image list -&amp;gt; Job&amp;lt;unit&amp;gt;
+let pipeline images = 
+  let imagesCount = List.length images 
+  let queueLength = 3
+
+  let imageScaler = BoundedWorker(queueLength, scaleImage) 
+  let imageFilterer = BoundedWorker(queueLength, filterImage)
+  let imageDisplayer = BoundedWorker(queueLength, displayImage)
+  
+  loadImages imageScaler.InMb images |&amp;gt; start &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+
+  [ imageScaler.CreateJob(imagesCount, imageFilterer.InMb)
+    imageFilterer.CreateJob(imagesCount,  imageDisplayer.InMb)
+    imageDisplayer.CreateJob(imagesCount)] &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+  |&amp;gt; Job.conIgnore &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Loads the provided images into the &lt;code&gt;imageScaler&lt;/code&gt;&#39;s &lt;code&gt;InMb&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; Creates three Jobs by providing the &lt;code&gt;imageFilterer&lt;/code&gt;&#39;s &lt;code&gt;InMb&lt;/code&gt; to &lt;code&gt;imageScaler&lt;/code&gt;, &lt;code&gt;imageDisplayer&lt;/code&gt;&#39;s &lt;code&gt;InMb&lt;/code&gt; to &lt;code&gt;imageFilterer&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; Runs all the three jobs parallelly and waits for all them to complete using &lt;code&gt;Job.conIgnore&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;If we run this pipeline with below input,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let images = [Image &amp;quot;Foo.png&amp;quot;; Image &amp;quot;Bar.png&amp;quot;;Image &amp;quot;Baz.png&amp;quot;] 
+
+#time &amp;quot;on&amp;quot;
+pipeline images |&amp;gt; run
+#time &amp;quot;off&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We&#39;ll get the following output.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Scaling Started: Foo.png
+Scaling Completed: Foo.png [Scaling]
+Scaling Started: Bar.png
+Filtering Started: Foo.png [Scaling]
+Filtering Completed: Foo.png [Scaling] [Filtering]
+Displaying Started: Foo.png [Scaling] [Filtering]
+Scaling Completed: Bar.png [Scaling]
+Scaling Started: Baz.png
+Filtering Started: Bar.png [Scaling]
+Displaying Completed: Foo.png [Scaling] [Filtering] [Displaying]
+Filtering Completed: Bar.png [Scaling] [Filtering]
+Displaying Started: Bar.png [Scaling] [Filtering]
+Displaying Completed: Bar.png [Scaling] [Filtering] [Displaying]
+Scaling Completed: Baz.png [Scaling]
+Filtering Started: Baz.png [Scaling]
+Filtering Completed: Baz.png [Scaling] [Filtering]
+Displaying Started: Baz.png [Scaling] [Filtering]
+Displaying Completed: Baz.png [Scaling] [Filtering] [Displaying]
+Real: 00:00:08.065, CPU: 00:00:00.085, GC gen0: 0, gen1: 0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we saw how to use &lt;code&gt;BoundedMb&lt;/code&gt; in Hopac to develop concurrent programs. Also, we have seen the difference between the Actor Programming Model and Concurrent ML, a programming model used by Hopac. The source code associated with this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/blob/0.9/fsharp/HopacSeries/Part7/script.fsx&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Concurrent Programming in Fsharp Using Hopac - Part 6</title>
