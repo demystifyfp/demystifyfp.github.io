@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="theme" content="hugo-academic">
-  <meta name="generator" content="Hugo 0.30.2" />
+  <meta name="generator" content="Hugo 0.49" />
   
   <meta name="description" content="Demystifying">
 
@@ -136,12 +136,28 @@
         
 
         
-
-        <li class="nav-item">
-          <a href="/#posts">
-            
-            <span>Posts</span>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
           </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
         </li>
 
         
@@ -205,126 +221,555 @@
 
 <div class="universal-wrapper">
 
-  <h1>Fsharps</h1>
+  <h1 style="padding-top:35px">Fsharps</h1>
 
   
 
   
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/">Concurrent Programming in Fsharp Using Hopac - Part 7</a></h2>
-    <div class="article-style">
-      
-      Hello there!
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/" itemprop="url">Concurrent Programming in Fsharp Using Hopac - Part 7</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-06-12 05:30:26 &#43;0530 IST" itemprop="datePublished">
+      Tue, Jun 12, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Hello there!
 Almost eight years back Tomas Petricek wrote a blog post introducing BlockingQueueAgent and followed it up with another blog post on how to apply it to solve an Image Processing problem using the pipeline concurrency pattern.
-In this blog post, we are going to learn how to port this example using Hopac&rsquo;s BoundedMb abstraction, aka Bounded Mailbox.
+In this blog post, we are going to learn how to port this example using Hopac's BoundedMb abstraction, aka Bounded Mailbox.
 Image processing pipeline As defined by Tomas in his blog post, the image processing pipeline works as depicted in the below image.
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/">Concurrent Programming in Fsharp Using Hopac - Part 6</a></h2>
-    <div class="article-style">
-      
-      <p>Hi there!
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/" itemprop="url">Concurrent Programming in Fsharp Using Hopac - Part 6</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-04-25 21:03:26 &#43;0530 IST" itemprop="datePublished">
+      Wed, Apr 25, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Hi there!
 Welcome back to the sixth part of my blog series on concurrent programming in fsharp. In this part, we are going to learn how to deal with state changes while doing concurrent programming through a fun example.
-Time Bomb Simulator The example that we are going to see is a time bomb simulator. The time bomb transitions through different states as shown below during its lifecycle.</p>
+Time Bomb Simulator The example that we are going to see is a time bomb simulator. The time bomb transitions through different states as shown below during its lifecycle.
 
-<p>The associated fsharp type TimeBomb will have the following signature</p>
-
-      
-    </div>
+The associated fsharp type TimeBomb will have the following signature
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">Concurrent Programming in fsharp Using Hopac - Part 5</a></h2>
-    <div class="article-style">
-      
-      Hi,
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/" itemprop="url">Concurrent Programming in fsharp Using Hopac - Part 5</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-03-20 17:13:48 &#43;0530 IST" itemprop="datePublished">
+      Tue, Mar 20, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    9 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Hi,
 In the last blog post, we learned how Alt in Hopac works and its applications. In this blog post, we are going to apply what we learned so far by creating a Ticker.
 Using ticker we can do something repeatedly at regular intervals.
-To implement a Ticker in Hopac, we have to know one more abstraction in Hopac called IVar. So, in the first section, we are going to learn IVar and then we&rsquo;ll use it to implement Ticker.
-      
-    </div>
+To implement a Ticker in Hopac, we have to know one more abstraction in Hopac called IVar. So, in the first section, we are going to learn IVar and then we'll use it to implement Ticker.
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/">Concurrent Programming in fsharp using Hopac - Part 4</a></h2>
-    <div class="article-style">
-      
-      Hi,
-Welcome back to the fourth part of Concurrent Programming in fsharp blog post series. In part-2, we just learned that Alt&lt;&lsquo;a&gt; is a subclass of Job&lt;&lsquo;a&gt;. In this blog post, we are doing to dive deep into this abstraction and learn what it brings to the table.
-An Example Before diving into the definition of Alt&lt;&lsquo;a&gt;, let&rsquo;s figure out why we need it in the first place.
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/" itemprop="url">Concurrent Programming in fsharp using Hopac - Part 4</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-03-16 08:46:01 &#43;0530 IST" itemprop="datePublished">
+      Fri, Mar 16, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Hi,
+Welcome back to the fourth part of Concurrent Programming in fsharp blog post series. In part-2, we just learned that Alt&lt;'a&gt; is a subclass of Job&lt;'a&gt;. In this blog post, we are doing to dive deep into this abstraction and learn what it brings to the table.
+An Example Before diving into the definition of Alt&lt;'a&gt;, let's figure out why we need it in the first place.
 Assume that we have a function delayedPrintn which prints a given message after n milliseconds
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/">Implementing API Gateway Pattern in fsharp using Hopac</a></h2>
-    <div class="article-style">
-      
-      Two years back, I wrote a blog post on how to implement the API Gateway pattern using Reactive Extensions(Rx). In this third part of concurrent programming in fsharp using Hopac blog series, we are going to revisit that blog post and port it to use Hopac instead of Reactive Extensions.
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/" itemprop="url">Implementing API Gateway Pattern in fsharp using Hopac</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-03-05 19:16:02 &#43;0530 IST" itemprop="datePublished">
+      Mon, Mar 5, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    14 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Two years back, I wrote a blog post on how to implement the API Gateway pattern using Reactive Extensions(Rx). In this third part of concurrent programming in fsharp using Hopac blog series, we are going to revisit that blog post and port it to use Hopac instead of Reactive Extensions.
 Rx vs Hopac The critical difference between Rx and Hopac is their communication model.
 Rx is primarily a system for querying data in motion asynchronously, and systems built using Rx rely on asynchronous message-passing.
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/">Concurrent Programming in Fsharp Using Hopac (Part-2)</a></h2>
-    <div class="article-style">
-      
-      In the last blog post, we learned the how to create jobs and run them parallelly using Hopac. In this second part of the blog post series, we are going to explore inter-job communication.
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/" itemprop="url">Concurrent Programming in Fsharp Using Hopac (Part-2)</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-02-28 19:47:02 &#43;0530 IST" itemprop="datePublished">
+      Wed, Feb 28, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    5 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    In the last blog post, we learned the how to create jobs and run them parallelly using Hopac. In this second part of the blog post series, we are going to explore inter-job communication.
 Share Memory By Communicating In multi-threaded programming model, if two threads want to communicate, the typical approach is using a shared memory backed by locks, thread-safe data structures (or other synchronisation primitives). We have to follow specific best practices to avoid Deadlocks and Race Conditions while using the shared memory approach.
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/">Concurrent Programming in fsharp using Hopac (Part-I)</a></h2>
-    <div class="article-style">
-      
-      Enabling developers to write concise code in solving complex problems is one of the significant characteristics of functional programming. The conciseness is mostly due to the abstractions provided by the functional programming language.
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/" itemprop="url">Concurrent Programming in fsharp using Hopac (Part-I)</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-02-26 19:08:32 &#43;0530 IST" itemprop="datePublished">
+      Mon, Feb 26, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Enabling developers to write concise code in solving complex problems is one of the significant characteristics of functional programming. The conciseness is mostly due to the abstractions provided by the functional programming language.
 Can we apply these abstractions and write concurrent programs with ease?
 We are going to find the answer to this question by writing concurrent programs in fsharp using the Hopac library.
-What is Hopac Hopac is a fsharp library that provides a programming model inspired by John Reppy&rsquo;s Concurrent ML language.
-      
-    </div>
+What is Hopac Hopac is a fsharp library that provides a programming model inspired by John Reppy's Concurrent ML language.
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/adding-meaning-to-primitive-types-in-fsharp/">Adding Meaning to Primitive Types in fsharp</a></h2>
-    <div class="article-style">
-      
-      One of the recommended guidelines in Domain Driven Design is modelling the domain ideas using the domain type (CustomerName, CustomerId) instead of using their corresponding primitive type (string, int). In fsharp, with the help of Single-Case Discriminated Union, we can follow this guideline with minimal effort.
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/adding-meaning-to-primitive-types-in-fsharp/" itemprop="url">Adding Meaning to Primitive Types in fsharp</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-02-12 19:23:36 &#43;0530 IST" itemprop="datePublished">
+      Mon, Feb 12, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/adding-meaning-to-primitive-types-in-fsharp/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    One of the recommended guidelines in Domain Driven Design is modelling the domain ideas using the domain type (CustomerName, CustomerId) instead of using their corresponding primitive type (string, int). In fsharp, with the help of Single-Case Discriminated Union, we can follow this guideline with minimal effort.
 While following this practice in one of my recent project in fsharp, I came across a compelling use case, and I used a lesser-known approach to solve the problem.
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/adding-meaning-to-primitive-types-in-fsharp/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/">Introducing FsConfig</a></h2>
-    <div class="article-style">
-      
-      I am delighted to introduce a new F# library, FsConfig. FsConfig is a F# library for reading configuration data from environment variables and AppSettings with type safety
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/" itemprop="url">Introducing FsConfig</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-02-06 19:48:26 &#43;0530 IST" itemprop="datePublished">
+      Tue, Feb 6, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    5 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    I am delighted to introduce a new F# library, FsConfig. FsConfig is a F# library for reading configuration data from environment variables and AppSettings with type safety
 Why FsConfig? To understand FsConfig, let&rsquo;s have a look at an use case from the FsTweet application.
 The FsTweet application follows The Twelve-Factor App guideline for managing the configuration data. During the application bootstrap, it retrieves its ten configuration parameters from their respective environment variables.
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
-  <div>
-    <h2><a href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/">Generic Programming Made Easy</a></h2>
-    <div class="article-style">
-      
-      Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters1.
+    
+    
+
+<div class="article-list-item" itemscope itemprop="blogPost">
+  
+  
+  <h3 class="article-title" itemprop="name">
+    <a href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/" itemprop="url">Generic Programming Made Easy</a>
+  </h3>
+  
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2017-12-15 19:39:26 &#43;0530 IST" itemprop="datePublished">
+      Fri, Dec 15, 2017
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    17 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/#disqus_thread"></a>
+  
+
+  
+
+  
+
+</div>
+
+  <div class="article-style" itemprop="articleBody">
+    
+    Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters1.
 Generic programming was part of .NET since .NET Version 2.0 and has a fascinating history as well!
 For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride.
-      
-    </div>
+    
   </div>
+  <p class="read-more">
+    <a href="https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/" class="btn btn-primary btn-outline">
+      CONTINUE READING
+    </a>
+  </p>
+</div>
+
   
 
   

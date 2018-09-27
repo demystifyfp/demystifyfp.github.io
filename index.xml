@@ -11,6 +11,136 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Using Clojure in Production</title>
+      <link>https://www.demystifyfp.com/clojure/blog/clojure-in-production/</link>
+      <pubDate>Wed, 26 Sep 2018 11:25:01 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/blog/clojure-in-production/</guid>
+      <description>
+
+&lt;p&gt;We at &lt;a href=&#34;www.ajira.tech&#34; target=&#34;_blank&#34;&gt;Ajira&lt;/a&gt; successfully delivered our first project in &lt;a href=&#34;https://clojure.org&#34; target=&#34;_blank&#34;&gt;Clojure&lt;/a&gt; recently. It was an impressive outing for the last eight weeks! We were able to deliver some complex features with ease because of the outstanding data-oriented programming features provided by Clojure.&lt;/p&gt;
+
+&lt;p&gt;This blog post summarizes our experiences.&lt;/p&gt;
+
+&lt;h2 id=&#34;the-problem-statement&#34;&gt;The Problem Statement&lt;/h2&gt;
+
+&lt;p&gt;The Project that we delivered was a &lt;a href=&#34;https://en.wikipedia.org/wiki/Low-code_development_platforms&#34; target=&#34;_blank&#34;&gt;Low Code Development Platform&lt;/a&gt; where the system administrator configures the way the entire application would look like &amp;amp; behave for the end user. In addition to this, the end user also can customise and create pages of his own. The platform also provides &lt;a href=&#34;https://en.wikipedia.org/wiki/Role-based_access_control&#34; target=&#34;_blank&#34;&gt;Role Based Access Control&lt;/a&gt; which is also configurable by the system administrator.&lt;/p&gt;
+
+&lt;p&gt;In a nutshell, there is no fixed domain or domain model, and configuration drives everything!&lt;/p&gt;
+
+&lt;h2 id=&#34;how-why-we-chose-clojure&#34;&gt;How &amp;amp; Why we chose Clojure&lt;/h2&gt;
+
+&lt;p&gt;After going through a &lt;a href=&#34;https://martinfowler.com/articles/lean-inception&#34; target=&#34;_blank&#34;&gt;lean inception&lt;/a&gt; with the client, we found that the critical piece that we have to solve is dynamically creating the SQL queries based on some configuration and transform the shape of the returned data.&lt;/p&gt;
+
+&lt;p&gt;Since the entire application is going to be dynamic and driven by configuration, we decided that a &lt;a href=&#34;https://en.wikipedia.org/wiki/Dynamic_programming_language&#34; target=&#34;_blank&#34;&gt;dynamic programming language&lt;/a&gt; would be an ideal fit and the contenders were Javascript (Node.js) &amp;amp; Clojure.&lt;/p&gt;
+
+&lt;p&gt;To chose the opt language, we took the dynamic SQL generation part and did a &lt;a href=&#34;https://en.wikipedia.org/wiki/Spike_(software_development)&#34; target=&#34;_blank&#34;&gt;spike&lt;/a&gt; on both Node.js &amp;amp; Clojure. Within half a day, we were able to solve it with ease in Clojure and even picked another piece for the spike and completed that as well. The Node.js implementation took a day.&lt;/p&gt;
+
+&lt;p&gt;Upon completion, we compared both the codebase and decided unanimously to go ahead with Clojure and got a nod from client too!&lt;/p&gt;
+
+&lt;p&gt;It turned out to be an excellent decision.&lt;/p&gt;
+
+&lt;h2 id=&#34;hammock-driven-development&#34;&gt;Hammock Driven Development&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;First, solve the problem. Then, write the code. - John Johnson&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;One of the significant benefits that we reaped while developing the project in Clojure was &lt;strong&gt;Productivity&lt;/strong&gt;. Inspired by the &lt;a href=&#34;https://www.youtube.com/watch?v=f84n5oFoZBc&#34; target=&#34;_blank&#34;&gt;Hammock Driven Development&lt;/a&gt;, we took a considerable amount of time to think about the problem before jumping in to code the solution. It was a remarkable experience. As the implementation was well thought out, we were able to deliver the features &lt;a href=&#34;https://www.youtube.com/watch?v=2V1FtfBDsLU&#34; target=&#34;_blank&#34;&gt;effectively&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Another thing that I’d like to highlight, the process of transforming the mental model (or a whiteboard sketch) of the solution to the actual code in Clojure is astonishingly simple! No ceremony, no boilerplate and the final solution exactly resembled what we had in our mind.&lt;/p&gt;
+
+&lt;h2 id=&#34;power-of-treating-code-as-data&#34;&gt;Power of treating code as data.&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://www.infoq.com/presentations/Thinking-in-Data&#34; target=&#34;_blank&#34;&gt;Data-Oriented Programming&lt;/a&gt; is a sweet spot of Clojure, and it helped us a lot while developing the solution.&lt;/p&gt;
+
+&lt;p&gt;Just by using Clojure’s &lt;a href=&#34;https://clojure.org/reference/data_structures#Maps&#34; target=&#34;_blank&#34;&gt;Map&lt;/a&gt;, &lt;a href=&#34;https://clojure.org/reference/data_structures#Vectors&#34; target=&#34;_blank&#34;&gt;Vector&lt;/a&gt; and its core library functions we were able to achieve a lot. It also helped us seamlessly to deliver what the client wants.&lt;/p&gt;
+
+&lt;h2 id=&#34;threading-macros&#34;&gt;Threading Macros&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://clojure.org/guides/threading_macros&#34; target=&#34;_blank&#34;&gt;Threading macros&lt;/a&gt; in Clojure is another outstanding part of the core library, and it helped us a lot in achieving better code organisation and readability.&lt;/p&gt;
+
+&lt;p&gt;In F#, I have used the &lt;a href=&#34;https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.%5b-h%5d-%5d%5b&#39;t1,&#39;u%5d-function-%5bfsharp%5d&#34; target=&#34;_blank&#34;&gt;pipeline operator&lt;/a&gt; to a great extent. While using it, I sometimes faced problems in defining the parameter order of functions that I am pipelining.&lt;/p&gt;
+
+&lt;p&gt;A parameter order of a function &lt;code&gt;f1&lt;/code&gt; that made sense in one context did not work well with pipelining in another context. So, I need to either change the parameter type or make use of the flip function to do an ephemeral swap of parameters or break the pipelining with a new intermediate binding and then continuing with a new pipelining. All these options break the elegance and readability that we get from pipelining.&lt;/p&gt;
+
+&lt;p&gt;In Clojure, I never had this problem due to the &lt;code&gt;as-&amp;gt;&lt;/code&gt; macro.&lt;/p&gt;
+
+&lt;p&gt;We have used &lt;code&gt;-&amp;gt;&lt;/code&gt; and &lt;code&gt;-&amp;gt;&amp;gt;&lt;/code&gt; macros most of the time and the &lt;code&gt;as-&amp;gt;&lt;/code&gt; macro in the places where the function&amp;rsquo;s parameter order are different.&lt;/p&gt;
+
+&lt;h2 id=&#34;destructing-pattern-matching&#34;&gt;Destructing &amp;amp; Pattern Matching&lt;/h2&gt;
+
+&lt;p&gt;Apart from the pipeline operator, the things that I enjoyed a lot while coding in F# are destructing and pattern matching. Clojure is right on the money on these features. Due to the dynamic type system and the LISP syntax, It is even more enjoyable in Clojure.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://github.com/clojure/core.match/wiki/Overview&#34; target=&#34;_blank&#34;&gt;clojure.match&lt;/a&gt; library had all the bells and whistles that we needed for doing pattern matching.&lt;/p&gt;
+
+&lt;h2 id=&#34;strongly-type-vs-dynamic-type&#34;&gt;Strongly Type vs Dynamic Type&lt;/h2&gt;
+
+&lt;p&gt;I have written production systems in C#, F#, Golang &amp;amp; Kotlin in the last nine years and I have been using functional programming principles to develop software for the previous four years.&lt;/p&gt;
+
+&lt;p&gt;This project is my first encounter with a dynamic programming language (for the backend) and LISP in production.&lt;/p&gt;
+
+&lt;p&gt;I was sceptic about using a dynamic programming language in production. I relied heavily on the type-safety provided by strongly typed functional programming languages like F# and used to wonder how can I build something stable without a strong type system. However, Clojure made me to revisit that thought process.&lt;/p&gt;
+
+&lt;p&gt;While developing the product, I felt the freedom (from rigid types) in a lot of places &amp;amp; the ability to reuse the functions in different contexts was quite useful.&lt;/p&gt;
+
+&lt;p&gt;I also liked the Clojure&amp;rsquo;s way (Rich Hickey&amp;rsquo;s way to be precise) approaching the problem solving using a dynamic programming language. The &lt;a href=&#34;https://www.youtube.com/watch?v=2V1FtfBDsLU&#34; target=&#34;_blank&#34;&gt;Effective Programs talk&lt;/a&gt; by Rich was an eye-opener for me!&lt;/p&gt;
+
+&lt;p&gt;I never felt like that I am missing the type system while working with Clojure!&lt;/p&gt;
+
+&lt;h2 id=&#34;libraries-that-made-our-job-easier&#34;&gt;Libraries That Made Our Job Easier&lt;/h2&gt;
+
+&lt;h4 id=&#34;honeysql-https-github-com-jkk-honeysql-honey-sql&#34;&gt;&lt;a href=&#34;https://github.com/jkk/honeysql#honey-sql&#34; target=&#34;_blank&#34;&gt;HoneySQL&lt;/a&gt;&lt;/h4&gt;
+
+&lt;p&gt;As mentioned earlier, the core engine of our product has to generate a SQL query based on a configuration. The configuration data was represented using Clojure&amp;rsquo;s data structures and what we wanted was a process to transform them into SQL.  &lt;a href=&#34;https://github.com/jkk/honeysql#honey-sql&#34; target=&#34;_blank&#34;&gt;HoneySQL&lt;/a&gt; exactly does this.&lt;/p&gt;
+
+&lt;p&gt;That platform had different kinds of widgets like charts, tables, add-edit forms. We made the configuration data of these widgets to specify their underlying database schema in a uniformed way and created &lt;a href=&#34;http://principles-wiki.net/principles:single_level_of_abstraction&#34; target=&#34;_blank&#34;&gt;a single layer of abstraction&lt;/a&gt; that takes this unified representation and used HoneySQL to generate the SQL query.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://github.com/jkk/honeysql#extensibility&#34; target=&#34;_blank&#34;&gt;extensibility&lt;/a&gt; feature provided by HoneySQL was advantageous, and we leveraged it a lot! For example, HoneySQL does not have inherent support for &lt;code&gt;ilike&lt;/code&gt; clause in Postgres. We just added an extension method with a couple of lines, and it worked like a charm.&lt;/p&gt;
+
+&lt;h4 id=&#34;compojure-api-https-github-com-metosin-compojure-api&#34;&gt;&lt;a href=&#34;https://github.com/metosin/compojure-api&#34; target=&#34;_blank&#34;&gt;Compojure API&lt;/a&gt;&lt;/h4&gt;
+
+&lt;p&gt;Apart from its simplicity on exposing HTTP APIs, its support for Swagger API documentation generation was very handy. We have also leveraged its &lt;a href=&#34;https://github.com/metosin/compojure-api/wiki/Coercion&#34; target=&#34;_blank&#34;&gt;input data coercion&lt;/a&gt; ability using &lt;a href=&#34;https://github.com/plumatic/schema&#34; target=&#34;_blank&#34;&gt;Schema&lt;/a&gt;. Defining nested specs for complex domain models was a breeze due to LISP’s inherent composability&lt;/p&gt;
+
+&lt;h4 id=&#34;toucan-https-github-com-metabase-toucan&#34;&gt;&lt;a href=&#34;https://github.com/metabase/toucan&#34; target=&#34;_blank&#34;&gt;Toucan&lt;/a&gt;&lt;/h4&gt;
+
+&lt;p&gt;We just loved this library. We had standard CRUD operations for dealing with application configuration. Developing this functionality using Toucan was an absolute breeze along with the Compojure API.&lt;/p&gt;
+
+&lt;h4 id=&#34;others&#34;&gt;Others&lt;/h4&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Logging - &lt;a href=&#34;https://github.com/pyr/unilog&#34; target=&#34;_blank&#34;&gt;Unilog&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Authentication &amp;amp; Authorization - &lt;a href=&#34;https://github.com/cemerick/friend&#34; target=&#34;_blank&#34;&gt;Friend&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;DB Migration - &lt;a href=&#34;https://flywaydb.org/&#34; target=&#34;_blank&#34;&gt;Flyway&lt;/a&gt; &amp;amp; &lt;a href=&#34;https://github.com/metaphor/lein-flyway&#34; target=&#34;_blank&#34;&gt;Lein Flyway Plugin&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Application Configuration - &lt;a href=&#34;https://github.com/grammarly/omniconf&#34; target=&#34;_blank&#34;&gt;OmniConf&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;JSON - &lt;a href=&#34;https://github.com/dakrone/cheshire&#34; target=&#34;_blank&#34;&gt;Cheshire&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Database Connection Pooling - &lt;a href=&#34;https://github.com/tomekw/hikari-cp&#34; target=&#34;_blank&#34;&gt;Hikari&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Amazon SES Client - &lt;a href=&#34;https://github.com/jstaffans/ses-mailer&#34; target=&#34;_blank&#34;&gt;SES Mailer&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;tools&#34;&gt;Tools&lt;/h2&gt;
+
+&lt;h4 id=&#34;vs-code-calva-https-marketplace-visualstudio-com-items-itemname-cospaia-clojure4vscode&#34;&gt;&lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode&#34; target=&#34;_blank&#34;&gt;VS Code Calva&lt;/a&gt;&lt;/h4&gt;
+
+&lt;p&gt;The creators of Calva has done an amazing work on bringing Emacs CIDER experience to VS Code. Along with the &lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer&#34; target=&#34;_blank&#34;&gt;Bracket Pair Colorizer&lt;/a&gt;, our development workflow went smooth.&lt;/p&gt;
+
+&lt;h4 id=&#34;cljfmt-https-github-com-weavejester-cljfmt-eastwood-https-github-com-jonase-eastwood&#34;&gt;&lt;a href=&#34;https://github.com/weavejester/cljfmt&#34; target=&#34;_blank&#34;&gt;cljfmt&lt;/a&gt; &amp;amp; &lt;a href=&#34;https://github.com/jonase/eastwood&#34; target=&#34;_blank&#34;&gt;Eastwood&lt;/a&gt;&lt;/h4&gt;
+
+&lt;p&gt;To ensure everybody in the team follows the same style &amp;amp; formatting of the Clojure code, we have used &lt;code&gt;cljfmt&lt;/code&gt; &amp;amp; Eastwood in the build pipeline.&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The secret to building large apps is never build large apps. Break your applications into small pieces. Then, assemble those testable, bite-sized pieces into your big application - Justin Meyer&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The above quote summarizes our overall experience of developing a product using Clojure. Clojure empowered us to deliver the software faster without compromising on the quality.&lt;/p&gt;
+
+&lt;p&gt;It was an enlightening journey. I’d definitely consider using Clojure in my upcoming projects for sure if it is an opt fit!&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Concurrent Programming in Fsharp Using Hopac - Part 7</title>
       <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/</link>
       <pubDate>Tue, 12 Jun 2018 05:30:26 +0530</pubDate>
@@ -2974,11 +3104,11 @@ let main argv =
       <guid>https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/</guid>
       <description>
 
-&lt;p&gt;Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:1&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:1&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;p&gt;Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
 
 &lt;p&gt;Generic programming was part of .NET since .NET Version 2.0 and has &lt;a href=&#34;https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/&#34; target=&#34;_blank&#34;&gt;a fascinating history&lt;/a&gt; as well!&lt;/p&gt;
 
-&lt;p&gt;For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride. Let&amp;rsquo;s have a look at the source code&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:2&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; below to get a feel of what I mean here!&lt;/p&gt;
+&lt;p&gt;For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride. Let&amp;rsquo;s have a look at the source code&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34;&gt;2&lt;/a&gt;&lt;/sup&gt; below to get a feel of what I mean here!&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let rec print (value : obj) =
   match value with
@@ -3280,7 +3410,7 @@ let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResu
 
 &lt;p&gt;What to do now?&lt;/p&gt;
 
-&lt;p&gt;Well, We can solve this by introducing another layer of abstraction&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:3&#34;&gt;&lt;a rel=&#34;footnote&#34; href=&#34;#fn:3&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;Well, We can solve this by introducing another layer of abstraction&lt;sup class=&#34;footnote-ref&#34; id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let parsePrimitive&amp;lt;&#39;T&amp;gt; (envVarName : string) : EnvVarParseResult&amp;lt;&#39;T&amp;gt; =
 

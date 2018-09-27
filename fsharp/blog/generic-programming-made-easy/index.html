@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="theme" content="hugo-academic">
-  <meta name="generator" content="Hugo 0.30.2" />
+  <meta name="generator" content="Hugo 0.49" />
   
   <meta name="description" content="Demystifying">
 
@@ -136,12 +136,28 @@
         
 
         
-
-        <li class="nav-item">
-          <a href="/#posts">
-            
-            <span>Posts</span>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
           </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
         </li>
 
         
@@ -302,11 +318,11 @@
       <div class="article-style" itemprop="articleBody">
         
 
-<p>Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters<sup class="footnote-ref" id="fnref:1"><a rel="footnote" href="#fn:1">1</a></sup>.</p>
+<p>Generic programming is a style of computer programming in which algorithms are written in terms of types to-be-specified-later that are then instantiated when needed for specific types provided as parameters<sup class="footnote-ref" id="fnref:1"><a href="#fn:1">1</a></sup>.</p>
 
 <p>Generic programming was part of .NET since .NET Version 2.0 and has <a href="https://blogs.msdn.microsoft.com/dsyme/2011/03/15/netc-generics-history-some-photos-from-feb-1999/" target="_blank">a fascinating history</a> as well!</p>
 
-<p>For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride. Let&rsquo;s have a look at the source code<sup class="footnote-ref" id="fnref:2"><a rel="footnote" href="#fn:2">2</a></sup> below to get a feel of what I mean here!</p>
+<p>For most of the use cases which involves generics, implementing them in F# is a cake-walk. However, when the generic programming requires reflection, it becomes a bumpy ride. Let&rsquo;s have a look at the source code<sup class="footnote-ref" id="fnref:2"><a href="#fn:2">2</a></sup> below to get a feel of what I mean here!</p>
 
 <pre><code class="language-fsharp">let rec print (value : obj) =
   match value with
@@ -608,7 +624,7 @@ let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt;
 
 <p>What to do now?</p>
 
-<p>Well, We can solve this by introducing another layer of abstraction<sup class="footnote-ref" id="fnref:3"><a rel="footnote" href="#fn:3">3</a></sup></p>
+<p>Well, We can solve this by introducing another layer of abstraction<sup class="footnote-ref" id="fnref:3"><a href="#fn:3">3</a></sup></p>
 
 <pre><code class="language-fsharp">let parsePrimitive&lt;'T&gt; (envVarName : string) : EnvVarParseResult&lt;'T&gt; =
 
@@ -978,7 +994,7 @@ val it : Result&lt;Config,EnvVarParseError list&gt; =
   
 <section id="comments">
   <div id="disqus_thread"></div>
-<script>
+<script type="application/javascript">
     var disqus_config = function () {
     
     
