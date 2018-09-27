@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.49" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/">
+  <meta property="og:title" content="Concurrent Programming in Fsharp Using Hopac - Part 6 | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2018-04-25T21:03:26&#43;05:30">
+  
+  <meta property="article:modified_time" content="2018-04-25T21:03:26&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+  <title>Concurrent Programming in Fsharp Using Hopac - Part 6 | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Concurrent Programming in Fsharp Using Hopac - Part 6</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/hopac">Hopac</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/concurrent-programming">concurrent-programming</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-04-25 21:03:26 &#43;0530 IST" itemprop="datePublished">
+      Wed, Apr 25, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    7 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Concurrent%20Programming%20in%20Fsharp%20Using%20Hopac%20-%20Part%206&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-6%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-6%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-6%2f&amp;title=Concurrent%20Programming%20in%20Fsharp%20Using%20Hopac%20-%20Part%206"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-6%2f&amp;title=Concurrent%20Programming%20in%20Fsharp%20Using%20Hopac%20-%20Part%206"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Concurrent%20Programming%20in%20Fsharp%20Using%20Hopac%20-%20Part%206&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-6%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+      
+
+      <div class="article-style" itemprop="articleBody">
+        <p>Hi there!</p>
+
+<p>Welcome back to the sixth part of my blog series on concurrent programming in fsharp. In this part, we are going to learn how to deal with state changes while doing concurrent programming through a fun example.</p>
+
+<h2 id="time-bomb-simulator">Time Bomb Simulator</h2>
+
+<p>The example that we are going to see is a time bomb simulator. The time bomb transitions through different states as shown below during its lifecycle.</p>
+
+<p><figure><img src="/img/fsharp/blog/hopac/timebomb_state_transition.png" alt=""></figure></p>
+
+<p>The associated fsharp type <code>TimeBomb</code> will have the following signature</p>
+
+<pre><code>type TimeBomb =
+  class
+    new : unit -&gt; TimeBomb
+    member Activate : seconds:int * defuseChar:char -&gt; unit
+    member Status : unit -&gt; Status
+    member TryDefuse : defuseChar:char -&gt; unit
+    member DeadStatusAlt : Hopac.Alt&lt;Reason&gt;
+    member SecondsRemainingCh : Hopac.Ch&lt;int&gt;
+  end
+</code></pre>
+
+<p>The time bomb will be initially in <em>NotActivated</em> state and moves to <em>Alive</em> state on a method call <code>Activate</code>. In this method call, we are going to specify the seconds that the time bomb has to wait before triggering the detonation. To support defuse, we are also going to define a unique character which defuses an alive time bomb.</p>
+
+<p>In <em>Alive</em> state, the time bomb sends the seconds remaining to the outside world via a Hopac Channel <code>SecondsRemainingCh</code>. While it is alive, we can call the <code>TryDefuse</code> with any character to defuse it.</p>
+
+<p>If the specified character in the <code>TryDefuse</code> method matches with the character that we provided during activation, the time bomb will go the <code>Dead</code> state with the value <code>Defused</code>.</p>
+
+<p>If none of the attempt succeeds in the stipulated time, the time bomb will go the <code>Dead</code> state with the value <code>Exploded</code>.</p>
+
+<p>The dead status change is communicated through <code>DeadStatusAlt</code>.</p>
+
+<h2 id="the-implementation">The Implementation</h2>
+
+<p>Let's start with defining the types to represent the time bomb's status</p>
+
+<pre><code class="language-fsharp">type Reason =
+| Exploded
+| Defused
+
+type Status =
+| NotActivated
+| Alive
+| Dead of Reason
+</code></pre>
+
+<p>The <code>TimeBomb</code> type is going to have two internal states <code>reason</code>, to capture the <code>Reason</code> for the <code>Dead</code> status and <code>activated</code>, to store whether the time bomb is activated or not.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // IVar&lt;Reason&gt;
+  let reason = IVar&lt;Reason&gt;()
+  // IVar&lt;unit&gt;
+  let activated = IVar()
+</code></pre>
+
+<p>We are making use of the Hopac's write once variable abstraction <code>IVar</code> to define the internal states as we did in the <a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">last blog post</a> to model the Ticker state.</p>
+
+<p>The next step is exposing the status of the time bomb.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // ...
+
+  // Status
+  member __.Status 
+    with get() =
+      let deadReasonAlt = <span class="callout">1</span>
+        IVar.read reason
+        |&gt; Alt.afterFun Dead
+
+      let activatedAlt = <span class="callout">2</span>
+        IVar.read activated
+        |&gt; Alt.afterFun (fun _ -&gt; Alive)
+      
+      let notActivatedAlt = <span class="callout">3</span>
+        Alt.always NotActivated 
+
+      Alt.choose [
+        deadReasonAlt 
+        activatedAlt
+        notActivatedAlt] 
+      |&gt; run <span class="callout">4</span>
+</code></pre>
+
+<p><span class="callout">1</span> The <code>deadReasonAlt</code> will be available when the <code>reason</code> IVar is populated.</p>
+
+<p><span class="callout">2</span> The <code>activatedAlt</code> will be available when <code>activated</code> IVar is populated.</p>
+
+<p><span class="callout">3</span> The <code>notActivatedAlt</code> is the default state, that'll <code>always</code> be available. (Like a default case in a switch statement)</p>
+
+<blockquote>
+<pre><code class="language-fsharp">val always: 'x -&gt; Alt&lt;'x&gt;
+</code></pre>
+
+<p>Creates an alternative that is always available and results in the given value.</p>
+</blockquote>
+
+<p><span class="callout">4</span> We are choosing between the above three <code>Alt</code>s.</p>
+
+<p>Then we are going to leverage the <code>Ticker</code> component we created in the <a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">last blog post</a> to send the seconds remaining via <code>SecondsRemainingCh</code>.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // ...
+  let secondsRemainingCh = Ch&lt;int&gt;()
+
+  // Ticker -&gt; int -&gt; Alt&lt;'a&gt;
+  let rec onTick (ticker : Ticker) secondsRemaining =
+    ticker.C
+    |&gt; Alt.afterJob (fun _ -&gt; Ch.send secondsRemainingCh secondsRemaining)
+    |&gt; Alt.afterJob (fun _ -&gt; onTick ticker (secondsRemaining - 1))
+
+  // int -&gt; Ticker
+  let startTicker seconds =
+    let ticker = new Ticker(TimeSpan.FromSeconds 1.)
+    onTick ticker (seconds - 1) |&gt; start
+    ticker
+
+  // ...
+
+  member __.SecondsRemainingCh
+    with get() = secondsRemainingCh
+</code></pre>
+
+<p>To model the explosion of the time bomb, let's define a <code>startTimeOut</code> function which takes the time bomb's actual seconds remaining during activation and uses <code>timeOut</code> function from Hopac to modify the internal state <code>reason</code> after the given delay.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // ...
+
+  // int -&gt; unit
+  let startTimeOut seconds =
+    let timeOutAlt = 
+      seconds 
+      |&gt; float 
+      |&gt; TimeSpan.FromSeconds 
+      |&gt; timeOut
+    
+    timeOutAlt
+    |&gt; Alt.afterJob (fun _ -&gt; 
+        IVar.tryFill reason Exploded)
+    |&gt; start
+</code></pre>
+
+<p>Now, we have all the required functions to expose the <code>Activate</code> method. So, let's put it together.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // ...
+
+  // int -&gt; Char -&gt; unit
+  let activate seconds =
+    let ticker = startTicker seconds <span class="callout">1</span>
+    startTimeOut seconds <span class="callout">2</span>
+    IVar.tryFill activated () |&gt; start <span class="callout">3</span>
+    IVar.read reason
+    |&gt; Alt.afterFun (fun _ -&gt; ticker.Stop()) <span class="callout">4</span>
+    |&gt; start
+  // ...
+
+  // int -&gt; unit
+  member this.Activate (seconds : int) =
+    match this.Status with
+    | NotActivated -&gt; activate seconds <span class="callout">5</span>
+    | _ -&gt; ()
+
+  member __.DeadStatusAlt
+    with get() = IVar.read reason <span class="callout">6</span>
+</code></pre>
+
+<p><span class="callout">1</span> Starts the ticker</p>
+
+<p><span class="callout">2</span> Starts the timer to keep track of the time to detonate the time bomb</p>
+
+<p><span class="callout">3</span> Fills the <code>activated</code> IVar to update the <code>Status</code>.</p>
+
+<p><span class="callout">4</span> Stops the <code>ticker</code>, when the time bomb is dead</p>
+
+<p><span class="callout">5</span> Activates the time bomb only if it's in <code>NotActivated</code> status.</p>
+
+<p><span class="callout">6</span> Exposes an <code>Alt</code> to communicate that the time bomb is dead.</p>
+
+<p>Now it's time to simulate the time bomb explosion.</p>
+
+<pre><code class="language-fsharp">// TimeBomb -&gt; unit
+let printSecondsRemaining (t : TimeBomb) =
+  t.SecondsRemainingCh
+  |&gt; Alt.afterFun (printfn &quot;Seconds Remaining: %d&quot;)
+  |&gt; Job.foreverServer |&gt; start
+
+// unit -&gt; unit
+let simulateExplosion () =
+  let seconds = 5
+  let t = TimeBomb()
+  t.Status |&gt; printfn &quot;Status: %A&quot;
+  t.Activate(seconds)
+  printSecondsRemaining t
+  t.Status |&gt; printfn &quot;Status: %A&quot;
+  t.DeadStatusAlt
+  |&gt; Alt.afterFun (printfn &quot;Status: %A&quot;)
+  |&gt; run
+</code></pre>
+
+<p>The <code>simulateExplosion</code> function creates a <code>TimeBomb</code> with five seconds as detonation time and prints the statuses &amp; the seconds remaining.</p>
+
+<pre><code class="language-bash">&gt; simulateExplosion ();;
+Status: NotActivated
+Status: Alive
+Seconds Remaining: 4
+Seconds Remaining: 3
+Seconds Remaining: 2
+Seconds Remaining: 1
+Seconds Remaining: 0
+Status: Exploded
+Real: 00:00:05.054, CPU: 00:00:00.078, GC gen0: 0, gen1: 0
+val it : unit = ()
+</code></pre>
+
+<p>Awesome!</p>
+
+<h2 id="adding-support-for-defuse">Adding Support For Defuse</h2>
+
+<p>Like we see in movies, a time bomb has to have a provision to defuse! Adding this to our <code>TimeBomb</code> implementation is straightforward.</p>
+
+<p>Unlike the real time bomb, instead of providing some random coloured wire to defuse the bomb, we are going to emulate this via random <code>char</code>.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // ...
+
+  // Ch&lt;char&gt;
+  let inCh = Ch&lt;char&gt;() <span class="callout">1</span>
+
+  // char -&gt; Alt&lt;unit&gt;
+  let rec inputLoop defuseChar =
+    let onInput inChar = 
+      if inChar = defuseChar then
+        IVar.tryFill reason Defused
+      else
+        inputLoop defuseChar :&gt; Job&lt;unit&gt;
+    inCh
+    |&gt; Alt.afterJob onInput <span class="callout">2</span>
+
+  // ...
+</code></pre>
+
+<p><span class="callout">1</span> Adds a new internal state <code>inCh</code>.</p>
+
+<p><span class="callout">2</span> On every input on the <code>inCh</code>, we are matching this input with the <code>defuseChar</code>. If it matches, we transition the status of the <code>TimeBomb</code> to <code>Dead</code> with the reason <code>Defused</code> else we continue the loop.</p>
+
+<pre><code class="language-fsharp">type TimeBomb () = 
+  // ...
+
+  // char -&gt; unit 
+  member this.TryDefuse(defuseChar) =
+    match this.Status with
+    | Alive -&gt; 
+      Ch.give inCh defuseChar 
+      |&gt; start
+    | _ -&gt; ()
+</code></pre>
+
+<p>Using the <code>TryDefuse</code> method, the consumer of <code>TimeBomb</code> can input the <code>defuseChar</code>, and it will be put into the <code>inCh</code> only if the <code>TimeBomb</code> is in <code>Alive</code> status.</p>
+
+<p>The final step is modifying the <code>activate</code> function to support defuse.</p>
+
+<pre><code class="language-diff">type TimeBomb () = 
+  // ...
+
+- let activate seconds =
++ let activate seconds defuseChar =
+    let ticker = startTicker seconds
+    startTimeOut seconds
+    IVar.tryFill activated () |&gt; start
++   inputLoop defuseChar |&gt; start
+    IVar.read reason
+    |&gt; Alt.afterFun (fun _ -&gt; ticker.Stop())
+    |&gt; start
+
+  // ...
+- member this.Activate (seconds : int) =
++ member this.Activate (seconds : int, defuseChar : char) =
+    match this.Status with
+    | NotActivated -&gt; 
+-     activate seconds
++     activate seconds defuseChar
+    | _ -&gt; ()
+</code></pre>
+
+<p>Alright, let's simulate the defuse and figure out whether it is working as expected!</p>
+
+<pre><code class="language-fsharp">let simulateDefuse char =
+  let seconds = 5
+  let t = TimeBomb()
+  t.Status |&gt; printfn &quot;Status: %A&quot;
+  t.Activate(seconds, 'a')
+  printSecondsRemaining t
+  t.Status |&gt; printfn &quot;Status: %A&quot;
+  
+  TimeSpan.FromSeconds 3. <span class="callout">1</span>
+  |&gt; timeOut 
+  |&gt; Alt.afterFun (fun _ -&gt; t.TryDefuse(char)) <span class="callout">2</span>
+  |&gt; Alt.afterJob (fun _ -&gt; t.DeadStatusAlt)
+  |&gt; Alt.afterFun (printfn &quot;Status: %A&quot;)
+  |&gt; run
+</code></pre>
+
+<p>The <code>simulateDefuse</code> function takes an input character and uses it to defuse the bomb (<span class="callout">2</span>) after a delay of three seconds (<span class="callout">1</span>).</p>
+
+<pre><code class="language-bash">&gt; simulateDefuse 'a' ;;
+Status: NotActivated
+Status: Alive
+Seconds Remaining: 4
+Seconds Remaining: 3
+Seconds Remaining: 2
+Status: Defused
+Real: 00:00:03.023, CPU: 00:00:00.026, GC gen0: 0, gen1: 0
+val it : unit = ()
+</code></pre>
+
+<p>Cool, we made it 😃</p>
+
+<p>Another simulation that we can add here is putting multiple time bombs in action. I leave it as an exercise for you!</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learned how to manage to state mutation (or transition) in a concurrent program using the abstractions provided by Hopac.</p>
+
+<p>The source code of this part is available on <a href="https://github.com/demystifyfp/BlogSamples/tree/0.8/fsharp/HopacSeries/Part6">GitHub</a>.</p>
+
+      </div>
+      
+    </div>
+  </div>
+
+  
+  </div>
+
+
+</article>
+
+
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">Concurrent Programming in fsharp Using Hopac - Part 5</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/">Concurrent Programming in fsharp using Hopac - Part 4</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/">Implementing API Gateway Pattern in fsharp using Hopac</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/">Concurrent Programming in Fsharp Using Hopac (Part-2)</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/">Concurrent Programming in fsharp using Hopac (Part-I)</a></li>
+    
+  </ul>
+</div>
+
+
+<div class="article-container">
+  <div class="article-inner bmc">
+    If you like my content, you can extend your support by buying me a coffee. Thanks!
+  </br>
+    <a href="https://www.buymeacoffee.com/demystifyfp" target="_blank">
+      <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" 
+      alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+</div>
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

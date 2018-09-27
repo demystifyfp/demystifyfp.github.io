@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Homes on Demystify FP</title>
+    <link>https://www.demystifyfp.com/home/</link>
+    <description>Recent content in Homes on Demystify FP</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>&amp;copy; 2017 Demystify FP</copyright>
+    <lastBuildDate>Wed, 20 Apr 2016 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://www.demystifyfp.com/home/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title></title>
+      <link>https://www.demystifyfp.com/home/about/</link>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/home/about/</guid>
+      <description>Because of some perceived complexities and the mathematical background in functional programming, developers get bogged down while learning and putting it into practice. As a matter of fact, few people give up after some initial attempts. But it is not as much harder as we think. It is just different!</description>
+    </item>
+    
+    <item>
+      <title>Recent F# Posts</title>
+      <link>https://www.demystifyfp.com/home/fsharp-posts/</link>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/home/fsharp-posts/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Recent Clojure Posts</title>
+      <link>https://www.demystifyfp.com/home/clojure-posts/</link>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/home/clojure-posts/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Books</title>
+      <link>https://www.demystifyfp.com/home/books/</link>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/home/books/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tags</title>
+      <link>https://www.demystifyfp.com/home/tags/</link>
+      <pubDate>Wed, 20 Sep 2017 00:00:00 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/home/tags/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.49" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/">
+  <meta property="og:title" content="Introducing FsConfig | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2018-02-06T19:48:26&#43;05:30">
+  
+  <meta property="article:modified_time" content="2018-02-06T19:48:26&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+  <title>Introducing FsConfig | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Introducing FsConfig</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/open-source">open-source</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsconfig">FsConfig</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-02-06 19:48:26 &#43;0530 IST" itemprop="datePublished">
+      Tue, Feb 6, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    5 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Introducing%20FsConfig&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fintroducing-fsconfig%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fintroducing-fsconfig%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fintroducing-fsconfig%2f&amp;title=Introducing%20FsConfig"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fintroducing-fsconfig%2f&amp;title=Introducing%20FsConfig"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Introducing%20FsConfig&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fintroducing-fsconfig%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+      
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>I am delighted to introduce a new F# library, <a href="https://github.com/demystifyfp/FsConfig" target="_blank">FsConfig</a>. FsConfig is a F# library for reading configuration data from environment variables and AppSettings with type safety</p>
+
+<h2 id="why-fsconfig">Why FsConfig?</h2>
+
+<p>To understand FsConfig, let&rsquo;s have a look at an use case from the <a href="https://github.com/demystifyfp/FsTweet" target="_blank">FsTweet</a> application.</p>
+
+<p>The FsTweet application follows <a href="https://12factor.net/config" target="_blank">The Twelve-Factor App</a> guideline for managing the configuration data. During the application bootstrap, it retrieves its ten configuration parameters from their respective environment variables.</p>
+
+<pre><code class="language-fsharp">open System
+
+let main argv =
+
+  let fsTweetConnString = 
+   Environment.GetEnvironmentVariable  &quot;FSTWEET_DB_CONN_STRING&quot;
+
+  let serverToken =
+    Environment.GetEnvironmentVariable &quot;FSTWEET_POSTMARK_SERVER_TOKEN&quot;
+
+  let senderEmailAddress =
+    Environment.GetEnvironmentVariable &quot;FSTWEET_SENDER_EMAIL_ADDRESS&quot;
+
+  let env = 
+    Environment.GetEnvironmentVariable &quot;FSTWEET_ENVIRONMENT&quot;
+
+  let streamConfig : GetStream.Config = {
+      ApiKey = 
+        Environment.GetEnvironmentVariable &quot;FSTWEET_STREAM_KEY&quot;
+      ApiSecret = 
+        Environment.GetEnvironmentVariable &quot;FSTWEET_STREAM_SECRET&quot;
+      AppId = 
+        Environment.GetEnvironmentVariable &quot;FSTWEET_STREAM_APP_ID&quot;
+  }
+
+  let serverKey = 
+    Environment.GetEnvironmentVariable &quot;FSTWEET_SERVER_KEY&quot;
+
+  let port = 
+    Environment.GetEnvironmentVariable &quot;PORT&quot; |&gt; uint16
+
+  // ...
+</code></pre>
+
+<p>Though the code snippet does the job, there are some shortcomings.</p>
+
+<ol>
+<li>The code is verbose.</li>
+<li>There is no error handling to deal with the absence of values or wrong values.</li>
+<li>Explicit type casting</li>
+</ol>
+
+<p>With the help of FsConfig, we can overcome these limitations by specifying the configuration data as a F# Record type.</p>
+
+<pre><code class="language-fsharp">type StreamConfig = {
+  Key : string
+  Secret : string
+  AppId : string
+}
+
+[&lt;Convention(&quot;FSTWEET&quot;)&gt;]
+type Config = {
+
+  DbConnString : string
+  PostmarkServerToken : string
+  SenderEmailAddress : string
+  ServerKey : string
+  Environment : string
+
+  [&lt;CustomName(&quot;PORT&quot;)&gt;]
+  Port : uint16
+  Stream : StreamConfig
+}
+</code></pre>
+
+<p>And then read all the associated environment variables in a single function call with type safety and error handling!</p>
+
+<pre><code class="language-fsharp">let main argv =
+
+  let config = 
+    match EnvConfig.Get&lt;Config&gt;() with
+    | Ok config -&gt; config
+    | Error error -&gt; 
+      match error with
+      | NotFound envVarName -&gt; 
+        failwithf &quot;Environment variable %s not found&quot; envVarName
+      | BadValue (envVarName, value) -&gt;
+        failwithf &quot;Environment variable %s has invalid value&quot; envVarName value
+      | NotSupported msg -&gt; 
+        failwith msg
+</code></pre>
+
+<h2 id="supported-data-types">Supported Data Types</h2>
+
+<p>FsConfig supports the following data types and leverages their respective <code>TryParse</code> function to do the type conversion.</p>
+
+<ul>
+<li><code>Int16</code>, <code>Int32</code>, <code>Int64</code>, <code>UInt16</code>, <code>UInt32</code>, <code>UInt64</code></li>
+<li><code>Byte</code>, <code>SByte</code></li>
+<li><code>Single</code>, <code>Double</code>, <code>Decimal</code></li>
+<li><code>Char</code>, <code>String</code></li>
+<li><code>Bool</code></li>
+<li><code>TimeSpan</code>, <code>DateTimeOffset</code>, <code>DateTime</code></li>
+<li><code>Guid</code></li>
+<li><code>Enum</code></li>
+</ul>
+
+<h3 id="option-type">Option Type</h3>
+
+<p>FsConfig allows us to specify optional configuration parameters using the <code>option</code> type. In the previous example, if the configuration parameter <code>Port</code> is optional, we can define it like</p>
+
+<pre><code class="language-diff">type Config = {
+   ...
+-  Port : uint16
++  Port : uint16 option
+}
+</code></pre>
+
+<h3 id="list-type">List Type</h3>
+
+<p>FsConfig also supports <code>list</code> type, and it expects comma separated individual values.</p>
+
+<p>For example, to get mulitple ports, we can define the config as</p>
+
+<pre><code class="language-fsharp">type Config = {
+  Port : uint16 list
+}
+</code></pre>
+
+<p>and then pass the value <code>8084,8085,8080</code> using the environment variable <code>PORT</code>.</p>
+
+<h3 id="record-type">Record Type</h3>
+
+<p>As shown in the <a href="#why-fsconfig" target="_blank">initial example</a>, FsConfig allows us to group similar configuration into a record type.</p>
+
+<pre><code class="language-fsharp">type AwsConfig = {
+  AccessKeyId : string
+  DefaultRegion : string
+  SecretAccessKey : string
+}
+
+type Config = {
+  Aws : AwsConfig
+}
+</code></pre>
+
+<blockquote>
+<p>With this configuration declaration, FsConfig read the environment variables <code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, and <code>AWS_DEFAULT_REGION</code> and populates the <code>Aws</code> field of type <code>AwsConfig</code>.</p>
+</blockquote>
+
+<h2 id="environment-variable-name-convention-customization">Environment Variable Name Convention &amp; Customization</h2>
+
+<p>By default, FsConfig follows Underscores with uppercase convention, as in <code>UPPER_CASE</code>, for deriving the environment variable name.</p>
+
+<pre><code class="language-fsharp">type Config = {
+  ServerKey : string
+}
+</code></pre>
+
+<blockquote>
+<p>Using this configuration declaration, FsConfig read the environment variable <code>SERVER_KEY</code> and populates the <code>ServerKey</code> field</p>
+</blockquote>
+
+<p>To specify a custom prefix in the environment variables, we can make use of the <code>Convention</code> attribute.</p>
+
+<pre><code class="language-fsharp">[&lt;Convention(&quot;FSTWEET&quot;)&gt;]
+type Config = {
+  ServerKey : string
+}
+</code></pre>
+
+<blockquote>
+<p>For this configuration declaration, FsConfig read the environment variable <code>FSTWEET_SERVER_KEY</code> and populates the <code>ServerKey</code> field.</p>
+</blockquote>
+
+<p>We can also override the separator character <code>_</code> using the <code>Convention</code> attribute&rsquo;s optional field <code>Separator</code></p>
+
+<pre><code class="language-fsharp">[&lt;Convention(&quot;FSTWEET&quot;, Separator=&quot;-&quot;)&gt;]
+type Config = {
+  ServerKey : string
+}
+</code></pre>
+
+<blockquote>
+<p>In this case, FsConfig derives the environment variable name as <code>FSTWEET-SERVER-KEY</code>.</p>
+</blockquote>
+
+<p>If an environment variable name is not following a convention, we can override the environment variable name at the field level using the <code>CustomName</code> attribute.</p>
+
+<pre><code class="language-fsharp">type Config = {
+  [&lt;CustomName(&quot;MY_SERVER_KEY&quot;)&gt;]
+  ServerKey : string
+}
+</code></pre>
+
+<blockquote>
+<p>Here, FsConfig uses the environment variable name <code>MY_SERVER_KEY</code> to get the ServerKey.</p>
+</blockquote>
+
+<p>We can also merely customise (or control) the environment variable name generation by passing an higher-order function while calling the <code>Get</code> function</p>
+
+<pre><code class="language-fsharp">open FsConfig
+
+// Prefix -&gt; string -&gt; string
+let lowerCaseConfigNameCanonicalizer (Prefix prefix) (name : string) = 
+  let lowerCaseName = name.ToLowerInvariant()
+  if String.IsNullOrEmpty prefix then 
+    name.ToLowerInvariant()
+  else
+    sprintf &quot;%s-%s&quot; (prefix.ToLowerInvariant()) lowerCaseName
+
+
+[&lt;Convention(&quot;FSTWEET&quot;)&gt;]
+type Config = {
+  ServerKey : string
+}
+
+let main argv =
+  let config = 
+    match EnvConfig.Get&lt;Config&gt; lowerCaseConfigNameCanonicalizer with
+    | Ok config -&gt; config
+    | Error error -&gt; failwithf &quot;Error : %A&quot; error
+</code></pre>
+
+<blockquote>
+<p>FsConfig computes the environment variable name as <code>fstweet-server-key</code> in this scenario.</p>
+</blockquote>
+
+<h2 id="getting-individual-environment-variables">Getting Individual Environment Variables</h2>
+
+<p>FsConfig also supports reading value directly by explicitly specifying the environment variable name</p>
+
+<pre><code class="language-fsharp">EnvConfig.Get&lt;decimal&gt; &quot;MY_APP_INITIAL_BALANCE&quot; // Result&lt;decimal, ConfigParseError&gt;
+</code></pre>
+
+<h2 id="appsettings">appSettings</h2>
+
+<p>Are you using <code>appSettings</code> in (either <code>web.config</code> or <code>App.config</code>) to manage your configuration settings? FsConfig supports that too!</p>
+
+<p>We can read the <code>appSettings</code> values using the <code>AppConfig</code> type instead of <code>EnvConfig</code> type.</p>
+
+<p>FsConfig uses the exact name of the field to derive the <code>appSettings</code> key name and doesn&rsquo;t use any separator by default.</p>
+
+<pre><code class="language-fsharp">type AwsConfig = {
+  AccessKeyId : string
+  DefaultRegion : string
+  SecretAccessKey : string
+}
+
+type Config = {
+  Port : uint16
+  Aws : AwsConfig
+}
+
+let main argv =
+  let config = 
+    match AppConfig.Get&lt;Config&gt;() with
+    | Ok config -&gt; config
+    | Error error -&gt; failwithf &quot;Error : %A&quot; error
+</code></pre>
+
+<blockquote>
+<p>The above code snippet looks for <code>appSettings</code> values with the name <code>Port</code>, <code>AwsAccessKeyId</code>, <code>AwsDefaultRegion</code>, <code>AwsSecretAccessKey</code> and populates the respective fields.</p>
+</blockquote>
+
+<p>All the customisation that we have seen for <code>EnvConfig</code> is applicable for <code>AppConfig</code> as well.</p>
+
+<h2 id="how-fsconfig-works">How FsConfig Works</h2>
+
+<p>If you are curious to know how FsConfig works and its internals then you might be interested in my blog post, <a href="/fsharp/blog/generic-programming-made-easy/" target="_blank">Generic Programming Made Easy</a> that deep dives into the initial implementation of FsConfig.</p>
+
+<p>The current version of FsConfig is available on <a href="https://github.com/demystifyfp/FsConfig" target="_blank">GitHub</a></p>
+
+<h2 id="feedback">Feedback</h2>
+
+<blockquote>
+<p>We all need people who will give us feedback. That&rsquo;s how we improve - Bill Gates.</p>
+</blockquote>
+
+<p>Your suggestions/feedback are welcome!</p>
+
+<h2 id="acknowledgements">Acknowledgements</h2>
+
+<p>The idea of FsConfig is inspired by <a href="https://twitter.com/kelseyhightower" target="_blank">Kelsey Hightower</a>&rsquo;s golang library <a href="https://github.com/kelseyhightower/envconfig" target="_blank">envconfig</a>.</p>
+
+<p>FsConfig uses <a href="https://twitter.com/eiriktsarpalis" target="_blank">Eirik Tsarpalis</a>&rsquo;s <a href="https://github.com/eiriktsarpalis/TypeShape" target="_blank">TypeShape</a> library for generic programming.</p>
+
+      </div>
+      
+    </div>
+  </div>
+
+  
+  </div>
+
+
+</article>
+
+
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/blog/generic-programming-made-easy/">Generic Programming Made Easy</a></li>
+    
+  </ul>
+</div>
+
+
+<div class="article-container">
+  <div class="article-inner bmc">
+    If you like my content, you can extend your support by buying me a coffee. Thanks!
+  </br>
+    <a href="https://www.buymeacoffee.com/demystifyfp" target="_blank">
+      <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" 
+      alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+</div>
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.49" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/clojure/blog/clojure-in-production/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/clojure/blog/clojure-in-production/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/clojure/blog/clojure-in-production/">
+  <meta property="og:title" content="Using Clojure in Production | Demystify FP">
+  <meta property="og:description" content=""><meta property="og:image" content="https://www.demystifyfp.com/img/clojure/blog/clj-in-prod/cover.png">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2018-09-26T11:25:01&#43;05:30">
+  
+  <meta property="article:modified_time" content="2018-09-26T11:25:01&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+  <title>Using Clojure in Production | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+<div class="article-header">
+  <img src="/img/clojure/blog/clj-in-prod/cover.png" class="article-banner" itemprop="image">
+  
+</div>
+
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Using Clojure in Production</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/clojure">clojure</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-09-26 11:25:01 &#43;0530 IST" itemprop="datePublished">
+      Wed, Sep 26, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    6 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/clojure/blog/clojure-in-production/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Using%20Clojure%20in%20Production&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fblog%2fclojure-in-production%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fblog%2fclojure-in-production%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fblog%2fclojure-in-production%2f&amp;title=Using%20Clojure%20in%20Production"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fblog%2fclojure-in-production%2f&amp;title=Using%20Clojure%20in%20Production"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Using%20Clojure%20in%20Production&amp;body=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fblog%2fclojure-in-production%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+      
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>We at <a href="www.ajira.tech" target="_blank">Ajira</a> successfully delivered our first project in <a href="https://clojure.org" target="_blank">Clojure</a> recently. It was an impressive outing for the last eight weeks! We were able to deliver some complex features with ease because of the outstanding data-oriented programming features provided by Clojure.</p>
+
+<p>This blog post summarizes our experiences.</p>
+
+<h2 id="the-problem-statement">The Problem Statement</h2>
+
+<p>The Project that we delivered was a <a href="https://en.wikipedia.org/wiki/Low-code_development_platforms" target="_blank">Low Code Development Platform</a> where the system administrator configures the way the entire application would look like &amp; behave for the end user. In addition to this, the end user also can customise and create pages of his own. The platform also provides <a href="https://en.wikipedia.org/wiki/Role-based_access_control" target="_blank">Role Based Access Control</a> which is also configurable by the system administrator.</p>
+
+<p>In a nutshell, there is no fixed domain or domain model, and configuration drives everything!</p>
+
+<h2 id="how-why-we-chose-clojure">How &amp; Why we chose Clojure</h2>
+
+<p>After going through a <a href="https://martinfowler.com/articles/lean-inception" target="_blank">lean inception</a> with the client, we found that the critical piece that we have to solve is dynamically creating the SQL queries based on some configuration and transform the shape of the returned data.</p>
+
+<p>Since the entire application is going to be dynamic and driven by configuration, we decided that a <a href="https://en.wikipedia.org/wiki/Dynamic_programming_language" target="_blank">dynamic programming language</a> would be an ideal fit and the contenders were Javascript (Node.js) &amp; Clojure.</p>
+
+<p>To chose the opt language, we took the dynamic SQL generation part and did a <a href="https://en.wikipedia.org/wiki/Spike_(software_development)" target="_blank">spike</a> on both Node.js &amp; Clojure. Within half a day, we were able to solve it with ease in Clojure and even picked another piece for the spike and completed that as well. The Node.js implementation took a day.</p>
+
+<p>Upon completion, we compared both the codebase and decided unanimously to go ahead with Clojure and got a nod from client too!</p>
+
+<p>It turned out to be an excellent decision.</p>
+
+<h2 id="hammock-driven-development">Hammock Driven Development</h2>
+
+<blockquote>
+<p>First, solve the problem. Then, write the code. - John Johnson</p>
+</blockquote>
+
+<p>One of the significant benefits that we reaped while developing the project in Clojure was <strong>Productivity</strong>. Inspired by the <a href="https://www.youtube.com/watch?v=f84n5oFoZBc" target="_blank">Hammock Driven Development</a>, we took a considerable amount of time to think about the problem before jumping in to code the solution. It was a remarkable experience. As the implementation was well thought out, we were able to deliver the features <a href="https://www.youtube.com/watch?v=2V1FtfBDsLU" target="_blank">effectively</a>.</p>
+
+<p>Another thing that I’d like to highlight, the process of transforming the mental model (or a whiteboard sketch) of the solution to the actual code in Clojure is astonishingly simple! No ceremony, no boilerplate and the final solution exactly resembled what we had in our mind.</p>
+
+<h2 id="power-of-treating-code-as-data">Power of treating code as data.</h2>
+
+<p><a href="https://www.infoq.com/presentations/Thinking-in-Data" target="_blank">Data-Oriented Programming</a> is a sweet spot of Clojure, and it helped us a lot while developing the solution.</p>
+
+<p>Just by using Clojure’s <a href="https://clojure.org/reference/data_structures#Maps" target="_blank">Map</a>, <a href="https://clojure.org/reference/data_structures#Vectors" target="_blank">Vector</a> and its core library functions we were able to achieve a lot. It also helped us seamlessly to deliver what the client wants.</p>
+
+<h2 id="threading-macros">Threading Macros</h2>
+
+<p><a href="https://clojure.org/guides/threading_macros" target="_blank">Threading macros</a> in Clojure is another outstanding part of the core library, and it helped us a lot in achieving better code organisation and readability.</p>
+
+<p>In F#, I have used the <a href="https://msdn.microsoft.com/en-us/visualfsharpdocs/conceptual/operators.%5b-h%5d-%5d%5b't1,'u%5d-function-%5bfsharp%5d" target="_blank">pipeline operator</a> to a great extent. While using it, I sometimes faced problems in defining the parameter order of functions that I am pipelining.</p>
+
+<p>A parameter order of a function <code>f1</code> that made sense in one context did not work well with pipelining in another context. So, I need to either change the parameter type or make use of the flip function to do an ephemeral swap of parameters or break the pipelining with a new intermediate binding and then continuing with a new pipelining. All these options break the elegance and readability that we get from pipelining.</p>
+
+<p>In Clojure, I never had this problem due to the <code>as-&gt;</code> macro.</p>
+
+<p>We have used <code>-&gt;</code> and <code>-&gt;&gt;</code> macros most of the time and the <code>as-&gt;</code> macro in the places where the function&rsquo;s parameter order are different.</p>
+
+<h2 id="destructing-pattern-matching">Destructing &amp; Pattern Matching</h2>
+
+<p>Apart from the pipeline operator, the things that I enjoyed a lot while coding in F# are destructing and pattern matching. Clojure is right on the money on these features. Due to the dynamic type system and the LISP syntax, It is even more enjoyable in Clojure.</p>
+
+<p>The <a href="https://github.com/clojure/core.match/wiki/Overview" target="_blank">clojure.match</a> library had all the bells and whistles that we needed for doing pattern matching.</p>
+
+<h2 id="strongly-type-vs-dynamic-type">Strongly Type vs Dynamic Type</h2>
+
+<p>I have written production systems in C#, F#, Golang &amp; Kotlin in the last nine years and I have been using functional programming principles to develop software for the previous four years.</p>
+
+<p>This project is my first encounter with a dynamic programming language (for the backend) and LISP in production.</p>
+
+<p>I was sceptic about using a dynamic programming language in production. I relied heavily on the type-safety provided by strongly typed functional programming languages like F# and used to wonder how can I build something stable without a strong type system. However, Clojure made me to revisit that thought process.</p>
+
+<p>While developing the product, I felt the freedom (from rigid types) in a lot of places &amp; the ability to reuse the functions in different contexts was quite useful.</p>
+
+<p>I also liked the Clojure&rsquo;s way (Rich Hickey&rsquo;s way to be precise) approaching the problem solving using a dynamic programming language. The <a href="https://www.youtube.com/watch?v=2V1FtfBDsLU" target="_blank">Effective Programs talk</a> by Rich was an eye-opener for me!</p>
+
+<p>I never felt like that I am missing the type system while working with Clojure!</p>
+
+<h2 id="libraries-that-made-our-job-easier">Libraries That Made Our Job Easier</h2>
+
+<h4 id="honeysql-https-github-com-jkk-honeysql-honey-sql"><a href="https://github.com/jkk/honeysql#honey-sql" target="_blank">HoneySQL</a></h4>
+
+<p>As mentioned earlier, the core engine of our product has to generate a SQL query based on a configuration. The configuration data was represented using Clojure&rsquo;s data structures and what we wanted was a process to transform them into SQL.  <a href="https://github.com/jkk/honeysql#honey-sql" target="_blank">HoneySQL</a> exactly does this.</p>
+
+<p>That platform had different kinds of widgets like charts, tables, add-edit forms. We made the configuration data of these widgets to specify their underlying database schema in a uniformed way and created <a href="http://principles-wiki.net/principles:single_level_of_abstraction" target="_blank">a single layer of abstraction</a> that takes this unified representation and used HoneySQL to generate the SQL query.</p>
+
+<p>The <a href="https://github.com/jkk/honeysql#extensibility" target="_blank">extensibility</a> feature provided by HoneySQL was advantageous, and we leveraged it a lot! For example, HoneySQL does not have inherent support for <code>ilike</code> clause in Postgres. We just added an extension method with a couple of lines, and it worked like a charm.</p>
+
+<h4 id="compojure-api-https-github-com-metosin-compojure-api"><a href="https://github.com/metosin/compojure-api" target="_blank">Compojure API</a></h4>
+
+<p>Apart from its simplicity on exposing HTTP APIs, its support for Swagger API documentation generation was very handy. We have also leveraged its <a href="https://github.com/metosin/compojure-api/wiki/Coercion" target="_blank">input data coercion</a> ability using <a href="https://github.com/plumatic/schema" target="_blank">Schema</a>. Defining nested specs for complex domain models was a breeze due to LISP’s inherent composability</p>
+
+<h4 id="toucan-https-github-com-metabase-toucan"><a href="https://github.com/metabase/toucan" target="_blank">Toucan</a></h4>
+
+<p>We just loved this library. We had standard CRUD operations for dealing with application configuration. Developing this functionality using Toucan was an absolute breeze along with the Compojure API.</p>
+
+<h4 id="others">Others</h4>
+
+<ul>
+<li>Logging - <a href="https://github.com/pyr/unilog" target="_blank">Unilog</a></li>
+<li>Authentication &amp; Authorization - <a href="https://github.com/cemerick/friend" target="_blank">Friend</a></li>
+<li>DB Migration - <a href="https://flywaydb.org/" target="_blank">Flyway</a> &amp; <a href="https://github.com/metaphor/lein-flyway" target="_blank">Lein Flyway Plugin</a></li>
+<li>Application Configuration - <a href="https://github.com/grammarly/omniconf" target="_blank">OmniConf</a></li>
+<li>JSON - <a href="https://github.com/dakrone/cheshire" target="_blank">Cheshire</a></li>
+<li>Database Connection Pooling - <a href="https://github.com/tomekw/hikari-cp" target="_blank">Hikari</a></li>
+<li>Amazon SES Client - <a href="https://github.com/jstaffans/ses-mailer" target="_blank">SES Mailer</a></li>
+</ul>
+
+<h2 id="tools">Tools</h2>
+
+<h4 id="vs-code-calva-https-marketplace-visualstudio-com-items-itemname-cospaia-clojure4vscode"><a href="https://marketplace.visualstudio.com/items?itemName=cospaia.clojure4vscode" target="_blank">VS Code Calva</a></h4>
+
+<p>The creators of Calva has done an amazing work on bringing Emacs CIDER experience to VS Code. Along with the <a href="https://marketplace.visualstudio.com/items?itemName=CoenraadS.bracket-pair-colorizer" target="_blank">Bracket Pair Colorizer</a>, our development workflow went smooth.</p>
+
+<h4 id="cljfmt-https-github-com-weavejester-cljfmt-eastwood-https-github-com-jonase-eastwood"><a href="https://github.com/weavejester/cljfmt" target="_blank">cljfmt</a> &amp; <a href="https://github.com/jonase/eastwood" target="_blank">Eastwood</a></h4>
+
+<p>To ensure everybody in the team follows the same style &amp; formatting of the Clojure code, we have used <code>cljfmt</code> &amp; Eastwood in the build pipeline.</p>
+
+<h2 id="summary">Summary</h2>
+
+<blockquote>
+<p>The secret to building large apps is never build large apps. Break your applications into small pieces. Then, assemble those testable, bite-sized pieces into your big application - Justin Meyer</p>
+</blockquote>
+
+<p>The above quote summarizes our overall experience of developing a product using Clojure. Clojure empowered us to deliver the software faster without compromising on the quality.</p>
+
+<p>It was an enlightening journey. I’d definitely consider using Clojure in my upcoming projects for sure if it is an opt fit!</p>
+
+      </div>
+      
+    </div>
+  </div>
+
+  
+  </div>
+
+
+</article>
+
+
+
+
+
+
+<div class="article-container">
+  <div class="article-inner bmc">
+    If you like my content, you can extend your support by buying me a coffee. Thanks!
+  </br>
+    <a href="https://www.buymeacoffee.com/demystifyfp" target="_blank">
+      <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" 
+      alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+</div>
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.49" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">
+  <meta property="og:title" content="Concurrent Programming in fsharp Using Hopac - Part 5 | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2018-03-20T17:13:48&#43;05:30">
+  
+  <meta property="article:modified_time" content="2018-03-20T17:13:48&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+  <title>Concurrent Programming in fsharp Using Hopac - Part 5 | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Concurrent Programming in fsharp Using Hopac - Part 5</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/hopac">Hopac</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/concurrent-programming">concurrent-programming</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-03-20 17:13:48 &#43;0530 IST" itemprop="datePublished">
+      Tue, Mar 20, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    9 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Concurrent%20Programming%20in%20fsharp%20Using%20Hopac%20-%20Part%205&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-5%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-5%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-5%2f&amp;title=Concurrent%20Programming%20in%20fsharp%20Using%20Hopac%20-%20Part%205"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-5%2f&amp;title=Concurrent%20Programming%20in%20fsharp%20Using%20Hopac%20-%20Part%205"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Concurrent%20Programming%20in%20fsharp%20Using%20Hopac%20-%20Part%205&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fconcurrent-programming-in-fsharp-using-hopac-part-5%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+      
+
+      <div class="article-style" itemprop="articleBody">
+        <p>Hi,</p>
+
+<p>In the <a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/">last blog post</a>, we learned how <code>Alt</code> in Hopac works and its applications. In this blog post, we are going to apply what we learned so far by creating a Ticker.</p>
+
+<p>Using ticker we can do something repeatedly at regular intervals.</p>
+
+<p>To implement a Ticker in Hopac, we have to know one more abstraction in Hopac called <code>IVar</code>. So, in the first section, we are going to learn <code>IVar</code> and then we'll use it to implement Ticker.</p>
+
+<p>Let's dive in</p>
+
+<h2 id="the-ivar-type">The IVar type</h2>
+
+<p>In a nutshell, <code>IVar</code> represents a write-once variable.</p>
+
+<blockquote>
+<p>Write once variables are designed for and most commonly used for getting replies from concurrent servers and asynchronous operations, but can also be useful for other purposes such as for one-shot events and for implementing incremental, but immutable, concurrent data structures.</p>
+
+<p>Because it is common to need to be able to communicate either an expected successful result or an exceptional failure in typical use cases of write once variables, direct mechanisms are provided for both. The implementation is optimized in such a way that the ability to report an exceptional failure does not add overhead to the expected successful usage scenarios.</p>
+
+<p>Write once variables are lightweight objects and it is typical to always just create a new write once variable when one is needed. In most cases, a write once variable will be slightly more lightweight than a channel. This is possible because write once variables do not support simple rendezvous like channels do. When simple rendezvous is necessary, a channel should be used instead. - <strong>Hopac Documentation</strong></p>
+</blockquote>
+
+<p>The <code>IVar&lt;'a&gt;</code> type is a subclass of <code>Promise&lt;'a&gt;</code> which in turn a subclass of <code>Alt&lt;'a&gt;</code>.</p>
+
+<p>Let's see <code>IVar</code> in action to learn it better</p>
+
+<pre><code class="language-fsharp">open Hopac 
+
+// IVar&lt;'a&gt; -&gt; 'a -&gt; unit
+let fillAndRead iVar value =
+  IVar.fill iVar value // Job&lt;unit&gt; <span class="callout">1</span>
+  |&gt; Job.bind (fun _ -&gt; IVar.read iVar) // Job&lt;unit&gt; <span class="callout">2</span>
+  |&gt; Job.map (printfn &quot;%A&quot;) // Job&lt;unit&gt;
+  |&gt; run // unit
+</code></pre>
+
+<p>As the name indicates, the <code>fillAndRead</code> is a function fills the given write-once variable <code>iVar</code> with the provided <code>value</code>, and then reads the <code>value</code> from the <code>iVar</code>. Finally the prints the value.</p>
+
+<p><span class="callout">1</span> The <code>IVar.fill</code> function creates a job that writes the given value to the given write-once variable.</p>
+
+<pre><code class="language-fsharp">val fill: IVar&lt;'x&gt; -&gt; 'x -&gt; Job&lt;unit&gt;
+</code></pre>
+
+<p><span class="callout">2</span> The <code>IVar.read</code> function creates an alternative that becomes available when the write-once variable had a value.</p>
+
+<pre><code class="language-fsharp">val read: IVar&lt;'x&gt; -&gt; Alt&lt;'x&gt;
+</code></pre>
+
+<p>Executing the <code>fillAndRead</code> function as below</p>
+
+<pre><code class="language-fsharp">fillAndRead (IVar&lt;bool&gt;()) true
+fillAndRead (IVar&lt;bool&gt;()) false
+</code></pre>
+
+<p>will give the following output</p>
+
+<pre><code class="language-bash">&gt; fillAndRead (IVar&lt;bool&gt;()) true
+- fillAndRead (IVar&lt;bool&gt;()) false
+- ;;
+true
+false
+val it : unit = ()
+</code></pre>
+
+<p>The <code>IVar.fill</code> function would return an exception if the <code>IVar</code> variable were already filled.</p>
+
+<p>We can verify this by defining a new <code>IVar</code> value <code>intIVar</code> and using this to call the <code>fillAndRead</code> twice</p>
+
+<pre><code class="language-fsharp">let intIVar = IVar&lt;int&gt;()
+fillAndRead intIVar 42
+</code></pre>
+
+<p>Executing the above two lines will yield the below output</p>
+
+<pre><code class="language-bash">&gt; let intIVar = IVar&lt;int&gt;()
+- fillAndRead intIVar 42
+- ;;
+42
+val intIVar : IVar&lt;int&gt;
+val it : unit = ()
+</code></pre>
+
+<p>And then calling <code>fillAndRead</code> function with <code>intIVar</code> will have the following output</p>
+
+<pre><code class="language-bash">&gt; fillAndRead intIVar 10
+- ;;
+Unhandled exception: System.Exception: IVar full
+No other causes.
+val it : unit = ()
+</code></pre>
+
+<p>If we don't want any exception to be thrown while filling a <code>IVar</code> value, we can make use of <code>IVar.tryFill</code> function, which creates a job that tries to write the given value to the given write-once variable. No operation takes place, and no error is reported in case of the write-once variable has already been written.</p>
+
+<pre><code class="language-fsharp">val tryFill: IVar&lt;'x&gt; -&gt; 'x -&gt; Job&lt;unit&gt;
+</code></pre>
+
+<p>Let's write a another function <code>tryFillAndRead</code> which exactly does what <code>fillAndRead</code> function did except the usage of <code>IVar.fill</code> function.</p>
+
+<pre><code class="language-fsharp">let tryFillAndRead iVar value =
+  IVar.tryFill iVar value
+  |&gt; Job.bind (fun _ -&gt; IVar.read iVar)
+  |&gt; Job.map (printfn &quot;%A&quot;)
+  |&gt; run
+</code></pre>
+
+<p>With this, if we try the above example with the <code>tryFillAndRead</code> function</p>
+
+<pre><code class="language-fsharp">let anotherIntIVar = IVar&lt;int&gt;()
+tryFillAndRead anotherIntIVar 42
+tryFillAndRead anotherIntIVar 10
+</code></pre>
+
+<p>We won't get any error and the value that we use to fill for the second time will be silently ignored.</p>
+
+<pre><code class="language-bash">&gt; let anotherIntIVar = IVar&lt;int&gt;()
+- tryFillAndRead anotherIntIVar 42
+- tryFillAndRead anotherIntIVar 10
+- ;;
+42
+42
+val anotherIntIVar : IVar&lt;int&gt;
+val it : unit = ()
+</code></pre>
+
+<p>The last thing that we need to explore before getting into the implementation of Ticker is, the return type of <code>IVar.read</code> function is <code>Alt&lt;'a&gt;</code>.</p>
+
+<p>So, we can use it to choose use between any other <code>Alt</code>.</p>
+
+<p>Say, for example, if we want a <code>IVar</code> value to be available in a certain amount of time and do something else if it didn't become available, we can achieve it like this.</p>
+
+<pre><code class="language-fsharp">open Hopac.Infixes
+
+// int -&gt; IVar&lt;'a&gt; -&gt; unit
+let readOrTimeout delayInMillis iVar =
+
+  let timeOutAlt = // Alt&lt;unit&gt;
+    timeOutMillis delayInMillis 
+    |&gt; Alt.afterFun (fun _ -&gt; printfn &quot;time out!&quot;) <span class="callout">1</span>
+  
+  let readAlt = // Alt&lt;unit&gt;
+    IVar.read iVar
+    |&gt; Alt.afterFun (printfn &quot;%A&quot;) <span class="callout">2</span>
+  
+  timeOutAlt &lt;|&gt; readAlt <span class="callout">3</span>
+  |&gt; run
+</code></pre>
+
+<p><span class="callout">1</span> <code>Alt&lt;unit&gt;</code> that prints a time-out after given time delay</p>
+
+<p><span class="callout">2</span> Prints the value of <code>iVar</code> as soon as it is available</p>
+
+<p><span class="callout">3</span> Chooses between <code>timeOutAlt</code> and <code>readAlt</code> and commits to whatever completes first</p>
+
+<p>If we fill a <code>iVar</code> value and run this function</p>
+
+<pre><code class="language-fsharp">let yetAnotherIntIVar = IVar&lt;int&gt;()
+tryFillAndRead yetAnotherIntIVar 10
+readOrTimeout 1000 intIVar
+</code></pre>
+
+<p>We can see the value of <code>IVar</code> in the output.</p>
+
+<pre><code class="language-bash">&gt; let yetAnotherIntIVar = IVar&lt;int&gt;()
+- tryFillAndRead yetAnotherIntIVar 10
+- readOrTimeout 1000 intIVar
+- ;;
+10
+10
+val yetAnotherIntIVar : IVar&lt;int&gt;
+val it : unit = ()
+</code></pre>
+
+<p>If we try the <code>readOrTimeout</code> function, with a new <code>IVar</code> value, we will see the time-out message</p>
+
+<pre><code class="language-fsharp">#time &quot;on&quot;
+readOrTimeout 2000 (IVar&lt;unit&gt;())
+#time &quot;off&quot;
+</code></pre>
+
+<pre><code class="language-bash">--&gt; Timing now on
+time out!
+Real: 00:00:02.001, CPU: 00:00:00.004, GC gen0: 0, gen1: 0
+val it : unit = ()
+--&gt; Timing now off
+</code></pre>
+
+<p>With this, we are wrapping up our exploration on <code>IVar</code>.</p>
+
+<h2 id="the-ticker-type">The Ticker Type</h2>
+
+<p>The <code>Ticker</code> type that we are going to implement will have the following signature.</p>
+
+<pre><code class="language-fsharp">type Ticker =
+  class
+    new : timeSpan:TimeSpan -&gt; Ticker <span class="callout">1</span>
+    member Stop : unit -&gt; unit <span class="callout">2</span>
+    member C : Ch&lt;DateTimeOffset&gt; <span class="callout">3</span>
+  end
+</code></pre>
+
+<p><span class="callout">1</span> The <code>Ticker</code> type is a class with a constructor that takes a <code>TimeSpan</code> to specify the interval.</p>
+
+<p><span class="callout">2</span> It is going to have a <code>Stop</code> function which stops the ticker.</p>
+
+<p><span class="callout">3</span> The member <code>C</code> exposes a channel which gives a <code>DateTimeOffset</code> value at regular intervals specified by the <code>TimeSpan</code>.</p>
+
+<p>We are going to hide the complexity of a ticker behind this <code>Ticker</code> type.</p>
+
+<pre><code class="language-fsharp">open Hopac
+open Hopac.Infixes
+open System
+
+type Ticker (timeSpan : TimeSpan) =
+  
+  // Ch&lt;DateTimeOffset&gt;
+  let tickCh = Ch&lt;DateTimeOffset&gt;() <span class="callout">1</span>
+  
+  // IVar&lt;unit&gt;
+  let cancelled = IVar() <span class="callout">2</span>
+
+  // unit -&gt; Alt&lt;unit&gt;
+  let tick () = <span class="callout">3</span>
+    Ch.give tickCh DateTimeOffset.Now
+
+  // unit -&gt; Alt&lt;unit&gt;
+  let rec loop () = <span class="callout">4</span>
+    // Alt&lt;unit&gt;
+    let tickerLoop = 
+      timeOut timeSpan
+      |&gt; Alt.afterJob tick
+      |&gt; Alt.afterJob loop
+    tickerLoop &lt;|&gt; IVar.read cancelled
+
+  do start (loop()) <span class="callout">5</span>
+
+  // unit -&gt; unit 
+  member __.Stop() = 
+    IVar.tryFill cancelled () |&gt; start <span class="callout">6</span>
+
+  // Ch&lt;DateTimeOffset&gt;
+  member __.C 
+    with get() = tickCh <span class="callout">7</span>
+</code></pre>
+
+<p><span class="callout">1</span> A <code>Ticker</code> channel <code>tickCh</code> initialised as private value.</p>
+
+<p><span class="callout">2</span> A <code>IVar</code> private value <code>cancelled</code> to keep track of the Ticker's state</p>
+
+<p><span class="callout">3</span> The <code>tick</code> function defines what to do on a tick. We are getting the <a href="https://msdn.microsoft.com/en-us/library/system.datetimeoffset.now.aspx">current date time offset</a> and give it to the outside world via the <code>tickCh</code>.</p>
+
+<p><span class="callout">4</span> The recursive function <code>loop</code> is the crux of our <code>Ticker</code> implementation that defines a loop function that will keep calling the <code>tick</code> function at the specified interval <code>timeSpan</code> until a value available on <code>cancelled</code> IVar.</p>
+
+<p>The <code>timeOut</code> function is similar to <code>timeOutMillis</code> function except it takes a <code>TimeSpan</code> instead of milliseconds as an <code>int</code>.</p>
+
+<p><span class="callout">5</span> We are kickstarting the loop function here. It will be invoked during the execution of the constructor.</p>
+
+<p><span class="callout">6</span> The <code>Stop</code> method tries to fill the <code>IVar</code> value <code>cancelled</code>, and it starts at a new <code>job</code>.</p>
+
+<p><span class="callout">7</span> Finally, we are exposing the <code>tickCh</code> as a getter member <code>C</code>.</p>
+
+<h2 id="the-ticker-type-in-action">The Ticker type in action</h2>
+
+<h4 id="use-case-1">Use Case #1</h4>
+
+<p>Our first use case is, executing a function repeatedly at an interval of <code>x</code> seconds for <code>n</code> times.</p>
+
+<p>This use case can be implemented as</p>
+
+<pre><code class="language-fsharp">// int -&gt; int -&gt; (DateTimeOffset -&gt; unit) -&gt; unit
+let useCase1 nTimes (xSeconds : int) f =
+  let timeSpan = 
+    xSeconds |&gt; float |&gt; TimeSpan.FromSeconds 
+  let ticker = new Ticker(timeSpan)
+
+  ticker.C // Ch&lt;DateTimeOffset&gt;
+  |&gt; Alt.afterFun f // Alt&lt;unit&gt; <span class="callout">1</span>
+  |&gt; Job.forN nTimes // Job&lt;unit&gt; <span class="callout">2</span>
+  |&gt; run
+  ticker.Stop()
+</code></pre>
+
+<p><span class="callout">1</span> Upon a tick on the <code>Ticker</code> channel, we are calling the provided function <code>f</code>.</p>
+
+<p><span class="callout">2</span> The <code>Job.forN</code> function creates a job that runs the given job sequentially the given number of times.</p>
+
+<pre><code class="language-fsharp">val forN: int -&gt; Job&lt;unit&gt; -&gt; Job&lt;unit&gt;
+</code></pre>
+
+<p>Here the <em>given job</em> is receiving value on the ticker channel and invoking the function <code>f</code> with the received value.</p>
+
+<p>Let's try this out in fsharp interactive to print the Ticker's tick time.</p>
+
+<pre><code class="language-bash">&gt; useCase1 5 2 (printfn &quot;%A&quot;);;
+21-03-2018 19:24:48 +05:30
+21-03-2018 19:24:50 +05:30
+21-03-2018 19:24:52 +05:30
+21-03-2018 19:24:54 +05:30
+21-03-2018 19:24:56 +05:30
+val it : unit = ()
+</code></pre>
+
+<h2 id="use-case-2">Use Case #2</h2>
+
+<p>The second use case is running two tickers at the different time interval for <code>x</code> milliseconds overall.</p>
+
+<p>As a first step, let's create a <code>ticker</code> function that creates a Ticker which ticks at given <code>seconds</code></p>
+
+<pre><code class="language-fsharp">// int -&gt; Ticker
+let ticker seconds =
+  seconds
+  |&gt; float 
+  |&gt; TimeSpan.FromSeconds
+  |&gt; Ticker
+</code></pre>
+
+<p>Then implement use case #2 as below</p>
+
+<pre><code class="language-fsharp">// int -&gt; int -&gt; int -&gt; unit
+let useCase2 t1Interval t2Interval xMillis =
+  let ticker1 = ticker t1Interval
+  let ticker2 = ticker t2Interval
+
+  let onTick tCh name loop = <span class="callout">1</span>
+    tCh 
+      |&gt; Alt.afterFun (fun t -&gt; printfn &quot;[%s] at %A&quot; name t)
+      |&gt; Alt.afterJob loop
+  
+  // unit -&gt; Alt&lt;'a&gt;
+  let rec loop () = <span class="callout">2</span>
+    onTick ticker1.C &quot;T1&quot; loop &lt;|&gt; onTick ticker2.C &quot;T2&quot; loop
+
+  printfn &quot;Starts at %A&quot; (DateTimeOffset.Now)
+  start (loop()) <span class="callout">3</span>
+
+  let onTimeOut _ = <span class="callout">4</span>
+    ticker1.Stop()
+    ticker2.Stop()
+
+  timeOutMillis xMillis <span class="callout">5</span>
+  |&gt; Alt.afterFun onTimeOut
+  |&gt; run
+  printfn &quot;Ends at %A&quot; (DateTimeOffset.Now)
+</code></pre>
+
+<p><span class="callout">1</span> The <code>onTick</code> function takes a channel, the ticker's name and a loop function. Upon receiving the <code>DateTimeOffset</code> value on the ticker, it prints it along with the ticker's name and then calls the provide <code>loop</code> function</p>
+
+<p><span class="callout">2</span> The recursive function <code>loop</code> chooses between two tickers channel and commits to the one that has a value and then calling itself via the <code>onTick</code> function.</p>
+
+<p><span class="callout">3</span> We are starting the Job returned by the <code>loop</code> function as a separate job.</p>
+
+<p><span class="callout">4</span> The <code>onTimeOut</code> function stops the tickers upon timeout.</p>
+
+<p><span class="callout">5</span> Finally, we wait for the given <code>x</code> milliseconds and call the <code>onTimeOut</code> function after the timeout.</p>
+
+<p>Executing this F# interactive will give us the similar output</p>
+
+<pre><code class="language-bash">&gt; useCase2 1 2 5000;;
+Starts at 21-03-2018 19:46:36 +05:30
+[T1] at 21-03-2018 19:46:37 +05:30
+[T2] at 21-03-2018 19:46:38 +05:30
+[T1] at 21-03-2018 19:46:38 +05:30
+[T1] at 21-03-2018 19:46:39 +05:30
+[T2] at 21-03-2018 19:46:40 +05:30
+[T1] at 21-03-2018 19:46:40 +05:30
+[T1] at 21-03-2018 19:46:41 +05:30
+Ends at 21-03-2018 19:46:41 +05:30
+val it : unit = ()
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we built a Ticker abstraction using the fundamental ideas provided by Hopac. And then using the ticker, we saw how to implement two different use cases.</p>
+
+<p>Just like composing functions together here we are composing the jobs and implementing complicated stuff with less code.</p>
+
+<p>You can find the source code associated with this blog post on <a href="https://github.com/demystifyfp/BlogSamples/tree/0.7/fsharp/HopacSeries/Part5">GitHub</a></p>
+
+      </div>
+      
+    </div>
+  </div>
+
+  
+  </div>
+
+
+</article>
+
+
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/">Concurrent Programming in fsharp using Hopac - Part 4</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/">Implementing API Gateway Pattern in fsharp using Hopac</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/">Concurrent Programming in Fsharp Using Hopac (Part-2)</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/">Concurrent Programming in fsharp using Hopac (Part-I)</a></li>
+    
+    <li><a href="/fsharp/blog/adding-meaning-to-primitive-types-in-fsharp/">Adding Meaning to Primitive Types in fsharp</a></li>
+    
+  </ul>
+</div>
+
+
+<div class="article-container">
+  <div class="article-inner bmc">
+    If you like my content, you can extend your support by buying me a coffee. Thanks!
+  </br>
+    <a href="https://www.buymeacoffee.com/demystifyfp" target="_blank">
+      <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" 
+      alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+</div>
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
+
