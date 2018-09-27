@@ -18,9 +18,9 @@
       <guid>https://www.demystifyfp.com/clojure/blog/clojure-in-production/</guid>
       <description>
 
-&lt;p&gt;We at &lt;a href=&#34;www.ajira.tech&#34; target=&#34;_blank&#34;&gt;Ajira&lt;/a&gt; successfully delivered our first project in &lt;a href=&#34;https://clojure.org&#34; target=&#34;_blank&#34;&gt;Clojure&lt;/a&gt; recently. It was an impressive outing for the last eight weeks! We were able to deliver some complex features with ease because of the outstanding data-oriented programming features provided by Clojure.&lt;/p&gt;
+&lt;p&gt;We at &lt;a href=&#34;www.ajira.tech&#34; target=&#34;_blank&#34;&gt;Ajira&lt;/a&gt; successfully delivered our first project in &lt;a href=&#34;https://clojure.org&#34; target=&#34;_blank&#34;&gt;Clojure&lt;/a&gt; recently. It was an impressive outing for the last eight weeks!&lt;/p&gt;
 
-&lt;p&gt;This blog post summarizes our experiences.&lt;/p&gt;
+&lt;p&gt;We were able to deliver some complex features with ease because of the outstanding data-oriented programming features provided by Clojure. This blog post summarizes our experiences.&lt;/p&gt;
 
 &lt;h2 id=&#34;the-problem-statement&#34;&gt;The Problem Statement&lt;/h2&gt;
 
