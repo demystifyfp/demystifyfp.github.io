@@ -74,7 +74,7 @@
 
 &lt;p&gt;The &lt;a href=&#34;https://github.com/clojure/core.match/wiki/Overview&#34; target=&#34;_blank&#34;&gt;clojure.match&lt;/a&gt; library had all the bells and whistles that we needed for doing pattern matching.&lt;/p&gt;
 
-&lt;h2 id=&#34;strongly-type-vs-dynamic-type&#34;&gt;Strongly Type vs Dynamic Type&lt;/h2&gt;
+&lt;h2 id=&#34;static-type-vs-dynamic-type&#34;&gt;Static Type vs Dynamic Type&lt;/h2&gt;
 
 &lt;p&gt;I have written production systems in C#, F#, Golang &amp;amp; Kotlin in the last nine years and I have been using functional programming principles to develop software for the previous four years.&lt;/p&gt;
 
