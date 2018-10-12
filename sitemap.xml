@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/</loc>
+      <lastmod>2018-10-12T19:39:17+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/clojure/blog/clojure-in-production/</loc>
       <lastmod>2018-09-26T11:25:01+05:30</lastmod>
     </url>
@@ -152,7 +161,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/clojure/</loc>
-      <lastmod>2018-09-26T11:25:01+05:30</lastmod>
+      <lastmod>2018-10-12T19:39:17+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -162,7 +171,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/clojure/</loc>
-      <lastmod>2018-09-26T11:25:01+05:30</lastmod>
+      <lastmod>2018-10-12T19:39:17+05:30</lastmod>
       <priority>0</priority>
     </url>
     

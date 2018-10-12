@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Wed, 26 Sep 2018 11:25:01 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 12 Oct 2018 19:39:17 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-1)</title>
+      <link>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/</link>
+      <pubDate>Fri, 12 Oct 2018 19:39:17 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/</guid>
+      <description>Hi,
+In my last blog post on our experiences in using Clojure in production, I mentioned that we used Compojure API and Toucan to implement CRUD APIs. The abstraction that we created using these libraries helped us to create HTTP CRUD APIs for any domain entity in a matter of minutes. In this small blog-post series, I am going to share how we did it.
+This first part is going to focus on developing a RESTful CRUD APIs for a specific domain entity.</description>
+    </item>
     
     <item>
       <title>Using Clojure in Production</title>

@@ -11,6 +11,369 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-1)</title>
+      <link>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/</link>
+      <pubDate>Fri, 12 Oct 2018 19:39:17 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/</guid>
+      <description>
+
+&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;In my &lt;a href=&#34;https://www.demystifyfp.com/clojure/blog/clojure-in-production/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt; on our experiences in using Clojure in production, I mentioned that we used &lt;a href=&#34;https://github.com/metosin/compojure-api&#34; target=&#34;_blank&#34;&gt;Compojure API&lt;/a&gt; and &lt;a href=&#34;https://github.com/metabase/toucan&#34; target=&#34;_blank&#34;&gt;Toucan&lt;/a&gt; to implement CRUD APIs. The abstraction that we created using these libraries helped us to create HTTP CRUD APIs for any domain entity in a matter of minutes. In this small blog-post series, I am going to share how we did it.&lt;/p&gt;
+
+&lt;p&gt;This first part is going to focus on developing a RESTful CRUD APIs for a specific domain entity. In the next part, we are going to generalize the implementation to make it extendable for other domain entities.&lt;/p&gt;
+
+&lt;h2 id=&#34;project-setup&#34;&gt;Project Setup&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we are going to develop the CRUD APIs for domain entity &lt;code&gt;user&lt;/code&gt; with PostgreSQL as the database.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a new Clojure project using &lt;a href=&#34;https://leiningen.org/&#34; target=&#34;_blank&#34;&gt;Leiningen&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; lein new app resultful-crud
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then add the following dependencies in &lt;em&gt;project.clj&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clj&#34;&gt;(defproject resultful-crud &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :dependencies [[org.clojure/clojure &amp;quot;1.9.0&amp;quot;]
+
+                 ; Web
+                 [prismatic/schema &amp;quot;1.1.9&amp;quot;]
+                 [metosin/compojure-api &amp;quot;2.0.0-alpha26&amp;quot;]
+                 [ring/ring-jetty-adapter &amp;quot;1.6.3&amp;quot;]
+
+                 ; Database
+                 [toucan &amp;quot;1.1.9&amp;quot;]
+                 [org.postgresql/postgresql &amp;quot;42.2.4&amp;quot;]
+
+                 ; Password Hashing
+                 [buddy/buddy-hashers &amp;quot;1.3.0&amp;quot;]]
+  ; ...
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To keep things simple, we are going to create the database and create the table directly using &lt;code&gt;psql&lt;/code&gt; instead of using database migration utilities like &lt;a href=&#34;https://flywaydb.org/&#34; target=&#34;_blank&#34;&gt;Flyway&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; createdb restful-crud
+
+&amp;gt; psql -d restful-crud
+
+restful-crud:&amp;gt; CREATE TABLE &amp;quot;user&amp;quot; (
+                id SERIAL PRIMARY KEY,
+                username VARCHAR(50) UNIQUE NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL
+              );
+CREATE TABLE
+
+restful-crud:&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;initialising-toucan&#34;&gt;Initialising Toucan&lt;/h2&gt;
+
+&lt;p&gt;Toucan requires us to provide two information to initialise itself&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A database connection specification.&lt;/li&gt;
+&lt;li&gt;Toucan requires that all models live in specific predictable namespaces and we have to provide the &lt;a href=&#34;https://github.com/metabase/toucan/blob/master/docs/setup.md#configuring-the-root-model-namespace&#34; target=&#34;_blank&#34;&gt;root namespace&lt;/a&gt; where it can find the models.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The right place to do this configuration is during application bootstrap.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/resultful_crud/core.clj
+(ns resultful-crud.core
+  (:require [toucan.db :as db]
+            [toucan.models :as models])
+  (:gen-class))
+
+(def db-spec
+  {:dbtype &amp;quot;postgres&amp;quot;
+   :dbname &amp;quot;restful-crud&amp;quot;
+   :user &amp;quot;postgres&amp;quot;
+   :password &amp;quot;postgres&amp;quot;})
+
+(defn -main
+  [&amp;amp; args]
+  (db/set-default-db-connection! db-spec)
+  (models/set-root-namespace! &#39;resultful-crud.models))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;adding-the-user-model&#34;&gt;Adding The User Model&lt;/h3&gt;
+
+&lt;p&gt;Then create a new folder &lt;em&gt;models&lt;/em&gt; in &lt;em&gt;src/restful_crud&lt;/em&gt; directory and add a new file &lt;em&gt;user.clj&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/resultful_crud/models/user.clj
+(ns resultful-crud.models.user
+  (:require [toucan.models :refer [defmodel]]))
+
+(defmodel User :user)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The keyword &lt;code&gt;:user&lt;/code&gt; represents the table name.&lt;/p&gt;
+
+&lt;h2 id=&#34;creating-schema-for-userrequest&#34;&gt;Creating Schema For UserRequest&lt;/h2&gt;
+
+&lt;p&gt;Compojure-api supports &lt;a href=&#34;https://github.com/metosin/compojure-api/wiki/Coercion&#34; target=&#34;_blank&#34;&gt;pluggable coercion&lt;/a&gt; with out-of-the-box implementations for &lt;a href=&#34;https://github.com/plumatic/schema&#34; target=&#34;_blank&#34;&gt;Schema&lt;/a&gt; and &lt;a href=&#34;https://clojure.org/guides/spec&#34; target=&#34;_blank&#34;&gt;clojure.spec&lt;/a&gt;. In this series, we are going to use &lt;em&gt;Schema&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Here are the constraints that we have for the domain entity.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;username&lt;/code&gt; should not contain more than 50 characters, and it shouldn&amp;rsquo;t be empty&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;email&lt;/code&gt; should be a valid email address&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;password&lt;/code&gt; should contain at least five characters and not more than 50 characters.&lt;br /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To incorporate this check, let&amp;rsquo;s add some utility functions.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/resultful_crud/string_util.clj
+
+(ns resultful-crud.string-util
+  (:require [clojure.string :as str]))
+
+(def non-blank? (complement str/blank?))
+
+(defn max-length? [length text]
+  (&amp;lt;= (count text) length))
+
+(defn non-blank-with-max-length? [length text]
+  (and (non-blank? text) (max-length? length text)))
+
+(defn min-length? [length text]
+  (&amp;gt;= (count text) length))
+
+(defn length-in-range? [min-length max-length text]
+  (and (min-length? min-length text) (max-length? max-length text)))
+
+(def email-regex
+  #&amp;quot;(?i)[a-z0-9!#$%&amp;amp;&#39;*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&amp;amp;&#39;*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?&amp;quot;)
+
+(defn email? [email]
+  (boolean (and (string? email) (re-matches email-regex email))))  
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then use these functions to define a schema for &lt;code&gt;UserRequest&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+(ns resultful-crud.user
+  (:require [schema.core :as s]
+            [resultful-crud.string-util :as str]))
+
+(defn valid-username? [name]
+  (str/non-blank-with-max-length? 50 name))
+
+(defn valid-password? [password]
+  (str/length-in-range? 5 50 password))
+
+(s/defschema UserRequestSchema
+  {:username (s/constrained s/Str valid-username?)
+   :password (s/constrained s/Str valid-password?)
+   :email (s/constrained s/Str str/email?)})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;user-create-api&#34;&gt;User Create API&lt;/h2&gt;
+
+&lt;p&gt;Now we have a Schema for the user, and it is time to create our first API for creating a new user.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start this by adding a handler function that takes a create user request and persist it in the database using Toucan.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+(ns resultful-crud.user
+  (:require ; ...
+            [resultful-crud.models.user :refer [User]]
+            [buddy.hashers :as hashers]
+            [clojure.set :refer [rename-keys]]
+            [toucan.db :as db]
+            [ring.util.http-response :refer [created]]))
+; ...
+
+(defn id-&amp;gt;created [id]
+  (created (str &amp;quot;/users/&amp;quot; id) {:id id}))
+
+(defn canonicalize-user-req [user-req]
+  (-&amp;gt; (update user-req :password hashers/derive)
+      (rename-keys {:password :password_hash})))
+
+(defn create-user-handler [create-user-req]
+  (-&amp;gt;&amp;gt; (canonicalize-user-req create-user-req)
+       (db/insert! User)
+       :id
+       id-&amp;gt;created))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;create-user-handler&lt;/code&gt; function takes a &lt;code&gt;create-user-req&lt;/code&gt; a coerced version of below JSON and does the following&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Canonicalize the request by hashing the password, the rename the key &lt;code&gt;password&lt;/code&gt; with &lt;code&gt;password_hash&lt;/code&gt; (to match the column name in the database)&lt;/li&gt;
+&lt;li&gt;Insert into the table using Toucan&amp;rsquo;s &lt;code&gt;insert!&lt;/code&gt; function&lt;/li&gt;
+&lt;li&gt;Takes the &lt;code&gt;id&lt;/code&gt; of the new user returned by Toucan and returns the ring&amp;rsquo;s &lt;code&gt;created&lt;/code&gt; HTTP response&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;username&amp;quot; : &amp;quot;foobar&amp;quot;,
+  &amp;quot;password&amp;quot; : &amp;quot;barfoo&amp;quot;,
+  &amp;quot;email&amp;quot; : &amp;quot;foobar@example.com&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is wiring up this handler with a Compojure-api route.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+(ns resultful-crud.user
+  (:require ; ...
+            [compojure.api.sweet :refer [POST]]))
+; ...
+
+(def user-routes
+  [(POST &amp;quot;/users&amp;quot; []
+     :body [create-user-req UserRequestSchema]
+     (create-user-handler create-user-req))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, using the &lt;code&gt;ring-jetty&lt;/code&gt; adapter, we are going to expose this route as an HTTP API&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/core.clj
+(ns resultful-crud.core
+  (:require ; ...
+            [ring.adapter.jetty :refer [run-jetty]]
+            [compojure.api.sweet :refer [routes]]
+            [resultful-crud.user :refer [user-routes]]))
+; ...
+
+(def app (apply routes user-routes))
+
+(defn -main
+  [&amp;amp; args]
+  ; ...
+  (run-jetty app {:port 3000}))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;get-user-api&#34;&gt;Get User API&lt;/h2&gt;
+
+&lt;p&gt;The next API is getting a user by his/her &lt;code&gt;id&lt;/code&gt;. As we did earlier, create a handler for getting a user by id and wire it up in a route.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+(ns resultful-crud.user
+  (:require ; ...
+            [compojure.api.sweet :refer [POST GET]]
+            [ring.util.http-response :refer [created ok not-found]]))
+; ...
+
+(defn user-&amp;gt;response [user]
+  (if user
+    (ok user)
+    (not-found)))
+
+(defn get-user-handler [user-id]
+  (-&amp;gt; (User user-id)
+      (dissoc :password_hash)
+      user-&amp;gt;response))
+
+(def user-routes
+  [ ; ...
+    (GET &amp;quot;/users/:id&amp;quot; []
+     :path-params [id :- s/Int]
+     (get-user-handler id))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can repeat the similar approach for the other APIs as below.&lt;/p&gt;
+
+&lt;h2 id=&#34;get-users-api&#34;&gt;Get Users API&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+; ...
+(defn get-users-handler []
+  (-&amp;gt;&amp;gt; (db/select User)
+       (map #(dissoc % :password_hash))
+       ok))
+
+(def user-routes
+  [ ; ...
+    (GET &amp;quot;/users&amp;quot; []
+     (get-users-handler))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;update-user-api&#34;&gt;Update User API&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+(ns resultful-crud.user
+  (:require ; ...
+            [compojure.api.sweet :refer [POST GET PUT]]))
+; ...
+
+(defn update-user-handler [id update-user-req]
+  (db/update! User id (canonicalize-user-req update-user-req))
+  (ok))
+
+(def user-routes
+  [ ; ...
+    (PUT &amp;quot;/users/:id&amp;quot; []
+      :path-params [id :- s/Int]
+      :body [update-user-req UserRequestSchema]
+      (update-user-handler id update-user-req))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;delete-user-api&#34;&gt;Delete User API&lt;/h2&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/user.clj
+(ns resultful-crud.user
+  (:require ; ...
+            [compojure.api.sweet :refer [POST GET PUT DELETE]]))
+; ...
+
+(defn delete-user-handler [user-id]
+  (db/delete! User :id user-id)
+  (ok))
+
+(def user-routes
+  [ ; ...
+    (DELETE &amp;quot;/users/:id&amp;quot; []
+     :path-params [id :- s/Int]
+     (delete-user-handler id))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;exposing-swagger-ui&#34;&gt;Exposing Swagger UI&lt;/h2&gt;
+
+&lt;p&gt;Compojure API offers Swagger integration out of the box. To wire it up we just need to wrap the app with &lt;code&gt;api&lt;/code&gt; function with a swagger configuration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; cat src/resultful_crud/core.clj
+(ns resultful-crud.core
+  (:require ; ...
+            [compojure.api.sweet :refer [api routes]]))
+; ...
+
+(def swagger-config
+  {:ui &amp;quot;/swagger&amp;quot;
+   :spec &amp;quot;/swagger.json&amp;quot;
+   :options {:ui {:validatorUrl nil}
+             :data {:info {:version &amp;quot;1.0.0&amp;quot;, :title &amp;quot;Restful CRUD API&amp;quot;}}}})
+
+; (def app (apply routes user-routes))
+(def app (api {:swagger swagger-config} (apply routes user-routes)))
+
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now if we run the application, we can access the Swagger UI on &lt;a href=&#34;http://localhost:3000/swagger&#34; target=&#34;_blank&#34;&gt;http://localhost:3000/swagger&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/restful/restful_user_swagger_ui.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we have seen how to implement a RESTful CRUD APIs in Clojure using Compojure-Api &amp;amp; Toucan.&lt;/p&gt;
+
+&lt;p&gt;The code that we have in place for the exposing the &lt;code&gt;user&lt;/code&gt; endpoints can be generalised so that other domain entities can be exposed without repeating the similar pattern.&lt;/p&gt;
+
+&lt;p&gt;We will see this in the next part of this blog post series! Stay Tuned!!&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The sample code is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.10/clojure/resultful-crud&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Using Clojure in Production</title>
       <link>https://www.demystifyfp.com/clojure/blog/clojure-in-production/</link>
       <pubDate>Wed, 26 Sep 2018 11:25:01 +0530</pubDate>
