@@ -376,7 +376,7 @@ restful-crud:&gt;
 
 <p>The right place to do this configuration is during application bootstrap.</p>
 
-<pre><code class="language-clojure">; src/resultful_crud/core.clj
+<pre><code class="language-clojure">; src/restful_crud/core.clj
 (ns resultful-crud.core
   (:require [toucan.db :as db]
             [toucan.models :as models])
@@ -398,7 +398,7 @@ restful-crud:&gt;
 
 <p>Then create a new folder <em>models</em> in <em>src/restful_crud</em> directory and add a new file <em>user.clj</em></p>
 
-<pre><code class="language-clojure">; src/resultful_crud/models/user.clj
+<pre><code class="language-clojure">; src/restful_crud/models/user.clj
 (ns resultful-crud.models.user
   (:require [toucan.models :refer [defmodel]]))
 
@@ -421,7 +421,7 @@ restful-crud:&gt;
 
 <p>To incorporate this check, let&rsquo;s add some utility functions.</p>
 
-<pre><code class="language-clojure">; src/resultful_crud/string_util.clj
+<pre><code class="language-clojure">; src/restful_crud/string_util.clj
 
 (ns resultful-crud.string-util
   (:require [clojure.string :as str]))
@@ -449,7 +449,7 @@ restful-crud:&gt;
 
 <p>And then use these functions to define a schema for <code>UserRequest</code></p>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 (ns resultful-crud.user
   (:require [schema.core :as s]
             [resultful-crud.string-util :as str]))
@@ -472,7 +472,7 @@ restful-crud:&gt;
 
 <p>Let&rsquo;s start this by adding a handler function that takes a create user request and persist it in the database using Toucan.</p>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 (ns resultful-crud.user
   (:require ; ...
             [resultful-crud.models.user :refer [User]]
@@ -513,7 +513,7 @@ restful-crud:&gt;
 
 <p>The next step is wiring up this handler with a Compojure-api route.</p>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 (ns resultful-crud.user
   (:require ; ...
             [compojure.api.sweet :refer [POST]]))
@@ -527,7 +527,7 @@ restful-crud:&gt;
 
 <p>Finally, using the <code>ring-jetty</code> adapter, we are going to expose this route as an HTTP API</p>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/core.clj
+<pre><code class="language-clojure">; cat src/restful_crud/core.clj
 (ns resultful-crud.core
   (:require ; ...
             [ring.adapter.jetty :refer [run-jetty]]
@@ -547,7 +547,7 @@ restful-crud:&gt;
 
 <p>The next API is getting a user by his/her <code>id</code>. As we did earlier, create a handler for getting a user by id and wire it up in a route.</p>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 (ns resultful-crud.user
   (:require ; ...
             [compojure.api.sweet :refer [POST GET]]
@@ -575,7 +575,7 @@ restful-crud:&gt;
 
 <h2 id="get-users-api">Get Users API</h2>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 ; ...
 (defn get-users-handler []
   (-&gt;&gt; (db/select User)
@@ -590,7 +590,7 @@ restful-crud:&gt;
 
 <h2 id="update-user-api">Update User API</h2>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 (ns resultful-crud.user
   (:require ; ...
             [compojure.api.sweet :refer [POST GET PUT]]))
@@ -610,7 +610,7 @@ restful-crud:&gt;
 
 <h2 id="delete-user-api">Delete User API</h2>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/user.clj
+<pre><code class="language-clojure">; cat src/restful_crud/user.clj
 (ns resultful-crud.user
   (:require ; ...
             [compojure.api.sweet :refer [POST GET PUT DELETE]]))
@@ -631,7 +631,7 @@ restful-crud:&gt;
 
 <p>Compojure API offers Swagger integration out of the box. To wire it up we just need to wrap the app with <code>api</code> function with a swagger configuration.</p>
 
-<pre><code class="language-clojure">; cat src/resultful_crud/core.clj
+<pre><code class="language-clojure">; cat src/restful_crud/core.clj
 (ns resultful-crud.core
   (:require ; ...
             [compojure.api.sweet :refer [api routes]]))
