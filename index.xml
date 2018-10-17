@@ -11,6 +11,359 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-2)</title>
+      <link>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-2/</link>
+      <pubDate>Thu, 18 Oct 2018 01:17:17 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-2/</guid>
+      <description>&lt;p&gt;Hi,&lt;/p&gt;
+
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/&#34;&gt;last blog post&lt;/a&gt;, we learned how to implement RESTful APIs using Compojure-API &amp;amp; Toucan. We are going to generalise that example by creating a little abstraction around it.&lt;/p&gt;
+
+&lt;p&gt;The abstraction that we are going to create is going to help us in creating similar RESTful endpoints for any domain entities with less code.&lt;/p&gt;
+
+&lt;p&gt;Let&#39;s dive in!&lt;/p&gt;
+
+&lt;h2 id=&#34;the-book-entity&#34;&gt;The Book Entity&lt;/h2&gt;
+
+&lt;p&gt;To abstract what we did there, we need a few more specific implementation. So, let&#39;s repeat what we did there with another entity called &amp;quot;Book&amp;quot;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; psql -d restful-crud
+
+restful-crud:&amp;gt; CREATE TABLE book (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(100) NOT NULL,
+                year_published INTEGER NOT NULL
+              );
+CREATE TABLE
+
+restful-crud:&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step after creating a &lt;code&gt;book&lt;/code&gt; table is to create a &lt;a href=&#34;https://github.com/metabase/toucan/blob/master/docs/defining-models.md&#34;&gt;Toucan model&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/models/book.clj
+(ns resultful-crud.models.book
+  (:require [toucan.models :refer [defmodel]]))
+
+(defmodel Book :book)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then create the schema for &lt;code&gt;Book&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/book.clj
+(ns resultful-crud.book
+  (:require [schema.core :as s]
+            [resultful-crud.string-util :as str]))
+
+(defn valid-book-title? [title]
+  (str/non-blank-with-max-length? 100 title))
+
+(defn valid-year-published? [year]
+  (&amp;lt;= 2000 year 2018))
+
+(s/defschema BookRequestSchema
+  {:title (s/constrained s/Str valid-book-title?)
+   :year_published (s/constrained s/Int valid-year-published?)})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To expose the CRUD APIs let&#39;s repeat what we did for &lt;code&gt;User&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/book.clj
+(ns resultful-crud.book
+  (:require ; ...
+            [resultful-crud.models.book :refer [Book]]
+            [toucan.db :as db]
+            [ring.util.http-response :refer [ok not-found created]]
+            [compojure.api.sweet :refer [GET POST PUT DELETE]]))
+
+;; Create
+(defn id-&amp;gt;created [id]
+  (created (str &amp;quot;/books/&amp;quot; id) {:id id}))
+
+(defn create-book-handler [create-book-req]
+  (-&amp;gt; (db/insert! Book create-book-req)
+      :id
+      id-&amp;gt;created))
+
+;; Get All
+(defn get-books-handler []
+  (ok (db/select Book)))
+
+;; Get By Id
+(defn book-&amp;gt;response [book]
+  (if book
+    (ok book)
+    (not-found)))
+
+(defn get-book-handler [book-id]
+  (-&amp;gt; (Book book-id)
+      book-&amp;gt;response))
+
+;; Update
+(defn update-book-handler [id update-book-req]
+  (db/update! Book id update-book-req)
+  (ok))
+
+;; Delete
+(defn delete-book-handler [book-id]
+  (db/delete! Book :id book-id)
+  (ok))
+
+;; Routes
+(def book-routes
+  [(POST &amp;quot;/books&amp;quot; []
+     :body [create-book-req BookRequestSchema]
+     (create-book-handler create-book-req))
+   (GET &amp;quot;/books&amp;quot; []
+     (get-books-handler))
+   (GET &amp;quot;/books/:id&amp;quot; []
+     :path-params [id :- s/Int]
+     (get-book-handler id))
+   (PUT &amp;quot;/books/:id&amp;quot; []
+     :path-params [id :- s/Int]
+     :body [update-book-req BookRequestSchema]
+     (update-book-handler id update-book-req))
+   (DELETE &amp;quot;/books/:id&amp;quot; []
+     :path-params [id :- s/Int]
+     (delete-book-handler id))])
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The last step is exposing these routes as HTTP endpoints.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;; src/restful_crud/core.clj
+(ns resultful-crud.core
+  (:require 
++           [resultful-crud.book :refer [book-routes]]))
+...
+(def app (api {:swagger swagger-config} 
+-             (apply routes user-routes)))
++             (apply routes (concat user-routes book-routes))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;the-restful-abstraction&#34;&gt;The RESTful Abstraction&lt;/h2&gt;
+
+&lt;p&gt;If we have a closer look at the routes &amp;amp; handlers of the CRUD operations of &lt;code&gt;Book&lt;/code&gt; &amp;amp; &lt;code&gt;User&lt;/code&gt;, there are many similarities that we can generalise so that we don&#39;t need to repeat the same for the other entities that we&#39;ll be adding in the system.&lt;/p&gt;
+
+&lt;h3 id=&#34;create-handler&#34;&gt;Create Handler&lt;/h3&gt;
+
+&lt;p&gt;Let&#39;s start from &lt;code&gt;create&lt;/code&gt; handler &amp;amp; route.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/restful/create-api.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;As we can see from the diagram, other than canonicalising the create request all the other things are similar across two implementations. We can view this implementation like a pipeline.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/restful/create-pipeline.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt; *&lt;em&gt;-represents entity&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;We can take inspiration from Pedestal&#39;s &lt;a href=&#34;http://pedestal.io/reference/interceptors&#34;&gt;interceptor&lt;/a&gt;, and model the &lt;em&gt;pre-insert-hook&lt;/em&gt; as &lt;code&gt;enter&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;The abstracted version of &lt;code&gt;create&lt;/code&gt; would look like&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/restful.clj
+(ns restful-crud.restful
+  (:require [compojure.api.sweet :refer [POST]]
+            [toucan.db :as db]
+            [ring.util.http-response :refer [created]]))
+
+(defn id-&amp;gt;created [name id]
+  (created (str &amp;quot;/&amp;quot; name &amp;quot;/&amp;quot; id) {:id id}))
+
+(defn create-route [{:keys [name model req-schema enter]}] &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
+  (let [enter-interceptor (or enter identity) &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
+        path (str &amp;quot;/&amp;quot; name)]
+    (POST path http-req
+      :body [req-body req-schema]
+      (-&amp;gt;&amp;gt; (enter-interceptor req-body) &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
+           (db/insert! model)
+           :id
+           (id-&amp;gt;created name)))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; All the required parameters are received as a &lt;code&gt;map&lt;/code&gt; and destructured &lt;a href=&#34;https://gist.github.com/john2x/e1dca953548bfdfb9844#shortcuts&#34;&gt;using the &lt;code&gt;:keys&lt;/code&gt; keyword&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; As &lt;code&gt;enter&lt;/code&gt; interceptor is optional, we are using the &lt;code&gt;identity&lt;/code&gt; function as a replacement if the &lt;code&gt;enter&lt;/code&gt; interceptor doesn&#39;t exist.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; In the request processing pipeline, we are transforming the incoming &lt;code&gt;req-body&lt;/code&gt; using the &lt;code&gt;enter-interceptor&lt;/code&gt;. Rest of the code is similar to our concrete implementation except that the actual domain entity related aspects are parameterised.&lt;/p&gt;
+
+&lt;h3 id=&#34;get-by-id-handler&#34;&gt;Get By Id Handler&lt;/h3&gt;
+
+&lt;p&gt;The &lt;code&gt;get-by-id&lt;/code&gt; handlers of &lt;code&gt;user&lt;/code&gt; &amp;amp; &lt;code&gt;book&lt;/code&gt; differ on what we do after we fetch it from the database.&lt;br&gt;
+&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/restful/get-by-id-api.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;
+As depicted in the image, in &lt;code&gt;get-user-handler&lt;/code&gt; we &lt;code&gt;dissoc&lt;/code&gt; the &lt;code&gt;password_hash&lt;/code&gt; from the &lt;code&gt;user&lt;/code&gt; instance.
+Again this can be viewed as a pipeline, where need a hook to transform the instance retrieved from the database.
+&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/restful/get-by-id-pipeline.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
+
+&lt;p&gt;This &lt;code&gt;post-fetch-hook&lt;/code&gt; can be viewed as a &lt;code&gt;leave&lt;/code&gt; interceptor and implemented as below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/restful.clj
+(ns restful-crud.restful
+  (:require ; ...
+            [schema.core :as s]
+            [compojure.api.sweet :refer [... GET]]
+            [ring.util.http-response :refer [... ok]]))
+; ...
+
+(defn resource-id-path [name]
+  (str &amp;quot;/&amp;quot; name &amp;quot;/:id&amp;quot;))
+
+(defn entity-&amp;gt;response [entity]
+  (if entity (ok entity) (not-found)))
+
+(defn get-by-id-route [{:keys [name model leave]}]
+  (let [leave-interceptor (or leave identity)
+        path (resource-id-path name)]
+    (GET path []
+      :path-params [id :- s/Int]
+      (-&amp;gt; (model id)
+          leave-interceptor
+          entity-&amp;gt;response))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can do the same for other handlers as below.&lt;/p&gt;
+
+&lt;h3 id=&#34;get-all-handler&#34;&gt;Get All Handler&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/restful.clj
+; ...
+
+(defn get-all-route [{:keys [name model leave]}]
+  (let [leave-interceptor (or leave identity)
+        path (str &amp;quot;/&amp;quot; name)]
+    (GET path []
+      (-&amp;gt;&amp;gt; (db/select model)
+           (map leave-interceptor)
+           ok))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;update-handler&#34;&gt;Update Handler&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/restful.clj
+(ns restful-crud.restful
+  (:require ; ...
+            [compojure.api.sweet :refer [... PUT]]
+            ...))
+; ...
+
+(defn update-route [{:keys [name model req-schema enter]}]
+  (let [enter-interceptor (or enter identity)
+        path (resource-id-path name)]
+    (PUT path http-req
+      :path-params [id :- s/Int]
+      :body [req-body req-schema]
+      (db/update! model id (enter-interceptor req-body))
+      (ok))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;delete-handler&#34;&gt;Delete Handler&lt;/h3&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/restful.clj
+(ns restful-crud.restful
+  (:require ; ...
+            [compojure.api.sweet :refer [... DELETE]]
+            ...))
+; ...
+
+(defn delete-route [{:keys [name model]}]
+  (let [path (resource-id-path name)]
+    (DELETE path []
+      :path-params [id :- s/Int]
+      (db/delete! model :id id)
+      (ok))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;combining-all-the-handlers&#34;&gt;Combining All the Handlers&lt;/h3&gt;
+
+&lt;p&gt;The last piece that we need to implement is a function that put all the above handlers together. By making use of the &lt;code&gt;routes&lt;/code&gt; function from Compojure-Api, we can achieve it as below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/restful.clj
+(ns restful-crud.restful
+  (:require ; ...
+            [compojure.api.sweet :refer [... routes]]
+            ...))
+; ...
+(defn resource [resource-config]
+  (routes
+   (create-route resource-config)
+   (get-by-id-route resource-config)
+   (get-all-route resource-config)
+   (update-route resource-config)
+   (delete-route resource-config)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;using-the-restful-abstraction&#34;&gt;Using the RESTful abstraction&lt;/h2&gt;
+
+&lt;p&gt;Now we have the functionality in-place for exposing CRUD endpoints for any domain entity. We can leverage it for the &lt;code&gt;user&lt;/code&gt; &amp;amp; the &lt;code&gt;book&lt;/code&gt; entity.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/user.clj
+(ns restful-crud.book
+  (:require ; ...
+            [restful-crud.restful :as restful]))
+; ...
+
+(def user-entity-route
+  (restful/resource {:model User
+                     :name &amp;quot;users&amp;quot;
+                     :req-schema UserRequestSchema
+                     :leave #(dissoc % :password_hash)
+                     :enter canonicalize-user-req}))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/book.clj
+(ns restful-crud.book
+  (:require ; ...
+            [restful-crud.restful :as restful]))
+; ...
+
+(def book-entity-route
+  (restful/resource {:model Book
+                     :name &amp;quot;books&amp;quot;
+                     :req-schema BookRequestSchema}))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then expose them in the &lt;code&gt;app&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/restful_crud/core.clj
+(ns restful-crud.core
+  (:require ; ...
+            [restful-crud.user :refer [user-entity-route]]
+            [restful-crud.book :refer [book-entity-route]])
+  (:gen-class))
+
+; (def app (api {:swagger swagger-config} 
+;               (apply routes (concat user-routes book-routes))))
+(def app (api {:swagger swagger-config} 
+              (apply routes book-entity-route user-entity-route)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we want to expose RESTful CRUD APIs for a future entity, the steps that we need to follow are&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Create a table&lt;/li&gt;
+&lt;li&gt;Add the Toucan model&lt;/li&gt;
+&lt;li&gt;Create a Schema for the request body&lt;/li&gt;
+&lt;li&gt;Create &lt;code&gt;enter&lt;/code&gt; &amp;amp; &lt;code&gt;leave&lt;/code&gt; interceptor functions (if required)&lt;/li&gt;
+&lt;li&gt;Expose the routes by calling the &lt;code&gt;resource&lt;/code&gt; function with appropriate parameters.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;That&#39;s it!&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;We have followed this approach in our production codebase and exposed APIs for a significant number of domain entities. When we started the project, we didn&#39;t have this abstraction. After exposing CRUD APIs for some entities, we realised the repetitions in the code and derived this approach.&lt;/p&gt;
+
+&lt;p&gt;The sample implementation in this blog post not covers certain aspects like error-handling, audit-entries(created-by, updated-by), pagination for brevity.&lt;/p&gt;
+
+&lt;p&gt;IMHO there is no &lt;a href=&#34;https://www.youtube.com/watch?v=zhpWhkW8kcc&#34;&gt;perfect abstraction&lt;/a&gt;, and it applies to the one that we just saw as well. It was just perfect enough and enabled us to move faster.&lt;/p&gt;
+
+&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/restful/how-to-abstract.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt; *Credits- Alex Martelli&#39;s &lt;a href=&#34;https://www.youtube.com/watch?v=zhpWhkW8kcc&#34;&gt;Tower of abstractions talk&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;The sample code is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.11/clojure/restful-crud&#34;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+    </item>
+    
+    <item>
       <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-1)</title>
       <link>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/</link>
       <pubDate>Fri, 12 Oct 2018 19:39:17 +0530</pubDate>
