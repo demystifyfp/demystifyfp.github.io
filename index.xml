@@ -11,6 +11,235 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Model Binding in Suave and Saturn</title>
+      <link>https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/</link>
+      <pubDate>Mon, 17 Dec 2018 20:50:23 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/</guid>
+      <description>
+
+&lt;p&gt;In one of the fsharp project that I was part of in early this year, we encountered an interesting scenario where we need to do serialisation of a fsharp record type from the query string (and multi-part form) in &lt;a href=&#34;https://www.suave.io&#34; target=&#34;_blank&#34;&gt;Suave&lt;/a&gt;, and the out of the box model binding support didn&amp;rsquo;t suit our requirements.&lt;/p&gt;
+
+&lt;p&gt;So, we rolled out our own, and the solution came from a library which was not intended to solve this problem. In this blog post, I will be sharing what the problem was and how we solved it. The solution that we came up with is not limited to Suave alone, and it can be used in &lt;a href=&#34;https://saturnframework.org/&#34; target=&#34;_blank&#34;&gt;Saturn&lt;/a&gt; and &lt;a href=&#34;https://github.com/giraffe-fsharp/Giraffe&#34; target=&#34;_blank&#34;&gt;Giraffe&lt;/a&gt; as well.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;This blog post is a part of fsharp &lt;a href=&#34;https://sergeytihon.com/2018/10/22/f-advent-calendar-in-english-2018/&#34; target=&#34;_blank&#34;&gt;advent calendar 2018&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;the-problem-statement&#34;&gt;The Problem Statement&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s assume that we have the following fsharp types to represent the filter criteria of an e-commerce portal that sells books.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type DealsCategory =
+| AllDeals
+| AllEBooks
+| ActionAndAdventure
+| Media
+| Fiction
+
+type Language =
+| English
+| Hindi
+| Tamil
+
+type Rating =
+| Five
+| FourAndAbove
+| ThreeAndAbove
+
+type SearchFilter = {
+  Languages : Language list
+  Rating : Rating option
+}
+
+type Search = {
+  Category : DealsCategory
+  Filter : SearchFilter
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The record type &lt;code&gt;Search&lt;/code&gt; represents the data that we&amp;rsquo;ll be receiving from the front-end as a query string.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;curl &#39;http://localhost:8080/books?category=Fiction&amp;amp;rating=Five&amp;amp;languages=Tamil&amp;amp;languages=English&#39;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In Suave, model binding support is provided using the &lt;a href=&#34;https://www.nuget.org/packages/Suave.Experimental/&#34; target=&#34;_blank&#34;&gt;Suave.Experimental&lt;/a&gt; package and it currently supports only binding form values as mentioned in &lt;a href=&#34;http://vgaltes.com/post/forms-with-suave-experimental-and-suave-forms/&#34; target=&#34;_blank&#34;&gt;this blog post&lt;/a&gt;. However, the form binding logic in this package can be extended by replacing &lt;code&gt;req.formData&lt;/code&gt; with &lt;code&gt;req.query&lt;/code&gt; in &lt;a href=&#34;https://github.com/SuaveIO/suave/blob/v2.5.3/src/Suave.Experimental/Form.fs#L118&#34; target=&#34;_blank&#34;&gt;this file&lt;/a&gt; (you need to copy and paste the code in your project!). A significant limitation was it supports record types with only &lt;code&gt;String&lt;/code&gt;, &lt;code&gt;Decimal&lt;/code&gt;, &lt;code&gt;DateTime&lt;/code&gt;, &lt;code&gt;MailAddress&lt;/code&gt; types for model binding.&lt;/p&gt;
+
+&lt;p&gt;The model binding in the Saturn framework (using &lt;a href=&#34;https://github.com/giraffe-fsharp/Giraffe/blob/master/DOCUMENTATION.md#binding-query-strings&#34; target=&#34;_blank&#34;&gt;Giraffe&lt;/a&gt;) doesn&amp;rsquo;t have these limitations, and it also supports Discriminated Union Types that has cases alone. Unfortunately, it doesn&amp;rsquo;t support nested records out of the box. It is one of the critical requirement for us as many of our view model&amp;rsquo;s fields are record types.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s find a solution to this!&lt;/p&gt;
+
+&lt;h2 id=&#34;model-binding&#34;&gt;Model Binding&lt;/h2&gt;
+
+&lt;p&gt;The model binding logic that we wanted to develop should conceptually work like this&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/model-binding/model-binding.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;It takes three input,&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;The record type that it wants to bind&lt;/li&gt;
+&lt;li&gt;A value store (query string or form field) to get the values for the fields of the given record type.&lt;/li&gt;
+&lt;li&gt;A field name canoncializer to fix the field name transformations like PascalCasing to CamelCasing  (&lt;code&gt;Languages&lt;/code&gt; to &lt;code&gt;languages&lt;/code&gt;)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Then it iterates all the fields in the record type, and for each field name, it calls the field name canoncializer to get the corresponding field name in the value store and finally get the value of the given field name from the value store.&lt;/p&gt;
+
+&lt;p&gt;If the above operation is successful for all the fields, it should return the value of the given record type else return an appropriate error.&lt;/p&gt;
+
+&lt;p&gt;After whiteboarding this stuff out, it struck that I was doing a similar logic in the &lt;a href=&#34;https://github.com/demystifyfp/FsConfig&#34; target=&#34;_blank&#34;&gt;FsConfig&lt;/a&gt; (an F# library for reading configuration data from environment variables and AppSettings) and I can use it use it here!&lt;/p&gt;
+
+&lt;p&gt;In FsConfig, the model binding logic reads the value from the environment variables or the application settings file. Here we need to read from query strings or form fields!&lt;/p&gt;
+
+&lt;h2 id=&#34;suave-solution-using-fsconfig&#34;&gt;Suave Solution Using FsConfig&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code&gt;parse&lt;/code&gt; &lt;a href=&#34;https://github.com/demystifyfp/FsConfig/blob/2.0.2/src/FsConfig/Config.fs#L280&#34; target=&#34;_blank&#34;&gt;function&lt;/a&gt; in the FsConfig library has the following function signature&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;IConfigReader -&amp;gt; FieldNameCanonicalizer -&amp;gt; string -&amp;gt; &#39;T
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;parse&lt;/code&gt; function takes three parameters&lt;/p&gt;
+
+&lt;p&gt;[1] The &lt;code&gt;IConfigReader&lt;/code&gt; interface represents the value store in the above diagram.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type IConfigReader =
+  // given a key, return its value if it exists or none
+  abstract member GetValue : string -&amp;gt; string option
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;[2] The &lt;code&gt;FieldNameCanonicalizer&lt;/code&gt; is a function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Prefix = Prefix of string
+type FieldNameCanonicalizer = Prefix -&amp;gt; string -&amp;gt; string
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The first parameter represents the prefix which will be either empty or the field name if the corresponding field is a record type. The second parameter is the actual field name.&lt;/p&gt;
+
+&lt;p&gt;[3] The third parameter is the custom prefix that you may want to prefix for all the fields of the parent record. (Typical environment variables uses some prefix for namespacing like &lt;code&gt;MYAPP_PORT&lt;/code&gt;)&lt;/p&gt;
+
+&lt;p&gt;To make it work for Suave, we need to provide appropriate values for these parameters.&lt;/p&gt;
+
+&lt;p&gt;The first parameter is &lt;code&gt;IConfigReader&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// HttpRequest -&amp;gt; Map&amp;lt;string, string&amp;gt;
+let queryStringsMap (request : HttpRequest) =
+  request.query
+  |&amp;gt; List.groupBy fst
+  |&amp;gt; List.map (fun (x, keyVals) -&amp;gt; 
+                (x, keyVals 
+                    |&amp;gt; List.map snd 
+                    |&amp;gt; List.choose id 
+                    |&amp;gt; String.concat &amp;quot;,&amp;quot;))
+  |&amp;gt; Map.ofList
+
+// IConfigReader
+type HttpQueryStringsProvider(request : HttpRequest) =
+    // value store for query string
+    let queryStringsMap = queryStringsMap request
+
+    interface IConfigReader with
+      // retrieving the value from the query string
+      member __.GetValue name =
+        Map.tryFind name queryStringsMap
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The second parameter is &lt;code&gt;FieldNameCanonicalizer&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// PascalCase to camelCase
+let private camelCaseCanonicalizer _ (name : string) =
+  name
+  |&amp;gt; String.mapi (fun i c -&amp;gt;
+      if (i = 0) then Char.ToLowerInvariant c else c)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are ignoring the prefix here as we are using are not going to use it.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The final parameter is custom prefix which is a blank string in our case as we are not using any custom prefix.&lt;/p&gt;
+
+&lt;p&gt;With these things in place, we can create a new function called &lt;code&gt;bindQueryStrings&lt;/code&gt; which does the model binding using the FsConfig&amp;rsquo;s &lt;code&gt;parse&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// HttpRequest -&amp;gt; Result&amp;lt;&#39;T, string&amp;gt;
+let bindQueryStrings&amp;lt;&#39;T&amp;gt; (request : HttpRequest) =
+  let queryStringsProvider = new HttpQueryStringsProvider(request)
+  parse&amp;lt;&#39;T&amp;gt; queryStringsProvider camelCaseCanonicalizer &amp;quot;&amp;quot;
+  |&amp;gt; Result.mapError (fun e -&amp;gt; e.ToString())
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To see it in action, wire it up in a webpart&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let getBooks ctx = async {
+  let search = bindQueryStrings&amp;lt;Search&amp;gt; ctx.request
+  // just printing it for brevity
+  printfn &amp;quot;%A&amp;quot; search
+  return! Successful.OK &amp;quot;Todo&amp;quot; ctx
+}
+
+let app =
+  path &amp;quot;/books&amp;quot; &amp;gt;=&amp;gt; getBooks
+
+[&amp;lt;EntryPoint&amp;gt;]
+let main argv = 
+  startWebServer defaultConfig app
+  0
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;saturn-solution-using-fsconfig&#34;&gt;Saturn Solution Using FsConfig&lt;/h2&gt;
+
+&lt;p&gt;The solution in Saturn using FsConfig will be very similar. We need to use HTTP models specific to Saturn to retrieve the query string values.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type QueryStringReader(ctx : HttpContext) =
+  interface IConfigReader with
+    member __.GetValue name =
+      printfn &amp;quot;--&amp;gt; %s&amp;quot; name
+      match ctx.Request.Query.TryGetValue name with
+      | true, x -&amp;gt; Some (x.ToString())
+      | _ -&amp;gt; None
+
+let bindQueryStrings&amp;lt;&#39;T&amp;gt; (ctx : HttpContext) =
+  let reader = new QueryStringReader(ctx)
+  parse&amp;lt;&#39;T&amp;gt; reader camelCaseCanonicalizer &amp;quot;&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And then use it like below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let getBooks (ctx : HttpContext) = task {
+  let search = bindQueryString&amp;lt;Search&amp;gt; ctx
+  // just printing it for brevity
+  printfn &amp;quot;%A&amp;quot; search
+  return! Controller.text ctx &amp;quot;TODO&amp;quot;
+}
+
+let bookController = controller {
+  index getBooks
+}
+
+let apiRouter = router {
+  forward &amp;quot;/books&amp;quot; bookController
+}
+
+let app = application {
+    use_router apiRouter
+    url &amp;quot;http://0.0.0.0:8080&amp;quot;
+}
+
+[&amp;lt;EntryPoint&amp;gt;]
+let main _ =
+  run app
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;Tomas Petricek once wrote an excellent blog post on &lt;a href=&#34;http://tomasp.net/blog/2015/library-frameworks/&#34; target=&#34;_blank&#34;&gt;library vs frameworks&lt;/a&gt; where he encourages us to focus on using libraries which can be plugged to any code to solve the problems. The effort that we did here remind me of this blog post and it was amazing that it fits well with both Suave and Saturn.&lt;/p&gt;
+
+&lt;p&gt;This model binding logic can be extended to bind the data from anywhere even from a database like &lt;a href=&#34;https://github.com/SlapperAutoMapper/Slapper.AutoMapper&#34; target=&#34;_blank&#34;&gt;Slapper.AutoMapper&lt;/a&gt;. It has some loose ends. If I get some time to fix those quirks, I am planning to release this as a separate library.&lt;/p&gt;
+
+&lt;p&gt;You can find the source code associated with this blog post in my &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.12/fsharp/ModelBinding&#34; target=&#34;_blank&#34;&gt;GitHub repository&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-2)</title>
       <link>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-2/</link>
       <pubDate>Thu, 18 Oct 2018 01:17:17 +0530</pubDate>
@@ -4473,15 +4702,6 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
       <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
       
       <guid>https://www.demystifyfp.com/book/fs-applied/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>F# Applied II</title>
-      <link>https://www.demystifyfp.com/book/fs-applied-ii/</link>
-      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.demystifyfp.com/book/fs-applied-ii/</guid>
       <description></description>
     </item>
     

@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/</loc>
+      <lastmod>2018-12-17T20:50:23+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-2/</loc>
       <lastmod>2018-10-18T01:17:17+05:30</lastmod>
     </url>
@@ -230,7 +239,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/fsharp/</loc>
-      <lastmod>2018-06-12T05:30:26+05:30</lastmod>
+      <lastmod>2018-12-17T20:50:23+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -240,7 +249,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/fsharp/</loc>
-      <lastmod>2018-06-12T05:30:26+05:30</lastmod>
+      <lastmod>2018-12-17T20:50:23+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -300,6 +309,26 @@
     
       <loc>https://www.demystifyfp.com/tags/reflection/</loc>
       <lastmod>2017-12-15T19:39:26+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/tags/saturn/</loc>
+      <lastmod>2018-12-17T20:50:23+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/tags/suave/</loc>
+      <lastmod>2018-12-17T20:50:23+05:30</lastmod>
       <priority>0</priority>
     </url>
     

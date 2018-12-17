@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.49" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+    
+    
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/vs.min.css">
+    
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/">
+  <meta property="og:title" content="Model Binding in Suave and Saturn | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2018-12-17T20:50:23&#43;05:30">
+  
+  <meta property="article:modified_time" content="2018-12-17T20:50:23&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+  <title>Model Binding in Suave and Saturn | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Model Binding in Suave and Saturn</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/fsharp">fsharp</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/suave">suave</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/saturn">saturn</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2018-12-17 20:50:23 &#43;0530 IST" itemprop="datePublished">
+      Mon, Dec 17, 2018
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    6 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Model%20Binding%20in%20Suave%20and%20Saturn&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fmodel-binding-in-suave-and-saturn%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fmodel-binding-in-suave-and-saturn%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fmodel-binding-in-suave-and-saturn%2f&amp;title=Model%20Binding%20in%20Suave%20and%20Saturn"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fmodel-binding-in-suave-and-saturn%2f&amp;title=Model%20Binding%20in%20Suave%20and%20Saturn"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Model%20Binding%20in%20Suave%20and%20Saturn&amp;body=https%3a%2f%2fwww.demystifyfp.com%2ffsharp%2fblog%2fmodel-binding-in-suave-and-saturn%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>In one of the fsharp project that I was part of in early this year, we encountered an interesting scenario where we need to do serialisation of a fsharp record type from the query string (and multi-part form) in <a href="https://www.suave.io" target="_blank">Suave</a>, and the out of the box model binding support didn&rsquo;t suit our requirements.</p>
+
+<p>So, we rolled out our own, and the solution came from a library which was not intended to solve this problem. In this blog post, I will be sharing what the problem was and how we solved it. The solution that we came up with is not limited to Suave alone, and it can be used in <a href="https://saturnframework.org/" target="_blank">Saturn</a> and <a href="https://github.com/giraffe-fsharp/Giraffe" target="_blank">Giraffe</a> as well.</p>
+
+<blockquote>
+<p>This blog post is a part of fsharp <a href="https://sergeytihon.com/2018/10/22/f-advent-calendar-in-english-2018/" target="_blank">advent calendar 2018</a>.</p>
+</blockquote>
+
+<h2 id="the-problem-statement">The Problem Statement</h2>
+
+<p>Let&rsquo;s assume that we have the following fsharp types to represent the filter criteria of an e-commerce portal that sells books.</p>
+
+<pre><code class="language-fsharp">type DealsCategory =
+| AllDeals
+| AllEBooks
+| ActionAndAdventure
+| Media
+| Fiction
+
+type Language =
+| English
+| Hindi
+| Tamil
+
+type Rating =
+| Five
+| FourAndAbove
+| ThreeAndAbove
+
+type SearchFilter = {
+  Languages : Language list
+  Rating : Rating option
+}
+
+type Search = {
+  Category : DealsCategory
+  Filter : SearchFilter
+}
+</code></pre>
+
+<p>The record type <code>Search</code> represents the data that we&rsquo;ll be receiving from the front-end as a query string.</p>
+
+<pre><code class="language-bash">curl 'http://localhost:8080/books?category=Fiction&amp;rating=Five&amp;languages=Tamil&amp;languages=English'
+</code></pre>
+
+<p>In Suave, model binding support is provided using the <a href="https://www.nuget.org/packages/Suave.Experimental/" target="_blank">Suave.Experimental</a> package and it currently supports only binding form values as mentioned in <a href="http://vgaltes.com/post/forms-with-suave-experimental-and-suave-forms/" target="_blank">this blog post</a>. However, the form binding logic in this package can be extended by replacing <code>req.formData</code> with <code>req.query</code> in <a href="https://github.com/SuaveIO/suave/blob/v2.5.3/src/Suave.Experimental/Form.fs#L118" target="_blank">this file</a> (you need to copy and paste the code in your project!). A significant limitation was it supports record types with only <code>String</code>, <code>Decimal</code>, <code>DateTime</code>, <code>MailAddress</code> types for model binding.</p>
+
+<p>The model binding in the Saturn framework (using <a href="https://github.com/giraffe-fsharp/Giraffe/blob/master/DOCUMENTATION.md#binding-query-strings" target="_blank">Giraffe</a>) doesn&rsquo;t have these limitations, and it also supports Discriminated Union Types that has cases alone. Unfortunately, it doesn&rsquo;t support nested records out of the box. It is one of the critical requirement for us as many of our view model&rsquo;s fields are record types.</p>
+
+<p>Let&rsquo;s find a solution to this!</p>
+
+<h2 id="model-binding">Model Binding</h2>
+
+<p>The model binding logic that we wanted to develop should conceptually work like this</p>
+
+<p><img src="/img/fsharp/blog/model-binding/model-binding.png" alt="" /></p>
+
+<p>It takes three input,</p>
+
+<ol>
+<li>The record type that it wants to bind</li>
+<li>A value store (query string or form field) to get the values for the fields of the given record type.</li>
+<li>A field name canoncializer to fix the field name transformations like PascalCasing to CamelCasing  (<code>Languages</code> to <code>languages</code>)</li>
+</ol>
+
+<p>Then it iterates all the fields in the record type, and for each field name, it calls the field name canoncializer to get the corresponding field name in the value store and finally get the value of the given field name from the value store.</p>
+
+<p>If the above operation is successful for all the fields, it should return the value of the given record type else return an appropriate error.</p>
+
+<p>After whiteboarding this stuff out, it struck that I was doing a similar logic in the <a href="https://github.com/demystifyfp/FsConfig" target="_blank">FsConfig</a> (an F# library for reading configuration data from environment variables and AppSettings) and I can use it use it here!</p>
+
+<p>In FsConfig, the model binding logic reads the value from the environment variables or the application settings file. Here we need to read from query strings or form fields!</p>
+
+<h2 id="suave-solution-using-fsconfig">Suave Solution Using FsConfig</h2>
+
+<p>The <code>parse</code> <a href="https://github.com/demystifyfp/FsConfig/blob/2.0.2/src/FsConfig/Config.fs#L280" target="_blank">function</a> in the FsConfig library has the following function signature</p>
+
+<pre><code class="language-fsharp">IConfigReader -&gt; FieldNameCanonicalizer -&gt; string -&gt; 'T
+</code></pre>
+
+<p>The <code>parse</code> function takes three parameters</p>
+
+<p>[1] The <code>IConfigReader</code> interface represents the value store in the above diagram.</p>
+
+<pre><code class="language-fsharp">type IConfigReader =
+  // given a key, return its value if it exists or none
+  abstract member GetValue : string -&gt; string option
+</code></pre>
+
+<p>[2] The <code>FieldNameCanonicalizer</code> is a function.</p>
+
+<pre><code class="language-fsharp">type Prefix = Prefix of string
+type FieldNameCanonicalizer = Prefix -&gt; string -&gt; string
+</code></pre>
+
+<p>The first parameter represents the prefix which will be either empty or the field name if the corresponding field is a record type. The second parameter is the actual field name.</p>
+
+<p>[3] The third parameter is the custom prefix that you may want to prefix for all the fields of the parent record. (Typical environment variables uses some prefix for namespacing like <code>MYAPP_PORT</code>)</p>
+
+<p>To make it work for Suave, we need to provide appropriate values for these parameters.</p>
+
+<p>The first parameter is <code>IConfigReader</code>.</p>
+
+<pre><code class="language-fsharp">// HttpRequest -&gt; Map&lt;string, string&gt;
+let queryStringsMap (request : HttpRequest) =
+  request.query
+  |&gt; List.groupBy fst
+  |&gt; List.map (fun (x, keyVals) -&gt; 
+                (x, keyVals 
+                    |&gt; List.map snd 
+                    |&gt; List.choose id 
+                    |&gt; String.concat &quot;,&quot;))
+  |&gt; Map.ofList
+
+// IConfigReader
+type HttpQueryStringsProvider(request : HttpRequest) =
+    // value store for query string
+    let queryStringsMap = queryStringsMap request
+
+    interface IConfigReader with
+      // retrieving the value from the query string
+      member __.GetValue name =
+        Map.tryFind name queryStringsMap
+</code></pre>
+
+<p>The second parameter is <code>FieldNameCanonicalizer</code>.</p>
+
+<pre><code class="language-fsharp">// PascalCase to camelCase
+let private camelCaseCanonicalizer _ (name : string) =
+  name
+  |&gt; String.mapi (fun i c -&gt;
+      if (i = 0) then Char.ToLowerInvariant c else c)
+</code></pre>
+
+<blockquote>
+<p>We are ignoring the prefix here as we are using are not going to use it.</p>
+</blockquote>
+
+<p>The final parameter is custom prefix which is a blank string in our case as we are not using any custom prefix.</p>
+
+<p>With these things in place, we can create a new function called <code>bindQueryStrings</code> which does the model binding using the FsConfig&rsquo;s <code>parse</code> function.</p>
+
+<pre><code class="language-fsharp">// HttpRequest -&gt; Result&lt;'T, string&gt;
+let bindQueryStrings&lt;'T&gt; (request : HttpRequest) =
+  let queryStringsProvider = new HttpQueryStringsProvider(request)
+  parse&lt;'T&gt; queryStringsProvider camelCaseCanonicalizer &quot;&quot;
+  |&gt; Result.mapError (fun e -&gt; e.ToString())
+</code></pre>
+
+<p>To see it in action, wire it up in a webpart</p>
+
+<pre><code class="language-fsharp">let getBooks ctx = async {
+  let search = bindQueryStrings&lt;Search&gt; ctx.request
+  // just printing it for brevity
+  printfn &quot;%A&quot; search
+  return! Successful.OK &quot;Todo&quot; ctx
+}
+
+let app =
+  path &quot;/books&quot; &gt;=&gt; getBooks
+
+[&lt;EntryPoint&gt;]
+let main argv = 
+  startWebServer defaultConfig app
+  0
+</code></pre>
+
+<h2 id="saturn-solution-using-fsconfig">Saturn Solution Using FsConfig</h2>
+
+<p>The solution in Saturn using FsConfig will be very similar. We need to use HTTP models specific to Saturn to retrieve the query string values.</p>
+
+<pre><code class="language-fsharp">type QueryStringReader(ctx : HttpContext) =
+  interface IConfigReader with
+    member __.GetValue name =
+      printfn &quot;--&gt; %s&quot; name
+      match ctx.Request.Query.TryGetValue name with
+      | true, x -&gt; Some (x.ToString())
+      | _ -&gt; None
+
+let bindQueryStrings&lt;'T&gt; (ctx : HttpContext) =
+  let reader = new QueryStringReader(ctx)
+  parse&lt;'T&gt; reader camelCaseCanonicalizer &quot;&quot;
+</code></pre>
+
+<p>And then use it like below</p>
+
+<pre><code class="language-fsharp">let getBooks (ctx : HttpContext) = task {
+  let search = bindQueryString&lt;Search&gt; ctx
+  // just printing it for brevity
+  printfn &quot;%A&quot; search
+  return! Controller.text ctx &quot;TODO&quot;
+}
+
+let bookController = controller {
+  index getBooks
+}
+
+let apiRouter = router {
+  forward &quot;/books&quot; bookController
+}
+
+let app = application {
+    use_router apiRouter
+    url &quot;http://0.0.0.0:8080&quot;
+}
+
+[&lt;EntryPoint&gt;]
+let main _ =
+  run app
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>Tomas Petricek once wrote an excellent blog post on <a href="http://tomasp.net/blog/2015/library-frameworks/" target="_blank">library vs frameworks</a> where he encourages us to focus on using libraries which can be plugged to any code to solve the problems. The effort that we did here remind me of this blog post and it was amazing that it fits well with both Suave and Saturn.</p>
+
+<p>This model binding logic can be extended to bind the data from anywhere even from a database like <a href="https://github.com/SlapperAutoMapper/Slapper.AutoMapper" target="_blank">Slapper.AutoMapper</a>. It has some loose ends. If I get some time to fix those quirks, I am planning to release this as a separate library.</p>
+
+<p>You can find the source code associated with this blog post in my <a href="https://github.com/demystifyfp/BlogSamples/tree/0.12/fsharp/ModelBinding" target="_blank">GitHub repository</a>.</p>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  </div>
+
+
+</article>
+
+
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-7/">Concurrent Programming in Fsharp Using Hopac - Part 7</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-6/">Concurrent Programming in Fsharp Using Hopac - Part 6</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-5/">Concurrent Programming in fsharp Using Hopac - Part 5</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/">Concurrent Programming in fsharp using Hopac - Part 4</a></li>
+    
+    <li><a href="/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-3/">Implementing API Gateway Pattern in fsharp using Hopac</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+      
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js" integrity="sha256-/BfiIkHlHoVihZdc6TFuj7MmJ0TWcWsMXkeDFwhi0zw=" crossorigin="anonymous"></script>
+      
+
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/fsharp.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/diff.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/clojure.min.js"></script>
+      
+      <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/bash.min.js"></script>
+      
+
+      
+
+      <script>hljs.initHighlightingOnLoad();</script>
+    
+
+    
+    
+
+  </body>
+</html>
