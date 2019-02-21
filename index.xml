@@ -1714,7 +1714,7 @@ let fillAndRead iVar value =
   |&amp;gt; run // unit
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;As the name indicates, the &lt;code&gt;fillAndRead&lt;/code&gt; is a function fills the given write-once variable &lt;code&gt;iVar&lt;/code&gt; with the provided &lt;code&gt;value&lt;/code&gt;, and then reads the &lt;code&gt;value&lt;/code&gt; from the &lt;code&gt;iVar&lt;/code&gt;. Finally the prints the value.&lt;/p&gt;
+&lt;p&gt;As the name indicates, the &lt;code&gt;fillAndRead&lt;/code&gt; is a function fills the given write-once variable &lt;code&gt;iVar&lt;/code&gt; with the provided &lt;code&gt;value&lt;/code&gt;, and then reads the &lt;code&gt;value&lt;/code&gt; from the &lt;code&gt;iVar&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;IVar.fill&lt;/code&gt; function creates a job that writes the given value to the given write-once variable.&lt;/p&gt;
 
