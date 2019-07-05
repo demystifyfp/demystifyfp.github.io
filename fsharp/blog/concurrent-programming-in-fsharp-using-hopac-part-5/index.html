@@ -89,8 +89,7 @@
 
 <meta name="flattr:id" content="qjy9np">
 
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-twilight.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
@@ -347,8 +346,8 @@
 
 // IVar&lt;'a&gt; -&gt; 'a -&gt; unit
 let fillAndRead iVar value =
-  IVar.fill iVar value // Job&lt;unit&gt; <span class="callout">1</span>
-  |&gt; Job.bind (fun _ -&gt; IVar.read iVar) // Job&lt;unit&gt; <span class="callout">2</span>
+  IVar.fill iVar value // Job&lt;unit&gt; // <span class="callout">1</span>
+  |&gt; Job.bind (fun _ -&gt; IVar.read iVar) // Job&lt;unit&gt; // <span class="callout">2</span>
   |&gt; Job.map (printfn &quot;%A&quot;) // Job&lt;unit&gt;
   |&gt; run // unit
 </code></pre>
@@ -454,13 +453,13 @@ let readOrTimeout delayInMillis iVar =
 
   let timeOutAlt = // Alt&lt;unit&gt;
     timeOutMillis delayInMillis 
-    |&gt; Alt.afterFun (fun _ -&gt; printfn &quot;time out!&quot;) <span class="callout">1</span>
+    |&gt; Alt.afterFun (fun _ -&gt; printfn &quot;time out!&quot;) // <span class="callout">1</span>
   
   let readAlt = // Alt&lt;unit&gt;
     IVar.read iVar
-    |&gt; Alt.afterFun (printfn &quot;%A&quot;) <span class="callout">2</span>
+    |&gt; Alt.afterFun (printfn &quot;%A&quot;) // <span class="callout">2</span>
   
-  timeOutAlt &lt;|&gt; readAlt <span class="callout">3</span>
+  timeOutAlt &lt;|&gt; readAlt // <span class="callout">3</span>
   |&gt; run
 </code></pre>
 
@@ -511,9 +510,9 @@ val it : unit = ()
 
 <pre><code class="language-fsharp">type Ticker =
   class
-    new : timeSpan:TimeSpan -&gt; Ticker <span class="callout">1</span>
-    member Stop : unit -&gt; unit <span class="callout">2</span>
-    member C : Ch&lt;DateTimeOffset&gt; <span class="callout">3</span>
+    new : timeSpan:TimeSpan -&gt; Ticker // <span class="callout">1</span>
+    member Stop : unit -&gt; unit // <span class="callout">2</span>
+    member C : Ch&lt;DateTimeOffset&gt; // <span class="callout">3</span>
   end
 </code></pre>
 
@@ -532,17 +531,17 @@ open System
 type Ticker (timeSpan : TimeSpan) =
   
   // Ch&lt;DateTimeOffset&gt;
-  let tickCh = Ch&lt;DateTimeOffset&gt;() <span class="callout">1</span>
+  let tickCh = Ch&lt;DateTimeOffset&gt;() // <span class="callout">1</span>
   
   // IVar&lt;unit&gt;
-  let cancelled = IVar() <span class="callout">2</span>
+  let cancelled = IVar() // <span class="callout">2</span>
 
   // unit -&gt; Alt&lt;unit&gt;
-  let tick () = <span class="callout">3</span>
+  let tick () = // <span class="callout">3</span>
     Ch.give tickCh DateTimeOffset.Now
 
   // unit -&gt; Alt&lt;unit&gt;
-  let rec loop () = <span class="callout">4</span>
+  let rec loop () = // <span class="callout">4</span>
     // Alt&lt;unit&gt;
     let tickerLoop = 
       timeOut timeSpan
@@ -550,15 +549,15 @@ type Ticker (timeSpan : TimeSpan) =
       |&gt; Alt.afterJob loop
     tickerLoop &lt;|&gt; IVar.read cancelled
 
-  do start (loop()) <span class="callout">5</span>
+  do start (loop()) // <span class="callout">5</span>
 
   // unit -&gt; unit 
   member __.Stop() = 
-    IVar.tryFill cancelled () |&gt; start <span class="callout">6</span>
+    IVar.tryFill cancelled () |&gt; start // <span class="callout">6</span>
 
   // Ch&lt;DateTimeOffset&gt;
   member __.C 
-    with get() = tickCh <span class="callout">7</span>
+    with get() = tickCh // <span class="callout">7</span>
 </code></pre>
 
 <p><span class="callout">1</span> A <code>Ticker</code> channel <code>tickCh</code> initialised as private value.</p>
@@ -592,8 +591,8 @@ let useCase1 nTimes (xSeconds : int) f =
   let ticker = new Ticker(timeSpan)
 
   ticker.C // Ch&lt;DateTimeOffset&gt;
-  |&gt; Alt.afterFun f // Alt&lt;unit&gt; <span class="callout">1</span>
-  |&gt; Job.forN nTimes // Job&lt;unit&gt; <span class="callout">2</span>
+  |&gt; Alt.afterFun f // Alt&lt;unit&gt; // <span class="callout">1</span>
+  |&gt; Job.forN nTimes // Job&lt;unit&gt; // <span class="callout">2</span>
   |&gt; run
   ticker.Stop()
 </code></pre>
@@ -639,23 +638,23 @@ let useCase2 t1Interval t2Interval xMillis =
   let ticker1 = ticker t1Interval
   let ticker2 = ticker t2Interval
 
-  let onTick tCh name loop = <span class="callout">1</span>
+  let onTick tCh name loop = // <span class="callout">1</span>
     tCh 
       |&gt; Alt.afterFun (fun t -&gt; printfn &quot;[%s] at %A&quot; name t)
       |&gt; Alt.afterJob loop
   
   // unit -&gt; Alt&lt;'a&gt;
-  let rec loop () = <span class="callout">2</span>
+  let rec loop () = // <span class="callout">2</span>
     onTick ticker1.C &quot;T1&quot; loop &lt;|&gt; onTick ticker2.C &quot;T2&quot; loop
 
   printfn &quot;Starts at %A&quot; (DateTimeOffset.Now)
-  start (loop()) <span class="callout">3</span>
+  start (loop()) // <span class="callout">3</span>
 
-  let onTimeOut _ = <span class="callout">4</span>
+  let onTimeOut _ = // <span class="callout">4</span>
     ticker1.Stop()
     ticker2.Stop()
 
-  timeOutMillis xMillis <span class="callout">5</span>
+  timeOutMillis xMillis // <span class="callout">5</span>
   |&gt; Alt.afterFun onTimeOut
   |&gt; run
   printfn &quot;Ends at %A&quot; (DateTimeOffset.Now)

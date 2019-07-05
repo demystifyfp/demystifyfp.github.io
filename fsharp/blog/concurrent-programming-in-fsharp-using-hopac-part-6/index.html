@@ -89,8 +89,7 @@
 
 <meta name="flattr:id" content="qjy9np">
 
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-twilight.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
@@ -329,7 +328,7 @@
 
 <p>The associated fsharp type <code>TimeBomb</code> will have the following signature</p>
 
-<pre><code>type TimeBomb =
+<pre><code class="language-fsharp">type TimeBomb =
   class
     new : unit -&gt; TimeBomb
     member Activate : seconds:int * defuseChar:char -&gt; unit
@@ -383,22 +382,22 @@ type Status =
   // Status
   member __.Status 
     with get() =
-      let deadReasonAlt = <span class="callout">1</span>
+      let deadReasonAlt = // // <span class="callout">1</span>
         IVar.read reason
         |&gt; Alt.afterFun Dead
 
-      let activatedAlt = <span class="callout">2</span>
+      let activatedAlt = // // <span class="callout">2</span>
         IVar.read activated
         |&gt; Alt.afterFun (fun _ -&gt; Alive)
       
-      let notActivatedAlt = <span class="callout">3</span>
+      let notActivatedAlt = // <span class="callout">3</span>
         Alt.always NotActivated 
 
       Alt.choose [
         deadReasonAlt 
         activatedAlt
         notActivatedAlt] 
-      |&gt; run <span class="callout">4</span>
+      |&gt; run // <span class="callout">4</span>
 </code></pre>
 
 <p><span class="callout">1</span> The <code>deadReasonAlt</code> will be available when the <code>reason</code> IVar is populated.</p>
@@ -466,22 +465,22 @@ type Status =
 
   // int -&gt; Char -&gt; unit
   let activate seconds =
-    let ticker = startTicker seconds <span class="callout">1</span>
-    startTimeOut seconds <span class="callout">2</span>
-    IVar.tryFill activated () |&gt; start <span class="callout">3</span>
+    let ticker = startTicker seconds // <span class="callout">1</span>
+    startTimeOut seconds // <span class="callout">2</span>
+    IVar.tryFill activated () |&gt; start // <span class="callout">3</span>
     IVar.read reason
-    |&gt; Alt.afterFun (fun _ -&gt; ticker.Stop()) <span class="callout">4</span>
+    |&gt; Alt.afterFun (fun _ -&gt; ticker.Stop()) // <span class="callout">4</span>
     |&gt; start
   // ...
 
   // int -&gt; unit
   member this.Activate (seconds : int) =
     match this.Status with
-    | NotActivated -&gt; activate seconds <span class="callout">5</span>
+    | NotActivated -&gt; activate seconds // <span class="callout">5</span>
     | _ -&gt; ()
 
   member __.DeadStatusAlt
-    with get() = IVar.read reason <span class="callout">6</span>
+    with get() = IVar.read reason // <span class="callout">6</span>
 </code></pre>
 
 <p><span class="callout">1</span> Starts the ticker</p>
@@ -544,7 +543,7 @@ val it : unit = ()
   // ...
 
   // Ch&lt;char&gt;
-  let inCh = Ch&lt;char&gt;() <span class="callout">1</span>
+  let inCh = Ch&lt;char&gt;() // <span class="callout">1</span>
 
   // char -&gt; Alt&lt;unit&gt;
   let rec inputLoop defuseChar =
@@ -554,7 +553,7 @@ val it : unit = ()
       else
         inputLoop defuseChar :&gt; Job&lt;unit&gt;
     inCh
-    |&gt; Alt.afterJob onInput <span class="callout">2</span>
+    |&gt; Alt.afterJob onInput // <span class="callout">2</span>
 
   // ...
 </code></pre>
@@ -612,9 +611,9 @@ val it : unit = ()
   printSecondsRemaining t
   t.Status |&gt; printfn &quot;Status: %A&quot;
   
-  TimeSpan.FromSeconds 3. <span class="callout">1</span>
+  TimeSpan.FromSeconds 3. // <span class="callout">1</span>
   |&gt; timeOut 
-  |&gt; Alt.afterFun (fun _ -&gt; t.TryDefuse(char)) <span class="callout">2</span>
+  |&gt; Alt.afterFun (fun _ -&gt; t.TryDefuse(char)) // <span class="callout">2</span>
   |&gt; Alt.afterJob (fun _ -&gt; t.DeadStatusAlt)
   |&gt; Alt.afterFun (printfn &quot;Status: %A&quot;)
   |&gt; run

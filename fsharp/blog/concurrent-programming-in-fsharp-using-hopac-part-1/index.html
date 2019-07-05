@@ -89,8 +89,7 @@
 
 <meta name="flattr:id" content="qjy9np">
 
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-twilight.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
@@ -520,9 +519,9 @@ let getProductReviews id = job {
 
 // int -&gt; Job&lt;ProductWithReviews&gt;
 let getProductWithReviews id = job {
-  let! product = getProduct id <span class="callout">1</span>
-  let! reviews = getProductReviews id <span class="callout">2</span>
-  return {  <span class="callout">3</span>
+  let! product = getProduct id // <span class="callout">1</span>
+  let! reviews = getProductReviews id // <span class="callout">2</span>
+  return {  // <span class="callout">3</span>
     Id = id
     Name = product.Name
     Reviews = reviews |&gt; List.map (fun r -&gt; r.Author,r.Comment)

@@ -89,8 +89,7 @@
 
 <meta name="flattr:id" content="qjy9np">
 
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-twilight.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
@@ -397,10 +396,10 @@ let getExpenditure expenseCategory transactions =
   getExpenses transactions
   |&gt; List.filter (fun e -&gt; e.Category = expenseCategory)
   |&gt; List.sumBy (fun expense -&gt; 
-    let (Money m) = expense.Amount <span class="callout">1</span>
-    m <span class="callout">2</span>
+    let (Money m) = expense.Amount // <span class="callout">1</span>
+    m // <span class="callout">2</span>
   )
-  |&gt; Money <span class="callout">3</span>
+  |&gt; Money // <span class="callout">3</span>
 </code></pre>
 
 <p><span class="callout">1</span> Unwrapping the underlying <code>decimal</code> value from the <code>Money</code> type.</p>
@@ -419,9 +418,9 @@ let getExpenditure expenseCategory transactions =
 let averageExpenditure expenseCategory transactionsList =
   transactionsList
   |&gt; List.map (getExpenditure expenseCategory)
-  |&gt; List.map (fun (Money m) -&gt; m) <span class="callout">1</span>
+  |&gt; List.map (fun (Money m) -&gt; m) // <span class="callout">1</span>
   |&gt; List.average
-  |&gt; Money <span class="callout">2</span>
+  |&gt; Money // <span class="callout">2</span>
 </code></pre>
 
 <p>Like the use case #1,</p>
@@ -446,21 +445,21 @@ let balance transactions =
   transactions
   |&gt; List.map ( function
                 | Credit x -&gt; 
-                  let (Money m) = x.Amount <span class="callout">1</span>
+                  let (Money m) = x.Amount // <span class="callout">1</span>
                   m
                 | Debit y -&gt;
-                  let (Money m) = y.Amount <span class="callout">2</span>
+                  let (Money m) = y.Amount // <span class="callout">2</span>
                   -m
               )
   |&gt; List.sum
-  |&gt; Money <span class="callout">3</span>
+  |&gt; Money // <span class="callout">3</span>
 </code></pre>
 
 <p>In the <code>balance</code> function, we have used an optimised version of the formula.</p>
 
 <p>Instead of computing the sum of credits and debits separately, we are applying the unary minus to all debits and calculating the sum of these transformed values in a single go.</p>
 
-<p>Like what we did for the use cases #1 and #2, Here also we are unwrapping the <code>decimal</code> type from the <code>Money</code> type at <span class="callout">1</span> and <span class="callout">2</span>, and at <span class="callout">3</span> we are wrapping the <code>decimal</code> type back to <code>Money</code> type after computing the sum.</p>
+<p>Like what we did for the use cases #1 and #2, Here also we are unwrapping the <code>decimal</code> type from the <code>Money</code> type at  <span class="callout">1</span> and <span class="callout">2</span>, and at <span class="callout">3</span> we are wrapping the <code>decimal</code> type back to <code>Money</code> type after computing the sum.</p>
 
 <h2 id="unwrapping-and-wrapping-boilerplate">Unwrapping and Wrapping Boilerplate</h2>
 
@@ -487,9 +486,9 @@ let balance transactions =
 <pre><code class="language-fsharp">type Money = Money of decimal with
   
   // Money * Money -&gt; Money
-  static member (+) (Money m1, Money m2) = Money (m1 + m2) <span class="callout">1</span>
+  static member (+) (Money m1, Money m2) = Money (m1 + m2) // <span class="callout">1</span>
   
-  static member Zero = Money 0m <span class="callout">2</span>
+  static member Zero = Money 0m // <span class="callout">2</span>
 </code></pre>
 
 <p><span class="callout">1</span> Unwraps the <code>decimal</code> type for two operands of <code>Money</code> and returns the summed value with the target type <code>Money</code></p>
@@ -557,10 +556,10 @@ List.average : ^T list -&gt; ^T
    transactions
 -  |&gt; List.map ( function
 -                | Credit x -&gt; 
--                  let (Money m) = x.Amount &lt;1&gt;
+-                  let (Money m) = x.Amount // &lt;1&gt;
 -                  m
 -                | Debit y -&gt;
--                  let (Money m) = y.Amount &lt;2&gt;
+-                  let (Money m) = y.Amount // &lt;2&gt;
 -                  -m
 -              )
 -  |&gt; List.sum

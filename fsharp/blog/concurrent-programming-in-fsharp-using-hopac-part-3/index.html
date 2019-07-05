@@ -89,8 +89,7 @@
 
 <meta name="flattr:id" content="qjy9np">
 
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-twilight.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
@@ -358,9 +357,9 @@
 <pre><code class="language-bash">&gt; touch ApiGateway.fsx
 &gt; forge paket init
 &gt; forge paket add Hopac
-&gt; forge paket add Http.fs <span class="callout">1</span>
-&gt; forge paket add System.Net.Http <span class="callout">2</span>
-&gt; forge paket add FSharp.Data <span class="callout">3</span>
+&gt; forge paket add Http.fs // <span class="callout">1</span>
+&gt; forge paket add System.Net.Http // <span class="callout">2</span>
+&gt; forge paket add FSharp.Data // <span class="callout">3</span>
 </code></pre>
 
 <p><span class="callout">1</span> <a href="https://github.com/haf/Http.fs"><strong>Http.Fs</strong></a> - A simple, functional HTTP client library for F# using Hopac</p>
@@ -394,8 +393,8 @@ open HttpFs.Client
 let httpGet url =
   Request.createUrl Get url // Request 
   |&gt; Request.setHeader (UserAgent &quot;FsHopac&quot;) // Request
-  |&gt; getResponse // Alt&lt;Response&gt; <span class="callout">1</span>
-  |&gt; Job.bind Response.readBodyAsString // Job&lt;string&gt; <span class="callout">2</span>
+  |&gt; getResponse // Alt&lt;Response&gt; // <span class="callout">1</span>
+  |&gt; Job.bind Response.readBodyAsString // Job&lt;string&gt; // <span class="callout">2</span>
 </code></pre>
 
 <p><span class="callout">1</span> <code>getResponse</code> is a function from <em>Http.Fs</em> library that fires the HTTP request and returns the Response as <code>Alt</code>, a subclass of Hopac's <code>Job</code>.</p>
@@ -426,7 +425,7 @@ let userUrl = sprintf &quot;%s/users/%s&quot; basePath
 let getUser username : Job&lt;User&gt; =
   userUrl username 
   |&gt; httpGet // Job&lt;string&gt;
-  |&gt; Job.map UserTypeProvider.Parse // Job&lt;User&gt; <span class="callout">1</span>
+  |&gt; Job.map UserTypeProvider.Parse // Job&lt;User&gt; // <span class="callout">1</span>
 </code></pre>
 
 <p><span class="callout">1</span> The <code>Job.map</code> function creates a job that runs the given job (<code>Job&lt;string&gt;</code>) and maps the result of the job (<code>string</code>) with the given function (<code>string -&gt; User</code>).</p>
@@ -588,11 +587,11 @@ let getRepoDto username (repo : Repo) =
 // string -&gt; Job&lt;UserDto&gt;
 let getUserDto username = job {
   let! user, repos = 
-    getUser username &lt;*&gt; getTopThreeUserRepos username <span class="callout">1</span> 
+    getUser username &lt;*&gt; getTopThreeUserRepos username // <span class="callout">1</span> 
   let! repoDtos = 
     repos 
-    |&gt; Array.map (getRepoDto username) <span class="callout">2</span>
-    |&gt; Job.conCollect <span class="callout">3</span>
+    |&gt; Array.map (getRepoDto username) // <span class="callout">2</span>
+    |&gt; Job.conCollect // <span class="callout">3</span>
   return {
     Name = user.Name 
     AvatarUrl = user.AvatarUrl
@@ -704,28 +703,28 @@ let httpGetWithPagination url =
 let getAllUserRepos username =
   
   // string -&gt; Repo list -&gt; Job&lt;Repo list&gt;
-  let rec getAllUserRepos' url (repos : Repo list) = job {  <span class="callout">1</span>
+  let rec getAllUserRepos' url (repos : Repo list) = job {  // <span class="callout">1</span>
     let! gitHubResponse = httpGetWithPagination url // GitHubResponse
     let currentPageRepos = 
       gitHubResponse.Body // string
       |&gt; ReposTypeProvider.Parse // Repo []
       |&gt; Array.toList // Repo list
-    let reposSoFar = repos @ currentPageRepos <span class="callout">2</span>
+    let reposSoFar = repos @ currentPageRepos // <span class="callout">2</span>
     match gitHubResponse.NextPageUrl with
-    | Some nextPageUrl -&gt; <span class="callout">3</span>
-       return! getAllUserRepos' nextPageUrl reposSoFar <span class="callout">4</span>
-    | None -&gt; return reposSoFar <span class="callout">5</span>
+    | Some nextPageUrl -&gt; // <span class="callout">3</span>
+       return! getAllUserRepos' nextPageUrl reposSoFar // <span class="callout">4</span>
+    | None -&gt; return reposSoFar // <span class="callout">5</span>
   }
 
-  getAllUserRepos' (userReposUrl username) [] // Job&lt;Repo list&gt; <span class="callout">6</span>
+  getAllUserRepos' (userReposUrl username) [] // Job&lt;Repo list&gt; // <span class="callout">6</span>
   |&gt; Job.map (List.toArray) // Job&lt;Repo []&gt; 
 </code></pre>
 
-<p><span class="callout">1</span> - The recursive function <code>getAllUserRepos'</code> implements the page navigation logic and the outer function <code>getAllUserRepos</code> calls this recursive one (at <span class="callout">6</span>) with the initial URL and an empty list of <code>Repo</code>.</p>
+<p><span class="callout">1</span> - The recursive function <code>getAllUserRepos'</code> implements the page navigation logic and the outer function <code>getAllUserRepos</code> calls this recursive one (at // <span class="callout">6</span>) with the initial URL and an empty list of <code>Repo</code>.</p>
 
 <p><span class="callout">2</span> - After getting the <code>Repo list</code> of the current page, the <code>getAllUserRepos'</code> function concatenates it with the repos from the initial list.</p>
 
-<p><span class="callout">3</span> - If the current page has the next page URL, we are calling the <code>getAllUserRepos'</code> function recursively with the next page's URL and repo lists populated so far (at <span class="callout">4</span>).</p>
+<p><span class="callout">3</span> - If the current page has the next page URL, we are calling the <code>getAllUserRepos'</code> function recursively with the next page's URL and repo lists populated so far (at // <span class="callout">4</span>).</p>
 
 <p><span class="callout">5</span> - If we reached the last page, we just return the repo lists populated so far</p>
 
@@ -868,14 +867,14 @@ open System.Threading
 
 <p>Then write the <code>getUserApi</code> function that calls the <code>getUserDto</code> function and transforms the return value to the corresponding HTTP response.</p>
 
-<pre><code class="language-fsharp">open Suave.Operators <span class="callout">1</span>
+<pre><code class="language-fsharp">open Suave.Operators // <span class="callout">1</span>
 
 // string -&gt; HttpContext -&gt; Async&lt;HttpContext option&gt;
 let getUserApi username ctx = async {
   let! userDtoResponse =
     getUserDto username // Job&lt;UserDto&gt;
-    |&gt; Job.catch // Job&lt;Choice&lt;UserDto, exn&gt;&gt; <span class="callout">2</span>
-    |&gt; Job.toAsync // Async&lt;Choice&lt;UserDto, exn&gt;&gt; <span class="callout">3</span>
+    |&gt; Job.catch // Job&lt;Choice&lt;UserDto, exn&gt;&gt; // <span class="callout">2</span>
+    |&gt; Job.toAsync // Async&lt;Choice&lt;UserDto, exn&gt;&gt; // <span class="callout">3</span>
   match userDtoResponse with
   | Choice1Of2 userDto -&gt;
     let res =

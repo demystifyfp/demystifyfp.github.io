@@ -89,8 +89,7 @@
 
 <meta name="flattr:id" content="qjy9np">
 
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-twilight.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
 <script>
@@ -333,9 +332,9 @@
 
 <pre><code class="language-fsharp">// int -&gt; int -&gt; Job&lt;unit&gt;
 let createJob jobId delayInMillis = job {
-  printfn &quot;starting job:%d&quot; jobId <span class="callout">1</span>
-  do! timeOutMillis delayInMillis <span class="callout">2</span>
-  printfn &quot;completed job:%d&quot; jobId <span class="callout">3</span>
+  printfn &quot;starting job:%d&quot; jobId // <span class="callout">1</span>
+  do! timeOutMillis delayInMillis // <span class="callout">2</span>
+  printfn &quot;completed job:%d&quot; jobId // <span class="callout">3</span>
 }
 
 // Job&lt;unit&gt; list
@@ -352,7 +351,7 @@ run concurrentJobs
 
 <p>The <code>job</code> created by the <code>createJob</code> function does two things.</p>
 
-<p><span class="callout">1</span> &amp; <span class="callout">3</span> - prints the status of the job</p>
+<p><span class="callout">1</span> &amp; // <span class="callout">3</span> - prints the status of the job</p>
 
 <p><span class="callout">2</span> - perform the actual computation (simulated using delay)</p>
 
@@ -396,13 +395,13 @@ run concurrentJobs
 
 <pre><code class="language-fsharp">// Ch&lt;JobStatus&gt; -&gt; int -&gt; Job&lt;unit&gt;
 let createJob jobStatusChannel jobId = job {
-  do! Ch.give jobStatusChannel (Started jobId) <span class="callout">1</span>
-  do! timeOutMillis (jobId * 1000) <span class="callout">2</span>
-  do! Ch.give jobStatusChannel (Completed jobId) <span class="callout">3</span>
+  do! Ch.give jobStatusChannel (Started jobId) // <span class="callout">1</span>
+  do! timeOutMillis (jobId * 1000) // <span class="callout">2</span>
+  do! Ch.give jobStatusChannel (Completed jobId) // <span class="callout">3</span>
 }
 </code></pre>
 
-<p><span class="callout">1</span> &amp; <span class="callout">3</span> - Communicate the job status through channels instead of printing</p>
+<p><span class="callout">1</span> &amp; // <span class="callout">3</span> - Communicate the job status through channels instead of printing</p>
 
 <p><span class="callout">2</span> - Simulates a long computation. (Job id <code>1</code> takes one second, <code>2</code> takes two seconds and so on)</p>
 
@@ -419,7 +418,7 @@ let createJob jobStatusChannel jobId = job {
 
 <pre><code class="language-fsharp">// Ch&lt;JobStatus&gt; -&gt; Job&lt;unit&gt;
 let jobStatusPrinterJob jobStatusChannel = job {
-  let! jobStatus = Ch.take jobStatusChannel <span class="callout">1</span>
+  let! jobStatus = Ch.take jobStatusChannel // <span class="callout">1</span>
   match jobStatus with
   | Started jobId -&gt;
     printfn &quot;starting job:%d&quot; jobId
@@ -436,10 +435,10 @@ let jobStatusPrinterJob jobStatusChannel = job {
 
 <pre><code class="language-fsharp">// Ch&lt;JobStatus&gt; -&gt; int -&gt; Job&lt;unit&gt;
 let main jobStatusChannel jobsCount = job {
-  let jobStatusPrinter = jobStatusPrinterJob jobStatusChannel <span class="callout">1</span>
-  do! Job.foreverServer jobStatusPrinter <span class="callout">2</span>
-  let myJobs = List.init jobsCount (createJob jobStatusChannel) <span class="callout">3</span>
-  return! Job.conIgnore myJobs <span class="callout">4</span>
+  let jobStatusPrinter = jobStatusPrinterJob jobStatusChannel // <span class="callout">1</span>
+  do! Job.foreverServer jobStatusPrinter // <span class="callout">2</span>
+  let myJobs = List.init jobsCount (createJob jobStatusChannel) // <span class="callout">3</span>
+  return! Job.conIgnore myJobs // <span class="callout">4</span>
 }
 </code></pre>
 

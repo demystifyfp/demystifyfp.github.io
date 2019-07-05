@@ -45,3 +45,27 @@ pre code {
 .article-date {
   font-family: 'Open Sans', serif;
 }
+
+.rbl1 {
+  color: #ccc !important;
+}
+
+.rbl2 {
+  color: #0098e6 !important;
+}
+
+.rbl3 {
+  color: #e16d6d !important;
+}
+
+.rbl4 {
+  color: #3fa455 !important;
+}
+
+.rbl5 {
+  color: #c968e6 !important;
+}
+
+.rbl6 {
+  color: #999 !important;
+}
