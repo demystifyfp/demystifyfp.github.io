@@ -7,10 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Thu, 18 Oct 2018 01:17:17 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 26 Jul 2019 15:39:03 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Bootstrapping Clojure Project Using Mount And Aero</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/</link>
+      <pubDate>Fri, 26 Jul 2019 15:39:03 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/</guid>
+      <description>In this blog post, we are going to focus on bootstrapping the Clojure project using Mount &amp;amp; Aero and interacting with the application using the REPL.
+ This blog post is a part 1 of the blog series Building an E-Commerce Marketplace Middleware in Clojure.
+ Getting Started Let&amp;rsquo;s get started by creating a new app project using Leiningen and give it a project name wheel.
+lein new app wheel  Reading Configuration To manage the application-level configuration, we are going to use Aero.</description>
+    </item>
     
     <item>
       <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-2)</title>
@@ -45,6 +57,17 @@ This first part is going to focus on developing a RESTful CRUD APIs for a specif
       <description>We at Ajira successfully delivered our first project in Clojure recently. It was an impressive outing for the last eight weeks!
 We were able to deliver some complex features with ease because of the outstanding data-oriented programming features provided by Clojure. This blog post summarizes our experiences.
 The Problem Statement The Project that we delivered was a Low Code Development Platform where the system administrator configures the way the entire application would look like &amp;amp; behave for the end user.</description>
+    </item>
+    
+    <item>
+      <title>Building an E-Commerce Marketplace Middleware in Clojure</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/intro/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/intro/</guid>
+      <description>We recently built an e-commerce marketplace middleware for a leading retail chain for consumer electronics &amp;amp; durables. The middleware enables them to sell their products on multiple e-commerce sites seamlessly.
+Through this blog post series, I am planning to share how we developed it in Clojure by building a minimal version of it.
+Problem Statement The retailer (our client) runs 134 stores across 32 cities in India. In addition to this, they sell their products in e-commerce marketplaces Tata-Cliq, Amazon and Flipkart.</description>
     </item>
     
   </channel>

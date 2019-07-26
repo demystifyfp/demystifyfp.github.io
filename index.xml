@@ -11,6 +11,186 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Bootstrapping Clojure Project Using Mount And Aero</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/</link>
+      <pubDate>Fri, 26 Jul 2019 15:39:03 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/</guid>
+      <description>
+
+&lt;p&gt;In this blog post, we are going to focus on bootstrapping the Clojure project using &lt;a href=&#34;https://github.com/tolitius/mount&#34; target=&#34;_blank&#34;&gt;Mount&lt;/a&gt; &amp;amp; &lt;a href=&#34;https://github.com/juxt/aero&#34; target=&#34;_blank&#34;&gt;Aero&lt;/a&gt; and interacting with the application using the REPL.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;This blog post is a part 1 of the blog series &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/intro/&#34; target=&#34;_blank&#34;&gt;Building an E-Commerce Marketplace Middleware in Clojure&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;getting-started&#34;&gt;Getting Started&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by creating a new &lt;code&gt;app&lt;/code&gt; project using &lt;a href=&#34;https://github.com/technomancy/leiningen&#34; target=&#34;_blank&#34;&gt;Leiningen&lt;/a&gt; and give it a project name &lt;code&gt;wheel&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;lein new app wheel
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;reading-configuration&#34;&gt;Reading Configuration&lt;/h2&gt;
+
+&lt;p&gt;To manage the application-level configuration, we are going to use &lt;a href=&#34;https://github.com/juxt/aero&#34; target=&#34;_blank&#34;&gt;Aero&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; project.clj
+(defproject wheel &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :dependencies [[org.clojure/clojure &amp;quot;1.10.1&amp;quot;]
+                 [aero &amp;quot;1.1.3&amp;quot;]]
+  ; ...
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Aero expects us to specify the configuration as a Clojure &lt;code&gt;map&lt;/code&gt; in an &lt;code&gt;EDN&lt;/code&gt; file. So, let&amp;rsquo;s create a &lt;code&gt;config.edn&lt;/code&gt; in the &lt;code&gt;resources&lt;/code&gt; directory and add configuration map with the database configuration entry.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;{:app
+ {:database
+  {:adapter            &amp;quot;postgresql&amp;quot;
+   :username           #or [#env &amp;quot;WHEEL_APP_DB_USERNAME&amp;quot; &amp;quot;postgres&amp;quot;]
+   :password           #or [#env &amp;quot;WHEEL_APP_DB_PASSWORD&amp;quot; &amp;quot;postgres&amp;quot;]
+   :database-name      #or [#env &amp;quot;WHEEL_APP_DB_NAME&amp;quot; &amp;quot;wheel&amp;quot;]
+   :server-name        #or [#env &amp;quot;WHEEL_APP_DB_SERVER&amp;quot; &amp;quot;localhost&amp;quot;]
+   :port-number        #or [#env &amp;quot;WHEEL_APP_DB_PORT&amp;quot; 5432]}}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When Aero reads this map, it tries to populate the configuration parameters from the environment variables and use the defaults if the corresponding environment variable not found.&lt;/p&gt;
+
+&lt;p&gt;To read this configuration in our application, Let&amp;rsquo;s add a new file &lt;code&gt;config.clj&lt;/code&gt; under a folder &lt;code&gt;infra&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/wheel/infra
+&amp;gt; touch src/wheel/infra/config.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add a new function to read this configuration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; infra/config.clj
+(ns wheel.infra.config
+  (:require [aero.core :as aero]
+            [clojure.java.io :as io]))
+
+(defn- read-config []
+  (aero/read-config (io/resource &amp;quot;config.edn&amp;quot;)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we need to read this configuration during the application bootstrap before starting anything else. It&amp;rsquo;s where &lt;a href=&#34;https://github.com/tolitius/mount&#34; target=&#34;_blank&#34;&gt;Mount&lt;/a&gt; comes into the picture.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; project.clj
+(defproject wheel &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :dependencies [ ; ...
+                 [mount &amp;quot;0.1.16&amp;quot;]]
+  ; ...
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With Mount added as dependency, let&amp;rsquo;s define a Mount state called &lt;code&gt;root&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; infra/config.clj
+(ns wheel.infra.config
+  (:require ; ...
+            [mount.core :as mount]))
+
+(defn- read-config []
+  (aero/read-config (io/resource &amp;quot;config.edn&amp;quot;)))
+
+(mount/defstate root
+  :start (read-config))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add a new function &lt;code&gt;database&lt;/code&gt; to expose the database configuration,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; infra/config.clj
+; ...
+(defn database []
+  (get-in root [:app :database]))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;By defining an individual function(s) like this for each sub-system configuration, we are decoupling the implementation of the configuration from the downstream parts of the system which require this configuration.&lt;/p&gt;
+
+&lt;h2 id=&#34;verifying-using-repl&#34;&gt;Verifying using REPL&lt;/h2&gt;
+
+&lt;p&gt;To verify our implementation so far, let&amp;rsquo;s start the REPL&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; lein repl
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Inside the REPL, load and switch to the &lt;code&gt;wheel.infra.config&lt;/code&gt; namespace&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wheel.core=&amp;gt; (load &amp;quot;wheel/infra/config&amp;quot;)
+nil
+wheel.core=&amp;gt; (in-ns &#39;wheel.infra.config)
+#object[clojure.lang.Namespace 0x7d26cd65 &amp;quot;wheel.infra.config&amp;quot;]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then start Mount, which will in-turn start the &lt;code&gt;config/root&lt;/code&gt; state.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wheel.infra.config=&amp;gt; (mount/start)
+{:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now we can call the &lt;code&gt;database&lt;/code&gt; function to get the database configuration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wheel.infra.config=&amp;gt; (database)
+{:adapter &amp;quot;postgresql&amp;quot;, :username &amp;quot;postgres&amp;quot;, ...}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This approach is one of the least effective ways to interact with the REPL without any editor/IDE support.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s have a look at how do we do it in VS Code.&lt;/p&gt;
+
+&lt;h2 id=&#34;vs-code-calva-repl&#34;&gt;VS Code Calva-REPL&lt;/h2&gt;
+
+&lt;p&gt;The VS Code &lt;a href=&#34;https://marketplace.visualstudio.com/items?itemName=betterthantomorrow.calva&#34; target=&#34;_blank&#34;&gt;Calva Extension&lt;/a&gt; provides a very good development experience for developing Clojure applications in VS Code.&lt;/p&gt;
+
+&lt;p&gt;To use the REPL in VS Code, open the project and issue the command &lt;code&gt;Calva: Start a REPL project and connect&lt;/code&gt; (&lt;code&gt;ctrl+alt+c ctrl+alt+j&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;In the project type prompt, select &lt;code&gt;Leiningen&lt;/code&gt; and then in the profiles prompt, select none.&lt;/p&gt;
+
+&lt;p&gt;When Calva has connected, it will open a REPL window.&lt;/p&gt;
+
+&lt;p&gt;Then open the &lt;code&gt;config.clj&lt;/code&gt; file and issue the command &lt;code&gt;Calva: Load (evaluate) current file and its dependencies&lt;/code&gt; (&lt;code&gt;ctrl+alt+c enter&lt;/code&gt;). It will load the &lt;code&gt;wheel.infra.config&lt;/code&gt; namespace in the REPL.&lt;/p&gt;
+
+&lt;p&gt;We can type in the code as we did in the previous section. However, typing directly in the REPL is not a recommended practice. Usually, we will use the &lt;a href=&#34;https://clojuredocs.org/clojure.core/comment&#34; target=&#34;_blank&#34;&gt;comment&lt;/a&gt; special form and type in the individual expressions that we want to explore in the REPL.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; config.clj
+; ...
+(comment 
+  (mount/start)
+  (database))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To verify the output, place the cursor at the end of &lt;code&gt;(mount/start)&lt;/code&gt; and issue the command &lt;code&gt;Calva: Send Current Form to REPL wind and evaluate it&lt;/code&gt; (&lt;code&gt;alt+ctrl+c  alt+e&lt;/code&gt;). We will get output like below in the REPL window.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wheel.infra.config=&amp;gt; (mount/start)
+{:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can do a similar thing to verify the &lt;code&gt;database&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wheel.infra.config=&amp;gt; (database)
+{:adapter &amp;quot;postgresql&amp;quot;, :username &amp;quot;postgres&amp;quot;, ...}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We can stop the application by calling the mount&amp;rsquo;s &lt;code&gt;stop&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; config.clj
+; ...
+(comment 
+  (mount/stop))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we created a new Clojure project using Leiningen, added the application-level configuration using Aero and bootstrapped the configuration reading part using Mount. We also learnt how to interact with the application using the REPL.&lt;/p&gt;
+
+&lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.13/clojure/wheel&#34; target=&#34;_blank&#34;&gt;this GitHub&lt;/a&gt; repository.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Model Binding in Suave and Saturn</title>
       <link>https://www.demystifyfp.com/fsharp/blog/model-binding-in-suave-and-saturn/</link>
       <pubDate>Mon, 17 Dec 2018 20:50:23 +0530</pubDate>
@@ -4694,15 +4874,6 @@ val it : Result&amp;lt;Config,EnvVarParseError list&amp;gt; =
 &lt;/ol&gt;
 &lt;/div&gt;
 </description>
-    </item>
-    
-    <item>
-      <title>F# Applied</title>
-      <link>https://www.demystifyfp.com/book/fs-applied/</link>
-      <pubDate>Wed, 27 Apr 2016 00:00:00 +0000</pubDate>
-      
-      <guid>https://www.demystifyfp.com/book/fs-applied/</guid>
-      <description></description>
     </item>
     
   </channel>
