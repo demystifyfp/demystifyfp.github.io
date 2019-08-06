@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 26 Jul 2019 15:39:03 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 06 Aug 2019 21:59:03 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/tags/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Configuring Database Connection Pooling, Migration and Reloaded Workflow</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/</link>
+      <pubDate>Tue, 06 Aug 2019 21:59:03 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/</guid>
+      <description>In the last blog post, we bootstrapped the Clojure project using Mount and Aero. We are going to continue from we left off and configure database connection pooling, migration &amp;amp; Reloaded Workflow in this blog post.
+ This blog post is a part 2 of the blog series Building an E-Commerce Marketplace Middleware in Clojure.
+ Configuring Hikari-CP Let&amp;rsquo;s get started by adding the hikari-cp, a Clojure wrapper to HikariCP, and the Postgres driver dependencies in the project.</description>
+    </item>
     
     <item>
       <title>Bootstrapping Clojure Project Using Mount And Aero</title>

@@ -11,6 +11,247 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Configuring Database Connection Pooling, Migration and Reloaded Workflow</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/</link>
+      <pubDate>Tue, 06 Aug 2019 21:59:03 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/</guid>
+      <description>
+
+&lt;p&gt;In the &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;, we bootstrapped the Clojure project using Mount and Aero. We are going to continue from we left off and configure database connection pooling, migration &amp;amp; Reloaded Workflow in this blog post.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;This blog post is a part 2 of the blog series &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/intro/&#34; target=&#34;_blank&#34;&gt;Building an E-Commerce Marketplace Middleware in Clojure&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;configuring-hikari-cp&#34;&gt;Configuring Hikari-CP&lt;/h2&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by adding the &lt;a href=&#34;https://github.com/tomekw/hikari-cp&#34; target=&#34;_blank&#34;&gt;hikari-cp&lt;/a&gt;, a Clojure wrapper to &lt;a href=&#34;https://github.com/brettwooldridge/HikariCP&#34; target=&#34;_blank&#34;&gt;HikariCP&lt;/a&gt;, and the Postgres driver dependencies in the &lt;code&gt;project.clj&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(defproject wheel &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :dependencies [; ...
+                 [org.postgresql/postgresql &amp;quot;42.2.6&amp;quot;]
+                 [hikari-cp &amp;quot;2.8.0&amp;quot;]]
+  ; ...
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;NOTE: If you already have a running (and jacked in) REPL, you need to stop and start it again after adding any dependencies in the &lt;code&gt;project.clj&lt;/code&gt; file.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To configure the Hikari connection pool, Let&amp;rsquo;s create a new file &lt;code&gt;database.clj&lt;/code&gt; in the &lt;code&gt;infra&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/wheel/infra/database.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then define a mount state &lt;code&gt;datasource&lt;/code&gt; to manage the life-cycle of the connection pool.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns wheel.infra.database
+  (:require [wheel.infra.config :as config]
+            [mount.core :as mount]
+            [hikari-cp.core :as hikari]))
+
+(defn- make-datasource []
+  (hikari/make-datasource (config/database))) ;&amp;lt;1&amp;gt;
+
+(mount/defstate datasource
+  :start (make-datasource)
+  :stop (hikari/close-datasource datasource))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Retrieves the database configuration and creates the datasource object.&lt;/p&gt;
+
+&lt;p&gt;Now if we start the application through Mount, we will get the following output.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.database=&amp;gt; (mount/start)
+{:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot; 
+           &amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As the state &lt;code&gt;datasource&lt;/code&gt; depends on the config&amp;rsquo;s &lt;code&gt;root&lt;/code&gt; state, Mount starts it first and then it starts the &lt;code&gt;datasource&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&#34;database-migration-using-flyway&#34;&gt;Database Migration Using Flyway&lt;/h2&gt;
+
+&lt;p&gt;There are multiple libraries in Clojure (and Java) to perform database migration. Our preference is &lt;a href=&#34;https://flywaydb.org&#34; target=&#34;_blank&#34;&gt;Flyway&lt;/a&gt;, based on our success in other Java projects.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by adding the dependency in the &lt;code&gt;project.clj&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(defproject wheel &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :dependencies [; ...
+                 [org.flywaydb/flyway-core &amp;quot;5.2.4&amp;quot;]]
+  ; ...
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then in the &lt;code&gt;database.clj&lt;/code&gt; file, &lt;code&gt;import&lt;/code&gt; the &lt;code&gt;Flyway&lt;/code&gt; namespace and add a new function &lt;code&gt;migrate&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns wheel.infra.database
+  ; ...
+  (:import [org.flywaydb.core Flyway]))
+
+; ...
+
+(defn migrate []
+  (.. (Flyway/configure) ; &amp;lt;1&amp;gt;
+      (dataSource datasource)
+      (locations (into-array String [&amp;quot;classpath:db/migration&amp;quot;])) ; &amp;lt;2&amp;gt;
+      load
+      migrate))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Creates an instance of Flyway and setup the configuration using the &lt;a href=&#34;https://clojure.org/reference/java_interop#_the_dot_special_form&#34; target=&#34;_blank&#34;&gt;dot special form&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; Setting the migration files path to &lt;code&gt;database/migration&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;This path doesn&amp;rsquo;t exist yet. So, let&amp;rsquo;s create it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;&amp;gt; mkdir -p resources/database/migration 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To verify the database migration, let&amp;rsquo;s load the updated &lt;code&gt;database.clj&lt;/code&gt; in the REPL and invoke the &lt;code&gt;migrate&lt;/code&gt; function.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.database=&amp;gt; (mount/start)
+{:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot; 
+           &amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+wheel.infra.database=&amp;gt; (migrate)
+0
+wheel.infra.database=&amp;gt; (mount/stop)
+{:stopped [&amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we check the database now, it will have the &lt;code&gt;flyway_schema_history&lt;/code&gt; table.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; psql -d wheel
+
+wheel=# \d
+
+                 List of relations
+ Schema |         Name          | Type  |  Owner
+--------+-----------------------+-------+----------
+ public | flyway_schema_history | table | postgres
+(1 row)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;separating-database-migration-from-application-bootstrap&#34;&gt;Separating Database Migration From Application Bootstrap&lt;/h2&gt;
+
+&lt;p&gt;Performing database migration during application bootstrap has &lt;a href=&#34;https://pythonspeed.com/articles/schema-migrations-server-startup/&#34; target=&#34;_blank&#34;&gt;certain limitations&lt;/a&gt;, and it is a best practice to decouple it. In our application, we did it by having separate entry-points, one to start the application and another to migrate the database.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s create a new file &lt;code&gt;core.clj&lt;/code&gt; in the &lt;code&gt;infra&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;&amp;gt; touch src/wheel/infra/core.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then define two functions, &lt;code&gt;start-app&lt;/code&gt; and &lt;code&gt;migrate-database&lt;/code&gt;, to start the application and perform database migration, respectively.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns wheel.infra.core
+  (:require [wheel.infra.config :as config]
+            [wheel.infra.database :as db]
+            [mount.core :as mount]))
+
+(defn start-app []
+  (mount/start))
+
+(defn migrate-database []
+  (mount/start #&#39;config/root #&#39;db/datasource) ; &amp;lt;1&amp;gt;
+  (db/migrate) ; &amp;lt;2&amp;gt;
+  (mount/stop #&#39;db/datasource)) ; &amp;lt;3&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Invokes Mount&amp;rsquo;s &lt;code&gt;start&lt;/code&gt; function with that states that we wanted to start. Note that Mount doesn&amp;rsquo;t start the transitive dependent states in this function overload.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; Performs the database migration&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; Stops the datasource after completing the migration.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s add the &lt;code&gt;stop-app&lt;/code&gt; function as well to stop the application.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns wheel.infra.core
+  ;...
+  )
+; ...
+(defn stop-app []
+  (mount/stop))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;reloaded-workflow&#34;&gt;Reloaded Workflow&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&#34;http://thinkrelevance.com/blog/2013/06/04/clojure-workflow-reloaded&#34; target=&#34;_blank&#34;&gt;Reloaded Workflow&lt;/a&gt; is one of the common practice in Clojure development to do interactive REPL driven development.&lt;/p&gt;
+
+&lt;p&gt;Adding this to our current codebase is straight-forward.&lt;/p&gt;
+
+&lt;p&gt;As a first step, add a Leiningen user profile called &lt;code&gt;dev&lt;/code&gt; in the &amp;rsquo;s &lt;code&gt;project.clj&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(defproject wheel &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :profiles { ;...
+             :dev {:source-paths [&amp;quot;dev&amp;quot;] ; &amp;lt;1&amp;gt;
+                   :dependencies [[org.clojure/tools.namespace &amp;quot;0.3.1&amp;quot;]]}}) ; &amp;lt;2&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Adds a new source-path to load the Clojure files from the &lt;code&gt;dev&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; Adds a dev dependency &lt;a href=&#34;https://github.com/clojure/tools.namespace&#34; target=&#34;_blank&#34;&gt;tools.namespace&lt;/a&gt; to reload the modified source files interactively.&lt;/p&gt;
+
+&lt;p&gt;Then, create a new file &lt;code&gt;user.clj&lt;/code&gt; in the &lt;code&gt;dev&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; dev/user.clj
+(ns user
+  (:require [wheel.infra.core :refer [start-app ; &amp;lt;1&amp;gt;
+                                      stop-app 
+                                      migrate-database]
+                              :as infra]
+            [clojure.tools.namespace.repl :as repl]))
+
+(defn reset [] ; &amp;lt;2&amp;gt;
+  (stop-app)
+  (repl/refresh :after &#39;infra/start-app))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; Makes &lt;code&gt;start-app&lt;/code&gt;, &lt;code&gt;stop-app&lt;/code&gt; and &lt;code&gt;migrate-database&lt;/code&gt; function to be available in the &lt;code&gt;user&lt;/code&gt; namespace.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; Adds a &lt;code&gt;reset&lt;/code&gt; function, which stops the application and reloads all the modified codes. Using the &lt;code&gt;:after&lt;/code&gt; parameter, we are informing the &lt;code&gt;refresh&lt;/code&gt; function to start the app after the reload.&lt;/p&gt;
+
+&lt;p&gt;To see it in action, stop the current REPL session and start it again. This time profile selection Calva prompt will include the &lt;code&gt;dev&lt;/code&gt; profile in the list of options.
+&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/lein-profiles-prompt.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When we select the &lt;code&gt;dev&lt;/code&gt; profile, it will start the Leiningen REPL along with the configuration specified the &lt;code&gt;dev&lt;/code&gt; profile.&lt;/p&gt;
+
+&lt;p&gt;Then from the REPL, we can include the &lt;code&gt;user&lt;/code&gt; profile and manage the application&amp;rsquo;s life cycle.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.core=&amp;gt; (in-ns &#39;user)
+#namespace[user]
+
+wheel.core=&amp;gt; (start-app)
+{:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot; 
+           &amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+
+wheel.core=&amp;gt; (stop-app)
+{:stopped [&amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+
+wheel.core=&amp;gt; (migrate-database)
+{:stopped [&amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+
+wheel.core=&amp;gt; (reset)
+:reloading (wheel.infra.config wheel.infra.database 
+            wheel.infra.core wheel.core wheel.core-test user)
+{:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot; 
+           &amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we learnt how to configure the database connection pooling using Hikari, database migration using Flyway and Reloaded Workflow using the Mount and Leiningen profile. There are other libraries and ways to do this as well, but the approach that I described here is the one that worked for us.&lt;/p&gt;
+
+&lt;p&gt;I would love to learn your preferences and approaches.&lt;/p&gt;
+
+&lt;p&gt;The source code associated with this part is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.14/clojure/wheel&#34; target=&#34;_blank&#34;&gt;this GitHub&lt;/a&gt; repository.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Bootstrapping Clojure Project Using Mount And Aero</title>
       <link>https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/</link>
       <pubDate>Fri, 26 Jul 2019 15:39:03 +0530</pubDate>
@@ -232,6 +473,7 @@ wheel.core=&amp;gt; (in-ns &#39;wheel.infra.config)
 
 &lt;ol&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/&#34; target=&#34;_blank&#34;&gt;Bootstrapping the Clojure Project with Mount&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/&#34; target=&#34;_blank&#34;&gt;Configuring Database Connection Pooling, Migration and Reloaded Workflow&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>
     </item>
@@ -3969,301 +4211,6 @@ List.average : ^T list -&amp;gt; ^T
 &lt;p&gt;In this blog post, we saw how to avoid some boilerplate code while creating domain types for primitives in fsharp. On a side note, by adding the static members &lt;code&gt;+&lt;/code&gt; and &lt;code&gt;Zero&lt;/code&gt; we made the &lt;code&gt;Money&lt;/code&gt; type a &lt;a href=&#34;https://en.wikipedia.org/wiki/Monoid&#34;&gt;Monoid&lt;/a&gt;. The &lt;code&gt;List.sum&lt;/code&gt; and &lt;code&gt;List.sumBy&lt;/code&gt; functions are designed to act on any Monoids and hence we solved the use cases with less code!&lt;/p&gt;
 
 &lt;p&gt;The source code is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.1&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Introducing FsConfig</title>
-      <link>https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/</link>
-      <pubDate>Tue, 06 Feb 2018 19:48:26 +0530</pubDate>
-      
-      <guid>https://www.demystifyfp.com/fsharp/blog/introducing-fsconfig/</guid>
-      <description>
-
-&lt;p&gt;I am delighted to introduce a new F# library, &lt;a href=&#34;https://github.com/demystifyfp/FsConfig&#34; target=&#34;_blank&#34;&gt;FsConfig&lt;/a&gt;. FsConfig is a F# library for reading configuration data from environment variables and AppSettings with type safety&lt;/p&gt;
-
-&lt;h2 id=&#34;why-fsconfig&#34;&gt;Why FsConfig?&lt;/h2&gt;
-
-&lt;p&gt;To understand FsConfig, let&amp;rsquo;s have a look at an use case from the &lt;a href=&#34;https://github.com/demystifyfp/FsTweet&#34; target=&#34;_blank&#34;&gt;FsTweet&lt;/a&gt; application.&lt;/p&gt;
-
-&lt;p&gt;The FsTweet application follows &lt;a href=&#34;https://12factor.net/config&#34; target=&#34;_blank&#34;&gt;The Twelve-Factor App&lt;/a&gt; guideline for managing the configuration data. During the application bootstrap, it retrieves its ten configuration parameters from their respective environment variables.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open System
-
-let main argv =
-
-  let fsTweetConnString = 
-   Environment.GetEnvironmentVariable  &amp;quot;FSTWEET_DB_CONN_STRING&amp;quot;
-
-  let serverToken =
-    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_POSTMARK_SERVER_TOKEN&amp;quot;
-
-  let senderEmailAddress =
-    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_SENDER_EMAIL_ADDRESS&amp;quot;
-
-  let env = 
-    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_ENVIRONMENT&amp;quot;
-
-  let streamConfig : GetStream.Config = {
-      ApiKey = 
-        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_KEY&amp;quot;
-      ApiSecret = 
-        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_SECRET&amp;quot;
-      AppId = 
-        Environment.GetEnvironmentVariable &amp;quot;FSTWEET_STREAM_APP_ID&amp;quot;
-  }
-
-  let serverKey = 
-    Environment.GetEnvironmentVariable &amp;quot;FSTWEET_SERVER_KEY&amp;quot;
-
-  let port = 
-    Environment.GetEnvironmentVariable &amp;quot;PORT&amp;quot; |&amp;gt; uint16
-
-  // ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Though the code snippet does the job, there are some shortcomings.&lt;/p&gt;
-
-&lt;ol&gt;
-&lt;li&gt;The code is verbose.&lt;/li&gt;
-&lt;li&gt;There is no error handling to deal with the absence of values or wrong values.&lt;/li&gt;
-&lt;li&gt;Explicit type casting&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;With the help of FsConfig, we can overcome these limitations by specifying the configuration data as a F# Record type.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type StreamConfig = {
-  Key : string
-  Secret : string
-  AppId : string
-}
-
-[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;)&amp;gt;]
-type Config = {
-
-  DbConnString : string
-  PostmarkServerToken : string
-  SenderEmailAddress : string
-  ServerKey : string
-  Environment : string
-
-  [&amp;lt;CustomName(&amp;quot;PORT&amp;quot;)&amp;gt;]
-  Port : uint16
-  Stream : StreamConfig
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And then read all the associated environment variables in a single function call with type safety and error handling!&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let main argv =
-
-  let config = 
-    match EnvConfig.Get&amp;lt;Config&amp;gt;() with
-    | Ok config -&amp;gt; config
-    | Error error -&amp;gt; 
-      match error with
-      | NotFound envVarName -&amp;gt; 
-        failwithf &amp;quot;Environment variable %s not found&amp;quot; envVarName
-      | BadValue (envVarName, value) -&amp;gt;
-        failwithf &amp;quot;Environment variable %s has invalid value&amp;quot; envVarName value
-      | NotSupported msg -&amp;gt; 
-        failwith msg
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;supported-data-types&#34;&gt;Supported Data Types&lt;/h2&gt;
-
-&lt;p&gt;FsConfig supports the following data types and leverages their respective &lt;code&gt;TryParse&lt;/code&gt; function to do the type conversion.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;Int16&lt;/code&gt;, &lt;code&gt;Int32&lt;/code&gt;, &lt;code&gt;Int64&lt;/code&gt;, &lt;code&gt;UInt16&lt;/code&gt;, &lt;code&gt;UInt32&lt;/code&gt;, &lt;code&gt;UInt64&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Byte&lt;/code&gt;, &lt;code&gt;SByte&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Single&lt;/code&gt;, &lt;code&gt;Double&lt;/code&gt;, &lt;code&gt;Decimal&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Char&lt;/code&gt;, &lt;code&gt;String&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Bool&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;TimeSpan&lt;/code&gt;, &lt;code&gt;DateTimeOffset&lt;/code&gt;, &lt;code&gt;DateTime&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Guid&lt;/code&gt;&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;Enum&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&#34;option-type&#34;&gt;Option Type&lt;/h3&gt;
-
-&lt;p&gt;FsConfig allows us to specify optional configuration parameters using the &lt;code&gt;option&lt;/code&gt; type. In the previous example, if the configuration parameter &lt;code&gt;Port&lt;/code&gt; is optional, we can define it like&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;type Config = {
-   ...
--  Port : uint16
-+  Port : uint16 option
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;list-type&#34;&gt;List Type&lt;/h3&gt;
-
-&lt;p&gt;FsConfig also supports &lt;code&gt;list&lt;/code&gt; type, and it expects comma separated individual values.&lt;/p&gt;
-
-&lt;p&gt;For example, to get mulitple ports, we can define the config as&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
-  Port : uint16 list
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;and then pass the value &lt;code&gt;8084,8085,8080&lt;/code&gt; using the environment variable &lt;code&gt;PORT&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;record-type&#34;&gt;Record Type&lt;/h3&gt;
-
-&lt;p&gt;As shown in the &lt;a href=&#34;#why-fsconfig&#34; target=&#34;_blank&#34;&gt;initial example&lt;/a&gt;, FsConfig allows us to group similar configuration into a record type.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type AwsConfig = {
-  AccessKeyId : string
-  DefaultRegion : string
-  SecretAccessKey : string
-}
-
-type Config = {
-  Aws : AwsConfig
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;With this configuration declaration, FsConfig read the environment variables &lt;code&gt;AWS_ACCESS_KEY_ID&lt;/code&gt;, &lt;code&gt;AWS_SECRET_ACCESS_KEY&lt;/code&gt;, and &lt;code&gt;AWS_DEFAULT_REGION&lt;/code&gt; and populates the &lt;code&gt;Aws&lt;/code&gt; field of type &lt;code&gt;AwsConfig&lt;/code&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&#34;environment-variable-name-convention-customization&#34;&gt;Environment Variable Name Convention &amp;amp; Customization&lt;/h2&gt;
-
-&lt;p&gt;By default, FsConfig follows Underscores with uppercase convention, as in &lt;code&gt;UPPER_CASE&lt;/code&gt;, for deriving the environment variable name.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
-  ServerKey : string
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Using this configuration declaration, FsConfig read the environment variable &lt;code&gt;SERVER_KEY&lt;/code&gt; and populates the &lt;code&gt;ServerKey&lt;/code&gt; field&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;To specify a custom prefix in the environment variables, we can make use of the &lt;code&gt;Convention&lt;/code&gt; attribute.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;)&amp;gt;]
-type Config = {
-  ServerKey : string
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;For this configuration declaration, FsConfig read the environment variable &lt;code&gt;FSTWEET_SERVER_KEY&lt;/code&gt; and populates the &lt;code&gt;ServerKey&lt;/code&gt; field.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;We can also override the separator character &lt;code&gt;_&lt;/code&gt; using the &lt;code&gt;Convention&lt;/code&gt; attribute&amp;rsquo;s optional field &lt;code&gt;Separator&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;, Separator=&amp;quot;-&amp;quot;)&amp;gt;]
-type Config = {
-  ServerKey : string
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;In this case, FsConfig derives the environment variable name as &lt;code&gt;FSTWEET-SERVER-KEY&lt;/code&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;If an environment variable name is not following a convention, we can override the environment variable name at the field level using the &lt;code&gt;CustomName&lt;/code&gt; attribute.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Config = {
-  [&amp;lt;CustomName(&amp;quot;MY_SERVER_KEY&amp;quot;)&amp;gt;]
-  ServerKey : string
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Here, FsConfig uses the environment variable name &lt;code&gt;MY_SERVER_KEY&lt;/code&gt; to get the ServerKey.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;We can also merely customise (or control) the environment variable name generation by passing an higher-order function while calling the &lt;code&gt;Get&lt;/code&gt; function&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open FsConfig
-
-// Prefix -&amp;gt; string -&amp;gt; string
-let lowerCaseConfigNameCanonicalizer (Prefix prefix) (name : string) = 
-  let lowerCaseName = name.ToLowerInvariant()
-  if String.IsNullOrEmpty prefix then 
-    name.ToLowerInvariant()
-  else
-    sprintf &amp;quot;%s-%s&amp;quot; (prefix.ToLowerInvariant()) lowerCaseName
-
-
-[&amp;lt;Convention(&amp;quot;FSTWEET&amp;quot;)&amp;gt;]
-type Config = {
-  ServerKey : string
-}
-
-let main argv =
-  let config = 
-    match EnvConfig.Get&amp;lt;Config&amp;gt; lowerCaseConfigNameCanonicalizer with
-    | Ok config -&amp;gt; config
-    | Error error -&amp;gt; failwithf &amp;quot;Error : %A&amp;quot; error
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;FsConfig computes the environment variable name as &lt;code&gt;fstweet-server-key&lt;/code&gt; in this scenario.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&#34;getting-individual-environment-variables&#34;&gt;Getting Individual Environment Variables&lt;/h2&gt;
-
-&lt;p&gt;FsConfig also supports reading value directly by explicitly specifying the environment variable name&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;EnvConfig.Get&amp;lt;decimal&amp;gt; &amp;quot;MY_APP_INITIAL_BALANCE&amp;quot; // Result&amp;lt;decimal, ConfigParseError&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;appsettings&#34;&gt;appSettings&lt;/h2&gt;
-
-&lt;p&gt;Are you using &lt;code&gt;appSettings&lt;/code&gt; in (either &lt;code&gt;web.config&lt;/code&gt; or &lt;code&gt;App.config&lt;/code&gt;) to manage your configuration settings? FsConfig supports that too!&lt;/p&gt;
-
-&lt;p&gt;We can read the &lt;code&gt;appSettings&lt;/code&gt; values using the &lt;code&gt;AppConfig&lt;/code&gt; type instead of &lt;code&gt;EnvConfig&lt;/code&gt; type.&lt;/p&gt;
-
-&lt;p&gt;FsConfig uses the exact name of the field to derive the &lt;code&gt;appSettings&lt;/code&gt; key name and doesn&amp;rsquo;t use any separator by default.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type AwsConfig = {
-  AccessKeyId : string
-  DefaultRegion : string
-  SecretAccessKey : string
-}
-
-type Config = {
-  Port : uint16
-  Aws : AwsConfig
-}
-
-let main argv =
-  let config = 
-    match AppConfig.Get&amp;lt;Config&amp;gt;() with
-    | Ok config -&amp;gt; config
-    | Error error -&amp;gt; failwithf &amp;quot;Error : %A&amp;quot; error
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The above code snippet looks for &lt;code&gt;appSettings&lt;/code&gt; values with the name &lt;code&gt;Port&lt;/code&gt;, &lt;code&gt;AwsAccessKeyId&lt;/code&gt;, &lt;code&gt;AwsDefaultRegion&lt;/code&gt;, &lt;code&gt;AwsSecretAccessKey&lt;/code&gt; and populates the respective fields.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;All the customisation that we have seen for &lt;code&gt;EnvConfig&lt;/code&gt; is applicable for &lt;code&gt;AppConfig&lt;/code&gt; as well.&lt;/p&gt;
-
-&lt;h2 id=&#34;how-fsconfig-works&#34;&gt;How FsConfig Works&lt;/h2&gt;
-
-&lt;p&gt;If you are curious to know how FsConfig works and its internals then you might be interested in my blog post, &lt;a href=&#34;https://www.demystifyfp.com/fsharp/blog/generic-programming-made-easy/&#34; target=&#34;_blank&#34;&gt;Generic Programming Made Easy&lt;/a&gt; that deep dives into the initial implementation of FsConfig.&lt;/p&gt;
-
-&lt;p&gt;The current version of FsConfig is available on &lt;a href=&#34;https://github.com/demystifyfp/FsConfig&#34; target=&#34;_blank&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;feedback&#34;&gt;Feedback&lt;/h2&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;We all need people who will give us feedback. That&amp;rsquo;s how we improve - Bill Gates.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Your suggestions/feedback are welcome!&lt;/p&gt;
-
-&lt;h2 id=&#34;acknowledgements&#34;&gt;Acknowledgements&lt;/h2&gt;
-
-&lt;p&gt;The idea of FsConfig is inspired by &lt;a href=&#34;https://twitter.com/kelseyhightower&#34; target=&#34;_blank&#34;&gt;Kelsey Hightower&lt;/a&gt;&amp;rsquo;s golang library &lt;a href=&#34;https://github.com/kelseyhightower/envconfig&#34; target=&#34;_blank&#34;&gt;envconfig&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;FsConfig uses &lt;a href=&#34;https://twitter.com/eiriktsarpalis&#34; target=&#34;_blank&#34;&gt;Eirik Tsarpalis&lt;/a&gt;&amp;rsquo;s &lt;a href=&#34;https://github.com/eiriktsarpalis/TypeShape&#34; target=&#34;_blank&#34;&gt;TypeShape&lt;/a&gt; library for generic programming.&lt;/p&gt;
 </description>
     </item>
     
