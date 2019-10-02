@@ -400,17 +400,17 @@
 
 <p><span class="callout">1</span> Creates an instance of Flyway and setup the configuration using the <a href="https://clojure.org/reference/java_interop#_the_dot_special_form" target="_blank">dot special form</a></p>
 
-<p><span class="callout">2</span> Setting the migration files path to <code>database/migration</code>.</p>
+<p><span class="callout">2</span> Setting the migration files path to <code>db/migration</code>.</p>
 
 <p>This path doesn&rsquo;t exist yet. So, let&rsquo;s create it.</p>
 
-<pre><code class="language-sh">&gt; mkdir -p resources/database/migration 
+<pre><code class="language-sh">&gt; mkdir -p resources/db/migration
 </code></pre>
 
 <p>To verify the database migration, let&rsquo;s load the updated <code>database.clj</code> in the REPL and invoke the <code>migrate</code> function.</p>
 
 <pre><code class="language-sh">wheel.infra.database=&gt; (mount/start)
-{:started [&quot;#'wheel.infra.config/root&quot; 
+{:started [&quot;#'wheel.infra.config/root&quot;
            &quot;#'wheel.infra.database/datasource&quot;]}
 wheel.infra.database=&gt; (migrate)
 0

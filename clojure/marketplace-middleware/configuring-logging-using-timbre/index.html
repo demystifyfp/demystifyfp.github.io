@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.53" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/">
+  <meta property="og:title" content="Configuring Logging Using Timbre | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-10-02T05:50:01&#43;05:30">
+  
+  <meta property="article:modified_time" content="2019-10-02T05:50:01&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+  Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/components/'
+</script>
+
+  <title>Configuring Logging Using Timbre | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Configuring Logging Using Timbre</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/clojure">clojure</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/timbre">Timbre</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2019-10-02 05:50:01 &#43;0530 IST" itemprop="datePublished">
+      Wed, Oct 2, 2019
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    9 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Configuring%20Logging%20Using%20Timbre&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fconfiguring-logging-using-timbre%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fconfiguring-logging-using-timbre%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fconfiguring-logging-using-timbre%2f&amp;title=Configuring%20Logging%20Using%20Timbre"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fconfiguring-logging-using-timbre%2f&amp;title=Configuring%20Logging%20Using%20Timbre"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Configuring%20Logging%20Using%20Timbre&amp;body=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fconfiguring-logging-using-timbre%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>In the first two blog posts of the blog series <a href="/clojure/marketplace-middleware/intro/" target="_blank">Building an E-Commerce Marketplace Middleware in Clojure</a>, we learnt how to bootstrap a Clojure project using <a href="https://github.com/tolitius/mount" target="_blank">Mount</a> &amp; <a href="https://github.com/juxt/aero" target="_blank">Aero</a> and how to configure database connection pooling &amp; database migration along with reloaded workflow. We are going to continue setting up the infrastructure, and in this blog post, we are going to take up logging using <a href="https://github.com/ptaoussanis/timbre" target="_blank">Timbre</a>.</p>
+
+<p>Timbre is a Clojure/Script logging library that enables to configure logging using a simple Clojure map. If you ever had a hard time dealing with complex (XML based) configuration setup for logging, you will feel a breath of fresh air while using Timbre. Let&rsquo;s dive in!</p>
+
+<blockquote>
+<p>This blog post is a part 3 of the blog series <a href="/clojure/marketplace-middleware/intro/" target="_blank">Building an E-Commerce Marketplace Middleware in Clojure</a>.</p>
+</blockquote>
+
+<h2 id="timbre-101">Timbre 101</h2>
+
+<p>To get started, let&rsquo;s add the dependency in the <em>project.clj</em> and restart the REPL to download and include the dependency in our project.</p>
+
+<pre><code class="language-clojure">(defproject wheel &quot;0.1.0-SNAPSHOT&quot;
+  ; ...
+  :dependencies [; ...
+                 [com.taoensso/timbre &quot;4.10.0&quot;]]
+  ; ...
+  )
+</code></pre>
+
+<p>Then create a new file <code>log.clj</code> and refer the <code>timbre</code> library.</p>
+
+<pre><code class="language-bash">&gt; touch src/wheel/infra/log.clj
+</code></pre>
+
+<pre><code class="language-clojure">(ns wheel.infra.log
+  (:require [taoensso.timbre :as timbre]))
+</code></pre>
+
+<p>To play with the functionality provided by Timbre, send the above snippet to the REPL and then use any of the <code>info</code>, <code>warn</code>, <code>debug</code> or <code>error</code> macro to perform the logging. By default, Timbre uses <code>println</code> to write the logs in the console.</p>
+
+<pre><code class="language-sh">wheel.infra.log=&gt; (timbre/info &quot;Hello Timbre!&quot;)
+19-09-29 04:59:03 UnknownHost INFO [wheel.infra.log:1] - Hello Timbre!
+nil
+</code></pre>
+
+<p>These macros also accept Clojure maps.</p>
+
+<pre><code class="language-sh">wheel.infra.log=&gt; (timbre/info {:Hello &quot;Timbre!&quot;})
+19-09-29 05:02:44 UnknownHost INFO [wheel.infra.log:1] - {:Hello &quot;Timbre!&quot;}
+nil
+</code></pre>
+
+<h2 id="customizing-the-output-log-format">Customizing the Output Log Format</h2>
+
+<p>The default output format is naive and not friendly for reading by an external tool like <a href="https://www.elastic.co/products/logstash" target="_blank">logstash</a>. We can modify the behaviour and use JSON as our output format by following the below steps.</p>
+
+<p>Let&rsquo;s add the <a href="https://github.com/dakrone/cheshire" target="_blank">Chesire</a> library to take care of JSON serialization in the <em>project.clj</em> file and restart the REPL.</p>
+
+<pre><code class="language-clojure">(defproject wheel &quot;0.1.0-SNAPSHOT&quot;
+  ; ...
+  :dependencies [; ...
+                 [chesire &quot;5.9.0&quot;]]
+  ; ...
+  )
+</code></pre>
+
+<p>Timbre provides a hook <code>output-fn</code>, a function with the signature <code>(fn [data]) -&gt; string</code>, to customize the output format. The data is a map that contains the actual message, log level, timestamp, hostname and much more.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/log.clj
+; ...
+(defn- json-output [{:keys [level msg_ instant]}] ;&lt;1&gt;
+  (let [event (read-string (force msg_))] ;&lt;2&gt;
+    (json/generate-string {:timestamp instant ;&lt;3&gt;
+                           :level level
+                           :event event})))
+</code></pre>
+
+<p><span class="callout">1</span> It destructures the interested keys from the <code>data</code> map.</p>
+
+<p><span class="callout">2</span> Timbre use <a href="https://clojuredocs.org/clojure.core/delay" target="_blank">delay</a> for the logging message. So, here we are retrieving the value using the <a href="https://clojuredocs.org/clojure.core/force" target="_blank">force</a> function and then uses <a href="https://clojuredocs.org/clojure.core/read-string" target="_blank">read-string</a> to convert the <code>string</code> to its corresponding Clojure data structure.</p>
+
+<p><span class="callout">3</span> It generates the stringified JSON representation of the log entry containing the log level, timestamp and the actual message.</p>
+
+<p>To wire this function with Timbre, we are going to make use of its <code>merge-config!</code> function.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/log.clj
+; ...
+(defn init []
+  (timbre/merge-config! {:output-fn json-output}))
+</code></pre>
+
+<p>As the name indicates, the <code>init</code> function acts as the entry point for initialization the logging, and here we are modifying the Timbre&rsquo;s config to use our <code>json-output</code> function as its <code>output-fn</code> function.</p>
+
+<p>Now if we log after calling this <code>init</code> function, we will get the output as below.</p>
+
+<pre><code class="language-sh">wheel.infra.log=&gt; (init)
+{:level :debug, :ns-whitelist [], :ns-blacklist [] ...}
+</code></pre>
+
+<pre><code class="language-sh">wheel.infra.log=&gt; (timbre/info {:name :an-event/succeeded})
+{&quot;timestamp&quot;:&quot;2019-09-29T05:30:42Z&quot;, &quot;level&quot;:&quot;info&quot;,&quot;event&quot;:{&quot;name&quot;:&quot;an-event/succeeded&quot;}}
+nil
+</code></pre>
+
+<p>Let&rsquo;s invoke this <code>init</code> function from the application&rsquo;s <code>start-app</code> function to set up this configuration during application bootstrap.</p>
+
+<pre><code class="language-diff"> (ns wheel.infra.core
+   (:require [mount.core :as mount]
++            [wheel.infra.log :as log]
+             [wheel.infra.config :as config]
+             [wheel.infra.database :as db]))
+
+ (defn start-app []
++  (log/init)
+   (mount/start))
+...
+</code></pre>
+
+<h2 id="logs-as-the-single-source-of-truth">Logs as the Single Source of Truth</h2>
+
+<p>The middleware that we built acts as a liaison between our client&rsquo;s order management system(OMS) and the e-commerce marketplaces.</p>
+
+<p><img src="/img/clojure/blog/ecom-middleware/middleware-10K-View.png" alt="" /></p>
+
+<p>Logging all the business (domain) event occurred in or processed by the middleware is one of the critical requirement. We incorporated it by defining functions that either returns an event (a Clojure map) or a list of events.</p>
+
+<p>At the boundaries of the system, we consume these data and write it to a log. In the logging configuration, we had a database appender which projects the log entries (events) to a table. We&rsquo;ll learn more about it in the upcoming blog posts.</p>
+
+<p>In this blog post, we are going to focus on modelling the event.</p>
+
+<h3 id="modelling-event-using-clojure-spec">Modelling Event using clojure.spec</h3>
+
+<p>An event in the wild is a Clojure map with a bunch of key-value pairs. But treating the event like this will be hard to develop and maintain. So, we need a specification of what constitutes an event. We are going to make use of <a href="https://clojure.org/guides/spec" target="_blank">clojure.spec</a> to define it.</p>
+
+<p>Let&rsquo;s get started by creating a new file <em>event.clj</em> and add the spec for the individual keys.</p>
+
+<pre><code class="language-bash">&gt; mkdir src/wheel/middleware
+&gt; touch src/wheel/middleware/event.clj
+</code></pre>
+
+<pre><code class="language-clojure">(ns wheel.middleware.event
+  (:require [clojure.spec.alpha :as s]))
+
+(s/def ::id uuid?)
+(s/def ::parent-id ::id) ; &lt;1&gt;
+(s/def ::name qualified-keyword?) ; &lt;2&gt;
+(s/def ::level #{:info :warn :debug :error :fatal})
+</code></pre>
+
+<p><span class="callout">1</span> As the name indicates, the <code>parent-id</code> represents the <code>id</code> of an event which resulted in the event in question.</p>
+
+<p><span class="callout">2</span> An event name is a namespaced keyword. We&rsquo;ll discuss it more in the upcoming blog posts.</p>
+
+<p>To model the timestamp of the event, we are going to take advantage of the fact our Client works on IST(+05:30) timezone and all their transactions are on IST.</p>
+
+<p>Let&rsquo;s add the <code>ist-timestamp</code> spec in a new file <code>offset-date-time.clj</code>. We will be using <a href="https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations" target="_blank">ISO 8061</a> combined date-time representation with a time zone designator.</p>
+
+<pre><code class="language-bash">&gt; touch src/wheel/offset-date-time.clj
+</code></pre>
+
+<pre><code class="language-clojure">(ns wheel.offset-date-time
+  (:require [clojure.spec.alpha :as s])
+  (:import [java.time.format DateTimeFormatter
+                             DateTimeParseException]
+           [java.time OffsetDateTime]))
+
+(defn iso-8061-format? [x]
+  (try
+    (.parse DateTimeFormatter/ISO_OFFSET_DATE_TIME x)
+    true
+    (catch DateTimeParseException e
+      false)))
+
+(defn ist? [x]
+  (if (iso-8061-format? x)
+    (= (.. (OffsetDateTime/parse x) getOffset toString)
+       &quot;+05:30&quot;)
+    false))
+
+(s/def ::iso-8061-format (s/and string? iso-8061-format?))
+(s/def ::ist-timestamp (s/and ::iso-8061-format ist?))
+</code></pre>
+
+<p>We can verify it in the REPL as below.</p>
+
+<pre><code class="language-sh">wheel.offset-date-time=&gt; (s/valid? ::ist-timestamp &quot;2007-04-05T12:30-02:00&quot;)
+false
+wheel.offset-date-time=&gt; (s/valid? ::ist-timestamp &quot;2019-10-01T06:56+05:30&quot;)
+true
+</code></pre>
+
+<p>Then in <code>event.clj</code>, use this <code>ist-timestamp</code> spec to define the <code>timestamp</code> spec.</p>
+
+<pre><code class="language-clojure">; src/wheel/middleware/event.clj
+(ns wheel.middleware.event
+  (:require ; ...
+            [wheel.offset-date-time :as offset-date-time]))
+; ...
+(s/def ::timestamp ::offset-date-time/ist-timestamp)
+</code></pre>
+
+<p>There are two types of events in the middleware, <code>system</code> and <code>domain</code> events.</p>
+
+<p>The <code>system</code> events represent the events associated with the technical implementation of the application like <code>db.migration/failed</code>, <code>ibm-mq.connection/failed</code>, and so on.</p>
+
+<p>As you correctly guessed, the <code>domain</code> events represent business-specific events in the middleware.</p>
+
+<pre><code class="language-clojure">; src/wheel/middleware/event.clj
+; ...
+(s/def ::type #{:domain :system})
+</code></pre>
+
+<p>All the <code>domain</code> events should have a <code>channel-id</code> and <code>channel-name</code>. The term <code>channel</code> represents the e-commerce marketplace (Amazon, Flipkart or Tata CliQ) through which our client sells their products.</p>
+
+<p>To define the spec for the <code>channel-id</code> (a non-empty string identifier from OMS), <code>channel-name</code> (an enumeration of markplaces), create a new file <code>channel.clj</code>.</p>
+
+<pre><code class="language-bash">&gt; mkdir src/wheel/marketplace
+&gt; touch src/wheel/marketplace/channel.clj
+</code></pre>
+
+<pre><code class="language-clojure">(ns wheel.marketplace.channel
+  (:require [clojure.spec.alpha :as s]))
+
+(s/def ::id (complement clojure.string/blank?))
+(s/def ::name #{:tata-cliq :amazon :flipkart})
+</code></pre>
+
+<p>Then we can use this spec in the event spec.</p>
+
+<pre><code class="language-clojure">; src/wheel/middleware/event.clj
+(ns wheel.middleware.event
+  (:require ; ...
+            [wheel.marketplace.channel :as channel]))
+; ...
+(s/def ::channel-id ::channel/id)
+(s/def ::channel-name ::channel/name)
+</code></pre>
+
+<p>Now we have all the individual attributes of an event, and we can define the spec of the <code>event</code> itself using Clojure&rsquo;s <a href="https://clojure.org/guides/spec#_multi_spec" target="_blank">multi-spec</a></p>
+
+<pre><code class="language-clojure">; src/wheel/middleware/event.clj
+; ...
+
+(defmulti event-type :type) ; &lt;1&gt;
+(defmethod event-type :system [_] ; &lt;2&gt;
+  (s/keys :req-un [::id ::name ::type ::level ::timestamp]
+          :opt-un [::parent-id]))
+(defmethod event-type :domain [_] ; &lt;3&gt;
+  (s/keys :req-un [::id ::name ::type ::level ::timestamp
+                   ::channel-id ::channel-name]
+          :opt-un [::parent-id]))
+(defmethod event-type :default [_] ; &lt;4&gt;
+  (s/keys :req-un [::type]))
+
+(s/def ::event (s/multi-spec event-type :type))
+</code></pre>
+
+<p><span class="callout">1</span> It defines multi-method dispatch based of the <code>:type</code> key.</p>
+
+<p><span class="callout">2</span> It defines the <code>:system</code> event spec.</p>
+
+<p><span class="callout">3</span> It defines the <code>:domain</code> event spec.</p>
+
+<p><span class="callout">4</span> It defines the default event spec which requires an event map with a <code>:type</code> key and conforms to the <code>::type</code> spec.</p>
+
+<p>Let&rsquo;s verify the spec in the REPL</p>
+
+<pre><code class="language-sh">wheel.middleware.event=&gt; (s/valid?
+                          ::event
+                          {:name :ranging/succeeded
+                          :type :domain
+                          :channel-id 1
+                          :level :info
+                          :timestamp &quot;2019-10-01T12:30+05:30&quot;
+                          :id (java.util.UUID/randomUUID)
+                          :channel-name :tata-cliq})
+true
+</code></pre>
+
+<pre><code class="language-sh">wheel.middleware.event=&gt; (s/valid?
+                          ::event
+                          {:name :db.migration/failed
+                            :type :system
+                            :level :fatal
+                            :timestamp &quot;2019-10-01T12:30+05:30&quot;
+                            :id (java.util.UUID/randomUUID)})
+true
+</code></pre>
+
+<p>We will revisiting this event spec, when we are implementing the business requirements.</p>
+
+<h3 id="asserting-logging-event">Asserting &amp; Logging Event</h3>
+
+<p>We are going to add a function <code>write!</code> in the <em>log.clj</em> file that takes an <code>event</code> and writes it to the log using Timbre. The application boundaries will use this function to perform the logging.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/log.clj
+(ns wheel.infra.log
+  (:require ; ...
+            [clojure.spec.alpha :as s]
+            [wheel.middleware.event :as event]))
+; ...
+
+(defn write! [{:keys [level] :as event}] ; &lt;1&gt;
+  {:pre [(s/assert ::event/event event)]} ; &lt;2&gt;
+  (case level ; &lt;3&gt;
+    :info (timbre/info event)
+    :debug (timbre/debug event)
+    :warn (timbre/warn event)
+    :error (timbre/error event)
+    :fatal (timbre/fatal event)))
+</code></pre>
+
+<p><span class="callout">1</span>It destructures the <code>level</code> from the <code>event</code> and also keeps the <code>event</code></p>
+
+<p><span class="callout">2</span>It uses the Clojure&rsquo;s function <a href="https://clojure.org/reference/special_forms#_fn_name_param_condition_map_expr_2" target="_blank">pre-condition</a> to assert the incoming parameter against the <code>event</code> spec.</p>
+
+<p><span class="callout">3</span>It invokes the appropriate <code>log</code> macros of the Timbre library based on the event&rsquo;s <code>level</code>.</p>
+
+<p>When we evaluate this <code>write!</code> function with a random map, we&rsquo;ll get the following output.</p>
+
+<pre><code class="language-sh">wheel.infra.log=&gt; (write! {:level :info :name :foo})
+{&quot;timestamp&quot;:&quot;2019-10-01T15:46:22Z&quot;,&quot;level&quot;:&quot;info&quot;,&quot;event&quot;:{&quot;level&quot;:&quot;info&quot;,&quot;name&quot;:&quot;foo&quot;}}
+nil
+</code></pre>
+
+<p>If you are wondering the pre-condition didn&rsquo;t get executed, it&rsquo;s because Clojure spec&rsquo;s asserts as disabled by default, we need to enable them.</p>
+
+<pre><code class="language-sh">wheel.infra.log=&gt; (s/check-asserts true)
+true
+wheel.infra.log=&gt; (write! {:level :info :name :foo})
+Execution error - invalid arguments to wheel.infra.log/write! at (log.clj:17).
+{:level :info, :name :foo} - failed: (contains? % :type) at: [nil]
+class clojure.lang.ExceptionInfo
+# ... Stack traces ignored for brevity
+</code></pre>
+
+<p>After enabling the asserts checking it is now working as expected.</p>
+
+<p>In our application, we are going to turn on the <code>check-asserts</code> by setting it up during application startup.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/core.clj
+
+(ns wheel.infra.core
+  (:require ; ...
+            [clojure.spec.alpha :as s]))
+
+(defn start-app
+  ([] 
+   (start-app true))
+  ([check-asserts]
+   (log/init)
+   (s/check-asserts check-asserts)
+   (mount/start)))
+
+; ...
+</code></pre>
+
+<p>The rewritten version of <code>start-app</code> is a multi-arity function that optionally accepts a parameter to set the <code>check-asserts</code> flag. Typically in the production environment, we can turn off this flag.</p>
+
+<p>To log multiple events, let&rsquo;s add the <code>write-all!</code> function, which invokes the <code>write!</code> function for each provided events.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/log.clj
+; ...
+(defn write-all! [events]
+  (run! write! events))
+</code></pre>
+
+<p>As a final step, rewrite the <code>json-output</code> function to log the event itself as it already contains the timestamp and level.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/log.clj
+; ...
+
+(defn- json-output [{:keys [msg_]}]
+  (let [event (read-string (force msg_))]
+    (json/generate-string event)))
+</code></pre>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learned how to configure Timbre with JSON output and also created abstractions <code>write!</code> &amp; <code>write-all!</code> to do the logging. In the upcoming blog posts, we are going to add database and Slack appenders. Stay tuned!</p>
+
+<p>The source code associated with this part is available on <a href="https://github.com/demystifyfp/BlogSamples/tree/0.15/clojure/wheel" target="_blank">this GitHub</a> repository.</p>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  </div>
+
+
+</article>
+
+
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/">Configuring Database Connection Pooling, Migration and Reloaded Workflow</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/">Bootstrapping Clojure Project Using Mount And Aero</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/intro/">Building an E-Commerce Marketplace Middleware in Clojure</a></li>
+    
+    <li><a href="/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-2/">RESTful CRUD APIs Using Compojure-API and Toucan (Part-2)</a></li>
+    
+    <li><a href="/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/">RESTful CRUD APIs Using Compojure-API and Toucan (Part-1)</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+
+    
+    
+
+  </body>
+</html>

@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/</loc>
+      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/</loc>
       <lastmod>2019-08-06T21:59:03+05:30</lastmod>
     </url>
@@ -206,7 +215,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/clojure/</loc>
-      <lastmod>2019-08-06T21:59:03+05:30</lastmod>
+      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -216,7 +225,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/clojure/</loc>
-      <lastmod>2019-08-06T21:59:03+05:30</lastmod>
+      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -366,6 +375,16 @@
     
       <loc>https://www.demystifyfp.com/tags/</loc>
       <lastmod>2018-02-12T19:23:36+05:30</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    
+    <url>
+    
+      <loc>https://www.demystifyfp.com/tags/timbre/</loc>
+      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
       <priority>0</priority>
     </url>
     
