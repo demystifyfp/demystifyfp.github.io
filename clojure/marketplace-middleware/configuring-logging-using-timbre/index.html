@@ -347,14 +347,14 @@
 
 <p>To play with the functionality provided by Timbre, send the above snippet to the REPL and then use any of the <code>info</code>, <code>warn</code>, <code>debug</code> or <code>error</code> macro to perform the logging. By default, Timbre uses <code>println</code> to write the logs in the console.</p>
 
-<pre><code class="language-sh">wheel.infra.log=&gt; (timbre/info &quot;Hello Timbre!&quot;)
+<pre><code class="language-clojure">wheel.infra.log=&gt; (timbre/info &quot;Hello Timbre!&quot;)
 19-09-29 04:59:03 UnknownHost INFO [wheel.infra.log:1] - Hello Timbre!
 nil
 </code></pre>
 
 <p>These macros also accept Clojure maps.</p>
 
-<pre><code class="language-sh">wheel.infra.log=&gt; (timbre/info {:Hello &quot;Timbre!&quot;})
+<pre><code class="language-clojure">wheel.infra.log=&gt; (timbre/info {:Hello &quot;Timbre!&quot;})
 19-09-29 05:02:44 UnknownHost INFO [wheel.infra.log:1] - {:Hello &quot;Timbre!&quot;}
 nil
 </code></pre>
@@ -402,11 +402,11 @@ nil
 
 <p>Now if we log after calling this <code>init</code> function, we will get the output as below.</p>
 
-<pre><code class="language-sh">wheel.infra.log=&gt; (init)
+<pre><code class="language-clojure">wheel.infra.log=&gt; (init)
 {:level :debug, :ns-whitelist [], :ns-blacklist [] ...}
 </code></pre>
 
-<pre><code class="language-sh">wheel.infra.log=&gt; (timbre/info {:name :an-event/succeeded})
+<pre><code class="language-clojure">wheel.infra.log=&gt; (timbre/info {:name :an-event/succeeded})
 {&quot;timestamp&quot;:&quot;2019-09-29T05:30:42Z&quot;, &quot;level&quot;:&quot;info&quot;,&quot;event&quot;:{&quot;name&quot;:&quot;an-event/succeeded&quot;}}
 nil
 </code></pre>
@@ -492,7 +492,7 @@ nil
 
 <p>We can verify it in the REPL as below.</p>
 
-<pre><code class="language-sh">wheel.offset-date-time=&gt; (s/valid? ::ist-timestamp &quot;2007-04-05T12:30-02:00&quot;)
+<pre><code class="language-clojure">wheel.offset-date-time=&gt; (s/valid? ::ist-timestamp &quot;2007-04-05T12:30-02:00&quot;)
 false
 wheel.offset-date-time=&gt; (s/valid? ::ist-timestamp &quot;2019-10-01T06:56+05:30&quot;)
 true
@@ -574,11 +574,11 @@ true
 
 <p>Let&rsquo;s verify the spec in the REPL</p>
 
-<pre><code class="language-sh">wheel.middleware.event=&gt; (s/valid?
+<pre><code class="language-clojure">wheel.middleware.event=&gt; (s/valid?
                           ::event
                           {:name :ranging/succeeded
                           :type :domain
-                          :channel-id 1
+                          :channel-id &quot;UA&quot;
                           :level :info
                           :timestamp &quot;2019-10-01T12:30+05:30&quot;
                           :id (java.util.UUID/randomUUID)
@@ -586,7 +586,7 @@ true
 true
 </code></pre>
 
-<pre><code class="language-sh">wheel.middleware.event=&gt; (s/valid?
+<pre><code class="language-clojure">wheel.middleware.event=&gt; (s/valid?
                           ::event
                           {:name :db.migration/failed
                             :type :system
@@ -627,14 +627,14 @@ true
 
 <p>When we evaluate this <code>write!</code> function with a random map, we&rsquo;ll get the following output.</p>
 
-<pre><code class="language-sh">wheel.infra.log=&gt; (write! {:level :info :name :foo})
+<pre><code class="language-clojure">wheel.infra.log=&gt; (write! {:level :info :name :foo})
 {&quot;timestamp&quot;:&quot;2019-10-01T15:46:22Z&quot;,&quot;level&quot;:&quot;info&quot;,&quot;event&quot;:{&quot;level&quot;:&quot;info&quot;,&quot;name&quot;:&quot;foo&quot;}}
 nil
 </code></pre>
 
 <p>If you are wondering the pre-condition didn&rsquo;t get executed, it&rsquo;s because Clojure spec&rsquo;s asserts as disabled by default, we need to enable them.</p>
 
-<pre><code class="language-sh">wheel.infra.log=&gt; (s/check-asserts true)
+<pre><code class="language-clojure">wheel.infra.log=&gt; (s/check-asserts true)
 true
 wheel.infra.log=&gt; (write! {:level :info :name :foo})
 Execution error - invalid arguments to wheel.infra.log/write! at (log.clj:17).

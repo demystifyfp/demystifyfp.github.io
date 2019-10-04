@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Thu, 18 Oct 2018 01:17:17 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 04 Oct 2019 17:55:02 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/tags/toucan/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Storing Log Events in Postgres Using Toucan</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/</link>
+      <pubDate>Fri, 04 Oct 2019 17:55:02 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/</guid>
+      <description>In the last blog post, we configured Timbre to log the events in the Console. In this blog post, we are going to add a database appender to persist the domain level events alone in Postgres using Toucan.
+ This blog post is a part 4 of the blog series Building an E-Commerce Marketplace Middleware in Clojure.
+ Adding Migration Script Let&amp;rsquo;s get started by adding the migration script to create the event table in the database.</description>
+    </item>
     
     <item>
       <title>RESTful CRUD APIs Using Compojure-API and Toucan (Part-2)</title>

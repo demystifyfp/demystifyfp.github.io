@@ -11,6 +11,302 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Storing Log Events in Postgres Using Toucan</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/</link>
+      <pubDate>Fri, 04 Oct 2019 17:55:02 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/</guid>
+      <description>
+
+&lt;p&gt;In the last blog post, we configured Timbre to log the events in the Console. In this blog post, we are going to add a database appender to persist the domain level events alone in Postgres using &lt;a href=&#34;https://github.com/metabase/toucan&#34; target=&#34;_blank&#34;&gt;Toucan&lt;/a&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;This blog post is a part 4 of the blog series &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/intro/&#34; target=&#34;_blank&#34;&gt;Building an E-Commerce Marketplace Middleware in Clojure&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&#34;adding-migration-script&#34;&gt;Adding Migration Script&lt;/h3&gt;
+
+&lt;p&gt;Let&amp;rsquo;s get started by adding the migration script to create the &lt;code&gt;event&lt;/code&gt; table in the database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-batch&#34;&gt;&amp;gt; mkdir -p resources/db/migration
+&amp;gt; touch resources/db/migration/V201910021105__create_event.sql
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;-- V201910021105__create_event.sql
+CREATE TYPE event_level AS ENUM (
+  &#39;info&#39;, &#39;debug&#39;,
+  &#39;error&#39;, &#39;warn&#39;,
+  &#39;fatal&#39;);
+
+CREATE TYPE channel_name AS ENUM (
+  &#39;tata-cliq&#39;, &#39;amazon&#39;, &#39;flipkart&#39;);
+
+CREATE TABLE event (
+  id UUID PRIMARY KEY,
+  parent_id UUID REFERENCES event(id),
+  level event_level NOT NULL,
+  name TEXT NOT NULL,
+  channel_id TEXT NOT NULL,
+  channel_name channel_name NOT NULL,
+  timestamp TIMESTAMP WITH TIME ZONE NOT NULL
+);
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As we &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/#database-migration-using-flyway&#34; target=&#34;_blank&#34;&gt;already configured&lt;/a&gt; flyway to use the &lt;code&gt;db/migration&lt;/code&gt; directory for the migration files, we can invoke the &lt;code&gt;migrate-database&lt;/code&gt; function in the &lt;em&gt;infra/core.clj&lt;/em&gt; in the REPL to migrate the database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;wheel.infra.core=&amp;gt; (migrate-database)
+{:stopped [&amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After the successful database migration, we can see the &lt;code&gt;event&lt;/code&gt; table in the &lt;code&gt;wheel&lt;/code&gt; database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; psql -d wheel
+wheel=# \d event
+                Table &amp;quot;public.event&amp;quot;
+    Column    |           Type           | Nullable |
+--------------+--------------------------+----------+
+ id           | uuid                     | not null |
+ parent_id    | uuid                     |          |
+ level        | event_level              | not null |
+ name         | text                     | not null |
+ channel_id   | text                     | not null |
+ channel_name | channel_name             | not null |
+ timestamp    | timestamp with time zone | not null |
+# ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;configuring-toucan&#34;&gt;Configuring Toucan&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://github.com/metabase/toucan&#34; target=&#34;_blank&#34;&gt;Toucan&lt;/a&gt; is a light-weight ORM library. It provides the better parts of an ORM for Clojure. Let&amp;rsquo;s add this dependency in our &lt;em&gt;project.clj&lt;/em&gt; and restart the REPL to make it a part of our project.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(defproject wheel &amp;quot;0.1.0-SNAPSHOT&amp;quot;
+  ; ...
+  :dependencies [; ...
+                 [toucan &amp;quot;1.14.0&amp;quot;]]
+  ; ...
+  )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To use Toucan to interact with the database, we need to set two of its settings. The &lt;code&gt;datasource&lt;/code&gt; it has to use and the namespace it has to look for the application model definitions.&lt;/p&gt;
+
+&lt;p&gt;As we need to do this only once in the application&amp;rsquo; life cycle, let&amp;rsquo;s define a new Mount state &lt;code&gt;toucan&lt;/code&gt; to configure these settings.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/database.clj
+(ns wheel.infra.database
+  (:require ; ...
+            [toucan.db :as db]
+            [toucan.models :as models])
+  ; ...
+  )
+; ...
+(defn- configure-toucan []
+  (db/set-default-db-connection! {:datasource datasource}) ; &amp;lt;1&amp;gt;
+  (models/set-root-namespace! &#39;wheel.model)) ; &amp;lt;2&amp;gt;
+
+(mount/defstate toucan
+  :start (configure-toucan))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then we need to add the model definition for the &lt;code&gt;event&lt;/code&gt; table.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/wheel/model
+&amp;gt; touch src/wheel/model/event.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/model/event.clj
+(ns wheel.model.event
+  (:require [toucan.models :as models]))
+
+(models/defmodel Event :event
+  models/IModel
+  (types [_]
+         {:name :keyword
+          :channel-name :channel-name
+          :level :event-level}))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Toucan supports Clojure keywords out of the box for the column values, and all we need to do is specify the column type as &lt;code&gt;:keyword&lt;/code&gt;. It internally takes care of converting the keyword to string and vice-versa.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;channel_name&lt;/code&gt; and the &lt;code&gt;level&lt;/code&gt; are enums in PostgreSQL and Toucan doesn&amp;rsquo;t know how to convert them. To make it work with enums, we defined the event model with these column having the type &lt;code&gt;:channel-name&lt;/code&gt; and &lt;code&gt;:event-level&lt;/code&gt; respectively.&lt;/p&gt;
+
+&lt;p&gt;Then in the &lt;code&gt;configure-toucan&lt;/code&gt; function, we need to define the &lt;code&gt;in&lt;/code&gt; and &lt;code&gt;out&lt;/code&gt; functions for these types.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/database.clj
+(ns wheel.infra.database
+  ; ...
+  (:import ; ...
+           [org.postgresql.util PGobject]))
+
+; ...
+(defn- pg-object-fn [pg-type]
+  (fn [value]
+    (doto (PGobject.)
+      (.setType pg-type)
+      (.setValue (name value)))))
+
+(defn- configure-toucan []
+  ; ... 
+  (models/add-type! :event-level
+                    :in (pg-object-fn &amp;quot;event_level&amp;quot;)
+                    :out keyword)
+  (models/add-type! :channel-name
+                    :in (pg-object-fn &amp;quot;channel_name&amp;quot;)
+                    :out keyword))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;During database writes, Toucan uses the function passed &lt;code&gt;:in&lt;/code&gt; parameter to convert the value into the corresponding &lt;code&gt;PGobject&lt;/code&gt; and the &lt;code&gt;:out&lt;/code&gt; function to convert the value from the database to a Clojure keyword.&lt;/p&gt;
+
+&lt;p&gt;We are using &lt;strong&gt;kebab-case&lt;/strong&gt; naming convention for the column names, but in Postgres, we are using &lt;strong&gt;snake_case&lt;/strong&gt; convention. We can let the Toucan take care of this conversion by configuring it like this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(defn- configure-toucan []
+  ; ...
+  (db/set-default-automatically-convert-dashes-and-underscores! true))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;With this, the configuration side of Toucan is done and let&amp;rsquo;s add a function to persist an event in the database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/model/event.clj
+(ns wheel.model.event
+  (:require ; ...
+            [clojure.spec.alpha :as s]
+            [toucan.db :as db]
+            [wheel.middleware.event :as event])
+  (:import [java.time OffsetDateTime]
+           [java.time.format DateTimeFormatter]))
+; ...
+
+(defn- timestamp-&amp;gt;offset-date-time [timestamp]
+  (OffsetDateTime/parse timestamp DateTimeFormatter/ISO_OFFSET_DATE_TIME))
+
+(defn create! [new-event]
+  {:pre [(s/assert ::event/event new-event)
+         (s/assert event/domain? new-event)]}
+  (as-&amp;gt; new-event evt
+    (update evt :timestamp timestamp-&amp;gt;offset-date-time)
+    (dissoc evt :type)
+    (db/insert! Event evt)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Like the &lt;code&gt;write!&lt;/code&gt; function in the &lt;code&gt;log.clj&lt;/code&gt;, the &lt;code&gt;create!&lt;/code&gt; function is one of the application boundaries where we take an event and save it to the database.&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;In the actual project that we developed, We made it a practice to have spec asserts in all the public functions at the application boundaries.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Here we have two asserts, one to check whether the incoming data is an &lt;code&gt;event&lt;/code&gt; or not and another one to check whether it is a domain event as we will be storing only domain events in the database.&lt;/p&gt;
+
+&lt;p&gt;This &lt;code&gt;domain?&lt;/code&gt; function is not defined yet, so let&amp;rsquo;s add it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+; ...
+(defn domain? [event]
+  (and (s/valid? ::event event)
+       (= :domain (:type event))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If we load all these changes in the REPL and execute the following expression, we should be able to see the new event in the database.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.model.event=&amp;gt; (create! {:name :ranging/succeeded
+                              :type :domain
+                              :channel-id &amp;quot;UA&amp;quot;
+                              :level :info
+                              :timestamp &amp;quot;2019-10-01T12:30+05:30&amp;quot;
+                              :id (java.util.UUID/randomUUID)
+                              :channel-name :tata-cliq})
+#wheel.model.event.EventInstance
+{:channel-id &amp;quot;UA&amp;quot;,
+ :channel-name :tata-cliq,
+ :id #uuid &amp;quot;1866be97-9a8d-4e96-b1a4-b700a9b6ff25&amp;quot;,
+ :level :info,
+ :name :ranging/succeeded,
+ :parent-id nil,
+ :timestamp #inst &amp;quot;2019-10-01T07:00:00.000-00:00&amp;quot;}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/first-event-in-pg.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s turn our attention to the Timbre side and a database appender to using this &lt;code&gt;create!&lt;/code&gt; function to store the log entry (event).&lt;/p&gt;
+
+&lt;h3 id=&#34;adding-database-appender&#34;&gt;Adding Database Appender&lt;/h3&gt;
+
+&lt;p&gt;Create a new directory &lt;em&gt;log_appender&lt;/em&gt; under &lt;em&gt;infra&lt;/em&gt; and a new file &lt;em&gt;database.clj&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/wheel/infra/log_appender
+&amp;gt; touch src/wheel/infra/log_appender/database.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add a function that takes the message from the log and create the event using the &lt;code&gt;create!&lt;/code&gt; function that we just defined.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/log_appender/database.clj
+(ns wheel.infra.log-appender.database
+  (:require [wheel.model.event :as event]))
+
+(defn- append-to-db [{:keys [msg_]}]
+  (let [evnt (read-string (force msg_))]
+    (when (= :domain (:type evnt))
+      (event/create! evnt))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: We are only storing the event&amp;rsquo;s of type &lt;code&gt;:domain&lt;/code&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;An appender in &lt;a href=&#34;https://github.com/ptaoussanis/timbre#configuration&#34; target=&#34;_blank&#34;&gt;Timbre&lt;/a&gt; is a map, and our database appender would look like this.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/log_appender/database.clj
+; ...
+(def appender {:enabled? true
+               :output-fn :inherit
+               :async? true
+               :fn append-to-db})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;:fn&lt;/code&gt; key specifies the side-effect, appending to the database, and we are setting the &lt;code&gt;:async?&lt;/code&gt; flag to true to perform the logging asynchronously.&lt;/p&gt;
+
+&lt;p&gt;The last step is to configure Timbre to use this appender.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/log.clj
+(ns wheel.infra.log
+  (:require ; ...
+            [wheel.infra.log-appender.database :as database]))
+
+; ...
+
+(defn init []
+  (timbre/merge-config! {; ...
+                         :appenders {:database database/appender}}))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;After loading these changes in REPL, if we try to log using the &lt;code&gt;write!&lt;/code&gt; we can see that the new event getting stored in the database as expected.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (init)
+{:level :debug
+ ; ... ignored for brevity
+}
+wheel.infra.log=&amp;gt; (write! {:name :deranging/succeeded
+                           :type :domain
+                           :level :info
+                           :channel-id &amp;quot;UB&amp;quot;
+                           :timestamp &amp;quot;2019-10-04T15:56+05:30&amp;quot;
+                           :id (java.util.UUID/randomUUID)
+                           :channel-name :tata-cliq})
+{&amp;quot;name&amp;quot;:&amp;quot;deranging/succeeded&amp;quot;,&amp;quot;type&amp;quot;:&amp;quot;domain&amp;quot;, ... }
+nil
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/second-event-in-pg.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, we implemented the PostgreSQL appender for Timbre to persist the domain events in the database. In this process, we learnt how to configure Toucan to work with Postgres enum types, how to leverage clojure.spec in the application boundaries. In the next blog post, we will be adding an appender to send messages on Slack in case of any errors.&lt;/p&gt;
+
+&lt;p&gt;The source code associated with this part is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.15/clojure/wheel&#34; target=&#34;_blank&#34;&gt;this GitHub&lt;/a&gt; repository.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Configuring Logging Using Timbre</title>
       <link>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/</link>
       <pubDate>Wed, 02 Oct 2019 05:50:01 +0530</pubDate>
@@ -49,14 +345,14 @@
 
 &lt;p&gt;To play with the functionality provided by Timbre, send the above snippet to the REPL and then use any of the &lt;code&gt;info&lt;/code&gt;, &lt;code&gt;warn&lt;/code&gt;, &lt;code&gt;debug&lt;/code&gt; or &lt;code&gt;error&lt;/code&gt; macro to perform the logging. By default, Timbre uses &lt;code&gt;println&lt;/code&gt; to write the logs in the console.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.log=&amp;gt; (timbre/info &amp;quot;Hello Timbre!&amp;quot;)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (timbre/info &amp;quot;Hello Timbre!&amp;quot;)
 19-09-29 04:59:03 UnknownHost INFO [wheel.infra.log:1] - Hello Timbre!
 nil
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;These macros also accept Clojure maps.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.log=&amp;gt; (timbre/info {:Hello &amp;quot;Timbre!&amp;quot;})
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (timbre/info {:Hello &amp;quot;Timbre!&amp;quot;})
 19-09-29 05:02:44 UnknownHost INFO [wheel.infra.log:1] - {:Hello &amp;quot;Timbre!&amp;quot;}
 nil
 &lt;/code&gt;&lt;/pre&gt;
@@ -104,11 +400,11 @@ nil
 
 &lt;p&gt;Now if we log after calling this &lt;code&gt;init&lt;/code&gt; function, we will get the output as below.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.log=&amp;gt; (init)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (init)
 {:level :debug, :ns-whitelist [], :ns-blacklist [] ...}
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.log=&amp;gt; (timbre/info {:name :an-event/succeeded})
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (timbre/info {:name :an-event/succeeded})
 {&amp;quot;timestamp&amp;quot;:&amp;quot;2019-09-29T05:30:42Z&amp;quot;, &amp;quot;level&amp;quot;:&amp;quot;info&amp;quot;,&amp;quot;event&amp;quot;:{&amp;quot;name&amp;quot;:&amp;quot;an-event/succeeded&amp;quot;}}
 nil
 &lt;/code&gt;&lt;/pre&gt;
@@ -194,7 +490,7 @@ nil
 
 &lt;p&gt;We can verify it in the REPL as below.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.offset-date-time=&amp;gt; (s/valid? ::ist-timestamp &amp;quot;2007-04-05T12:30-02:00&amp;quot;)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.offset-date-time=&amp;gt; (s/valid? ::ist-timestamp &amp;quot;2007-04-05T12:30-02:00&amp;quot;)
 false
 wheel.offset-date-time=&amp;gt; (s/valid? ::ist-timestamp &amp;quot;2019-10-01T06:56+05:30&amp;quot;)
 true
@@ -276,11 +572,11 @@ true
 
 &lt;p&gt;Let&amp;rsquo;s verify the spec in the REPL&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.middleware.event=&amp;gt; (s/valid?
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.middleware.event=&amp;gt; (s/valid?
                           ::event
                           {:name :ranging/succeeded
                           :type :domain
-                          :channel-id 1
+                          :channel-id &amp;quot;UA&amp;quot;
                           :level :info
                           :timestamp &amp;quot;2019-10-01T12:30+05:30&amp;quot;
                           :id (java.util.UUID/randomUUID)
@@ -288,7 +584,7 @@ true
 true
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.middleware.event=&amp;gt; (s/valid?
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.middleware.event=&amp;gt; (s/valid?
                           ::event
                           {:name :db.migration/failed
                             :type :system
@@ -329,14 +625,14 @@ true
 
 &lt;p&gt;When we evaluate this &lt;code&gt;write!&lt;/code&gt; function with a random map, we&amp;rsquo;ll get the following output.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.log=&amp;gt; (write! {:level :info :name :foo})
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (write! {:level :info :name :foo})
 {&amp;quot;timestamp&amp;quot;:&amp;quot;2019-10-01T15:46:22Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;info&amp;quot;,&amp;quot;event&amp;quot;:{&amp;quot;level&amp;quot;:&amp;quot;info&amp;quot;,&amp;quot;name&amp;quot;:&amp;quot;foo&amp;quot;}}
 nil
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;If you are wondering the pre-condition didn&amp;rsquo;t get executed, it&amp;rsquo;s because Clojure spec&amp;rsquo;s asserts as disabled by default, we need to enable them.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.log=&amp;gt; (s/check-asserts true)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.log=&amp;gt; (s/check-asserts true)
 true
 wheel.infra.log=&amp;gt; (write! {:level :info :name :foo})
 Execution error - invalid arguments to wheel.infra.log/write! at (log.clj:17).
@@ -449,7 +745,7 @@ class clojure.lang.ExceptionInfo
 
 &lt;p&gt;Now if we start the application through Mount, we will get the following output.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.database=&amp;gt; (mount/start)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.database=&amp;gt; (mount/start)
 {:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot; 
            &amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
 &lt;/code&gt;&lt;/pre&gt;
@@ -492,12 +788,12 @@ class clojure.lang.ExceptionInfo
 
 &lt;p&gt;This path doesn&amp;rsquo;t exist yet. So, let&amp;rsquo;s create it.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;&amp;gt; mkdir -p resources/db/migration
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir -p resources/db/migration
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;To verify the database migration, let&amp;rsquo;s load the updated &lt;code&gt;database.clj&lt;/code&gt; in the REPL and invoke the &lt;code&gt;migrate&lt;/code&gt; function.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.infra.database=&amp;gt; (mount/start)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.infra.database=&amp;gt; (mount/start)
 {:started [&amp;quot;#&#39;wheel.infra.config/root&amp;quot;
            &amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
 wheel.infra.database=&amp;gt; (migrate)
@@ -525,7 +821,7 @@ wheel=# \d
 
 &lt;p&gt;Let&amp;rsquo;s create a new file &lt;code&gt;core.clj&lt;/code&gt; in the &lt;code&gt;infra&lt;/code&gt; directory.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;&amp;gt; touch src/wheel/infra/core.clj
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/wheel/infra/core.clj
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Then define two functions, &lt;code&gt;start-app&lt;/code&gt; and &lt;code&gt;migrate-database&lt;/code&gt;, to start the application and perform database migration, respectively.&lt;/p&gt;
@@ -605,7 +901,7 @@ wheel=# \d
 
 &lt;p&gt;Then from the REPL, we can include the &lt;code&gt;user&lt;/code&gt; profile and manage the application&amp;rsquo;s life cycle.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code class=&#34;language-sh&#34;&gt;wheel.core=&amp;gt; (in-ns &#39;user)
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.core=&amp;gt; (in-ns &#39;user)
 #namespace[user]
 
 wheel.core=&amp;gt; (start-app)
@@ -859,6 +1155,7 @@ wheel.core=&amp;gt; (in-ns &#39;wheel.infra.config)
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/&#34; target=&#34;_blank&#34;&gt;Bootstrapping the Clojure Project with Mount&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/&#34; target=&#34;_blank&#34;&gt;Configuring Database Connection Pooling, Migration and Reloaded Workflow&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/&#34; target=&#34;_blank&#34;&gt;Configuring Logging Using Timbre&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/&#34; target=&#34;_blank&#34;&gt;Storing Log Events in Postgres Using Toucan&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>
     </item>
@@ -4024,310 +4321,6 @@ val it : unit = ()
 &lt;p&gt;In this blog post, we have seen the Hopac channels in action using a trivial example. In the upcoming blog posts, we&#39;ll be learning some more advanced abstractions provided by Hopac.&lt;/p&gt;
 
 &lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.3/fsharp/HopacSeries/Part2&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Concurrent Programming in fsharp using Hopac (Part-I)</title>
-      <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/</link>
-      <pubDate>Mon, 26 Feb 2018 19:08:32 +0530</pubDate>
-      
-      <guid>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-1/</guid>
-      <description>&lt;p&gt;Enabling developers to write concise code in solving complex problems is one of the significant characteristics of functional programming. The conciseness is mostly due to the abstractions provided by the functional programming language.&lt;/p&gt;
-
-&lt;p&gt;Can we apply these abstractions and write concurrent programs with ease?&lt;/p&gt;
-
-&lt;p&gt;We are going to find the answer to this question by writing concurrent programs in fsharp using the &lt;a href=&#34;https://github.com/Hopac/Hopac&#34;&gt;Hopac&lt;/a&gt; library.&lt;/p&gt;
-
-&lt;h2 id=&#34;what-is-hopac&#34;&gt;What is Hopac&lt;/h2&gt;
-
-&lt;p&gt;Hopac is a fsharp library that provides a programming model inspired by John Reppy&#39;s &lt;a href=&#34;https://en.wikipedia.org/wiki/Concurrent_ML&#34;&gt;Concurrent ML&lt;/a&gt; language. Other languages that offer similar or related models include Racket, Clojure core.async, and Go.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The essence of Hopac is lightweight threads, called jobs, and flexible lightweight synchronous message passing via channels (and other messaging primitives) - &lt;a href=&#34;https://github.com/Hopac/Hopac/blob/master/Docs/Programming.md#the-hopac-programming-model&#34;&gt;Hopac Programming model&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&#34;development-setup&#34;&gt;Development Setup&lt;/h2&gt;
-
-&lt;p&gt;We are going to make use of fsharp script file in this blog post to explore Hopac.&lt;/p&gt;
-
-&lt;p&gt;As a first step, initialise &lt;a href=&#34;https://fsprojects.github.io/Paket/&#34;&gt;paket&lt;/a&gt; either &lt;a href=&#34;https://fsprojects.github.io/Paket/getting-started.html#Manual-setup&#34;&gt;manually&lt;/a&gt; or using &lt;a href=&#34;http://forge.run/&#34;&gt;forge&lt;/a&gt;, which automates the manual setup.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; forge paket init
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then add the Hopac library using paket.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; paket add Hopac
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;After installing, create a fsharp script file and refer the Hopac library&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#r &amp;quot;packages/Hopac/lib/net45/Hopac.Core.dll&amp;quot;
-#r &amp;quot;packages/Hopac/lib/net45/Hopac.Platform.dll&amp;quot;
-#r &amp;quot;packages/Hopac/lib/net45/Hopac.dll&amp;quot;
-
-open Hopac
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;the-hello-world-job&#34;&gt;The &amp;quot;Hello World&amp;quot; Job&lt;/h2&gt;
-
-&lt;p&gt;The type &lt;a href=&#34;http://hopac.github.io/Hopac/Hopac.html#def:type%20Hopac.Job&#34;&gt;Job&lt;/a&gt; is the core programming model of Hopac that represents a lightweight thread of execution.&lt;/p&gt;
-
-&lt;p&gt;We can create &lt;code&gt;Job&amp;lt;&#39;x&amp;gt;&lt;/code&gt; in Hopac by using its &lt;a href=&#34;http://hopac.github.io/Hopac/Hopac.html#def:type%20Hopac.JobBuilder&#34;&gt;JobBuilder&lt;/a&gt; aka &lt;code&gt;job&lt;/code&gt; computation expression.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let helloWorldJob = job {
-  printfn &amp;quot;Hello, World!&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can then run this job using the &lt;a href=&#34;http://hopac.github.io/Hopac/Hopac.html#def:val%20Hopac.Hopac.run&#34;&gt;run&lt;/a&gt; function.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;run helloWorldJob
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Executing the above code in F# Interactive will produce the following output&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; run helloWorldJob;;
-Hello, World!
-val it : unit = ()
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The &lt;code&gt;run&lt;/code&gt; function starts running the given job and then blocks the current thread waiting for the job to either return successfully or fail. &lt;code&gt;run&lt;/code&gt; is mainly provided for conveniently running Hopac code from F# Interactive and can also be used as an entry point to the Hopac runtime in console applications. - Hopac Documentation.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&#34;a-time-consuming-job&#34;&gt;A Time Consuming Job&lt;/h2&gt;
-
-&lt;p&gt;Now we know how to create and run jobs in Hopac. As a next step, let&#39;s define a &lt;code&gt;job&lt;/code&gt; that takes some time for its computation.&lt;/p&gt;
-
-&lt;p&gt;We are going to simulate this delay by using the &lt;code&gt;timeOutInMillis&lt;/code&gt; function from Hopac that delays the computation for the provided milliseconds.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let longerHelloWorldJob = job {
-  do! timeOutMillis 2000
-  printfn &amp;quot;Hello, World!&amp;quot;
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we run this new job with the F# Interactive timer on, we can see that the execution of this function takes two seconds (or 2000 milliseconds).&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-run longerHelloWorldJob
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-
-Hello, World!
-Real: 00:00:02.003, CPU: 00:00:00.006, GC gen0: 0, gen1: 0
-val it : unit = ()
-
-
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;running-concurrent-jobs&#34;&gt;Running Concurrent Jobs&lt;/h2&gt;
-
-&lt;p&gt;To run multiple jobs concurrently, we first need multiple jobs. So, let&#39;s create a new function &lt;code&gt;createJob&lt;/code&gt; that takes a job id (to differentiate the jobs) and the job&#39;s computation time as its parameters and return the newly created &lt;code&gt;job&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// int -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
-let createJob jobId delayInMillis  = job {
-  printfn &amp;quot;starting job:%d&amp;quot; jobId
-  do! timeOutMillis delayInMillis
-  printfn &amp;quot;completed job:%d&amp;quot; jobId
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;With the help of this &lt;code&gt;createJob&lt;/code&gt; function, we can create multiple jobs with different computation time.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Job&amp;lt;unit&amp;gt; list
-let jobs = [
-  createJob 1 4000
-  createJob 2 3000
-  createJob 3 2000
-]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we run these job sequentially, it will take nine seconds (9000 milliseconds) to complete. To make it run concurrently and complete the execution in four seconds (4000 milliseconds), we can leverage the &lt;a href=&#34;http://hopac.github.io/Hopac/Hopac.html#def:val%20Hopac.Job.conIgnore&#34;&gt;conIgnore&lt;/a&gt; function from Hopac&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The &lt;code&gt;conIgnore&lt;/code&gt; function creates a job that runs all of the jobs as separate concurrent jobs and then waits for all of the jobs to finish. The results of the jobs are ignored.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Job&amp;lt;unit&amp;gt;
-let concurrentJobs = Job.conIgnore jobs
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Let&#39;s verify this concurrent behaviour&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-run concurrentJobs
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-
-starting job:3
-starting job:1
-starting job:2
-completed job:3
-completed job:2
-completed job:1
-Real: 00:00:04.007, CPU: 00:00:00.013, GC gen0: 0, gen1: 0
-val it : unit = ()
-
-
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Awesome! We just witnessed the power of Hopac for the very first time and saved five seconds in execution!&lt;/p&gt;
-
-&lt;h2 id=&#34;a-real-world-example&#34;&gt;A Real World Example&lt;/h2&gt;
-
-&lt;p&gt;As the last example of this blog post, let&#39;s have a look at a modified real-world use case from my previous project.&lt;/p&gt;
-
-&lt;p&gt;Let&#39;s assume that we are building a home page of a product in an e-commerce portal which displays the product along with its reviews. The product details are stored in a database, and the reviews of the product are stored in an external system. The requirement is to write an API that pulls the data from the both these sources, merge it and send it back to the client.&lt;/p&gt;
-
-&lt;p&gt;If we model this use case using Hopac Jobs, we would have a function to retrieve the product from the database.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Product = { 
-  Id : int
-  Name : string
-}
-
-// int -&amp;gt; Job&amp;lt;Product&amp;gt;
-let getProduct id = job {
-  
-  // Delay in the place of DB query logic for brevity
-  do! timeOutMillis 2000
-
-  return {Id = id; Name = &amp;quot;My Awesome Product&amp;quot;}
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Another function to retrieve the product reviews from an external system&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type Review = {
-  ProductId : int
-  Author : string
-  Comment : string
-}
-
-// int -&amp;gt; Job&amp;lt;Review list&amp;gt;
-let getProductReviews id = job {
-  
-  // Delay in the place of an external HTTP API call
-  do! timeOutMillis 3000
-  
-  return [
-    {ProductId = id; Author = &amp;quot;John&amp;quot;; Comment = &amp;quot;It&#39;s awesome!&amp;quot;}
-    {ProductId = id; Author = &amp;quot;Sam&amp;quot;; Comment = &amp;quot;Great product&amp;quot;}
-  ]
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The final piece is writing another function that merges the results from these two functions. Like the &lt;code&gt;async&lt;/code&gt; computation expression in fsharp, in the &lt;code&gt;job&lt;/code&gt; computation expression, we can use the &lt;code&gt;let!&lt;/code&gt; binding to retrieve the output (or result) of a job.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;type ProductWithReviews = {
-  Id : int
-  Name : string
-  Reviews : (string * string) list
-}
-
-// int -&amp;gt; Job&amp;lt;ProductWithReviews&amp;gt;
-let getProductWithReviews id = job {
-  let! product = getProduct id // &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
-  let! reviews = getProductReviews id // &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
-  return {  // &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
-    Id = id
-    Name = product.Name
-    Reviews = reviews |&amp;gt; List.map (fun r -&amp;gt; r.Author,r.Comment)
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; retrieves &lt;code&gt;Product&lt;/code&gt; from the &lt;code&gt;Job&amp;lt;Product&amp;gt;&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; retrieves &lt;code&gt;Review list&lt;/code&gt; from the &lt;code&gt;Job&amp;lt;Review list&amp;gt;&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; return the merged result &lt;code&gt;ProductWithReviews&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;Let&#39;s execute this snippet in F# Interactive to verify the outcome&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-getProductWithReviews 1 |&amp;gt; run
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-
-Real: 00:00:05.008, CPU: 00:00:00.009, GC gen0: 0, gen1: 0
-
-val it : ProductWithReviews =
-  {Id = 1;
-   Name = &amp;quot;My Awesome Product&amp;quot;;
-   Reviews = [(&amp;quot;John&amp;quot;, &amp;quot;It&#39;s awesome!&amp;quot;); (&amp;quot;Sam&amp;quot;, &amp;quot;Great product&amp;quot;)];}
-
-
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The output is as expected but the time it took is five seconds (two to retrieve the product and three to retrive the reviews). It is because of the sequential execution of the jobs&lt;/p&gt;
-
-&lt;p&gt;Can we make it fast by running them parallelly?&lt;/p&gt;
-
-&lt;p&gt;As these two function calls are independent of each other, we can run them parallelly and then merge the results.&lt;/p&gt;
-
-&lt;p&gt;To do it, we are going to leverage the infix operator &lt;code&gt;&amp;lt;*&amp;gt;&lt;/code&gt; from Hopac&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val ( &amp;lt;*&amp;gt; ): Job&amp;lt;&#39;x&amp;gt; -&amp;gt; Job&amp;lt;&#39;y&amp;gt; -&amp;gt; Job&amp;lt;&#39;x * &#39;y&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;The infix operator &lt;code&gt;&amp;lt;*&amp;gt;&lt;/code&gt; creates a job that runs the given jobs as two separate parallel jobs and returns a pair of their results.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac.Infixes
-
-let getProductWithReviews2 id = job {
-  let! product, reviews = 
-    getProduct id &amp;lt;*&amp;gt; getProductReviews id
-  return {
-    Id = id
-    Name = product.Name
-    Reviews = reviews |&amp;gt; List.map (fun r -&amp;gt; r.Author,r.Comment)
-  }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we execute this new function&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-getProductWithReviews2 1 |&amp;gt; run
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;we will get the same output now in three seconds instead of five.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-
-Real: 00:00:03.005, CPU: 00:00:00.008, GC gen0: 0, gen1: 0
-val it : ProductWithReviews =
-  {Id = 1;
-   Name = &amp;quot;My Awesome Product&amp;quot;;
-   Reviews = [(&amp;quot;John&amp;quot;, &amp;quot;It&#39;s awesome!&amp;quot;); (&amp;quot;Sam&amp;quot;, &amp;quot;Great product&amp;quot;)];}
-
-
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-
-&lt;p&gt;One of the well-thought aspects of Hopac library is its &lt;code&gt;job&lt;/code&gt; computation expression and its  similarity with the &lt;code&gt;async&lt;/code&gt; computation expression makes it easier to learn and apply!&lt;/p&gt;
-
-&lt;p&gt;We had only scratched the surface of the Hopac library in this blog post. Hopac library has a lot of powerful abstractions in its arsenal which we will see in action in the upcoming blog posts.&lt;/p&gt;
-
-&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.2/fsharp/HopacSeries/Part1&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

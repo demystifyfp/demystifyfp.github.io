@@ -361,7 +361,7 @@
 
 <p>Now if we start the application through Mount, we will get the following output.</p>
 
-<pre><code class="language-sh">wheel.infra.database=&gt; (mount/start)
+<pre><code class="language-clojure">wheel.infra.database=&gt; (mount/start)
 {:started [&quot;#'wheel.infra.config/root&quot; 
            &quot;#'wheel.infra.database/datasource&quot;]}
 </code></pre>
@@ -404,12 +404,12 @@
 
 <p>This path doesn&rsquo;t exist yet. So, let&rsquo;s create it.</p>
 
-<pre><code class="language-sh">&gt; mkdir -p resources/db/migration
+<pre><code class="language-bash">&gt; mkdir -p resources/db/migration
 </code></pre>
 
 <p>To verify the database migration, let&rsquo;s load the updated <code>database.clj</code> in the REPL and invoke the <code>migrate</code> function.</p>
 
-<pre><code class="language-sh">wheel.infra.database=&gt; (mount/start)
+<pre><code class="language-clojure">wheel.infra.database=&gt; (mount/start)
 {:started [&quot;#'wheel.infra.config/root&quot;
            &quot;#'wheel.infra.database/datasource&quot;]}
 wheel.infra.database=&gt; (migrate)
@@ -437,7 +437,7 @@ wheel=# \d
 
 <p>Let&rsquo;s create a new file <code>core.clj</code> in the <code>infra</code> directory.</p>
 
-<pre><code class="language-sh">&gt; touch src/wheel/infra/core.clj
+<pre><code class="language-bash">&gt; touch src/wheel/infra/core.clj
 </code></pre>
 
 <p>Then define two functions, <code>start-app</code> and <code>migrate-database</code>, to start the application and perform database migration, respectively.</p>
@@ -517,7 +517,7 @@ wheel=# \d
 
 <p>Then from the REPL, we can include the <code>user</code> profile and manage the application&rsquo;s life cycle.</p>
 
-<pre><code class="language-sh">wheel.core=&gt; (in-ns 'user)
+<pre><code class="language-clojure">wheel.core=&gt; (in-ns 'user)
 #namespace[user]
 
 wheel.core=&gt; (start-app)

@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/</loc>
+      <lastmod>2019-10-04T17:55:02+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/clojure/marketplace-middleware/configuring-logging-using-timbre/</loc>
       <lastmod>2019-10-02T05:50:01+05:30</lastmod>
     </url>
@@ -215,7 +224,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/clojure/</loc>
-      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
+      <lastmod>2019-10-04T17:55:02+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -225,7 +234,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/clojure/</loc>
-      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
+      <lastmod>2019-10-04T17:55:02+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -394,7 +403,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/toucan/</loc>
-      <lastmod>2018-10-18T01:17:17+05:30</lastmod>
+      <lastmod>2019-10-04T17:55:02+05:30</lastmod>
       <priority>0</priority>
     </url>
     
