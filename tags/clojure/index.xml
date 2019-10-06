@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 04 Oct 2019 17:55:02 +0530</lastBuildDate>
+    <lastBuildDate>Sun, 06 Oct 2019 20:25:41 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/tags/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Using Slack as Log Appender</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/</link>
+      <pubDate>Sun, 06 Oct 2019 20:25:41 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/</guid>
+      <description>The back-office team of our client has an active slack based workflow for most of their systems. As this middleware is going to be another system that they need to keep track of, they asked us to send messages on Slack if the middleware encounters an error during its operation. In this blog post, I am going to share how we did it in Clojure using Timbre.
+ This blog post is a part 5 of the blog series Building an E-Commerce Marketplace Middleware in Clojure.</description>
+    </item>
     
     <item>
       <title>Storing Log Events in Postgres Using Toucan</title>

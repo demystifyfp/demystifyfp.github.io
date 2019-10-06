@@ -5,6 +5,15 @@
     
     <url>
     
+      <loc>https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/</loc>
+      <lastmod>2019-10-06T20:25:41+05:30</lastmod>
+    </url>
+    
+  
+    
+    
+    <url>
+    
       <loc>https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/</loc>
       <lastmod>2019-10-04T17:55:02+05:30</lastmod>
     </url>
@@ -224,7 +233,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/clojure/</loc>
-      <lastmod>2019-10-04T17:55:02+05:30</lastmod>
+      <lastmod>2019-10-06T20:25:41+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -234,7 +243,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/clojure/</loc>
-      <lastmod>2019-10-04T17:55:02+05:30</lastmod>
+      <lastmod>2019-10-06T20:25:41+05:30</lastmod>
       <priority>0</priority>
     </url>
     
@@ -393,7 +402,7 @@
     <url>
     
       <loc>https://www.demystifyfp.com/tags/timbre/</loc>
-      <lastmod>2019-10-02T05:50:01+05:30</lastmod>
+      <lastmod>2019-10-06T20:25:41+05:30</lastmod>
       <priority>0</priority>
     </url>
     

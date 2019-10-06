@@ -11,7 +11,7 @@
   <meta name="description" content="Demystifying">
 
   
-  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/clojure/marketplace-middleware/intro/">
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/">
 
   
   
@@ -65,7 +65,7 @@
   <link rel="icon" type="image/png" href="/img/icon.png">
   <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
 
-  <link rel="canonical" href="https://www.demystifyfp.com/clojure/marketplace-middleware/intro/">
+  <link rel="canonical" href="https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/">
 
   <meta property="twitter:card" content="summary_large_image">
   
@@ -73,14 +73,14 @@
   <meta property="twitter:creator" content="@demystifyfp">
   
   <meta property="og:site_name" content="Demystify FP">
-  <meta property="og:url" content="https://www.demystifyfp.com/clojure/marketplace-middleware/intro/">
-  <meta property="og:title" content="Building an E-Commerce Marketplace Middleware in Clojure | Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/">
+  <meta property="og:title" content="Using Slack as Log Appender | Demystify FP">
   <meta property="og:description" content="">
   <meta property="og:locale" content="en-us">
   
-  <meta property="article:published_time" content="2019-07-26T12:42:03&#43;05:30">
+  <meta property="article:published_time" content="2019-10-06T20:25:41&#43;05:30">
   
-  <meta property="article:modified_time" content="2019-07-26T12:42:03&#43;05:30">
+  <meta property="article:modified_time" content="2019-10-06T20:25:41&#43;05:30">
   
 
   
@@ -96,7 +96,7 @@
   Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/components/'
 </script>
 
-  <title>Building an E-Commerce Marketplace Middleware in Clojure | Demystify FP</title>
+  <title>Using Slack as Log Appender | Demystify FP</title>
 
 </head>
 <body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
@@ -225,13 +225,15 @@
 
   <div class="article-container">
     <div class="article-inner">
-      <h1 itemprop="name">Building an E-Commerce Marketplace Middleware in Clojure</h1>
+      <h1 itemprop="name">Using Slack as Log Appender</h1>
       <div>
 
 
 <div class="article-tags">
   
   <a class="btn btn-primary btn-outline" href="/tags/clojure">clojure</a>
+  
+  <a class="btn btn-primary btn-outline" href="/tags/timbre">Timbre</a>
   
 </div>
 
@@ -243,22 +245,22 @@
 
   <span class="article-date">
     
-    <time datetime="2019-07-26 12:42:03 &#43;0530 IST" itemprop="datePublished">
-      Fri, Jul 26, 2019
+    <time datetime="2019-10-06 20:25:41 &#43;0530 IST" itemprop="datePublished">
+      Sun, Oct 6, 2019
     </time>
   </span>
 
   
   <span class="middot-divider"></span>
   <span class="article-reading-time">
-    2 min read
+    4 min read
   </span>
   
 
   
   
   <span class="middot-divider"></span>
-  <a href="https://www.demystifyfp.com/clojure/marketplace-middleware/intro/#disqus_thread"></a>
+  <a href="https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/#disqus_thread"></a>
   
 
   
@@ -269,35 +271,35 @@
   <ul class="share">
     <li>
       <a class="twitter"
-         href="https://twitter.com/intent/tweet?text=Building%20an%20E-Commerce%20Marketplace%20Middleware%20in%20Clojure&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fintro%2f"
+         href="https://twitter.com/intent/tweet?text=Using%20Slack%20as%20Log%20Appender&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fusing-slack-as-log-appender%2f"
          target="_blank" rel="noopener">
         <i class="fa fa-twitter"></i>
       </a>
     </li>
     <li>
       <a class="facebook"
-         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fintro%2f"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fusing-slack-as-log-appender%2f"
          target="_blank" rel="noopener">
         <i class="fa fa-facebook"></i>
       </a>
     </li>
     <li>
       <a class="linkedin"
-         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fintro%2f&amp;title=Building%20an%20E-Commerce%20Marketplace%20Middleware%20in%20Clojure"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fusing-slack-as-log-appender%2f&amp;title=Using%20Slack%20as%20Log%20Appender"
          target="_blank" rel="noopener">
         <i class="fa fa-linkedin"></i>
       </a>
     </li>
     <li>
       <a class="weibo"
-         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fintro%2f&amp;title=Building%20an%20E-Commerce%20Marketplace%20Middleware%20in%20Clojure"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fusing-slack-as-log-appender%2f&amp;title=Using%20Slack%20as%20Log%20Appender"
          target="_blank" rel="noopener">
         <i class="fa fa-weibo"></i>
       </a>
     </li>
     <li>
       <a class="email"
-         href="mailto:?subject=Building%20an%20E-Commerce%20Marketplace%20Middleware%20in%20Clojure&amp;body=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fintro%2f">
+         href="mailto:?subject=Using%20Slack%20as%20Log%20Appender&amp;body=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fusing-slack-as-log-appender%2f">
         <i class="fa fa-envelope"></i>
       </a>
     </li>
@@ -314,45 +316,177 @@
       <div class="article-style" itemprop="articleBody">
         
 
-<p><a href="https://www.ajira.tech" target="_blank">We</a> recently built an e-commerce marketplace middleware for a leading retail chain for consumer electronics &amp; durables. The middleware enables them to sell their products on multiple e-commerce sites seamlessly.</p>
+<p>The back-office team of our client has an active slack based workflow for most of their systems. As this middleware is going to be another system that they need to keep track of, they asked us to send messages on Slack if the middleware encounters an error during its operation. In this blog post, I am going to share how we did it in Clojure using Timbre.</p>
 
-<p>Through this blog post series, I am planning to share how we developed it in Clojure by building a minimal version of it.</p>
+<blockquote>
+<p>This blog post is a part 5 of the blog series <a href="/clojure/marketplace-middleware/intro/" target="_blank">Building an E-Commerce Marketplace Middleware in Clojure</a>.</p>
+</blockquote>
 
-<h2 id="problem-statement">Problem Statement</h2>
+<h3 id="slack-incoming-webhooks">Slack Incoming Webhooks</h3>
 
-<p>The retailer (our client) runs 134 stores across 32 cities in India. In addition to this, they sell their products in e-commerce marketplaces <a href="https://tatacliq.com" target="_blank">Tata-Cliq</a>, <a href="https://wwww.amazon.in" target="_blank">Amazon</a> and <a href="https://www.flipkart.com" target="_blank">Flipkart</a>.</p>
+<p>Slack has the mechanism of <a href="https://api.slack.com/incoming-webhooks" target="_blank">Incoming Webhooks</a> that provides a simple way to post messages from any application into Slack. By following <a href="https://api.slack.com/incoming-webhooks#getting-started" target="_blank">these steps</a>, we will get a unique <em>webhook</em> URL to which we can send a JSON payload with the message text and some other options.</p>
 
-<p>For managing the products inventory, updating the pricing of the product and honouring the customer orders in their 134 stores, they are using a proprietary Order Management System (OMS). To perform similar activities in the e-commerce marketplace sites, they were manually doing it from the seller portal provided by the marketplace. This back-office work is repetitive and exhausting.</p>
+<h3 id="sending-a-slack-message">Sending A Slack Message</h3>
 
-<p>They decided to improve this process by performing all the activities using their OMS. They wanted a middleware which will listen to the changes in the OMS and fulfil the order management activities across different marketplaces without any manual intervention.</p>
+<p>To work with the HTTP post requests, let&rsquo;s add <a href="https://github.com/dakrone/clj-http" target="_blank">clj-http</a> dependency in our <em>project.clj</em> and restart the REPL.</p>
 
-<h2 id="10-000-foot-view">10,000 Foot View</h2>
+<pre><code class="language-clojure">(defproject wheel &quot;0.1.0-SNAPSHOT&quot;
+  ; ...
+  :dependencies [; ...
+                 [clj-http &quot;3.10.0&quot;]]
+  ; ...
+  )
+</code></pre>
 
-<p>The system that we built would look like this.</p>
+<p>Then create a new directory <em>slack</em> and a Clojure file <em>webhook.clj</em> under it.</p>
 
-<p><img src="/img/clojure/blog/ecom-middleware/middleware-10K-View.png" alt="" /></p>
+<pre><code class="language-bash">&gt; mkdir src/wheel/slack
+&gt; touch src/wheel/slack/webhook.clj
+</code></pre>
 
-<p>The retailer&rsquo;s back office team perform their operations with their OMS. The OMS exposes these activities to the outside system using <a href="https://www.ibm.com/support/knowledgecenter/en/SSFKSJ_8.0.0/com.ibm.mq.pro.doc/q001020_.htm" target="_blank">IBM MQ</a>.</p>
+<p>Finally, create a function <code>post-message!</code> to post a message in a Slack channel using the webhook URL.</p>
 
-<p>In response to messages from the OMS, the middleware executes the respective operations (listing a product, unlisting a product, updating price of a product, etc.,) in the marketplace site.</p>
+<pre><code class="language-clojure">; src/wheel/slack/webhook.clj
+(ns wheel.slack.webhook
+  (:require [clj-http.client :as http]
+            [cheshire.core :as json]))
 
-<p>The middleware also runs some cron jobs which periodically pulls the new orders and order cancellations from the marketplaces and communicate it back to the OMS via IBM MQ.</p>
+(defn post-message! [webhook-url text attachments]
+  (let [body (json/generate-string {:text text
+                                    :attachments attachments})]
+    (http/post webhook-url {:content-type :json
+                            :body body})))
+</code></pre>
 
-<p>The middleware has a database (Postgres) to persists its operational data and exposes this data to the back office team via a dashboard powered by <a href="https://metabase.com" target="_blank">Metabase</a>.</p>
+<p>Let&rsquo;s try to execute this function in the REPL</p>
 
-<h2 id="how-we-developed-it">How we developed it</h2>
+<pre><code class="language-clojure">wheel.slack.webhook=&gt; (post-message! &quot;{{webhook-url}}&quot;
+                                     &quot;ranging failed&quot;
+                                     [{:color :danger
+                                       :fields [{:title &quot;Channel Name&quot;
+                                                 :value :tata-cliq
+                                                 :short true}
+                                                {:title &quot;Channel Id&quot;
+                                                 :value &quot;UA&quot;
+                                                 :short true}
+                                                {:title &quot;Event Id&quot;
+                                                 :value &quot;2f763cf7-d5d7-492c-a72d-4546bb547696&quot;}]}])
+{:body &quot;ok&quot;
+ ; ...
+ }
+</code></pre>
 
-<p>As mentioned earlier, we are going to build a minimal version of this project called <code>Wheel</code> using which I will be sharing how we implemented it.</p>
+<p>We should see something similar to this in the configured slack channel.</p>
 
-<p>I will also be updating the below list with the new blog post links.</p>
+<p><img src="/img/clojure/blog/ecom-middleware/sample-slack-event.png" alt="" /></p>
 
-<ol>
-<li><a href="/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/" target="_blank">Bootstrapping the Clojure Project with Mount</a></li>
-<li><a href="/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/" target="_blank">Configuring Database Connection Pooling, Migration and Reloaded Workflow</a></li>
-<li><a href="/clojure/marketplace-middleware/configuring-logging-using-timbre/" target="_blank">Configuring Logging Using Timbre</a></li>
-<li><a href="/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/" target="_blank">Storing Log Events in Postgres Using Toucan</a></li>
-<li><a href="/clojure/marketplace-middleware/using-slack-as-log-appender/" target="_blank">Using Slack as Log Appender</a></li>
-</ol>
+<h3 id="updating-application-config">Updating Application Config</h3>
+
+<p>To pass the slack&rsquo;s webhook URL to the application, let&rsquo;s update the <em>resources/config.edn</em>.</p>
+
+<pre><code class="language-clojure">{:app
+  {:database {...}
+   :log {:slack {:webhook-url #env &quot;WHEEL_APP_LOG_SLACK_WEBHOOK_URL&quot;}}}}
+</code></pre>
+
+<p>Then add the wrapper function in the <em>infra/config.clj</em></p>
+
+<pre><code class="language-clojure">; src/wheel/infra/config.clj
+; ...
+(defn slack-log-webhook-url []
+  (get-in root [:app :log :slack :webhook-url]))
+</code></pre>
+
+<p>To verify this new config, stop the REPL, set the environment variable <code>WHEEL_APP_LOG_SLACK_WEBHOOK_URL</code> with the webhook URL and start the REPL. Then start the app, call the <code>slack-log-webhook-url</code> function.</p>
+
+<pre><code class="language-clojure">wheel.core=&gt; (in-ns 'user)
+#&lt;clojure.lang.Namespace@13250e3 user&gt;
+user=&gt; (start-app)
+{:started [...]}
+user=&gt; (wheel.infra.config/slack-log-webhook-url)
+&quot;https://hooks.slack.com/services/....&quot;
+</code></pre>
+
+<p>All right! Now we have the infrastructure in place to send messages to Slack, and it&rsquo;s time to wire it up with Timbre.</p>
+
+<h3 id="adding-slack-appender">Adding Slack Appender</h3>
+
+<p>As we did for the <code>database</code> appender, let&rsquo;s create a new file <em>slack.clj</em> under <em>infra/log_appender</em></p>
+
+<pre><code class="language-bash">&gt; touch src/infra/log_appender/slack.clj
+</code></pre>
+
+<p>Then add two helper function to transform the events into slack text and attachment.</p>
+
+<pre><code class="language-clojure">; src/infra/log_appender/slack.clj
+(ns wheel.infra.log-appender.slack
+  (:require [wheel.slack.webhook :as slack]
+            [wheel.infra.config :as config]))
+
+(defn- event-&gt;text [{event-name :name}]
+  (str (namespace event-name) &quot; &quot; (name event-name)))
+
+(defn- event-&gt;attachment [{:keys [id channel-id channel-name]}]
+  {:color :danger
+   :fields [{:title &quot;Channel Name&quot;
+             :value channel-name
+             :short true}
+            {:title &quot;Channel Id&quot;
+             :value channel-id
+             :short true}
+            {:title &quot;Event Id&quot;
+             :value id}]})
+</code></pre>
+
+<pre><code class="language-clojure">wheel.infra.log-appender.slack==&gt; (event-&gt;text {:name :ranging/failed})
+&quot;ranging failed&quot;
+</code></pre>
+
+<p>The actual appender function uses these functions and posts the message using the <code>post-message!</code> function that we defined earlier.</p>
+
+<pre><code class="language-clojure">; src/infra/log_appender/slack.clj
+; ...
+
+(defn- send-to-slack [{:keys [msg_]}]
+  (let [event (read-string (force msg_))]
+    (when (= :domain (:type event))
+      (let [text (event-&gt;text event)
+            attachment (event-&gt;attachment event)
+            webhook-url (config/slack-log-webhook-url)]
+        (slack/post-message! webhook-url text [attachment])))))
+
+(def appender {:enabled? true
+               :output-fn :inherit
+               :async? true
+               :min-level :error
+               :fn send-to-slack})
+</code></pre>
+
+<p>Unlike the <code>database</code> appender, the <code>slack</code> one going to process only the logs with the level <code>:error</code> or above.</p>
+
+<p>The final step is adding this appender to the Timbre&rsquo;s config.</p>
+
+<pre><code class="language-clojure">(ns wheel.infra.log
+  (:require ; ...
+            [wheel.infra.log-appender.slack :as slack]))
+
+; ...
+
+(defn init []
+  (timbre/merge-config! {; ...
+                         :appenders { ;...
+                                     :slack slack/appender}}))
+
+; ...
+</code></pre>
+
+<p>If we reset the application in the REPL, and write an error log using the <code>write!</code> function, we should be able to see the log entry (event) both in the slack and in the database.</p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we started from where we left off in the previous post and added the new <code>slack</code> appender. Working with Timber for logging is such a pleasant experience. We are one more step closer in setting up the infrastructure aspects of the application. Stay tuned!</p>
+
+<p>The source code associated with this part is available on <a href="https://github.com/demystifyfp/BlogSamples/tree/0.17/clojure/wheel" target="_blank">this GitHub</a> repository.</p>
 
       </div>
 
@@ -374,11 +508,15 @@
   <h3>Related</h3>
   <ul>
     
-    <li><a href="/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-2/">RESTful CRUD APIs Using Compojure-API and Toucan (Part-2)</a></li>
+    <li><a href="/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/">Storing Log Events in Postgres Using Toucan</a></li>
     
-    <li><a href="/clojure/blog/restful-crud-apis-using-compojure-api-and-toucan-part-1/">RESTful CRUD APIs Using Compojure-API and Toucan (Part-1)</a></li>
+    <li><a href="/clojure/marketplace-middleware/configuring-logging-using-timbre/">Configuring Logging Using Timbre</a></li>
     
-    <li><a href="/clojure/blog/clojure-in-production/">Using Clojure in Production</a></li>
+    <li><a href="/clojure/marketplace-middleware/configuring-database-connection-pooling-migration-reloaded-workflow/">Configuring Database Connection Pooling, Migration and Reloaded Workflow</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/bootstrapping-clojure-project-using-mount-and-aero/">Bootstrapping Clojure Project Using Mount And Aero</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/intro/">Building an E-Commerce Marketplace Middleware in Clojure</a></li>
     
   </ul>
 </div>
