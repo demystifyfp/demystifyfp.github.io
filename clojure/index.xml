@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Sun, 06 Oct 2019 20:25:41 +0530</lastBuildDate>
+    <lastBuildDate>Thu, 10 Oct 2019 18:20:27 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Processing Messages From IBM-MQ in Clojure</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/processing-messages-from-ibmmq-in-clojure/</link>
+      <pubDate>Thu, 10 Oct 2019 18:20:27 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/processing-messages-from-ibmmq-in-clojure/</guid>
+      <description>The Order Management System(OMS) of our client exposes its operations in the form of messages via IBM-MQ. In this blog post, we are going to focus on setting up the infrastructure to receive and process these messages in our application.
+ This blog post is a part 6 of the blog series Building an E-Commerce Marketplace Middleware in Clojure.
+ Setting up IBM-MQ for Local Development We are going to leverage the IBM-MQ&amp;rsquo;s developers edition docker image for the local development.</description>
+    </item>
     
     <item>
       <title>Using Slack as Log Appender</title>
