@@ -11,6 +11,971 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Ranging Items In E-Commerce Marketplaces</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/ranging-items-in-marketplaces/</link>
+      <pubDate>Fri, 18 Oct 2019 20:58:27 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/ranging-items-in-marketplaces/</guid>
+      <description>
+
+&lt;p&gt;In this seventh part of the blog series &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/intro/&#34; target=&#34;_blank&#34;&gt;Building an E-Commerce Marketplace Middleware in Clojure&lt;/a&gt;, I am going to share how we captured a business operation from the client&amp;rsquo;s Order Management System(OMS) processed it in a marketplace.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ranging&lt;/strong&gt; is an activity in the OMS that turn on the visibility of an item in a marketplace and make it available for sale. The reverse operation is &lt;strong&gt;Deranging&lt;/strong&gt;, which unlist the item from the marketplace. There are two more operations &lt;strong&gt;Inventorying&lt;/strong&gt; and &lt;strong&gt;Pricing&lt;/strong&gt; which updates the inventory and the pricing of the items in the marketplace, respectively.&lt;/p&gt;
+
+&lt;p&gt;The back-office team of the Client perform these operations in their OMS. In turn, the OMS communicates the performed action to the middleware through IBM-MQ using XML encoded message.&lt;/p&gt;
+
+&lt;p&gt;This blog post is going to be a long one. So, here is a sneak preview of what we&amp;rsquo;ll be learning on the Clojure implementation front.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;A variant of the &lt;a href=&#34;https://www.destroyallsoftware.com/talks/boundaries&#34; target=&#34;_blank&#34;&gt;Functional Core, Imperative Shell&lt;/a&gt; technique in action.&lt;/li&gt;
+&lt;li&gt;More Clojure.Spec (and multi-spec) and asserting the public function parameters using it.&lt;/li&gt;
+&lt;li&gt;XML Parsing &amp;amp; Validation&lt;/li&gt;
+&lt;li&gt;Persisting JSON data in PostgreSQL using Toucan and much more.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;unified-message-handling&#34;&gt;Unified Message Handling&lt;/h3&gt;
+
+&lt;p&gt;The handling logic of all these operational messages will be as follows.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/message-handling-process.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Upon receiving the message, we log the message as an OMS event. It help us to keep track of the messages that we received from the OMS.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Then we parse the message. If it is a failure, we will be logging it as an error in the form of a System event.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If parsing is successful, for each channel in the message, we check whether the given channel exists.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If the channel exists, we will be performing the respective operation in the marketplace. If the processing succeeds, we log it as a domain success event else we log it as a domain failure event.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;If the channel not found, we&amp;rsquo;ll be logging as a system event.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Events from steps two to five, treats the OMS event (step one) as the parent event.&lt;/p&gt;
+
+&lt;p&gt;In the rest of the blog post, we&amp;rsquo;ll be talking about the implementation of Ranging message and the marketplace &lt;a href=&#34;https://www.tatacliq.com/&#34; target=&#34;_blank&#34;&gt;Tata-CliQ&lt;/a&gt; alone.&lt;/p&gt;
+
+&lt;h3 id=&#34;revisiting-event-spec&#34;&gt;Revisiting Event Spec&lt;/h3&gt;
+
+&lt;p&gt;As a first step towards implementing this unified message handling, let&amp;rsquo;s start from adding the spec for the &lt;code&gt;:oms&lt;/code&gt; event type.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;# src/wheel/middleware/event.clj
+
+- (s/def ::type #{:domain :system })
++ (s/def ::type #{:domain :system :oms})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+; ...
+(defmethod event-type :oms [_]
+  (s/keys :req-un [::id ::name ::type ::level ::timestamp]))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;adding-payload-spec&#34;&gt;Adding Payload Spec&lt;/h4&gt;
+
+&lt;p&gt;All three event types are going to have payloads that provide extra information about an event. To specify different payload specs, we first need to define the different event names.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+; ...
+(s/def ::oms-event-name #{:oms/items-ranged})
+(s/def ::domain-event-name #{})
+(s/def ::system-event-name #{:system/parsing-failed
+                             :system/channel-not-found})
+
+(s/def ::name ...
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;:oms/items-ranged&lt;/code&gt; - Ranging message received from OMS&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:system/parsing-failed&lt;/code&gt; - Parsing ranging message failed.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;:system/channel-not-found&lt;/code&gt; - Channel specified in the ranging message not found.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;We are leaving the &lt;code&gt;domain-event-name&lt;/code&gt; spec as an empty set for now.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Earlier we had the had the spec for the &lt;code&gt;name&lt;/code&gt; as &lt;code&gt;qualified-keyword?&lt;/code&gt;. We have to change it to either one of the above event-name spec.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;# src/wheel/middleware/event.clj
+
+- (s/def ::name qualified-keyword?)
++ (s/def ::name (s/or :oms ::oms-event-name 
++                     :domain ::domain-event-name
++                     :system ::system-event-name))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Before defining the payload type for these event-names, let&amp;rsquo;s add the spec for the messages from OMS.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/wheel/oms/message.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/oms/message.clj
+(ns wheel.oms.message
+  (:require [clojure.spec.alpha :as s]))
+
+(s/def ::type #{:ranging})
+(s/def ::id uuid?)
+(s/def ::message (s/and string? (complement clojure.string/blank?)))
+
+(s/def ::oms-message
+       (s/keys :req-un [::type ::id ::message]))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then add the event payload spec as below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+(ns wheel.middleware.event
+  (:require ; ...
+            [wheel.oms.message :as oms-message]))
+; ...
+(defmulti payload-type :type)
+
+(defmethod payload-type :oms/items-ranged [_]
+  (s/keys :req-un [::oms-message/message]))
+
+(s/def ::error-message (s/and string? (complement clojure.string/blank?)))
+
+(s/def ::message-type ::oms-message/type)
+(defmethod payload-type :system/parsing-failed [_]
+  (s/keys :req-un [::error-message ::message-type]))
+
+(defmethod payload-type :system/channel-not-found [_]
+  (s/keys :req-un [::channel-id ::message-type]))
+
+(defmethod payload-type :default [_]
+  (s/keys :req-un [::type]))
+(s/def ::payload (s/multi-spec payload-type :type))
+
+(defmulti event-type ...
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, add this &lt;code&gt;payload&lt;/code&gt; spec in all the &lt;code&gt;event&lt;/code&gt; spec.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;# src/wheel/middleware/event.clj
+
+(defmethod event-type :system [_]
+-  (s/keys :req-un [::id ::name ::type ::level ::timestamp]
++  (s/keys :req-un [::id ::name ::type ::level ::timestamp ::payload]
+           :opt-un [::parent-id]))
+(defmethod event-type :domain [_]
+-  (s/keys :req-un [::id ::name ::type ::level ::timestamp 
++  (s/keys :req-un [::id ::name ::type ::level ::timestamp ::payload
+                    ::channel-id ::channel-name]
+           :opt-un [::parent-id]))
+(defmethod event-type :oms [_]
+-  (s/keys :req-un [::id ::name ::type ::level ::timestamp]))
++  (s/keys :req-un [::id ::name ::type ::level ::timestamp ::payload]))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;system-processing-failed-event&#34;&gt;System Processing Failed Event&lt;/h4&gt;
+
+&lt;p&gt;To model the unhandled exception while processing a message from OMS, let&amp;rsquo;s add a new event name &lt;code&gt;:system/processing-failed&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+; ...
+(s/def ::system-event-name #{ ;...
+                             :system/processing-failed})
+; ...
+(s/def ::stacktrace (s/and string? (complement clojure.string/blank?)))
+
+(defmethod payload-type :system/processing-failed [_]
+  (s/keys :req-un [::error-message ::stacktrace]
+          :opt-un [::message-type]))
+
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;implementing-unified-message-handler&#34;&gt;Implementing Unified Message Handler&lt;/h3&gt;
+
+&lt;p&gt;With the spec for all the possible events in place, now it&amp;rsquo;s time to implement the message handler for the messages from OMS.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s start it from the rewriting message listener that we implemented in the &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/processing-messages-from-ibmmq-in-clojure/#consuming-messages-from-ibm-mq-queue&#34; target=&#34;_blank&#34;&gt;last blog post&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/oms.clj
+(ns wheel.infra.oms
+  (:require ; ...
+            [wheel.middleware.event :as event]
+            [wheel.middleware.core :as middleware] ; &amp;lt;1&amp;gt;
+            [wheel.infra.log :as log])
+  ; ...
+  )
+; ...
+(defn- message-listener [message-type oms-event-name] ; &amp;lt;2&amp;gt;
+  (proxy [MessageListener] []
+    (onMessage [^Message msg]
+      (try
+        (let [message   (.getBody msg String)
+              oms-event (event/oms oms-event-name message)] ; &amp;lt;3&amp;gt;
+          (-&amp;gt;&amp;gt; (middleware/handle {:id      (:id oms-event) ; &amp;lt;4&amp;gt;
+                                   :message message
+                                   :type    message-type}) 
+               (cons oms-event) ; &amp;lt;5&amp;gt;
+               log/write-all!)) ; &amp;lt;6&amp;gt;
+        (catch Throwable ex 
+          (log/write! (event/processing-failed ex))))))) ; &amp;lt;7&amp;gt;
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; &amp;amp; &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; The namespace &lt;code&gt;wheel.middleware.core&lt;/code&gt; doesn&amp;rsquo;t exist yet. We&amp;rsquo;ll be adding it in a  few minutes. This namespace is going to have a function &lt;code&gt;handle&lt;/code&gt; that takes &lt;code&gt;oms-message&lt;/code&gt; and performs the required actions in the marketplace. Then it returns a collection of events that represent the results of these actions. Think of this as a router in a web application.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; The rewritten version of the &lt;code&gt;message-listener&lt;/code&gt; function now takes two parameters, &lt;code&gt;message-type&lt;/code&gt; and  &lt;code&gt;oms-event-name&lt;/code&gt;. These parameters make it generic for processing the different types of messages from OMS.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; &amp;amp; &lt;span class=&#34;callout&#34;&gt;7&lt;/span&gt; The &lt;code&gt;oms&lt;/code&gt; and &lt;code&gt;processing-failed&lt;/code&gt; functions in the &lt;code&gt;wheel.middleware.event&lt;/code&gt; namespace is also not added yet, and we&amp;rsquo;ll be adding them in the next step. These functions construct an event of type &lt;code&gt;oms&lt;/code&gt; and &lt;code&gt;system&lt;/code&gt; with the parameters passed.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;5&lt;/span&gt; We are prepending the &lt;code&gt;oms-event&lt;/code&gt; with the results from the &lt;code&gt;handle&lt;/code&gt; functions. This &lt;code&gt;oms-event&lt;/code&gt; is the parent event that triggered all the other events&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;6&lt;/span&gt; We are writing all the events in the log using the &lt;code&gt;write-all!&lt;/code&gt; function that we defined earlier.&lt;/p&gt;
+
+&lt;p&gt;As we have changed the signature of the &lt;code&gt;message-listener&lt;/code&gt; function, let&amp;rsquo;s update the &lt;code&gt;ranging-consumer&lt;/code&gt; state that we defined using it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;  (mount/defstate ranging-consumer
+    :start (let [queue-name (:ranging-queue-name (config/oms-settings))
+-                listener   (message-listener)]
++                listener   (message-listener :ranging :oms/items-ranged)]
+            (start-consumer queue-name jms-ranging-session listener))
+    :stop (stop ranging-consumer))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here we are creating of message-listener for handling the &lt;code&gt;:ranging&lt;/code&gt; message from the OMS, and we name the message received from OMS as &lt;code&gt;:oms/items-ranged&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;This design follows a variant of the &lt;a href=&#34;https://www.destroyallsoftware.com/talks/boundaries&#34; target=&#34;_blank&#34;&gt;Functional Core, Imperative Shell&lt;/a&gt; technique.&lt;/p&gt;
+
+&lt;h4 id=&#34;adding-event-create-functions&#34;&gt;Adding Event Create Functions&lt;/h4&gt;
+
+&lt;p&gt;In the &lt;code&gt;message-listener&lt;/code&gt; function, we are calling two functions &lt;code&gt;event/oms&lt;/code&gt; to &lt;code&gt;event/processing-failed&lt;/code&gt; to create events. These functions don&amp;rsquo;t exist yet. So, let&amp;rsquo;s add it.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;# src/wheel/offset-date-time.clj
+
+  (ns wheel.offset-date-time
+    (:require [clojure.spec.alpha :as s])
+    (:import [java.time.format DateTimeFormatter DateTimeParseException]
+-            [java.time OffsetDateTime]))	           
++            [java.time OffsetDateTime ZoneId]))
+# ...
++ (defn ist-now []
++   (OffsetDateTime/now (ZoneId/of &amp;quot;+05:30&amp;quot;)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+(ns wheel.middleware.event
+  (:require ; ...
+            [clojure.stacktrace :as stacktrace]
+            [wheel.offset-date-time :as offset-date-time]
+            [wheel.oms.message :as oms-message])
+  (:import [java.util UUID]))
+; ...
+
+(defn- event [event-name payload &amp;amp;{:keys [level type parent-id
+                                          channel-id channel-name]
+                                   :or   {level :info
+                                          type  :domain}}] ; &amp;lt;1&amp;gt;
+  {:post [(s/assert ::event %)]}
+  (let [event {:id        (UUID/randomUUID)
+               :timestamp (str (offset-date-time/ist-now))
+               :name      event-name
+               :level     level
+               :type      type
+               :payload   (assoc payload :type event-name)}]
+    (cond-&amp;gt; event
+     parent-id (assoc :parent-id parent-id)
+     channel-id (assoc :channel-id channel-id)
+     channel-name (assoc :channel-name channel-name))))
+
+(defn oms [oms-event-name message]
+  {:pre [(s/assert ::oms-event-name oms-event-name)
+         (s/assert ::oms-message/message message)]
+   :post [(s/assert ::event %)]}
+  (event oms-event-name 
+         {:message message}
+         :type :oms))
+
+(defn- ex-&amp;gt;map [ex]
+  {:error-message (with-out-str (stacktrace/print-throwable ex))
+   :stacktrace (with-out-str (stacktrace/print-stack-trace ex 3))})
+
+(defn processing-failed [ex]
+  {:post [(s/assert ::event %)]}
+  (event :system/processing-failed
+         (ex-&amp;gt;map ex)
+         :type :system
+         :level :error))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;event&lt;/code&gt; function takes the name and payload (without type) of the event along with a set of &lt;a href=&#34;https://clojure.org/guides/destructuring#_keyword_arguments&#34; target=&#34;_blank&#34;&gt;keyword arguments&lt;/a&gt; and constructs a Clojure map that conforms to the &lt;code&gt;event&lt;/code&gt; spec.&lt;/p&gt;
+
+&lt;p&gt;Let&amp;rsquo;s also add the &lt;code&gt;parsing-failed&lt;/code&gt; function to construct the &lt;code&gt;parsing-failed&lt;/code&gt; event which we will be using shortly.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+; ...
+(defn parsing-failed [parent-id message-type error-message]
+  {:pre [(s/assert uuid? parent-id)
+         (s/assert ::oms-message/type message-type)
+         (s/assert ::error-message error-message)]
+   :post [(s/assert ::event %)]}
+  (event :system/parsing-failed 
+         {:error-message error-message
+          :message-type message-type}
+         :parent-id parent-id
+         :type :system
+         :level :error))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&#34;adding-generic-message-handler&#34;&gt;Adding Generic Message Handler&lt;/h4&gt;
+
+&lt;p&gt;The &lt;code&gt;message-listener&lt;/code&gt; function at the application boundary creates the &lt;code&gt;oms-message&lt;/code&gt; with the message received from IBM-MQ and pass it to the middleware to handle. This middleware&amp;rsquo;s &lt;code&gt;handle&lt;/code&gt; function also not implemented yet. So, let&amp;rsquo;s add it as well.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/wheel/middleware/core.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The messages from OMS are XML encoded. So, the handler has to validate it against an &lt;a href=&#34;https://en.wikipedia.org/wiki/XML_Schema_(W3C)&#34; target=&#34;_blank&#34;&gt;XML schema&lt;/a&gt;. If it is valid, then it has to be parsed to a Clojure data structure (sequence of maps).&lt;/p&gt;
+
+&lt;p&gt;This parsed data structure is also needed to be validated using clojure.spec to make sure that the message is a processable one. If the validation fails in either one of this, we&amp;rsquo;ll be returning the &lt;code&gt;parsing-failed&lt;/code&gt; event.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;(ns wheel.middleware.core
+  (:require [clojure.spec.alpha :as s]
+            [clojure.java.io :as io]
+            [wheel.middleware.event :as event]
+            [wheel.oms.message :as oms-message]
+            [wheel.xsd :as xsd]))
+
+; &amp;lt;1&amp;gt;
+(defmulti xsd-resource-file-path :type) 
+(defmulti parse :type)
+(defmulti spec :type)
+
+(defmulti process (fn [oms-msg parsed-oms-message] ; &amp;lt;2&amp;gt;
+                    (:type oms-msg)))
+
+(defn- validate-message [oms-msg]
+  (-&amp;gt; (xsd-resource-file-path oms-msg)
+      io/resource
+      io/as-file
+      (xsd/validate (:message oms-msg)))) ; &amp;lt;3&amp;gt;
+
+(defn handle [{:keys [id type]
+               :as   oms-msg}]
+  {:pre  [(s/assert ::oms-message/oms-message oms-msg)]
+   :post [(s/assert (s/coll-of ::event/event :min-count 1) %)]}
+  (if-let [err (validate-message oms-msg)]
+    [(event/parsing-failed id type err)]
+    (let [parsed-oms-message (parse oms-msg)]
+      (if (s/valid? (spec oms-msg) parsed-oms-message)
+        (process oms-msg parsed-oms-message) ; &amp;lt;4&amp;gt;
+        [(event/parsing-failed
+          id type
+          (s/explain-str (spec oms-msg) parsed-oms-message))]))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; &amp;amp; &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; We are defining three multi-methods &lt;code&gt;xsd-resource-file-path&lt;/code&gt;, &lt;code&gt;parse&lt;/code&gt; &amp;amp; &lt;code&gt;spec&lt;/code&gt; to get the XML schema file path in the &lt;em&gt;resources&lt;/em&gt; directory, parse the XML message to Clojure data structure and to get the expected clojure.spec of the parsed message respectively. The &lt;code&gt;process&lt;/code&gt; multi-method abstracts the processing of the parsed message from OMS. Each OMS message type (ranging, deranging, etc.) has to have an implementation for these multi-methods.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; The &lt;code&gt;validate-message&lt;/code&gt; performs the XML schema-based validation of the incoming message. We&amp;rsquo;ll be adding the &lt;code&gt;wheel.xsd/validate&lt;/code&gt; function shortly.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; We are dispatching the parsed OMS message to the &lt;code&gt;process&lt;/code&gt; multimethod.&lt;/p&gt;
+
+&lt;p&gt;Then add a new file &lt;em&gt;xsd.clj&lt;/em&gt; and implement the XML validation based on XSD as mentioned in this &lt;a href=&#34;https://stackoverflow.com/questions/15732/whats-the-best-way-to-validate-an-xml-file-against-an-xsd-file&#34; target=&#34;_blank&#34;&gt;stackoverflow answer&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/wheel/xsd.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/xsd.clj
+(ns wheel.xsd
+  (:import [javax.xml.validation SchemaFactory]
+           [javax.xml XMLConstants]
+           [org.xml.sax SAXException]
+           [java.io StringReader File]
+           [javax.xml.transform.stream StreamSource]))
+
+(defn validate [^File xsd-file ^String xml-content]
+  (let [validator (-&amp;gt; (SchemaFactory/newInstance 
+                       XMLConstants/W3C_XML_SCHEMA_NS_URI)
+                      (.newSchema xsd-file)
+                      (.newValidator))]
+    (try
+      (-&amp;gt;&amp;gt; (StringReader. xml-content)
+           StreamSource.
+           (.validate validator))
+      nil
+      (catch SAXException e (.getMessage e)))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This &lt;code&gt;validate&lt;/code&gt; function takes a &lt;code&gt;xsd-file&lt;/code&gt; of type &lt;code&gt;java.io.File&lt;/code&gt; and the &lt;code&gt;xml-content&lt;/code&gt; of type &lt;code&gt;String&lt;/code&gt;. It returns either &lt;code&gt;nil&lt;/code&gt; if the &lt;code&gt;xml-content&lt;/code&gt; conforms to the XSD file provided or the validation error message otherwise.&lt;/p&gt;
+
+&lt;h4 id=&#34;adding-ranging-message-handler&#34;&gt;Adding Ranging Message Handler&lt;/h4&gt;
+
+&lt;p&gt;A sample ranging message from the OMS would look like this&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UA&amp;quot; EAN=&amp;quot;EAN_1&amp;quot; ItemID=&amp;quot;SKU1&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UA&amp;quot; EAN=&amp;quot;EAN_2&amp;quot; ItemID=&amp;quot;SKU2&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UB&amp;quot; EAN=&amp;quot;EAN_3&amp;quot; ItemID=&amp;quot;SKU3&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;EXTNChannelItemList&lt;/code&gt; element(s) specifies which channel that we have to communicate and the &lt;code&gt;EXTNChannelItem&lt;/code&gt; element(s) determines the items that have to be ranged in that channel.&lt;/p&gt;
+
+&lt;p&gt;The XSD file for the ranging message is available in &lt;a href=&#34;https://gist.github.com/tamizhvendan/4544f0123bd30681be1c5198ed87522c#file-ranging-xsd&#34; target=&#34;_blank&#34;&gt;this gist&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;To keep this XSD file (and the future XSD files), create a new directory &lt;em&gt;oms/message_schema&lt;/em&gt; under &lt;em&gt;resources&lt;/em&gt; directory and download the gist there.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir -p resources/oms/message_schema
+&amp;gt; wget https://gist.githubusercontent.com/tamizhvendan/4544f0123bd30681be1c5198ed87522c/raw/2c2112bde069f6d002c184e8cfc5a6db77fbebcb/ranging.xsd -P resources/oms/message_schema 
+
+# ...
+- &#39;resources/oms/message_schema/ranging.xsd&#39; saved 
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then create the &lt;em&gt;ranging.clj&lt;/em&gt; file under &lt;em&gt;middleware&lt;/em&gt; directly and implement the &lt;code&gt;xsd-resource-file-path&lt;/code&gt; multimethod which returns the above XSD file path.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/ranging.clj
+(ns wheel.middleware.ranging
+  (:require [wheel.middleware.core :as middleware]))
+
+(defmethod middleware/xsd-resource-file-path :ranging [_]
+  &amp;quot;oms/message_schema/ranging.xsd&amp;quot;)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then let&amp;rsquo;s define the spec for the ranging message.&lt;/p&gt;
+
+&lt;p&gt;Given we are receiving the above sample XML as a message, we will be transforming it to a Clojure sequence as below.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;({:channel-id &amp;quot;UA&amp;quot;, :items ({:ean &amp;quot;EAN_1&amp;quot;, :id &amp;quot;SKU1&amp;quot;} 
+                            {:ean &amp;quot;EAN_2 &amp;quot;, :id &amp;quot;SKU2&amp;quot;})}
+ {:channel-id &amp;quot;UB&amp;quot;, :items ({:ean &amp;quot;EAN_3&amp;quot;, :id &amp;quot;SKU3&amp;quot;})})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To add a spec for this, Let&amp;rsquo;s add the spec for the &lt;code&gt;id&lt;/code&gt; and the &lt;code&gt;ean&lt;/code&gt; of the item.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/wheel/oms
+&amp;gt; touch src/wheel/oms/item.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/oms/item.clj
+(ns wheel.oms.item
+  (:require [clojure.spec.alpha :as s]))
+
+(s/def ::id (s/and string? (complement clojure.string/blank?)))
+(s/def ::ean (s/and string? (complement clojure.string/blank?)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then use these specs to define the spec for the ranging message and return it in the &lt;code&gt;spec&lt;/code&gt; multi-method implementation.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/ranging.clj
+(ns wheel.middleware.ranging
+  (:require ; ...
+            [clojure.spec.alpha :as s]
+            [wheel.oms.item :as oms-item]
+            [wheel.marketplace.channel :as channel]))
+
+; ...
+
+(s/def ::item
+  (s/keys :req-un [::oms-item/ean ::oms-item/id]))
+
+(s/def ::items (s/coll-of ::item :min-count 1))
+
+(s/def ::channel-id ::channel/id)
+(s/def ::channel-items
+  (s/keys :req-un [::channel-id ::items]))
+
+(s/def ::message
+  (s/coll-of ::channel-items :min-count 1))
+
+(defmethod middleware/spec :ranging [_]
+  ::message)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is parsing the XML content to a ranging message that satisfies the above spec.&lt;/p&gt;
+
+&lt;p&gt;The &lt;a href=&#34;https://clojuredocs.org/clojure.xml/parse&#34; target=&#34;_blank&#34;&gt;parse&lt;/a&gt; function from &lt;code&gt;clojure.xml&lt;/code&gt; namespace parses the XML and returns a tree of XML elements.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;wheel.middleware.ranging==&amp;gt; (clojure.xml/parse (java.io.StringBufferInputStream. &amp;quot;{above xml content}&amp;quot;))
+{:attrs nil,
+ :content [{:attrs nil,
+            :content [{:attrs {:ChannelID &amp;quot;UA&amp;quot;, :EAN &amp;quot;UA_EAN_1&amp;quot;, 
+                               :ItemID &amp;quot;SKU1&amp;quot;, :RangeFlag &amp;quot;Y&amp;quot;},
+                       :content nil,
+                       :tag :EXTNChannelItem}
+                      {:attrs {:ChannelID &amp;quot;UA&amp;quot;, :EAN &amp;quot;UA_EAN_2 &amp;quot;, 
+                               :ItemID &amp;quot;SKU2&amp;quot;, :RangeFlag &amp;quot;Y &amp;quot;},
+                       :content nil,
+                       :tag :EXTNChannelItem}],
+            :tag :EXTNChannelItemList}
+           {:attrs nil,
+            :content [{:attrs {:ChannelID &amp;quot;UB&amp;quot;, :EAN &amp;quot;UB_EAN_3&amp;quot;, 
+                               :ItemID &amp;quot;SKU3&amp;quot;, :RangeFlag &amp;quot;Y&amp;quot;},
+                       :content nil,
+                       :tag :EXTNChannelItem}],
+            :tag :EXTNChannelItemList}],
+ :tag :EXTNChannelList}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And we have to transform it to&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;({:channel-id &amp;quot;UA&amp;quot;, :items ({:ean &amp;quot;EAN_1&amp;quot;, :id &amp;quot;SKU1&amp;quot;} 
+                            {:ean &amp;quot;EAN_2 &amp;quot;, :id &amp;quot;SKU2&amp;quot;})}
+ {:channel-id &amp;quot;UB&amp;quot;, :items ({:ean &amp;quot;EAN_3&amp;quot;, :id &amp;quot;SKU3&amp;quot;})})
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Let&amp;rsquo;s do it&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/ranging.clj
+(ns wheel.middleware.ranging
+  (:require ; ...
+            [clojure.xml :as xml])
+  (:import [java.io StringBufferInputStream]))
+
+; ...
+
+(defn- to-item [{:keys [EAN ItemID]}]
+  {:ean EAN
+   :id ItemID})
+
+(defmethod middleware/parse :ranging [{:keys [message]}]
+  (-&amp;gt;&amp;gt; (StringBufferInputStream. message)
+       xml/parse
+       :content
+       (mapcat :content)
+       (map :attrs)
+       (group-by :ChannelID)
+       (map (fn [[id xs]]
+              {:channel-id  id
+               :items (map to-item xs)}))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Note: This kind of nested data transformation can also be achieved using &lt;a href=&#34;https://ravi.pckl.me/short/functional-xml-editing-using-zippers-in-clojure&#34; target=&#34;_blank&#34;&gt;XML Zippers&lt;/a&gt; or &lt;a href=&#34;https://github.com/noprompt/meander&#34; target=&#34;_blank&#34;&gt;Meander&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The last multimethod that we need to define is &lt;code&gt;process&lt;/code&gt;. To begin with, let&amp;rsquo;s throw an exception in the implementation.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/ranging.clj
+; ...
+
+(defmethod middleware/process :ranging [_ ranging-message]
+  (throw (Exception. &amp;quot;todo&amp;quot;)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To load these multimethod definitions during application bootstrap, let&amp;rsquo;s refer this namespace in the &lt;em&gt;infra/core.clj&lt;/em&gt; file&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/core.clj
+(ns wheel.infra.core
+  (:require ; ...
+            [wheel.middleware.ranging :as ranging]))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;revisiting-slack-appender&#34;&gt;Revisiting Slack Appender&lt;/h3&gt;
+
+&lt;p&gt;To make the Slack appender that &lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/&#34; target=&#34;_blank&#34;&gt;we added earlier&lt;/a&gt; more meaningful, let&amp;rsquo;s change the implementation of the &lt;code&gt;event-&amp;gt;attachment&lt;/code&gt; and &lt;code&gt;send-to-slack&lt;/code&gt; function like below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/log_appender/slack.clj
+(ns wheel.infra.log-appender.slack
+  (:require [wheel.slack.webhook :as slack]
+            [wheel.infra.config :as config]
+            [cheshire.core :as json]))
+
+; ...
+
+(defn- event-&amp;gt;attachment [{:keys [id channel-id channel-name parent-id payload]
+                           :or   {channel-name &amp;quot;N/A&amp;quot;
+                                  channel-id   &amp;quot;N/A&amp;quot;
+                                  parent-id    &amp;quot;N/A&amp;quot;}}]
+  {:color  :danger
+   :fields [{:title &amp;quot;Channel Name&amp;quot;
+             :value channel-name
+             :short true}
+            {:title &amp;quot;Channel Id&amp;quot;
+             :value channel-id
+             :short true}
+            {:title &amp;quot;Event Id&amp;quot;
+             :value id
+             :short true}
+            {:title &amp;quot;Parent Id&amp;quot;
+             :value parent-id
+             :short true}
+            {:title &amp;quot;Payload&amp;quot;
+             :value (str
+                     &amp;quot;```&amp;quot;
+                     (json/generate-string (dissoc payload :type)
+                                           {:pretty true})
+                     &amp;quot;```&amp;quot;)}]})
+
+(defn- send-to-slack [{:keys [msg_]}]
+  (let [event      (read-string (force msg_))
+        text       (event-&amp;gt;text event)
+        attachment (event-&amp;gt;attachment event)]
+    (slack/post-message! (config/slack-log-webhook-url) text [attachment])))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;When we test drive the app by reloading the application in the REPL and putting the following the XML messages in the IBM MQ, we&amp;rsquo;ll get the respective notification in the Slack.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/invalid-xml-slack-error.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;!-- An empty space in the Channel ID --&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot; &amp;quot; EAN=&amp;quot;EAN_1&amp;quot; ItemID=&amp;quot;SKU1&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/invalid-spec-slack-error.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Finally, a valid ranging XML message will throw the &amp;ldquo;todo&amp;rdquo; exception.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UA&amp;quot; EAN=&amp;quot;EAN_1&amp;quot; ItemID=&amp;quot;SKU1&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/todo-slack-error.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Everything is working as expected! Let&amp;rsquo;s move to the final step of processing the &lt;code&gt;ranging&lt;/code&gt; message.&lt;/p&gt;
+
+&lt;h3 id=&#34;processing-ranging-in-a-marketplace-channel&#34;&gt;Processing Ranging In A Marketplace Channel&lt;/h3&gt;
+
+&lt;p&gt;The processing of a OMS message in a marketplace channel involves the calling the respective API provided the marketplace. To keep this simple, we are going to a mock a HTTP server that accepts the following HTTP request&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;POST /channels/UA/ranging HTTP/1.1
+Host: localhost:3000
+Content-Type: application/json
+Authorization: Bearer top-secret!
+Accept: */*
+Content-Length: 79
+
+[{
+	&amp;quot;ean&amp;quot; : &amp;quot;EAN_1&amp;quot;,
+	&amp;quot;sku&amp;quot; : &amp;quot;SKU_1&amp;quot;
+},{
+	&amp;quot;ean&amp;quot; : &amp;quot;EAN_2&amp;quot;,
+	&amp;quot;sku&amp;quot; : &amp;quot;SKU_2&amp;quot;
+}]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To perform this action, let&amp;rsquo;s add a &lt;code&gt;tata-cliq&lt;/code&gt; API client that implements this fake request for ranging.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; mkdir src/wheel/marketplace/tata_cliq
+&amp;gt; touch src/wheel/marketplace/tata_cliq/api.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/marketplace/tata_cliq/api.clj
+(ns wheel.marketplace.tata-cliq.api
+  (:require [clj-http.client :as http]))
+
+(defn ranging [{:keys [base-url bearer-token]} channel-id items]
+  (let [url         (str base-url &amp;quot;/channels/&amp;quot; channel-id &amp;quot;/ranging&amp;quot;)
+        auth-header (str &amp;quot;Bearer &amp;quot; bearer-token)]
+    (http/post url {:form-params  items
+                    :content-type :json
+                    :headers      {:authorization auth-header}})))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then update the &lt;em&gt;config.edn&lt;/em&gt; to store the channel settings (&lt;code&gt;base-url&lt;/code&gt; &amp;amp; &lt;code&gt;bearer-token&lt;/code&gt;) and expose it a via a function in &lt;em&gt;config.clj&lt;/em&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; resources/config.edn
+{:app      ...
+ :settings {...
+            :channels {&amp;quot;UA&amp;quot; {:channel-name  :tata-cliq
+                             :base-url     &amp;quot;http://localhost:3000&amp;quot;
+                             :bearer-token &amp;quot;top-secret!&amp;quot;}
+                       &amp;quot;UB&amp;quot; {:channel-name :tata-cliq
+                             :base-url     &amp;quot;http://localhost:3000&amp;quot;
+                             :bearer-token &amp;quot;top-secret!&amp;quot;}}}}}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/config.clj
+; ...
+(defn get-channel-cofig [channel-id]
+  (get-in root [:settings :channels channel-id]))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To perform the ranging in the marketplace(s) in response to a message from OMS, we need to define a multimethod &lt;code&gt;process-ranging&lt;/code&gt; that dispatches based on the &lt;code&gt;channel-name&lt;/code&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/ranging.clj
+; ...
+(defmulti process-ranging (fn [{:keys [channel-name]} 
+                               oms-msg 
+                               ranging-message]
+                            channel-name))
+
+(defmethod middleware/process ... )
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then rewrite the &lt;code&gt;middleware/process&lt;/code&gt; multimethod implementation to iterate through each channel in the ranging message, and invoke the &lt;code&gt;process-ranging&lt;/code&gt; method after  getting their configuration.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/ranging.clj
+(ns wheel.middleware.ranging
+  (:require ; ...
+            [middleware.infra.event :as event]))
+; ...
+
+(defmethod middleware/process :ranging [{:keys [id]
+                                         :as oms-msg} ranging-message]
+  (for [{:keys [channel-id]
+         :as   ch-ranging-message} ranging-message]
+    (if-let [channel-config (config/get-channel-cofig channel-id)]
+      (try
+        (process-ranging channel-config oms-msg ch-ranging-message)
+        (catch Throwable ex
+          (event/processing-failed ex id :ranging channel-id (:channel-name channel-config))))
+      (event/channel-not-found id :ranging channel-id))))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The &lt;code&gt;channel-not-found&lt;/code&gt; function and &lt;code&gt;processing-failed&lt;/code&gt; function overload are not available, so let&amp;rsquo;s add them.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+; ...
+(defn processing-failed 
+  ([ex]
+   ; ... existing implementation
+   )
+  ([ex parent-id message-type channel-id channel-name]
+   {:post [(s/assert ::event %)]}
+   (event :system/processing-failed
+          (assoc (ex-&amp;gt;map ex) :message-type message-type)
+          :parent-id parent-id
+          :channel-id channel-id
+          :channel-name channel-name
+          :level :error)))
+; ...
+(defn channel-not-found [parent-id message-type channel-id]
+  {:pre [(s/assert uuid? parent-id)
+         (s/assert ::oms-message/type message-type)
+         (s/assert ::channel/id channel-id)]
+   :post [(s/assert ::event %)]}
+  (event :system/channel-not-found
+         {:channel-id channel-id
+          :message-type message-type}
+         :parent-id parent-id
+         :type :system
+         :level :error))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As we&amp;rsquo;ll be adding the &lt;code&gt;ranging/succeeded&lt;/code&gt; event, let&amp;rsquo;s add the spec for this as well.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/middleware/event.clj
+(s/def ::domain-event-name #{:ranging/succeeded})
+; ...
+(s/def ::ranged-item
+  (s/keys :req-un [::item/ean ::item/id]))
+(s/def ::ranged-items (s/coll-of ::ranged-item :min-count 1))
+(defmethod payload-type :ranging/succeeded [_]
+  (s/keys :req-un [::ranged-items]))
+
+(defn ranging-succeeded [parent-id channel-id channel-name items]
+  {:pre [(s/assert uuid? parent-id)
+         (s/assert ::channel/id channel-id)
+         (s/assert ::channel/name channel-name)
+         (s/assert ::ranged-items items)]
+   :post [(s/assert ::event %)]}
+  (event :ranging/succeeded
+         {:ranged-items items}
+         :parent-id parent-id
+         :channel-id channel-id
+         :channel-name channel-name))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The final piece left is defining the &lt;code&gt;tata-cliq&lt;/code&gt; implementation of the &lt;code&gt;process-ranging&lt;/code&gt; multimethod.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch src/wheel/marketplace/tata_cliq/core.clj
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/marketplace/tata_cliq/core.clj
+(ns wheel.marketplace.tata-cliq.core
+  (:require [wheel.marketplace.tata-cliq.api :as tata-cliq]
+            [wheel.middleware.ranging :as ranging]
+            [wheel.oms.message :as oms-message]
+            [wheel.middleware.event :as event]
+            [clojure.spec.alpha :as s]
+            [clojure.set :as set]))
+
+(defmethod ranging/process-ranging :tata-cliq
+  [{:keys [channel-name]
+    :as   channel-config}
+   {:keys [id]
+    :as   oms-msg}
+   {:keys [channel-id items]
+    :as   channel-items}]
+  {:pre [(s/assert ::oms-message/oms-message oms-msg)
+         (s/assert ::ranging/channel-items channel-items)]}
+  (tata-cliq/ranging channel-config channel-id
+                     (map #(set/rename-keys % {:id :sku}) items)) ; &amp;lt;1&amp;gt;
+  (event/ranging-succeeded id channel-id channel-name items))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; The &lt;code&gt;item&lt;/code&gt; in &lt;code&gt;tata-cliq&lt;/code&gt; API doesn&amp;rsquo;t have &lt;code&gt;id&lt;/code&gt; instead it uses &lt;code&gt;sku&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/core.clj
+(ns wheel.infra.core
+  (:require ; ...
+            [wheel.marketplace.tata-cliq.core :as tata-cliq]))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;setting-up-mock-server&#34;&gt;Setting Up Mock Server.&lt;/h3&gt;
+
+&lt;p&gt;To set up the Mock Server for tata-cliq we are going to use &lt;a href=&#34;https://mockoon.com&#34; target=&#34;_blank&#34;&gt;Mockon&lt;/a&gt;. The fake configuration is going to return HTTP Response &lt;code&gt;200&lt;/code&gt; for the channel-id &lt;code&gt;UA&lt;/code&gt; and &lt;code&gt;500&lt;/code&gt; for the channel-id &lt;code&gt;UB&lt;/code&gt;. This Mockon setup is available in &lt;a href=&#34;https://gist.githubusercontent.com/tamizhvendan/4544f0123bd30681be1c5198ed87522c/raw/d032e1e380ab565fd1f1e1ccf5c03b630b10ab6e/mockon.json&#34; target=&#34;_blank&#34;&gt;this gist&lt;/a&gt;. You can import it in the Mockon and start the Mockon server.&lt;/p&gt;
+
+&lt;p&gt;With this mock server, if we do a test drive of the implementation, we&amp;rsquo;ll get the following output in the Slack.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UC&amp;quot; EAN=&amp;quot;EAN_1&amp;quot; ItemID=&amp;quot;SKU1&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/ch-not-found-slack-error.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If we try with the channel id &lt;code&gt;UB&lt;/code&gt;, we&amp;rsquo;ll get the processing failed exception.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UB&amp;quot; EAN=&amp;quot;EAN_1&amp;quot; ItemID=&amp;quot;SKU1&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/ch-ranging-failed-slack-error.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For the channel id &lt;code&gt;UA&lt;/code&gt;, we&amp;rsquo;ll get the ranging succeeded as expected in the standard output log.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-xml&#34;&gt;&amp;lt;EXTNChannelList&amp;gt;
+  &amp;lt;EXTNChannelItemList&amp;gt;
+    &amp;lt;EXTNChannelItem ChannelID=&amp;quot;UA&amp;quot; EAN=&amp;quot;EAN_1&amp;quot; ItemID=&amp;quot;SKU1&amp;quot; RangeFlag=&amp;quot;Y&amp;quot;/&amp;gt;
+  &amp;lt;/EXTNChannelItemList&amp;gt;
+&amp;lt;/EXTNChannelList&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-json&#34;&gt;{
+  &amp;quot;payload&amp;quot;: {
+    &amp;quot;ranged-items&amp;quot;: [
+      {
+        &amp;quot;ean&amp;quot;: &amp;quot;EAN_1&amp;quot;,
+        &amp;quot;id&amp;quot;: &amp;quot;SKU1&amp;quot;
+      }
+    ],
+    &amp;quot;type&amp;quot;: &amp;quot;ranging/succeeded&amp;quot;
+  },
+  &amp;quot;name&amp;quot;: &amp;quot;ranging/succeeded&amp;quot;,
+  &amp;quot;type&amp;quot;: &amp;quot;domain&amp;quot;,
+  &amp;quot;channel-name&amp;quot;: &amp;quot;tata-cliq&amp;quot;,
+  &amp;quot;level&amp;quot;: &amp;quot;info&amp;quot;,
+  &amp;quot;id&amp;quot;: &amp;quot;f01e987b-bc72-41e9-9376-b362c3509273&amp;quot;,
+  &amp;quot;parent-id&amp;quot;: &amp;quot;8c22c6c1-9e00-463e-83bb-b2a77ab135a1&amp;quot;,
+  &amp;quot;channel-id&amp;quot;: &amp;quot;UA&amp;quot;,
+  &amp;quot;timestamp&amp;quot;: &amp;quot;2019-10-18T00:19:46.192+05:30&amp;quot;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;fixing-db-appender&#34;&gt;Fixing DB Appender&lt;/h3&gt;
+
+&lt;p&gt;In the database appender that we added earlier, we need to modify to support all the event types, and we also need to persist the event &lt;code&gt;payload&lt;/code&gt;. To do it, let&amp;rsquo;s add the database migration script.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;&amp;gt; touch resources/db/migration/V201910180025__alter_event.sql
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-sql&#34;&gt;-- resources/db/migration/V201910180025__alter_event.sql
+CREATE TYPE event_type AS ENUM (&#39;domain&#39;, &#39;oms&#39;, &#39;system&#39;);
+
+ALTER TABLE event ALTER COLUMN channel_id DROP NOT NULL;
+ALTER TABLE event ALTER COLUMN channel_name DROP NOT NULL;
+ALTER TABLE event ADD COLUMN type event_type NOT NULL DEFAULT &#39;domain&#39;;
+ALTER TABLE event ADD COLUMN payload JSONB NOT NULL DEFAULT &#39;{}&#39;;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The next step is adding the &lt;code&gt;event_type&lt;/code&gt; and the &lt;code&gt;jsonb&lt;/code&gt; type in the Toucan setup and use them in the &lt;code&gt;event&lt;/code&gt; model definition.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/database.clj
+(ns wheel.infra.database
+  (:require ;...
+            [cheshire.core :as json]))
+; ...
+(defn- to-pg-jsonb [value]
+  (doto (PGobject.)
+    (.setType &amp;quot;jsonb&amp;quot;)
+    (.setValue (json/generate-string value))))
+
+(defn- configure-toucan []
+  ;...
+  (models/add-type! :event-type
+                    :in (pg-object-fn &amp;quot;event_type&amp;quot;)
+                    :out keyword)
+  (models/add-type! :jsonb
+                    :in to-pg-jsonb
+                    :out #(json/parse-string (.getValue %) true)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/model/event.clj
+; ...
+(models/defmodel Event :event
+  models/IModel
+  (types [_]
+         {; ...
+          :type         :event-type
+          :payload      :jsonb}))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then rewrite the &lt;code&gt;create!&lt;/code&gt; event function as below&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/model/event.clj
+; ...
+(defn create! [new-event]
+  {:pre [(s/assert ::event/event new-event)]}
+  (db/insert! Event
+              (update new-event :timestamp timestamp-&amp;gt;offset-date-time)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Finally, rewrite the &lt;code&gt;append-to-db&lt;/code&gt; function in the database appender to log all the event types.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;; src/wheel/infra/log_appender/database.clj
+; ...
+(defn- append-to-db [{:keys [msg_]}]
+  (let [evnt (read-string (force msg_))]
+    (event/create! evnt)))
+; ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;To test these changes, run the migration script and reset the app from the REPL&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-clojure&#34;&gt;user=&amp;gt; (migrate-database)
+{:stopped [&amp;quot;#&#39;wheel.infra.database/datasource&amp;quot;]}
+user=&amp;gt; (reset)
+{:started [...]}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then put the valid XML ranging message of channel &lt;code&gt;UA&lt;/code&gt; in IBM-MQ, we should be able to see the new events in the database.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/clojure/blog/ecom-middleware/appender-db-output.png&#34; alt=&#34;&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
+
+&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;Thanks for reading the whole article. I believe you&amp;rsquo;d have got a high-level idea of our project design and implementation. Feel free to drop a comment if you&amp;rsquo;d like to discuss further!&lt;/p&gt;
+
+&lt;p&gt;In the next blog post, we are going to implement the other side of the communication. Marketplace to OMS in which we&amp;rsquo;ll be implementing cron jobs that fetch the information from the marketplace and relay it to the OMS. Stay tuned!&lt;/p&gt;
+
+&lt;p&gt;The source code associated with this part is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.19/clojure/wheel&#34; target=&#34;_blank&#34;&gt;this GitHub&lt;/a&gt; repository.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Processing Messages From IBM-MQ in Clojure</title>
       <link>https://www.demystifyfp.com/clojure/marketplace-middleware/processing-messages-from-ibmmq-in-clojure/</link>
       <pubDate>Thu, 10 Oct 2019 18:20:27 +0530</pubDate>
@@ -1605,6 +2570,7 @@ wheel.core=&amp;gt; (in-ns &#39;wheel.infra.config)
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/&#34; target=&#34;_blank&#34;&gt;Storing Log Events in Postgres Using Toucan&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/using-slack-as-log-appender/&#34; target=&#34;_blank&#34;&gt;Using Slack as Log Appender&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/processing-messages-from-ibmmq-in-clojure/&#34; target=&#34;_blank&#34;&gt;Processing Messages From IBM-MQ in Clojure&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://www.demystifyfp.com/clojure/marketplace-middleware/ranging-items-in-marketplaces/&#34; target=&#34;_blank&#34;&gt;Ranging Items In E-Commerce Marketplaces&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>
     </item>
@@ -3653,310 +4619,6 @@ val it : unit = ()
 &lt;p&gt;Just like composing functions together here we are composing the jobs and implementing complicated stuff with less code.&lt;/p&gt;
 
 &lt;p&gt;You can find the source code associated with this blog post on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.7/fsharp/HopacSeries/Part5&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Concurrent Programming in fsharp using Hopac - Part 4</title>
-      <link>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/</link>
-      <pubDate>Fri, 16 Mar 2018 08:46:01 +0530</pubDate>
-      
-      <guid>https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-4/</guid>
-      <description>&lt;p&gt;Hi,&lt;/p&gt;
-
-&lt;p&gt;Welcome back to the fourth part of Concurrent Programming in fsharp blog post series. In &lt;a href=&#34;https://www.demystifyfp.com/fsharp/blog/concurrent-programming-in-fsharp-using-hopac-part-2/#a-communicating-job-in-action&#34;&gt;part-2&lt;/a&gt;, we just learned that &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt; is a subclass of &lt;code&gt;Job&amp;lt;&#39;a&amp;gt;&lt;/code&gt;. In this blog post, we are doing to dive deep into this abstraction and learn what it brings to the table.&lt;/p&gt;
-
-&lt;h2 id=&#34;an-example&#34;&gt;An Example&lt;/h2&gt;
-
-&lt;p&gt;Before diving into the definition of &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt;, let&#39;s figure out why we need it in the first place.&lt;/p&gt;
-
-&lt;p&gt;Assume that we have a function &lt;code&gt;delayedPrintn&lt;/code&gt; which prints a given message after &lt;code&gt;n&lt;/code&gt; milliseconds&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac 
-
-// string -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
-let delayedPrintn msg delayInMillis =
-  timeOutMillis delayInMillis
-  |&amp;gt; Job.map (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Executing this function in F# interactive,&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-delayedPrintn &amp;quot;Hi&amp;quot; 3000 |&amp;gt; run
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;will give us the following output&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-Hi
-Real: 00:00:03.000, CPU: 00:00:00.002, GC gen0: 0, gen1: 0
-val it : unit = ()
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Nothing fancy and it worked as expected.&lt;/p&gt;
-
-&lt;p&gt;Let&#39;s make it little complicated by defining two more jobs to print &lt;code&gt;Hi&lt;/code&gt; and &lt;code&gt;Hello&lt;/code&gt; after waiting for &lt;code&gt;2000&lt;/code&gt; and &lt;code&gt;1000&lt;/code&gt; milliseconds respectively.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// Job&amp;lt;unit&amp;gt;
-let delayedHiPrinter = delayedPrintn &amp;quot;Hi&amp;quot; 2000
-
-// Job&amp;lt;unit&amp;gt;
-let delayedHelloPrinter = delayedPrintn &amp;quot;Hello&amp;quot; 1000
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then define a function to run these two jobs in parallel using the infix operator function &lt;code&gt;&amp;lt;*&amp;gt;&lt;/code&gt; from &lt;code&gt;Hopac.Infixes&lt;/code&gt; module.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;open Hopac.Infixes
-
-let runThemParallel () = 
-  delayedHiPrinter &amp;lt;*&amp;gt; delayedHelloPrinter 
-  |&amp;gt; run |&amp;gt; ignore
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we run this function in F# interactive,&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-runThemParallel ()
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can witness that the jobs were executed parallelly and print the output as expected.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-Hello
-Hi
-Real: 00:00:02.004, CPU: 00:00:00.006, GC gen0: 0, gen1: 0
-val it : unit = ()
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And here comes the new requirement!&lt;/p&gt;
-
-&lt;p&gt;Given we have two printers like the above, if one printer completes its job, stop the other from executing it.&lt;/p&gt;
-
-&lt;p&gt;That&#39;s interesting! Let&#39;s explore how can we solve this&lt;/p&gt;
-
-&lt;h2 id=&#34;the-alt-type&#34;&gt;The Alt Type&lt;/h2&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;Alt&lt;/code&gt; represents a first-class selective synchronous operation. The idea of alternatives is to allow one to introduce new selective synchronous operations to be used with non-determinic choice.&lt;/p&gt;
-
-&lt;p&gt;Obviously, when you have a concurrent server that responds to some protocol, you don&#39;t have to perform the protocol as a selective synchronous operation.&lt;/p&gt;
-
-&lt;p&gt;However, if you do encapsulate the protocol as a selective synchronous operation, you can then combine the operation with other selective synchronous operations. That is the essence of Hopac and CML. - &lt;a href=&#34;https://hopac.github.io/Hopac/Hopac.html#def:type%20Hopac.Alt&#34;&gt;Hopac Documentation&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The critical point that we are interested in to solve our problem is &lt;code&gt;selective&lt;/code&gt;. In other words, among the two printers, we are concerned (selective) in the one which prints first.&lt;/p&gt;
-
-&lt;p&gt;The function that can help us here is &lt;code&gt;Alt.choose&lt;/code&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;Alt.choose&lt;/code&gt; creates an alternative that is available when any one of the given alternatives is&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val choose: seq&amp;lt;#Alt&amp;lt;&#39;x&amp;gt;&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;As we are dealing with only two &lt;code&gt;Alt&lt;/code&gt;s, we are going to make use of &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; operator function which is an optimised version of calling the &lt;code&gt;choose&lt;/code&gt; function with a sequence of two items.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;&lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; creates an alternative that is available when either of the given alternatives is available. xA1 &amp;lt;|&amp;gt; xA2 is an optimized version of choose [xA1; xA2].&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val ( &amp;lt;|&amp;gt; ): Alt&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The given alternatives are processed in a left-to-right order with short-cut evaluation. In other words, given an alternative of the form first &amp;lt;|&amp;gt; second, the first alternative is first instantiated and, if it is available, is committed to and the second alternative will not be instantiated at all.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&#34;revisting-delayedprintn-function&#34;&gt;Revisting delayedPrintn function&lt;/h2&gt;
-
-&lt;p&gt;The &lt;code&gt;delayedPrintn&lt;/code&gt; function is returning &lt;code&gt;Job&amp;lt;unit&amp;gt;&lt;/code&gt; function now.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val delayedPrintn: string -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;To apply &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; operator function, we need to modify it to return &lt;code&gt;Alt&amp;lt;unit&amp;gt;&lt;/code&gt;. The &lt;code&gt;timeOutMillis&lt;/code&gt; function is already returning &lt;code&gt;Alt&amp;lt;unit&amp;gt;&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val timeOutMillis: int -&amp;gt; Alt&amp;lt;unit&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;But the &lt;code&gt;Job.map&lt;/code&gt; function transforming it to &lt;code&gt;Job&amp;lt;unit&amp;gt;&lt;/code&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val map: (&#39;x -&amp;gt; &#39;y) -&amp;gt; Job&amp;lt;&#39;x&amp;gt; -&amp;gt; Job&amp;lt;&#39;y&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let delayedPrintn msg delayInMillis =
-  timeOutMillis delayInMillis // Alt&amp;lt;unit&amp;gt;
-  |&amp;gt; Job.map (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg) // Job&amp;lt;unit&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;Alt&amp;lt;&#39;a&amp;gt; is a subclass of Job&amp;lt;&#39;a&amp;gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;To achieve what we are doing with &lt;code&gt;Job.map&lt;/code&gt;, we can make use of the &lt;code&gt;Alt.afterFun&lt;/code&gt; function&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val afterFun: (&#39;x -&amp;gt; &#39;y) -&amp;gt; Alt&amp;lt;&#39;x&amp;gt; -&amp;gt; Alt&amp;lt;&#39;y&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-diff&#34;&gt;- // string -&amp;gt; int -&amp;gt; Job&amp;lt;unit&amp;gt;
-+ // string -&amp;gt; int -&amp;gt; Alt&amp;lt;unit&amp;gt;
-  let delayedPrintn msg delayInMillis =
-    timeOutMillis delayInMillis // Alt&amp;lt;unit&amp;gt;
--   |&amp;gt; Job.map (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg) // Job&amp;lt;unit&amp;gt;
-+   |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg) // Alt&amp;lt;unit&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then we can make use of the &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; operator function to choose between the two printers.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// unit -&amp;gt; unit
-let chooseBetweenThem () =
-  delayedHiPrinter &amp;lt;|&amp;gt; delayedHelloPrinter 
-  |&amp;gt; run
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we execute the &lt;code&gt;chooseBetweenThem&lt;/code&gt; function with the timer on in F# interactive,&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;#time &amp;quot;on&amp;quot;
-chooseBetweenThem ()
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We can verify that it only prints &lt;code&gt;Hello&lt;/code&gt; after a seconds delay&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-Hello
-Real: 00:00:01.002, CPU: 00:00:00.004, GC gen0: 0, gen1: 0
-val it : unit = ()
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Awesome!!&lt;/p&gt;
-
-&lt;p&gt;Wait what is happening behind the scene? Was the &lt;code&gt;delayedHiPrinter&lt;/code&gt; called?&lt;/p&gt;
-
-&lt;p&gt;Yes, It is. But as soon as the &lt;code&gt;delayedHelloPrinter&lt;/code&gt; completes its execution, the &lt;code&gt;&amp;lt;|&amp;gt;&lt;/code&gt; function stops the execution of &lt;code&gt;delayedHiPrinter&lt;/code&gt; and hence we don&#39;t see &lt;code&gt;Hi&lt;/code&gt; in the output.&lt;/p&gt;
-
-&lt;p&gt;To verify this, we can modify the &lt;code&gt;delayedPrintn&lt;/code&gt; as below, which prints a log message when printer started its execution&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; int -&amp;gt; Alt&amp;lt;unit&amp;gt;
-let delayedPrintn msg delayInMillis =
-  Alt.prepareFun &amp;lt;| fun _ -&amp;gt; 
-    printfn &amp;quot;starting [%s]&amp;quot; msg
-    timeOutMillis delayInMillis
-    |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;%s&amp;quot; msg)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The &lt;code&gt;Alt.prepareFun&lt;/code&gt; function that we used here creates an alternative that is computed at instantiation time with the given anonymous function&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val prepareFun: (unit -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;) -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If we execute the function &lt;code&gt;chooseBetweenThem&lt;/code&gt; now, we&#39;ll get the following output&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;--&amp;gt; Timing now on
-starting [Hi]
-starting [Hello]
-Hello
-Real: 00:00:01.006, CPU: 00:00:00.005, GC gen0: 0, gen1: 0
-val it : unit = ()
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h2 id=&#34;negative-acknowledgement&#34;&gt;Negative Acknowledgement&lt;/h2&gt;
-
-&lt;p&gt;In the above section, we didn&#39;t care about the &lt;code&gt;delayedHiPrinter&lt;/code&gt; and ignored it completely. But in particular real-world use cases, we can&#39;t afford an execution to be stopped abruptly. In those cases, we need to let the &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt; know about this situation.&lt;/p&gt;
-
-&lt;p&gt;To implement this kind of scenarios, Hopac offers &lt;a href=&#34;https://github.com/Hopac/Hopac/blob/master/Docs/Alternatives.md#cancellation-with-negative-acknowledgments&#34;&gt;Negative Acknowledgement&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;To implement this behaviour in our example, let&#39;s create an another function &lt;code&gt;delayedPrintnWithNack&lt;/code&gt; which wraps the &lt;code&gt;delayedPrintn&lt;/code&gt; with the negative acknowledgement support.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;// string -&amp;gt; int -&amp;gt; Alt&amp;lt;unit&amp;gt;
-let delayedPrintnWithNack msg delayInMillis =
-
-  // Alt&amp;lt;&#39;a&amp;gt; -&amp;gt; Alt&amp;lt;unit&amp;gt; 
-  let onNack nack =  // &lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt;
-    nack
-    |&amp;gt; Alt.afterFun (fun _ -&amp;gt; printfn &amp;quot;aborting [%s]&amp;quot; msg)
-
-  Alt.withNackJob &amp;lt;| fun nack -&amp;gt; // &lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt;
-    Job.start (onNack nack) // &lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt;
-    |&amp;gt; Job.map (fun _ -&amp;gt; delayedPrintn msg delayInMillis) // &lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; // Job&amp;lt;Alt&amp;lt;unit&amp;gt;&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;There is a lot is happening in this short code snippet. So, Let&#39;s dissect it.&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;1&lt;/span&gt; We are defining an &lt;code&gt;onNack&lt;/code&gt; function to specify what to do in the event of a negative acknowledgement. For simplicity we are just printing an abort message.&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;2&lt;/span&gt; To make any &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt; negative acknowledgement aware, Hopac provides a function called &lt;code&gt;Alt.withNackJob&lt;/code&gt;.&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val withNackJob: (Promise&amp;lt;unit&amp;gt; -&amp;gt; Job&amp;lt;Alt&amp;lt;&#39;x&amp;gt;&amp;gt;) -&amp;gt; Alt&amp;lt;&#39;x&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The &lt;code&gt;withNackJob&lt;/code&gt; function creates an alternative that is computed at instantiation time with the given job constructed with a negative acknowledgement alternative.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;withNackJob&lt;/code&gt; allows client-server protocols that do require the server to be notified when the client aborts the transaction to be encapsulated as selective operations.&lt;/p&gt;
-
-&lt;p&gt;The negative acknowledgement alternative will be available in case some other instantiated alternative involved in the choice is committed to instead. - &lt;strong&gt;Hopac Documentation&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;Promise&amp;lt;&#39;a&amp;gt;&lt;/code&gt; is a sub class of &lt;code&gt;Alt&amp;lt;&#39;a&amp;gt;&lt;/code&gt;, which we&#39;ll see in detail in a later blog post&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;3&lt;/span&gt; Using the &lt;code&gt;Job.start&lt;/code&gt; function, we are immediately starting the &lt;code&gt;onNack&lt;/code&gt; job in an another concurrent job&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;val start: Job&amp;lt;unit&amp;gt; -&amp;gt; Job&amp;lt;unit&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;&lt;span class=&#34;callout&#34;&gt;4&lt;/span&gt; After starting the &lt;code&gt;onNack&lt;/code&gt; job, we are calling the actual &lt;code&gt;delayedPrintn&lt;/code&gt; and return its result.&lt;/p&gt;
-
-&lt;p&gt;Let&#39;s verify this behaviour with a new set of function.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-fsharp&#34;&gt;let delayedHiPrinterWithNack = 
-  delayedPrintnWithNack &amp;quot;Hi&amp;quot; 2000
-
-let delayedHelloPrinterWithNack = 
-  delayedPrintnWithNack &amp;quot;Hello&amp;quot; 1000
-
-let chooseBetweenThemWithNack () =
-  delayedHiPrinterWithNack &amp;lt;|&amp;gt; delayedHelloPrinterWithNack 
-  |&amp;gt; run
-
-#time &amp;quot;on&amp;quot;
-chooseBetweenThemWithNack ()
-#time &amp;quot;off&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;--&amp;gt; Timing now on
-
-starting [Hi]
-starting [Hello]
-Hello
-aborting [Hi]
-Real: 00:00:01.000, CPU: 00:00:00.001, GC gen0: 0, gen1: 0
-val it : unit = ()
-
---&amp;gt; Timing now off
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;From the log that we can assert that we gracefully handled the negative acknowledgement.&lt;/p&gt;
-
-&lt;p&gt;Here is my best effort to show what is happening in the &lt;code&gt;delayedPrintnWithNack&lt;/code&gt; function&lt;/p&gt;
-
-&lt;p&gt;&lt;figure&gt;&lt;img src=&#34;https://www.demystifyfp.com/img/fsharp/blog/hopac/nack.png&#34; alt=&#34;&#34;&gt;&lt;/figure&gt;&lt;/p&gt;
-
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-
-&lt;p&gt;In this blog post, we explored how to implement selective synchronisation in Hopac using &lt;code&gt;Alt&lt;/code&gt;. It is fascinating to experience that we can write harder concurrent programs with less code.&lt;/p&gt;
-
-&lt;p&gt;Stay tuned for the upcoming blog posts. We are going to build some awesome stuff using &lt;code&gt;Alt&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The source code of this blog post is available on &lt;a href=&#34;https://github.com/demystifyfp/BlogSamples/tree/0.6/fsharp/HopacSeries/Part4&#34;&gt;GitHub&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

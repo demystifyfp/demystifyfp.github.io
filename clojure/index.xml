@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Thu, 10 Oct 2019 18:20:27 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 18 Oct 2019 20:58:27 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Ranging Items In E-Commerce Marketplaces</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/ranging-items-in-marketplaces/</link>
+      <pubDate>Fri, 18 Oct 2019 20:58:27 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/ranging-items-in-marketplaces/</guid>
+      <description>In this seventh part of the blog series Building an E-Commerce Marketplace Middleware in Clojure, I am going to share how we captured a business operation from the client&amp;rsquo;s Order Management System(OMS) processed it in a marketplace.
+Ranging is an activity in the OMS that turn on the visibility of an item in a marketplace and make it available for sale. The reverse operation is Deranging, which unlist the item from the marketplace.</description>
+    </item>
     
     <item>
       <title>Processing Messages From IBM-MQ in Clojure</title>
