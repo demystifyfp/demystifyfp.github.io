@@ -7,10 +7,20 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>&amp;copy; 2017 Demystify FP</copyright>
-    <lastBuildDate>Fri, 18 Oct 2019 20:58:27 +0530</lastBuildDate>
+    <lastBuildDate>Tue, 22 Oct 2019 21:34:42 +0530</lastBuildDate>
     
 	<atom:link href="https://www.demystifyfp.com/tags/clojure/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Creating Cron Jobs in Clojure</title>
+      <link>https://www.demystifyfp.com/clojure/marketplace-middleware/creating-cron-jobs-in-clojure/</link>
+      <pubDate>Tue, 22 Oct 2019 21:34:42 +0530</pubDate>
+      
+      <guid>https://www.demystifyfp.com/clojure/marketplace-middleware/creating-cron-jobs-in-clojure/</guid>
+      <description>In the last blog post, we processed the messages from IBM-MQ and relayed the information to the marketplace. In this blog post, we are going to focus on adding cron jobs to our existing infrastructure. The cron jobs pull the data from the marketplace, perform some transformation and send it to the Order Management System(OMS) via IBM-MQ.
+ This blog post is a part 8 of the blog series Building an E-Commerce Marketplace Middleware in Clojure.</description>
+    </item>
     
     <item>
       <title>Ranging Items In E-Commerce Marketplaces</title>

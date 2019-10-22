@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="theme" content="hugo-academic">
+  <meta name="generator" content="Hugo 0.53" />
+  
+  <meta name="description" content="Demystifying">
+
+  
+  <link rel="alternate" hreflang="en-us" href="https://www.demystifyfp.com/clojure/marketplace-middleware/creating-cron-jobs-in-clojure/">
+
+  
+  
+
+
+  
+
+  
+  
+  
+  
+    
+  
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha512-6MXa8B6uaO18Hid6blRMetEIoPqHf7Ux1tnyIQdpt9qI5OACx7C+O3IVTr98vwGnlcg0LOLa02i9Y1HpVhlfiw==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/academicons/1.8.1/css/academicons.min.css" integrity="sha512-NThgw3XKQ1absAahW6to7Ey42uycrVvfNfyjqcFNgCmOCQ5AR4AO0SiXrN+8ZtYeappp56lk1WtvjVmEa+VR6A==" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw==" crossorigin="anonymous">
+  
+  
+  
+  
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700%7cRoboto:400,400italic,700%7cRoboto&#43;Mono">
+  
+  <link rel="stylesheet" href="/styles.css">
+  
+  <link rel="stylesheet" href="/css/custom.css">
+  
+
+  
+    <script>
+      window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+      ga('create', 'UA-111185766-1', 'auto');
+      ga('require', 'eventTracker');
+      ga('require', 'outboundLinkTracker');
+      ga('require', 'urlChangeTracker');
+      ga('send', 'pageview');
+    </script>
+    <script async src="//www.google-analytics.com/analytics.js"></script>
+    
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/autotrack/2.4.1/autotrack.js" integrity="sha512-HUmooslVKj4m6OBu0OgzjXXr+QuFYy/k7eLI5jdeEy/F4RSgMn6XRWRGkFi5IFaFgy7uFTkegp3Z0XnJf3Jq+g==" crossorigin="anonymous"></script>
+    
+  
+
+  
+  <link rel="alternate" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  <link rel="feed" href="https://www.demystifyfp.com/index.xml" type="application/rss+xml" title="Demystify FP">
+  
+
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="icon" type="image/png" href="/img/icon.png">
+  <link rel="apple-touch-icon" type="image/png" href="/img/icon-192.png">
+
+  <link rel="canonical" href="https://www.demystifyfp.com/clojure/marketplace-middleware/creating-cron-jobs-in-clojure/">
+
+  <meta property="twitter:card" content="summary_large_image">
+  
+  <meta property="twitter:site" content="@demystifyfp">
+  <meta property="twitter:creator" content="@demystifyfp">
+  
+  <meta property="og:site_name" content="Demystify FP">
+  <meta property="og:url" content="https://www.demystifyfp.com/clojure/marketplace-middleware/creating-cron-jobs-in-clojure/">
+  <meta property="og:title" content="Creating Cron Jobs in Clojure | Demystify FP">
+  <meta property="og:description" content="">
+  <meta property="og:locale" content="en-us">
+  
+  <meta property="article:published_time" content="2019-10-22T21:34:42&#43;05:30">
+  
+  <meta property="article:modified_time" content="2019-10-22T21:34:42&#43;05:30">
+  
+
+  
+<script type="text/javascript" id="hs-script-loader" async defer src="//js.hs-scripts.com/4132543.js"></script>
+
+
+<meta name="flattr:id" content="qjy9np">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/themes/prism-tomorrow.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+  Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.16.0/components/'
+</script>
+
+  <title>Creating Cron Jobs in Clojure | Demystify FP</title>
+
+</head>
+<body id="top" data-spy="scroll" data-target="#navbar-main" data-offset="71" >
+
+<nav class="navbar navbar-default navbar-fixed-top" id="navbar-main">
+  <div class="container">
+
+    
+    <div class="navbar-header">
+      
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+              data-target=".navbar-collapse" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      <a class="navbar-brand" href="/">Demystify FP</a>
+    </div>
+
+    
+    <div class="collapse navbar-collapse">
+
+      
+      <ul class="nav navbar-nav navbar-right">
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#about">
+            
+            <span>Home</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Posts
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="/#fsharp-posts">
+                
+                <span>F#</span>
+              </a>
+            </li>
+            
+            <li class="nav-item">
+              <a href="/#clojure-posts">
+                
+                <span>Clojure</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="/#books">
+            
+            <span>Books</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true">
+            Courses
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            
+            <li class="nav-item">
+              <a href="https://www.udemy.com/learn-suave/?couponCode=DEMYSTIFY_FP">
+                
+                <span>MiniSuave in F#</span>
+              </a>
+            </li>
+            
+          </ul>
+        </li>
+
+        
+        
+
+        
+
+        <li class="nav-item">
+          <a href="https://www.codementor.io/tamizhvendan">
+            
+            <span>Get 1:1 Help</span>
+          </a>
+        </li>
+
+        
+        
+
+        
+      </ul>
+
+    </div>
+  </div>
+</nav>
+
+
+<article class="article" itemscope itemtype="http://schema.org/Article">
+
+  
+
+
+  <div class="article-container">
+    <div class="article-inner">
+      <h1 itemprop="name">Creating Cron Jobs in Clojure</h1>
+      <div>
+
+
+<div class="article-tags">
+  
+  <a class="btn btn-primary btn-outline" href="/tags/clojure">clojure</a>
+  
+</div>
+
+
+</div>
+      
+
+<div class="article-metadata">
+
+  <span class="article-date">
+    
+    <time datetime="2019-10-22 21:34:42 &#43;0530 IST" itemprop="datePublished">
+      Tue, Oct 22, 2019
+    </time>
+  </span>
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    10 min read
+  </span>
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <a href="https://www.demystifyfp.com/clojure/marketplace-middleware/creating-cron-jobs-in-clojure/#disqus_thread"></a>
+  
+
+  
+
+  
+  
+<div class="share-box" aria-hidden="true">
+  <ul class="share">
+    <li>
+      <a class="twitter"
+         href="https://twitter.com/intent/tweet?text=Creating%20Cron%20Jobs%20in%20Clojure&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fcreating-cron-jobs-in-clojure%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-twitter"></i>
+      </a>
+    </li>
+    <li>
+      <a class="facebook"
+         href="https://www.facebook.com/sharer.php?u=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fcreating-cron-jobs-in-clojure%2f"
+         target="_blank" rel="noopener">
+        <i class="fa fa-facebook"></i>
+      </a>
+    </li>
+    <li>
+      <a class="linkedin"
+         href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fcreating-cron-jobs-in-clojure%2f&amp;title=Creating%20Cron%20Jobs%20in%20Clojure"
+         target="_blank" rel="noopener">
+        <i class="fa fa-linkedin"></i>
+      </a>
+    </li>
+    <li>
+      <a class="weibo"
+         href="http://service.weibo.com/share/share.php?url=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fcreating-cron-jobs-in-clojure%2f&amp;title=Creating%20Cron%20Jobs%20in%20Clojure"
+         target="_blank" rel="noopener">
+        <i class="fa fa-weibo"></i>
+      </a>
+    </li>
+    <li>
+      <a class="email"
+         href="mailto:?subject=Creating%20Cron%20Jobs%20in%20Clojure&amp;body=https%3a%2f%2fwww.demystifyfp.com%2fclojure%2fmarketplace-middleware%2fcreating-cron-jobs-in-clojure%2f">
+        <i class="fa fa-envelope"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+  
+
+</div>
+
+
+
+      <div class="article-style" itemprop="articleBody">
+        
+
+<p>In the <a href="/clojure/marketplace-middleware/ranging-items-in-marketplaces/" target="_blank">last blog post</a>, we processed the messages from IBM-MQ and relayed the information to the marketplace. In this blog post, we are going to focus on adding cron jobs to our existing infrastructure. The cron jobs pull the data from the marketplace, perform some transformation and send it to the Order Management System(OMS) via IBM-MQ.</p>
+
+<blockquote>
+<p>This blog post is a part 8 of the blog series <a href="/clojure/marketplace-middleware/intro/" target="_blank">Building an E-Commerce Marketplace Middleware in Clojure</a>.</p>
+</blockquote>
+
+<p>We will be following the <a href="https://www.destroyallsoftware.com/talks/boundaries" target="_blank">Functional Core, Imperative Shell</a> technique in this implementation as well by keeping the Cron job infrastructure at the application boundary.</p>
+
+<h2 id="leveraging-quartzite">Leveraging Quartzite</h2>
+
+<p>We are going to leverage <a href="http://clojurequartz.info/" target="_blank">Quartzite</a>, scheduling library for Clojure to create and run cron jobs in our project. Quartzite is a Clojure wrapper of Java&rsquo;s <a href="http://www.quartz-scheduler.org/" target="_blank">Quartz Job Scheduler</a>, one of the widely used and feature-rich open-source scheduling tools.</p>
+
+<h3 id="initializing-the-scheduler">Initializing the Scheduler</h3>
+
+<p>Let&rsquo;s get started by adding the dependency in the <em>project.clj</em></p>
+
+<pre><code class="language-clojure">(defproject wheel &quot;0.1.0-SNAPSHOT&quot;
+  ; ...
+  :dependencies [; ...
+                 [clojurewerkz/quartzite &quot;2.1.0&quot;]]
+  ; ...
+  )
+</code></pre>
+
+<p>Then create a new Clojure file <em>infra/cron/core.clj</em> to define a Mount state for the Quartz scheduler.</p>
+
+<pre><code class="language-bash">&gt; mkdir src/wheel/infra/cron
+&gt; touch src/wheel/infra/cron/core.clj
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/core.clj
+(ns wheel.infra.cron.core
+  (:require [clojurewerkz.quartzite.scheduler :as qs]
+            [mount.core :as mount]))
+
+(mount/defstate scheduler
+  :start (qs/start (qs/initialize))
+  :stop (qs/shutdown scheduler))
+</code></pre>
+
+<p>This Mount state <code>scheduler</code> takes care of starting the Quartz scheduler during application bootstrap and shutting it down while closing the application.</p>
+
+<h3 id="creating-job">Creating Job</h3>
+
+<p>The next step is to implement an abstraction that creates different kinds of Quartz <a href="https://www.quartz-scheduler.org/api/2.1.7/org/quartz/Job.html" target="_blank">Jobs</a> required for our application.</p>
+
+<pre><code class="language-bash">&gt; mkdir src/wheel/infra/cron/job
+&gt; touch src/wheel/infra/cron/job/core.clj
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/job/core.clj
+
+(ns wheel.infra.cron.job.core
+  (:require [clojurewerkz.quartzite.jobs :as qj]))
+
+(defmulti job-type :type)
+
+(defn- identifier [{:keys [channel-id type]}] 
+  (str channel-id &quot;/&quot; (name type)))
+
+(defn- create-job [channel-config cron-job-config] 
+  (qj/build
+   (qj/of-type (job-type cron-job-config))
+   (qj/using-job-data {:channel-config  channel-config
+                       :cron-job-config cron-job-config})
+   (qj/with-identity (qj/key (identifier cron-job-config)))))
+</code></pre>
+
+<p>The <code>create-job</code> function takes the configuration of a cron job and its associated channel&rsquo;s configuration as its parameters.</p>
+
+<p>It builds the Quartz&rsquo;s <code>Job</code> instance by getting the <code>JobType</code> using the multi-method <code>job-type</code>. While creating it passes the configuration parameters to the Job using the <a href="https://www.quartz-scheduler.org/api/2.1.7/org/quartz/JobDataMap.html" target="_blank">JobDataMap</a>.</p>
+
+<h3 id="creating-a-trigger">Creating A Trigger</h3>
+
+<p>The next functionality that we need is to have a function that produces a Quartz <a href="https://www.quartz-scheduler.org/api/2.1.7/org/quartz/Trigger.html" target="_blank">Trigger</a>. Triggers are the &lsquo;mechanism&rsquo; by which Jobs are scheduled.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/job/core.clj
+(ns wheel.infra.cron.job.core
+  (:require ;...
+            [clojurewerkz.quartzite.schedule.cron :as qsc]
+            [clojurewerkz.quartzite.triggers :as qt]))
+
+; ...
+(defn- create-trigger [{:keys [expression]
+                        :as   cron-job-config}]
+  (qt/build
+   (qt/with-identity (qt/key (identifier cron-job-config)))
+   (qt/with-schedule (qsc/schedule
+                      (qsc/cron-schedule expression)))))
+</code></pre>
+
+<p>The <code>expression</code> attribute in the <code>cron-job-config</code> holds the <a href="http://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html#crontrigger-tutorial" target="_blank">cron expression</a>. The <code>create-trigger</code> function uses it to create and associate a schedule with the trigger.</p>
+
+<h3 id="scheduling-jobs-for-execution">Scheduling Jobs For Execution</h3>
+
+<p>The final piece that we required is to have a function that takes a <code>cron-job-config</code> and schedule a Quartz Job for execution.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/job/core.clj
+(ns wheel.infra.cron.job.core
+  (:require ;...
+            [clojurewerkz.quartzite.scheduler :as qs]
+            [wheel.infra.config :as config]))
+
+; ...
+(defn schedule [scheduler {:keys [channel-id]
+                           :as   cron-job-config}]
+  (when-let [channel-config (config/get-channel-config channel-id)] ; &lt;1&gt;
+    (let [job     (create-job channel-config cron-job-config)
+          trigger (create-trigger cron-job-config)]
+      (qs/schedule scheduler job trigger)))) ; &lt;2&gt;
+</code></pre>
+
+<p>The final step is to get all the cron job configuration and scheduling it using this <code>schedule</code> function during the application bootstrap.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/core.clj
+(ns wheel.infra.cron.core
+  (:require ; ...
+            [wheel.infra.cron.job.core :as job]
+            [wheel.infra.config :as config]))
+; ...
+(defn init []
+  (for [cron-job-config (config/get-all-cron-jobs)]
+    (job/schedule scheduler cron-job-config)))
+</code></pre>
+
+<pre><code class="language-diff"># src/wheel/infra/core.clj
+
+(ns wheel.infra.core
+  (:require ...
++           [wheel.infra.cron.core :as cron]
+            ...))
+
+(defn start-app
+   ...
+-  (mount/start)))
++  (mount/start)
++  (cron/init)))    
+</code></pre>
+
+<h2 id="adding-cron-job-configuration">Adding Cron Job Configuration</h2>
+
+<p>The <code>config/get-all-cron-jobs</code> function in the above section is not a part of our application yet. So, let&rsquo;s fix it.</p>
+
+<pre><code class="language-clojure">; resources/config.edn
+{:app      {...
+ :settings {:oms       ...
+            :channels  ...
+            :cron-jobs [{:type       :allocate-order
+                         :channel-id &quot;UA&quot;
+                         :expression &quot;0 0/1 * 1/1 * ? *&quot;}]}}
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/infra/config.clj
+; ...
+(defn get-all-cron-jobs []
+  (get-in root [:settings :cron-jobs]))
+</code></pre>
+
+<blockquote>
+<p>NOTE: In the actual project, we stored the cron job configurations in the Postgres table with some additional attributes like <code>last-ran-at</code>, <code>next-run-at</code>. I am ignoring that here for brevity.</p>
+</blockquote>
+
+<h2 id="defining-allocate-order-job">Defining Allocate Order Job</h2>
+
+<p>One of the vital cron jobs of the middleware is allocating an order. It periodically polls for new orders on a marketplace channel and allocates them in the OMS if any.</p>
+
+<p>In this blog post, we are going to look at how we processed the new orders from Tata-CliQ. As we did it in the last blog post, we are going to use a fake implementation for their new orders API.</p>
+
+<p>As all the cron jobs are going to pull the channel and cron configuration information from the job context, which we set during during the job creation in the <code>create-job</code> function, and invoke a function in the channel, let&rsquo;s create a standard handle function.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/job/core.clj
+; ...
+(ns wheel.infra.cron.job.core
+  (:require ; ...
+            [clojurewerkz.quartzite.conversion :as qc]))
+
+(defn handle [channel-fn ctx]
+  (let [{:strs [channel-config cron-job-config]} (qc/from-job-data ctx)
+        {:keys [channel-id]}                     cron-job-config
+        {:keys [channel-name]}                   channel-config]
+      (channel-fn channel-id channel-config)))
+</code></pre>
+
+<p>Then use this <code>handle</code> function to define the <code>AllocateOrder</code> job.</p>
+
+<pre><code class="language-batch">&gt; touch src/wheel/infra/cron/job/allocate_order.clj
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/infra/cron/job/allocate_order.clj
+(ns wheel.infra.cron.job.allocate-order
+  (:require [wheel.infra.cron.job.core :as job]
+            [clojurewerkz.quartzite.jobs :as qj]
+            [wheel.marketplace.channel :as channel]))
+
+(qj/defjob AllocateOrderJob [ctx]
+  (job/handle channel/allocate-order ctx))
+
+(defmethod job/job-type :allocate-order [_]
+  AllocateOrderJob)
+</code></pre>
+
+<p>The higher-order function <code>channel/allocate-order</code> that we pass here to the <code>handle</code> function is a multi-method that takes care of the allocating order from different marketplace channels. It is also not defined yet. So, let&rsquo;s add it as well.</p>
+
+<pre><code class="language-clojure">; src/wheel/marketplace/channel.clj
+; ...
+
+(defmulti allocate-order (fn [channel-id channel-config]
+                           (:channel-name channel-config)))
+</code></pre>
+
+<h2 id="unified-order-data-model">Unified Order Data Model</h2>
+
+<p>The fake implementation of the tata-cliq&rsquo;s new orders API returns an XML response similar to this</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;Orders&gt;
+  &lt;Order&gt;
+    &lt;OrderNo&gt;181219-001-345786&lt;/OrderNo&gt;
+    &lt;AddressInfo&gt;
+      &lt;Shipping&gt;
+        &lt;FirstName&gt;Tamizhvendan&lt;/FirstName&gt;
+        &lt;LastName&gt;Sembiyan&lt;/LastName&gt;
+        &lt;Address1&gt;Plot No 222&lt;/Address1&gt;
+        &lt;Address2&gt;Ashok Nagar 42nd Street&lt;/Address2&gt;
+        &lt;City&gt;Chennai&lt;/City&gt;
+        &lt;State&gt;TamilNadu&lt;/State&gt;
+        &lt;Pincode&gt;600001&lt;/Pincode&gt;
+      &lt;/Shipping&gt;
+      &lt;Billing&gt;
+        &lt;FirstName&gt;Tamizhvendan&lt;/FirstName&gt;
+        &lt;LastName&gt;Sembiyan&lt;/LastName&gt;
+        &lt;Address1&gt;Plot No 222&lt;/Address1&gt;
+        &lt;Address2&gt;Ashok Nagar 42nd Street&lt;/Address2&gt;
+        &lt;City&gt;Chennai&lt;/City&gt;
+        &lt;State&gt;TamilNadu&lt;/State&gt;
+        &lt;Pincode&gt;600001&lt;/Pincode&gt;
+      &lt;/Billing&gt;
+    &lt;/AddressInfo&gt;
+    &lt;PaymentInfo&gt;
+      &lt;PaymentCost&gt;900.0&lt;/PaymentCost&gt;
+      &lt;PaymentId&gt;000000-1545216772601&lt;/PaymentId&gt;
+    &lt;/PaymentInfo&gt;
+    &lt;OrderLines&gt;
+      &lt;OrderLine&gt;
+        &lt;TransactionId&gt;200058001702351&lt;/TransactionId&gt;
+        &lt;ArticleNumber&gt;200374&lt;/ArticleNumber&gt;
+        &lt;Price&gt;900.0&lt;/Price&gt;
+      &lt;/OrderLine&gt;
+    &lt;/OrderLines&gt;
+  &lt;/Order&gt;
+&lt;/Orders&gt;
+</code></pre>
+
+<p>Our objective is to convert this into another XML format (like below) and send it to OMS via IBM-MQ.</p>
+
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
+&lt;Order OrderNo=&quot;181219-001-345786&quot;&gt;
+  &lt;PersonInfoBillTo City=&quot;Chennai&quot; FirstName=&quot;Tamizhvendan&quot; LastName=&quot;Sembiyan&quot; State=&quot;TamilNadu&quot; ZipCode=&quot;600001&quot;&gt;
+    &lt;Extn IRLAddressLine1=&quot;Plot No 222&quot; IRLAddressLine2=&quot;Ashok Nagar 42nd Street&quot; /&gt;
+  &lt;/PersonInfoBillTo&gt;
+  &lt;PersonInfoShipTo City=&quot;Chennai&quot; FirstName=&quot;Tamizhvendan&quot; LastName=&quot;Sembiyan&quot; State=&quot;TamilNadu&quot; ZipCode=&quot;600001&quot;&gt;
+    &lt;Extn IRLAddressLine1=&quot;Plot No 222&quot; IRLAddressLine2=&quot;Ashok Nagar 42nd Street&quot; /&gt;
+  &lt;/PersonInfoShipTo&gt;
+  &lt;PaymentDetailsList&gt;
+    &lt;PaymentDetails ProcessedAmount=&quot;900.0&quot; Reference1=&quot;000000-1545216772601&quot;/&gt;
+  &lt;/PaymentDetailsList&gt;
+  &lt;OrderLines&gt;
+    &lt;OrderLine&gt;
+      &lt;Item ItemID=&quot;200374&quot;/&gt;
+      &lt;LinePriceInfo LineTotal=&quot;900.0&quot;/&gt;
+    &lt;/OrderLine&gt;
+  &lt;/OrderLines&gt;
+&lt;/Order&gt;
+</code></pre>
+
+<p>To perform this, we are going to have a unified data model for representing an OMS order, and each marketplace has its logic to convert its data model into OMS&rsquo;s data model of the order.</p>
+
+<p>The standard data model would look like this for the above XML data.</p>
+
+<pre><code class="language-clojure">{:order-no &quot;181219-001-345786&quot;
+ :payments [{:amount 900 :reference-id &quot;000000-1545216772601&quot;}]
+ :order-lines [{:id &quot;200374&quot; :sale-price 900}]
+ :billing-address {:first-name &quot;Tamizhvendan&quot;
+                   :last-name &quot;Sembiyan&quot;
+                   :line1 &quot;Plot No 222&quot;
+                   :line2 &quot;Ashok Nagar 42nd Street&quot;
+                   :city &quot;Chennai&quot;
+                   :state &quot;TamilNadu&quot;
+                   :pincode 600001}
+ :shipping-address {:first-name &quot;Tamizhvendan&quot;
+                    :last-name &quot;Sembiyan&quot;
+                    :line1 &quot;Plot No 222&quot;
+                    :line2 &quot;Ashok Nagar 42nd Street&quot;
+                    :city &quot;Chennai&quot;
+                    :state &quot;TamilNadu&quot;
+                    :pincode 600001}}
+</code></pre>
+
+<p>As a first step let&rsquo;s define a spec for this</p>
+
+<pre><code class="language-batch">&gt; touch src/wheel/string.clj
+&gt; touch src/wheel/oms/address.clj
+&gt; touch src/wheel/oms/payment.clj
+&gt; touch src/wheel/oms/order_line.clj
+&gt; touch src/wheel/oms/order.clj
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/string.clj
+(ns wheel.string
+  (:require [clojure.string :as str]))
+
+(defn not-blank? [s]
+  (and (string? s) (not (str/blank? s))))
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/oms/address.clj
+(ns wheel.oms.address
+  (:require [clojure.spec.alpha :as s]
+            [wheel.string :as w-str]))
+
+(s/def ::first-name w-str/not-blank?)
+(s/def ::last-name w-str/not-blank?)
+(s/def ::line1 w-str/not-blank?)
+(s/def ::line2 w-str/not-blank?)
+(s/def ::city w-str/not-blank?)
+(s/def ::state w-str/not-blank?)
+(s/def ::pincode (s/int-in 110001 855118))
+
+(s/def ::address (s/keys :req-un [::first-name ::line1 ::city ::state ::pincode]
+                          :opt-un [::last-name ::line2]))
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/oms/payment.clj
+(ns wheel.oms.payment
+  (:require [clojure.spec.alpha :as s]
+            [wheel.string :as w-str]))
+
+(s/def ::amount (s/and decimal? pos?))
+(s/def ::reference-id w-str/not-blank?)
+
+(s/def ::payment (s/keys :req-un [::amount ::reference-id]))
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/oms/order_line.clj
+(ns wheel.oms.order-line
+  (:require [wheel.oms.item :as item]
+            [clojure.spec.alpha :as s]))
+
+(s/def ::sale-price (s/and decimal? pos?))
+
+(s/def ::order-line (s/keys :req-un [::item/id ::sale-price]))
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/oms/order.clj
+(ns wheel.oms.order
+  (:require [clojure.spec.alpha :as s]
+            [wheel.oms.address :as addr]
+            [wheel.oms.payment :as payment]
+            [wheel.oms.order-line :as order-line]
+            [wheel.string :as w-str]))
+
+(s/def ::order-no w-str/not-blank?)
+(s/def ::payments 
+  (s/coll-of ::payment/payment :min-count 1))
+(s/def ::order-lines 
+  (s/coll-of ::order-line/order-line :min-count 1))
+(s/def ::billing-address ::addr/address)
+(s/def ::shipping-address ::addr/address)
+(s/def ::order 
+  (s/keys :req-un [::order-no ::shipping-address 
+                   ::billing-address ::payments
+                   ::order-lines]))
+</code></pre>
+
+<p>The next step is to add a function that takes an order that conforms to the above spec and transforms it into its XML version.</p>
+
+<p>We are going to make use of <a href="https://github.com/clojure/data.xml" target="_blank">data.xml</a> library that allows the dynamic creation of XML content from Clojure data structures via <a href="https://github.com/weavejester/hiccup" target="_blank">Hiccup-like</a> style.</p>
+
+<pre><code class="language-clojure">; project.clj
+(defproject wheel &quot;0.1.0-SNAPSHOT&quot;
+  ; ...
+  :dependencies [; ...
+                 [org.clojure/data.xml &quot;0.0.8&quot;]]
+  ; ...
+  )
+
+```clojure
+; src/wheel/oms/order.clj
+(ns wheel.oms.order
+  (:require ; ...
+            [clojure.data.xml :as xml]))
+; ...
+(defn address-to-xml [{:keys [first-name last-name line1
+                              line2 city state pincode]}]
+  {:attrs {:FirstName first-name
+           :LastName last-name
+           :State state
+           :City city
+           :Pincode pincode}
+   :ext [:Extn {:IRLAddressLine1 line1
+                :IRLAddressLine2 line2}]})
+
+(defn to-xml [order]
+  {:pre [(s/assert ::order order)]}
+  (let [{:keys [order-no billing-address order-lines 
+                shipping-address payments]} order
+        {bill-to-attrs :attrs
+         bill-to-ext :ext} (address-to-xml billing-address)
+        {ship-to-attrs :attrs
+         ship-to-ext :ext} (address-to-xml shipping-address)]
+    (-&gt; [:Order {:OrderNo order-no}
+         [:PersonInfoBillTo bill-to-attrs bill-to-ext]
+         [:PersonInfoShipTo ship-to-attrs ship-to-ext]
+         [:PaymentDetailsList 
+          (map (fn [{:keys [amount reference-id]}]
+                 [:PaymentDetails {:ProcessedAmount amount
+                                   :Reference1 reference-id}]) payments)]
+         [:OrderLines
+          (map (fn [{:keys [id sale-price]}]
+                 [:OrderLine 
+                  [:Item {:ItemID id}]
+                  [:LinePriceInfo {:LineTotal sale-price}]])
+               order-lines)]]
+        xml/sexp-as-element
+        xml/indent-str)))
+</code></pre>
+
+<h2 id="sending-message-to-oms-via-ibm-mq">Sending Message to OMS via IBM-MQ</h2>
+
+<p>The next step is sending the transformed order information to IBM-MQ. To enable it, let&rsquo;s add a <a href="https://docs.oracle.com/javaee/7/api/javax/jms/MessageProducer.html" target="_blank">JMS producer</a> for order allocation in <em>infra/oms.clj</em>.</p>
+
+<pre><code class="language-clojure">; src/wheel/infra/oms.clj
+
+(mount/defstate order-allocating-session
+  :start (.createSession ibmmq/jms-conn false Session/AUTO_ACKNOWLEDGE)
+  :stop (stop order-allocating-session))
+
+(mount/defstate order-allocating-producer
+  :start (let [queue-name       (:order-allocating-queue-name (config/oms-settings))
+               ibmmq-queue-name (str &quot;queue:///&quot; queue-name)
+               destination      (.createQueue order-allocating-session ibmmq-queue-name)]
+           (.createProducer order-allocating-session destination))
+  :stop (stop order-allocating-producer))
+</code></pre>
+
+<p>Then define an OMS client that abstracts the communication to OMS.</p>
+
+<pre><code class="language-clojure">&gt; touch src/wheel/oms/client.clj
+</code></pre>
+
+<pre><code class="language-clojure">(ns wheel.oms.client
+  (:require [wheel.oms.order :as oms-order]
+            [wheel.infra.oms :as oms-infra]
+            [clojure.spec.alpha :as s]))
+
+(defn- send [session producer xml-message]
+  (let [msg (.createTextMessage session)]
+    (.setText msg xml-message)
+    (.send producer msg)))
+
+(defn allocate-order [order]
+  {:pre [(s/assert ::oms-order/order order)]}
+  (send oms-infra/order-allocating-session
+        oms-infra/order-allocating-producer
+        (oms-order/to-xml order)))
+</code></pre>
+
+<h2 id="adding-new-orders-api">Adding New Orders API</h2>
+
+<p>Let&rsquo;s switch our attention to the Tata-CliQ API side that is going to fetch the new orders from their site for the given channel id. The <a href="https://mockoon.com" target="_blank">Mockon</a> configuration for the fake server is available in <a href="https://gist.github.com/tamizhvendan/4544f0123bd30681be1c5198ed87522c#file-mockon-json" target="_blank">this gist</a>.</p>
+
+<pre><code class="language-clojure">; src/wheel/marketplace/tata_cliq/api.clj
+(ns wheel.marketplace.tata-cliq.api
+  (:require ; ...
+            [wheel.marketplace.tata-cliq.order :as tata-cliq-order])
+; ...
+
+(defn new-orders [{:keys [base-url bearer-token]} channel-id]
+  (let [url         (str base-url &quot;/channels/&quot; channel-id &quot;/new-orders&quot;)
+        auth-header (str &quot;Bearer &quot; bearer-token)]
+    (-&gt; (http/get url {:headers {:authorization auth-header}})
+        :body
+        tata-cliq-order/parse-new-orders)))
+</code></pre>
+
+<p>The <code>tata-cliq-order/parse-new-orders</code> function takes an XML response and transforms it into a tata-cliq&rsquo;s order data model.</p>
+
+<blockquote>
+<p>As it is so domain-specific, I am not going to share it here and you can refer to <a href="https://github.com/demystifyfp/BlogSamples/blob/0.20/clojure/wheel/src/wheel/marketplace/tata_cliq/order.clj" target="_blank">this implementation</a>. This implementation uses a custom <a href="https://github.com/demystifyfp/BlogSamples/blob/0.20/clojure/wheel/src/wheel/xml.clj" target="_blank">XML to Clojure map</a> conversion implementation</p>
+</blockquote>
+
+<pre><code class="language-clojure">; src/wheel/marketplace/tata_cliq/order.clj
+(ns wheel.marketplace.tata-cliq.order
+  (:require ; ...
+            ))
+
+(defn parse-new-orders [xml-response]
+  ; ... 
+  )
+
+(defn to-oms-order [tata-cliq-order]
+  ; ... 
+  )
+</code></pre>
+
+<p>As the name indicates the <code>to-oms-order</code> function takes a tata-cliq&rsquo;s order and transforms it to OMS&rsquo;s order representation.</p>
+
+<h2 id="wiring-up-with-the-cron-job">Wiring Up With The Cron Job</h2>
+
+<p>The final piece is wiring up the allocate order cron job for the Tata-Cliq API. It fetches the new orders, tranforms each order to its corresponding OMS representation and allocates them in the OMS.</p>
+
+<pre><code class="language-clojure">(ns wheel.marketplace.tata-cliq.core
+  (:require ; ...
+            [wheel.marketplace.tata-cliq.order :as tata-cliq-order]
+            [wheel.oms.client :as oms]
+            [wheel.marketplace.channel :as channel])
+; ...
+(defmethod channel/allocate-order :tata-cliq 
+  [channel-id channel-config]
+  (-&gt;&gt; (tata-cliq/new-orders channel-config channel-id)
+       (map tata-cliq-order/to-oms-order)
+       (run! oms/allocate-order)))
+</code></pre>
+
+<h2 id="logging-cron-activities">Logging Cron Activities.</h2>
+
+<p>Thanks to our existing logging infrastructure, logging cron job started and failed information would be easy to add.</p>
+
+<pre><code class="language-diff"># src/wheel/infra/cron/job/core.clj
+# ...
+(ns wheel.infra.cron.job.core
+  (:require # ...
++           [wheel.middleware.event :as event]  
+            ))
+
+(defn handle [channel-fn ctx]
+  (let [ # ...
++        cron-started-event (event/cron type channel-id channel-name) 
+         # ...]
+-    (channel-fn channel-id channel-config))
++    (try
++       (channel-fn channel-id channel-config)
++       (log/write! cron-started-event)
++       (catch Throwable ex
++         (log/write-all! [cron-started-event
++                          (event/cron type channel-id channel-name ex)]))))
+</code></pre>
+
+<pre><code class="language-clojure">; src/wheel/middleware/event.clj
+; ...
+(s/def ::system-event-name #{; ...
+                             :system.cron/started
+                             :system.cron/failed})
+
+(s/def ::job-type #{:allocate-order})
+; ...
+(defmethod payload-type :system.cron/started [_]
+  (s/keys :req-un [::job-type]))
+
+(defmethod payload-type :system.cron/failed [_]
+  (s/keys :req-un [::job-type ::error-message ::stacktrace]))
+
+(defn cron 
+  ([job-type channel-id channel-name]
+   (event :system.cron/started {:job-type job-type}
+          :channel-id channel-id
+          :channel-name channel-name
+          :type :system
+          :level :info))
+  ([job-type channel-id channel-name ex]
+   (event :system.cron/failed
+          (assoc (ex-&gt;map ex) :job-type job-type)
+          :channel-id channel-id
+          :channel-name channel-name
+          :type :system
+          :level :error)))
+</code></pre>
+
+<p>If we stop the fake API server for a moment, we will get the cron-job notification in the slack when the cron job got triggered.</p>
+
+<p><img src="/img/clojure/blog/ecom-middleware/cron-job-failed-notification.png" alt="" /></p>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this blog post, we learnt how to implement cron jobs in Clojure. With this, we are wrapping up the business requirement implementations of the sample app, Wheel. In the upcoming blog posts, I&rsquo;ll be touching upon how we went with the testing and also reflecting on the design of the overall design of the system.</p>
+
+<p>The source code associated with this part is available on <a href="https://github.com/demystifyfp/BlogSamples/tree/0.20/clojure/wheel" target="_blank">this GitHub</a> repository.</p>
+
+      </div>
+
+    </div>
+  </div>
+
+
+  </div>
+
+
+</article>
+
+
+
+
+
+<div class="article-container article-widget">
+  <div class="hr-light"></div>
+  <h3>Related</h3>
+  <ul>
+    
+    <li><a href="/clojure/marketplace-middleware/ranging-items-in-marketplaces/">Ranging Items In E-Commerce Marketplaces</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/processing-messages-from-ibmmq-in-clojure/">Processing Messages From IBM-MQ in Clojure</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/using-slack-as-log-appender/">Using Slack as Log Appender</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/storing-log-events-in-postgres-using-toucan/">Storing Log Events in Postgres Using Toucan</a></li>
+    
+    <li><a href="/clojure/marketplace-middleware/configuring-logging-using-timbre/">Configuring Logging Using Timbre</a></li>
+    
+  </ul>
+</div>
+
+
+
+
+<div class="article-container">
+  
+<section id="comments">
+  <div id="disqus_thread"></div>
+<script type="application/javascript">
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "demystifyfp" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+</section>
+
+
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p class="powered-by">
+
+      &copy; 2017 Demystify FP &middot; 
+
+      Powered by the
+      <a href="https://sourcethemes.com/academic/" target="_blank" rel="noopener">Academic theme</a> for
+      <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a>.
+
+      <span class="pull-right" aria-hidden="true">
+        <a href="#" id="back_to_top">
+          <span class="button_icon">
+            <i class="fa fa-chevron-up fa-2x"></i>
+          </span>
+        </a>
+      </span>
+
+    </p>
+  </div>
+</footer>
+
+
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close btn-large" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Cite</h4>
+      </div>
+      <div>
+        <pre><code class="modal-body tex"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary btn-outline js-copy-cite" href="#" target="_blank">
+          <i class="fa fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-primary btn-outline js-download-cite" href="#" target="_blank">
+          <i class="fa fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+    
+    <script id="dsq-count-scr" src="//demystifyfp.disqus.com/count.js" async></script>
+    
+
+    
+
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js" integrity="sha512-3P8rXCuGJdNZOnUx/03c1jOTnMn3rP63nBip5gOP2qmUh5YAdVAvFZ1E+QLZZbC1rtMrQb+mah3AfYW11RUrWA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.3/imagesloaded.pkgd.min.js" integrity="sha512-umsR78NN0D23AzgoZ11K7raBD+R6hqKojyBZs1w8WvYlsI+QuKRGBx3LFCwhatzBunCjDuJpDHwxD13sLMbpRA==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha512-iztkobsvnjKfAtTNdHkGVjAYTrrtlC7mGp/54c40wowO7LhURYl3gVzzcEqGl/qKXQltJ2HwMrdLcNUdo+N/RQ==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.4/isotope.pkgd.min.js" integrity="sha512-VDBOIlDbuC4VWxGJNmuFRQ0Li0SKkDpmGyuhAG5LTDLd/dJ/S0WMVxriR2Y+CyPL5gzjpN4f/6iqWVBJlht0tQ==" crossorigin="anonymous"></script>
+    
+    
+    <script src="/js/hugo-academic.js"></script>
+    
+    <script src="/js/custom.js"></script>
+    
+
+    
+    
+
+    
+    
+
+  </body>
+</html>
